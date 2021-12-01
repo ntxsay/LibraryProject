@@ -21,10 +21,32 @@
             <MUIXC:NavigationView.MenuItems>
                 <MUIXC:NavigationViewItem Content="Rechercher">
                     <MUIXC:NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xe721;"/>
+                    </MUIXC:NavigationViewItem.Icon>
+                </MUIXC:NavigationViewItem>
+                <MUIXC:NavigationViewItem Content="Bibliothèques" ToolTipService.ToolTip="Crée la fiche d'un animé" Tag="proposeGenre">
+                    <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8F1;"/>
                     </MUIXC:NavigationViewItem.Icon>
                 </MUIXC:NavigationViewItem>
+                <MUIXC:NavigationViewItem Content="Ajouter un élément" ToolTipService.ToolTip="Crée la fiche d'un animé" Tag="themeCollection">
+                    <MUIXC:NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xe710;"/>
+                    </MUIXC:NavigationViewItem.Icon>
+                </MUIXC:NavigationViewItem>
             </MUIXC:NavigationView.MenuItems>
+            <MUIXC:NavigationView.FooterMenuItems>
+                <MUIXC:NavigationViewItem Content="Paramètres" Tag="Settings">
+                    <MUIXC:NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE713;"/>
+                    </MUIXC:NavigationViewItem.Icon>
+                </MUIXC:NavigationViewItem>
+                <MUIXC:NavigationViewItem Content="À Propos" Tag="About">
+                    <MUIXC:NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE946;"/>
+                    </MUIXC:NavigationViewItem.Icon>
+                </MUIXC:NavigationViewItem>
+            </MUIXC:NavigationView.FooterMenuItems>
             <MUIXC:NavigationView.Content>
                 <Frame x:Name="MainFrameContainer">
                     
