@@ -6,10 +6,51 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+    Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
+    <!--Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"-->
+    <Page.Resources>
+        <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+        <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+    </Page.Resources>
     <Grid>
+        <MUIXC:NavigationView x:Name="PrincipalNaviguation" PaneDisplayMode="LeftMinimal" IsTitleBarAutoPaddingEnabled="False" IsSettingsVisible="False" IsBackEnabled="True"
+                              ItemInvoked="PrincipalNaviguation_ItemInvoked" BackRequested="PrincipalNaviguation_BackRequested">
+            <MUIXC:NavigationView.MenuItems>
+                <MUIXC:NavigationViewItem Content="Rechercher">
+                    <MUIXC:NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8F1;"/>
+                    </MUIXC:NavigationViewItem.Icon>
+                </MUIXC:NavigationViewItem>
+            </MUIXC:NavigationView.MenuItems>
+            <MUIXC:NavigationView.Content>
+                <Frame x:Name="MainFrameContainer">
+                    
+                </Frame>
+            </MUIXC:NavigationView.Content>
+        </MUIXC:NavigationView>
+        <Grid x:Name="CustomDragRegion" x:FieldModifier="Public" Margin="46 0 146 0" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="AppTitleBar" Background="Transparent" Margin="40 0 0 0">
+                <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
+                <!-- Using padding columns instead of Margin ensures that the background paints the area under the caption control buttons (for transparent buttons). -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="LeftPaddingColumn" Width="0"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Grid.Column="1" Spacing="8" Visibility="{x:Bind PrincipalNaviguation.IsPaneOpen, Mode=OneWay, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+                    <Image Source="Assets/Square44x44Logo.png"  HorizontalAlignment="Left" Width="20" Height="20"/>
+                    <TextBlock Text="Projet LNA" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="1" Background="Transparent"/>
+        </Grid>
 
     </Grid>
 </Page>
