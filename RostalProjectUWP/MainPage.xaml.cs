@@ -1,10 +1,16 @@
-﻿using RostalProjectUWP.Code.Helpers;
+﻿using RostalProjectUWP.Code;
+using RostalProjectUWP.Code.Helpers;
 using RostalProjectUWP.ViewModels;
+using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.Views;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
@@ -18,6 +24,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -29,9 +36,11 @@ namespace RostalProjectUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        public MainPageViewModel ViewModelPage { get; set; }
         public MainPage()
         {
             this.InitializeComponent();
+            ViewModelPage = new MainPageViewModel(this);
             this.TitleBarCustomization();
         }
 
@@ -103,7 +112,7 @@ namespace RostalProjectUWP
 
         #region Navigation
         public Microsoft.UI.Xaml.Controls.NavigationViewItem _lastItemMUCX;
-        private void PrincipalNaviguation_ItemInvoked(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewItemInvokedEventArgs args)
+        private async void PrincipalNaviguation_ItemInvoked(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewItemInvokedEventArgs args)
         {
             try
             {
@@ -115,7 +124,7 @@ namespace RostalProjectUWP
 
                 if (item.Tag != null && item.Tag.ToString() != "animesParentItem")
                 {
-                    NavigateToView(item.Tag.ToString(), item);
+                    await NavigateToViewAsync(item.Tag.ToString(), item);
                 }
             }
             catch (Exception)
@@ -125,7 +134,7 @@ namespace RostalProjectUWP
             }
         }
 
-        private async void NavigateToView(string itemTag, Microsoft.UI.Xaml.Controls.NavigationViewItem item = null)
+        private async Task NavigateToViewAsync(string itemTag, Microsoft.UI.Xaml.Controls.NavigationViewItem item = null)
         {
             try
             {
@@ -150,36 +159,92 @@ namespace RostalProjectUWP
 
         private void PrincipalNaviguation_BackRequested(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewBackRequestedEventArgs args)
         {
+            this.GoToBack();
+        }
+
+        public bool NavigateToView(string clickedView, object parameters)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                Type view = Assembly.GetExecutingAssembly().GetType($"RostalProjectUWP.Views.{clickedView}");
 
+                if (string.IsNullOrWhiteSpace(clickedView) || view == null)
+                {
+                    return false;
+                }
+
+                bool isSuccess = this.MainFrameContainer.Navigate(view, parameters, new EntranceNavigationTransitionInfo());
+                CheckBackArrowVisibility();
+                return isSuccess;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return false;
+            }
+        }
 
-                throw;
+        public void CheckBackArrowVisibility()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.ViewModelPage.IsBackArrowVisible = this.MainFrameContainer.CanGoBack
+                    ? Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible.Visible
+                    : Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
+            }
+        }
+
+        public void GoToBack()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.MainFrameContainer.CanGoBack)
+                {
+                    this.MainFrameContainer.GoBack();
+                }
+
+                CheckBackArrowVisibility();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
             }
         }
         #endregion
         #region Navigation-Method
+
         private async Task AddElementNavigationAsync()
         {
             try
             {
-                var dialog = new NewElementCD();
+                ManagePage managePage = ManagePage.Book;
+                var dialog = new NewElementCD(managePage);
 
                 var result = await dialog.ShowAsync();
                 if (result == ContentDialogResult.Primary)
                 {
-                    //return new OperationStateVM()
-                    //{
-                    //    IsSuccess = true,
-                    //    Result = viewModel,
-                    //};
+                    ManageBookParametersVM manageBookParameters = new ManageBookParametersVM()
+                    {
+                        EditMode = EditMode.Create,
+                        ViewModel = new LivreVM()
+                        {
+
+                        },
+                    };
+                    OpenManageBookPage(manageBookParameters);
                 }
                 else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                 {
-                    
+                    return;
                 }
             }
             catch (Exception)
@@ -188,6 +253,126 @@ namespace RostalProjectUWP
                 throw;
             }
         }
+
+        public bool OpenManageBookPage(ManageBookParametersVM manageBookParameters)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (manageBookParameters == null || manageBookParameters.ViewModel == null)
+                {
+                    Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : Le ViewModel est null.");
+                    return false;
+                }
+
+                return NavigateToView("ManageContainerPage", manageBookParameters);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return false;
+            }
+        }
+
+        //public bool OpenCollection(IEnumerable<AnimeVM> viewModelList)
+        //{
+        //    MethodBase m = MethodBase.GetCurrentMethod();
+        //    try
+        //    {
+        //        if (viewModelList == null)
+        //        {
+        //            Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : Le ViewModel est null.");
+        //            return false;
+        //        }
+
+        //        #region Header
+        //        Run runTitle = new Run()
+        //        {
+        //            Text = "Les animes",
+        //            FontWeight = FontWeights.Medium,
+        //        };
+
+        //        TextBlock header = new TextBlock();
+        //        header.Inlines.Add(runTitle);
+        //        #endregion
+
+        //        object settingViewDisplay = settingsServices.GetSetting(SettingsServices.Names.Display.ViewDisplayMode);
+        //        if (settingViewDisplay is string stringDisplayMode)
+        //        {
+        //            _displayViewModeUI.UpdateWindowTitle(settingsServices);
+        //            if (stringDisplayMode == SettingsServices.Values.Display.OnePageView)
+        //            {
+        //                MainPage mainPage = GetMainPage;
+        //                if (mainPage == null)
+        //                {
+        //                    Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : mainPage est null.");
+        //                    return false;
+        //                }
+        //                return _navigationUI.NavigateToView(NavigationUI.Path.Anime.AnimeList, viewModelList);
+        //            }
+        //            else if (stringDisplayMode == SettingsServices.Values.Display.TabView)
+        //            {
+        //                TabsUI tabs = new TabsUI("anime-local-collection", header, new AnimeCollectionPage(viewModelList),
+        //                    new Microsoft.UI.Xaml.Controls.SymbolIconSource()
+        //                    {
+        //                        Symbol = Symbol.List
+        //                    }, true);
+        //                tabs.OpenTab();
+        //                return true;
+        //            }
+        //        }
+
+        //        return false;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+        //        return false;
+        //    }
+        //}
         #endregion
+    }
+
+    public class MainPageViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        private readonly MainPage _mainPage;
+        public MainPageViewModel()
+        {
+
+        }
+
+        public MainPageViewModel(MainPage mainPage)
+        {
+            _mainPage = mainPage;
+        }
+
+
+        //public string AnimeList => NavigationUI.Path.Anime.AnimeList;
+        //public string AnimeNew => NavigationUI.Path.Anime.NewAnime;
+        //public string AnimeDashBoard => NavigationUI.Path.Anime.DashBoard;
+
+
+
+        private Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible _IsBackArrowVisible;
+        public Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible IsBackArrowVisible
+        {
+            get => _IsBackArrowVisible;
+            set
+            {
+                if (_IsBackArrowVisible != value)
+                {
+                    _IsBackArrowVisible = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

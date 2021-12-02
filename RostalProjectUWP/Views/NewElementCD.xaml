@@ -30,7 +30,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Quel type d'élément souhaitez-vous ajouter ?" TextWrapping="Wrap"/>
-        <ListView Grid.Row="1">
+        <ListView Grid.Row="1" SelectionMode="Single" SelectionChanged="ListView_SelectionChanged">
             <ListViewItem>
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe8f1;"/>

@@ -16,7 +16,7 @@
         <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
     </Page.Resources>
     <Grid>
-        <MUIXC:NavigationView x:Name="PrincipalNaviguation" PaneDisplayMode="LeftMinimal" IsTitleBarAutoPaddingEnabled="False" IsSettingsVisible="False" IsBackEnabled="True"
+        <MUIXC:NavigationView x:Name="PrincipalNaviguation" PaneDisplayMode="LeftMinimal" IsTitleBarAutoPaddingEnabled="False" IsSettingsVisible="False" IsBackEnabled="True" IsBackButtonVisible="{x:Bind ViewModelPage.IsBackArrowVisible, Mode=OneWay}"
                               ItemInvoked="PrincipalNaviguation_ItemInvoked" BackRequested="PrincipalNaviguation_BackRequested">
             <MUIXC:NavigationView.MenuItems>
                 <MUIXC:NavigationViewItem Content="Rechercher">

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RostalProjectUWP.Code;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,9 +20,47 @@ namespace RostalProjectUWP.Views
 {
     public sealed partial class NewElementCD : ContentDialog
     {
+        private ManagePage ManagePage { get; set; }
         public NewElementCD()
         {
             this.InitializeComponent();
+        }
+
+        public NewElementCD(ManagePage managePage)
+        {
+            this.InitializeComponent();
+            ManagePage = managePage;
+        }
+
+        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is ListView listView)
+                {
+                    if (listView.SelectedIndex == -1)
+                    {
+                        ManagePage = ManagePage.None;
+                    }
+                    else if (listView.SelectedIndex == 0)
+                    {
+                        ManagePage = ManagePage.Library;
+                    }
+                    else if (listView.SelectedIndex == 1)
+                    {
+                        ManagePage = ManagePage.Book;
+                    }
+                    else if (listView.SelectedIndex == 2)
+                    {
+                        ManagePage = ManagePage.Contacts;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -31,5 +70,7 @@ namespace RostalProjectUWP.Views
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
         }
+
+        
     }
 }

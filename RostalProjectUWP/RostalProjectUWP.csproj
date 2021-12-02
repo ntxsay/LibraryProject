@@ -119,6 +119,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Code\Enums.cs" />
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -127,8 +128,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\ContactVM.cs" />
+    <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\LivreVM.cs" />
-    <Compile Include="ViewModels\OperationStateVM.cs" />
+    <Compile Include="ViewModels\General\OperationStateVM.cs" />
     <Compile Include="Views\ManageContainerPage.xaml.cs">
       <DependentUpon>ManageContainerPage.xaml</DependentUpon>
     </Compile>
