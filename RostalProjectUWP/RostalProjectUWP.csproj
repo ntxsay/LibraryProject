@@ -128,6 +128,13 @@
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\ContactVM.cs" />
     <Compile Include="ViewModels\LivreVM.cs" />
+    <Compile Include="ViewModels\OperationStateVM.cs" />
+    <Compile Include="Views\ManageContainerPage.xaml.cs">
+      <DependentUpon>ManageContainerPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NewElementCD.xaml.cs">
+      <DependentUpon>NewElementCD.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -135,6 +142,7 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Backgrounds\polynesia-3021072.jpg" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -153,6 +161,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\ManageContainerPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NewElementCD.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
@@ -168,9 +184,7 @@
       <Version>2.7.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

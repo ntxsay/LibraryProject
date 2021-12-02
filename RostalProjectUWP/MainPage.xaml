@@ -24,17 +24,17 @@
                         <FontIcon Glyph="&#xe721;"/>
                     </MUIXC:NavigationViewItem.Icon>
                 </MUIXC:NavigationViewItem>
-                <MUIXC:NavigationViewItem Content="Ajouter un élément" ToolTipService.ToolTip="Crée la fiche d'un animé" Tag="themeCollection">
+                <MUIXC:NavigationViewItem Content="Nouvel élément" ToolTipService.ToolTip="Crée ou importe un élément" Tag="AddNewElement">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xe710;"/>
                     </MUIXC:NavigationViewItem.Icon>
                 </MUIXC:NavigationViewItem>
-                <MUIXC:NavigationViewItem Content="Bibliothèques" ToolTipService.ToolTip="Crée la fiche d'un animé" Tag="proposeGenre">
+                <MUIXC:NavigationViewItem Content="Bibliothèques" ToolTipService.ToolTip="Affiche la liste des bibliothèques de disponible" Tag="proposeGenre">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8F1;"/>
                     </MUIXC:NavigationViewItem.Icon>
                 </MUIXC:NavigationViewItem>
-                <MUIXC:NavigationViewItem Content="Emprunteurs" ToolTipService.ToolTip="Crée la fiche d'un animé" Tag="proposeGenre">
+                <MUIXC:NavigationViewItem Content="Emprunteurs" ToolTipService.ToolTip="Affiche la liste des contacts emprunteurs" Tag="proposeGenre">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xe779;"/>
                     </MUIXC:NavigationViewItem.Icon>

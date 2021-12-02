@@ -1,4 +1,6 @@
 ﻿using RostalProjectUWP.Code.Helpers;
+using RostalProjectUWP.ViewModels;
+using RostalProjectUWP.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -123,7 +125,7 @@ namespace RostalProjectUWP
             }
         }
 
-        private void NavigateToView(string itemTag, Microsoft.UI.Xaml.Controls.NavigationViewItem item = null)
+        private async void NavigateToView(string itemTag, Microsoft.UI.Xaml.Controls.NavigationViewItem item = null)
         {
             try
             {
@@ -132,9 +134,9 @@ namespace RostalProjectUWP
                     return;
                 }
 
-                if (itemTag == "proposeGenre")
+                if (itemTag == "AddNewElement")
                 {
-                    //
+                    await AddElementNavigationAsync();
                 }
                 
             }
@@ -157,7 +159,35 @@ namespace RostalProjectUWP
 
                 throw;
             }
-        } 
+        }
+        #endregion
+        #region Navigation-Method
+        private async Task AddElementNavigationAsync()
+        {
+            try
+            {
+                var dialog = new NewElementCD();
+
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    //return new OperationStateVM()
+                    //{
+                    //    IsSuccess = true,
+                    //    Result = viewModel,
+                    //};
+                }
+                else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                {
+                    
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         #endregion
     }
 }

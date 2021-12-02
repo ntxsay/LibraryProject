@@ -1,0 +1,54 @@
+﻿<ContentDialog
+    x:Class="RostalProjectUWP.Views.NewElementCD"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RostalProjectUWP.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Ajouter un élément"
+    x:Name="_dialog"
+    PrimaryButtonText="Créer"
+    SecondaryButtonText="Importer"
+    CloseButtonText="Annuler"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+    <ContentDialog.TitleTemplate>
+        <DataTemplate>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC8;" FontSize="24"/>
+                <TextBlock Text="{Binding  ElementName=_dialog, Path=Title}"/>
+            </StackPanel>
+        </DataTemplate>
+    </ContentDialog.TitleTemplate>
+    <ContentDialog.CornerRadius>
+        <CornerRadius>8</CornerRadius>
+    </ContentDialog.CornerRadius>
+    <Grid RowSpacing="8" Margin="0 8 0 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Quel type d'élément souhaitez-vous ajouter ?" TextWrapping="Wrap"/>
+        <ListView Grid.Row="1">
+            <ListViewItem>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe8f1;"/>
+                    <TextBlock Text="Bibliothèque"/>
+                </StackPanel>
+            </ListViewItem>
+            <ListViewItem>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
+                    <TextBlock Text="Livre"/>
+                </StackPanel>
+            </ListViewItem>
+            <ListViewItem>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                    <TextBlock Text="Contact emprunteur"/>
+                </StackPanel>
+            </ListViewItem>
+        </ListView>
+    </Grid>
+</ContentDialog>
