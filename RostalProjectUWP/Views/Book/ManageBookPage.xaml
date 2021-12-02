@@ -1,0 +1,30 @@
+﻿<Page
+    x:Class="RostalProjectUWP.Views.Book.ManageBookPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RostalProjectUWP.Views.Book"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    Background="Transparent"
+    NavigationCacheMode="Disabled">
+    <Page.Resources>
+        <ThemeShadow x:Name="BackgroundGridShadow"/>
+    </Page.Resources>
+    <Grid Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32"
+                    Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
+        <Grid.CornerRadius>
+            <CornerRadius>8</CornerRadius>
+        </Grid.CornerRadius>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+    </Grid>
+</Page>
