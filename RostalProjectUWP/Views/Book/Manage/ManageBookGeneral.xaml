@@ -127,7 +127,7 @@
                                          PlaceholderText="Système de cotation" VerticalAlignment="Top" FontSize="16">
                                     <TextBox.Header>
                                         <TextBlock>
-                                        <Run>Titre français</Run>
+                                        <Run>Cotation</Run>
                                         <!--<Run Typography.Variants="Superscript" FontWeight="Bold">*</Run>-->
                                         </TextBlock>
                                     </TextBox.Header>
@@ -172,6 +172,16 @@
                                     </Grid>
                                 </Grid>
                             </VariableSizedWrapGrid>
+                            <VariableSizedWrapGrid Grid.Row="1" Orientation="Horizontal" MaximumRowsOrColumns="2" 
+                                                   ItemWidth="{Binding ElementName=GridTitleContainer, Path=ActualWidth, Converter={StaticResource sizeDiviverConverter}, ConverterParameter='4-8', Mode=OneWay}">
+                                <VariableSizedWrapGrid.Resources>
+                                    <Style TargetType="Grid" x:Key="WrapGridChildStyle">
+                                        <Setter Property="Margin" Value="4 0" />
+                                        <Setter Property="VerticalAlignment" Value="Top" />
+                                    </Style>
+                                </VariableSizedWrapGrid.Resources>
+                                
+                            </VariableSizedWrapGrid>
                             <MTUUControls:WrapPanel Grid.Row="1" HorizontalSpacing="8" VerticalSpacing="28" >
                                 <StackPanel Orientation="Vertical" Spacing="4" MaxWidth="{Binding ElementName=GridTitleContainer, Path=ActualWidth, Converter={StaticResource sizeDiviverConverter}, ConverterParameter='2-8', Mode=OneWay}">
                                     <Grid>
@@ -209,7 +219,7 @@
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
                                         </Button>
                                     </Grid>
-                                    <ListBox x:Name="LBX_Auteurs" ItemsSource="{x:Bind ViewModel.Auteurs}" Height="190" HorizontalAlignment="Stretch" />
+                                    <ListView x:Name="LBX_Auteurs" ItemsSource="{x:Bind ViewModel.Auteurs}" Height="190" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True"/>
                                 </StackPanel>
                             </MTUUControls:WrapPanel>
 
