@@ -114,24 +114,24 @@
                                         <Setter Property="VerticalAlignment" Value="Top" />
                                     </Style>
                                 </VariableSizedWrapGrid.Resources>
-                                <TextBox Text="{x:Bind ViewModel.ISBN, Mode=TwoWay}" VerticalAlignment="Top"
-                                     PlaceholderText="ISBN" FontSize="16">
-                                    <TextBox.Header>
-                                        <TextBlock>
-                                        <Run>ISBN</Run>
-                                        <!--<Run Typography.Variants="Superscript" FontWeight="Bold">*</Run>-->
-                                        </TextBlock>
-                                    </TextBox.Header>
-                                </TextBox>
-                                <TextBox Text="{x:Bind ViewModel.Cotation, Mode=TwoWay}"
-                                         PlaceholderText="Système de cotation" VerticalAlignment="Top" FontSize="16">
-                                    <TextBox.Header>
-                                        <TextBlock>
-                                        <Run>Cotation</Run>
-                                        <!--<Run Typography.Variants="Superscript" FontWeight="Bold">*</Run>-->
-                                        </TextBlock>
-                                    </TextBox.Header>
-                                </TextBox>
+                                <!--ISBN-->
+                                <Grid Style="{StaticResource WrapGridChildStyle}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" Text="ISBN"/>
+                                    <TextBox Grid.Row="1" Text="{x:Bind ViewModel.ISBN, Mode=TwoWay}" PlaceholderText="ISBN" VerticalAlignment="Top" FontSize="16"></TextBox>
+                                </Grid>
+                                <!--Cotation-->
+                                <Grid Style="{StaticResource WrapGridChildStyle}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" Text="Cotation"/>
+                                    <TextBox Grid.Row="1" Text="{x:Bind ViewModel.Cotation, Mode=TwoWay}" PlaceholderText="Système de cotation" VerticalAlignment="Top" FontSize="16"></TextBox>
+                                </Grid>
                                 <!--Année Parution-->
                                 <Grid Style="{StaticResource WrapGridChildStyle}">
                                     <Grid.RowDefinitions>
