@@ -10,13 +10,21 @@ namespace RostalProjectUWP.ViewModels
     {
         public int Id { get; set; }
         public string Cotation { get; set; }
+
+        /// <summary>
+        /// L'ISBN est un numéro international normalisé permettant l'identification d'un livre dans une édition donnée.
+        /// </summary>
+        public string ISBN { get; set; }
+        public List<string> TitresOeuvre { get; set; }
         public string Titre { get; set; }
-        public string Auteur { get; set; }
+        public List<string> Auteurs { get; set; }
+        public List<string> Langues { get; set; }
         public string Description { get; set; }
         public short AnneeParution { get; set; }
         public List<BibliothequeVM> Bibliotheques { get; set; }
         public List<CategorieLivreVM> Categories { get; set; }
         public PretLivreVM Pret { get; set; }
+        public DateTimeOffset DateAjout { get; set; }
     }
 
     public class CategorieLivreVM

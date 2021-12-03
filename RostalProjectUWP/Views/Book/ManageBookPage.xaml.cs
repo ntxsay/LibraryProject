@@ -1,9 +1,15 @@
-﻿using RostalProjectUWP.ViewModels;
+﻿using RostalProjectUWP.Code;
+using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -13,6 +19,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
@@ -25,7 +32,12 @@ namespace RostalProjectUWP.Views.Book
     public sealed partial class ManageBookPage : Page
     {
         private ManageContainerPage _parentPage;
+        public ManageBookPageViewModel PageViewModel { get; set; } = new ManageBookPageViewModel();
         private LivreVM ViewModel { get; set; }
+        public EditMode Mode { get; set; }
+        public string Title { get; set; }
+        public string _actionButtonName;
+
         public ManageBookPage()
         {
             this.InitializeComponent();
@@ -34,11 +46,212 @@ namespace RostalProjectUWP.Views.Book
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is ManageBookContainerParentVM parameters)
+            if (e.Parameter is ManageBookParametersVM parameters)
             {
                 ViewModel = parameters.ViewModel;
+                Mode = parameters.EditMode;
                 _parentPage = parameters.ParentPage;
+                Initialize(parameters.ViewModel, parameters.EditMode);
             }
+        }
+
+        private void Initialize(LivreVM viewModel, EditMode editMode)
+        {
+            try
+            {
+                //ThemeListener.ThemeChanged += Listener_ThemeChanged;
+
+                if (viewModel != null)
+                {
+                    ViewModel = viewModel;
+                    Mode = editMode;
+                    switch (Mode)
+                    {
+                        case EditMode.Create:
+                            Title = "Ajouter un livre";
+                            _actionButtonName = "Créer";
+                            break;
+                        case EditMode.Edit:
+                            Title = $"Editer le livre {(viewModel.TitresOeuvre.Any() ? viewModel.TitresOeuvre.First() : "sans nom")}";
+                            _actionButtonName = "Mettre à jour";
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+
+        #region Navigation
+        private void MyNavigationView_ItemInvoked(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewItemInvokedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
+            }
+        }
+
+        public void NavigateToView(Type page, object parameters)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                _ = FrameContainer.Navigate(page, parameters, new EntranceNavigationTransitionInfo());
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
+            }
+        } 
+        #endregion
+
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnAction_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+    }
+
+    public class ManageBookPageViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+
+        public ItemTagContentVM LibraryManagementMenuItem => new ItemTagContentVM()
+        {
+            Text = "Gestionnaire de bibliothèque",
+            Tag = "library-management"
+        };
+
+        public ItemTagContentVM GeneralMenuItem => new ItemTagContentVM()
+        {
+            Text = "Général",
+            Tag = "general"
+        };
+
+        public ItemTagContentVM CategorieMenuItem => new ItemTagContentVM()
+        {
+            Text = "Catégories",
+            Tag = "categorie-sous-categorie"
+        };
+
+        public ItemTagContentVM DescriptionMenuItem => new ItemTagContentVM()
+        {
+            Text = "Description",
+            Tag = "description"
+        };
+
+        public ItemTagContentVM EditeursMenuItem => new ItemTagContentVM()
+        {
+            Text = "Editeurs",
+            Tag = "editeurs"
+        };
+
+        private ObservableCollection<OperationStateVM> _ErrorList = new ObservableCollection<OperationStateVM>();
+        public ObservableCollection<OperationStateVM> ErrorList
+        {
+            get => _ErrorList;
+            set
+            {
+                if (_ErrorList != value)
+                {
+                    _ErrorList = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _MessageState = "Erreur(s) détectées, vous pouvez valider la fiche";
+        public string MessageState
+        {
+            get => _MessageState;
+            set
+            {
+                if (_MessageState != value)
+                {
+                    _MessageState = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private SolidColorBrush _BrushColorState = new SolidColorBrush(Windows.UI.Colors.Green);
+        public SolidColorBrush BrushColorState
+        {
+            get => _BrushColorState;
+            set
+            {
+                if (_BrushColorState != value)
+                {
+                    _BrushColorState = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsProgressRingIndeterminate;
+        public bool IsProgressRingIndeterminate
+        {
+            get => _IsProgressRingIndeterminate;
+            set
+            {
+                if (_IsProgressRingIndeterminate != value)
+                {
+                    _IsProgressRingIndeterminate = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _DefaultBackgroundImageVisibility = Visibility.Collapsed;
+        public Visibility DefaultBackgroundImageVisibility
+        {
+            get => _DefaultBackgroundImageVisibility;
+            set
+            {
+                if (_DefaultBackgroundImageVisibility != value)
+                {
+                    _DefaultBackgroundImageVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _TopCloseButtonVisibility = Visibility.Visible;
+        public Visibility TopCloseButtonVisibility
+        {
+            get => _TopCloseButtonVisibility;
+            set
+            {
+                if (_TopCloseButtonVisibility != value)
+                {
+                    _TopCloseButtonVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

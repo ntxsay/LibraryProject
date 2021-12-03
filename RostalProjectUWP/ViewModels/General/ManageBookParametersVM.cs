@@ -16,14 +16,15 @@ namespace RostalProjectUWP.ViewModels.General
         public LivreVM ViewModel { get; set; }
         public EditMode EditMode { get; set; }
         public string ImageBackgroundPath { get; set; }
+        public ManageContainerPage ParentPage { get; set; }
     }
 
-    public class ManageBookContainerParentVM
-    {
-        public LivreVM ViewModel { get; set; }
-        public ManageContainerPage ParentPage { get; set; }
-        public ManageBookParametersVM Parameters { get; set; }
-    }
+    //public class ManageBookContainerParentVM
+    //{
+    //    public LivreVM ViewModel { get; set; }
+    //    public ManageContainerPage ParentPage { get; set; }
+    //    public ManageBookParametersVM Parameters { get; set; }
+    //}
 
     public class ManageBookParentChildVM
     {

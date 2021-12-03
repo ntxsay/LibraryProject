@@ -39,7 +39,7 @@ namespace RostalProjectUWP.Views
             if (e.Parameter is ManageBookParametersVM bookParameters)
             {
                 BookParameters = bookParameters;
-                NavigateToView(typeof(ManageBookPage), new ManageBookContainerParentVM() { ParentPage = this, Parameters = bookParameters });
+                NavigateToView(typeof(ManageBookPage), new ManageBookParametersVM() { ParentPage = this, ViewModel = bookParameters.ViewModel, EditMode = bookParameters.EditMode });
             }
         }
 

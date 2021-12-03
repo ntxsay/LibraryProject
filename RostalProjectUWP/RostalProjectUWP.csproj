@@ -129,6 +129,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\ContactVM.cs" />
+    <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
