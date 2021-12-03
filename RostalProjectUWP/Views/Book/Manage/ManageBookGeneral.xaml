@@ -173,18 +173,19 @@
                                 </Grid>
                             </VariableSizedWrapGrid>
                             <VariableSizedWrapGrid Grid.Row="1" Orientation="Horizontal" MaximumRowsOrColumns="2" 
-                                                   ItemWidth="{Binding ElementName=GridTitleContainer, Path=ActualWidth, Converter={StaticResource sizeDiviverConverter}, ConverterParameter='4-8', Mode=OneWay}">
+                                                   ItemWidth="{Binding ElementName=GridTitleContainer, Path=ActualWidth, Converter={StaticResource sizeDiviverConverter}, ConverterParameter='2-8', Mode=OneWay}">
                                 <VariableSizedWrapGrid.Resources>
                                     <Style TargetType="Grid" x:Key="WrapGridChildStyle">
                                         <Setter Property="Margin" Value="4 0" />
                                         <Setter Property="VerticalAlignment" Value="Top" />
                                     </Style>
                                 </VariableSizedWrapGrid.Resources>
-                                
-                            </VariableSizedWrapGrid>
-                            <MTUUControls:WrapPanel Grid.Row="1" HorizontalSpacing="8" VerticalSpacing="28" >
-                                <StackPanel Orientation="Vertical" Spacing="4" MaxWidth="{Binding ElementName=GridTitleContainer, Path=ActualWidth, Converter={StaticResource sizeDiviverConverter}, ConverterParameter='2-8', Mode=OneWay}">
-                                    <Grid>
+                                <Grid Style="{StaticResource WrapGridChildStyle}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -198,10 +199,14 @@
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
                                         </Button>
                                     </Grid>
-                                    <ListBox x:Name="LBX_TitresOeuvre" ItemsSource="{x:Bind ViewModel.TitresOeuvre}" Height="190" HorizontalAlignment="Left" />
-                                </StackPanel>
-                                <StackPanel Orientation="Vertical" Spacing="4" MaxWidth="{Binding ElementName=GridTitleContainer, Path=ActualWidth, Converter={StaticResource sizeDiviverConverter}, ConverterParameter='2-8', Mode=OneWay}">
-                                    <Grid>
+                                    <ListView x:Name="LBX_TitresOeuvre" Grid.Row="1" ItemsSource="{x:Bind ViewModel.TitresOeuvre}" Height="190" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True"/>
+                                </Grid>
+                                <Grid Style="{StaticResource WrapGridChildStyle}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -219,10 +224,9 @@
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
                                         </Button>
                                     </Grid>
-                                    <ListView x:Name="LBX_Auteurs" ItemsSource="{x:Bind ViewModel.Auteurs}" Height="190" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True"/>
-                                </StackPanel>
-                            </MTUUControls:WrapPanel>
-
+                                    <ListView x:Name="LBX_Auteurs" Grid.Row="1" ItemsSource="{x:Bind ViewModel.Auteurs}" Height="190" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True"/>
+                                </Grid>
+                            </VariableSizedWrapGrid>
                         </Grid>
                     </MUIXC:Expander.Content>
                 </MUIXC:Expander>
