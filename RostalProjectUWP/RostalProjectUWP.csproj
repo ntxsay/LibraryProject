@@ -119,6 +119,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Code\Converters\NullableBooleanConverters.cs" />
     <Compile Include="Code\Converters\SizeDiviserConverter.cs" />
     <Compile Include="Code\Enums.cs" />
     <Compile Include="Code\Helpers\StringHelpers.cs" />

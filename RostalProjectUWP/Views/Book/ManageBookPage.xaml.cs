@@ -1,6 +1,8 @@
 ﻿using RostalProjectUWP.Code;
+using RostalProjectUWP.Code.Helpers;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
+using RostalProjectUWP.Views.Book.Manage;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -57,6 +59,7 @@ namespace RostalProjectUWP.Views.Book
 
         private void Initialize(LivreVM viewModel, EditMode editMode)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 //ThemeListener.ThemeChanged += Listener_ThemeChanged;
@@ -80,10 +83,10 @@ namespace RostalProjectUWP.Views.Book
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
             }
         }
 
@@ -94,7 +97,21 @@ namespace RostalProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                if (!(args.InvokedItemContainer is Microsoft.UI.Xaml.Controls.NavigationViewItem item))
+                {
+                    return;
+                }
 
+                string itemTag = item.Tag.ToString();
+                if (itemTag.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    return;
+                }
+
+                if (itemTag == PageViewModel.GeneralMenuItem.Tag)
+                {
+                    this.NavigateToView(typeof(ManageBookGeneral), new ManageBookParentChildVM() { ViewModel = ViewModel, ParentPage = this });
+                }
             }
             catch (Exception ex)
             {
