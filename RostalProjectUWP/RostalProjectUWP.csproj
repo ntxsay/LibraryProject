@@ -137,8 +137,14 @@
     <Compile Include="Views\Book\ManageBookPage.xaml.cs">
       <DependentUpon>ManageBookPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\Manage\ManageBookCategorie.xaml.cs">
+      <DependentUpon>ManageBookCategorie.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\Manage\ManageBookGeneral.xaml.cs">
       <DependentUpon>ManageBookGeneral.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Book\Manage\NewCategorieCD.xaml.cs">
+      <DependentUpon>NewCategorieCD.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ManageContainerPage.xaml.cs">
       <DependentUpon>ManageContainerPage.xaml</DependentUpon>
@@ -176,7 +182,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Book\Manage\ManageBookCategorie.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Book\Manage\ManageBookGeneral.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\Manage\NewCategorieCD.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

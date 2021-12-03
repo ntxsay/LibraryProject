@@ -56,6 +56,10 @@ namespace RostalProjectUWP.Views.Book
                 Initialize(parameters.ViewModel, parameters.EditMode);
             }
         }
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitializeFirstItem();
+        }
 
         private void Initialize(LivreVM viewModel, EditMode editMode)
         {
@@ -92,6 +96,26 @@ namespace RostalProjectUWP.Views.Book
 
 
         #region Navigation
+        private void InitializeFirstItem()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                //PageViewModel.ErrorList.CollectionChanged += ErrorList_CollectionChanged;
+
+                if (MyNavigationView.MenuItems[2] is Microsoft.UI.Xaml.Controls.NavigationViewItem first)
+                {
+                    MyNavigationView.SelectedItem = first;
+                }
+
+                this.NavigateToView(typeof(ManageBookGeneral), new ManageBookParentChildVM() { ViewModel = ViewModel, ParentPage = this });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
+            }
+        }
         private void MyNavigationView_ItemInvoked(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewItemInvokedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -111,6 +135,10 @@ namespace RostalProjectUWP.Views.Book
                 if (itemTag == PageViewModel.GeneralMenuItem.Tag)
                 {
                     this.NavigateToView(typeof(ManageBookGeneral), new ManageBookParentChildVM() { ViewModel = ViewModel, ParentPage = this });
+                }
+                else if (itemTag == PageViewModel.CategorieMenuItem.Tag)
+                {
+                    this.NavigateToView(typeof(ManageBookCategorie), new ManageBookParentChildVM() { ViewModel = ViewModel, ParentPage = this });
                 }
             }
             catch (Exception ex)
@@ -144,6 +172,8 @@ namespace RostalProjectUWP.Views.Book
         {
 
         }
+
+        
     }
 
     public class ManageBookPageViewModel : INotifyPropertyChanged

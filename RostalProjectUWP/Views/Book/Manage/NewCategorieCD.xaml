@@ -1,0 +1,34 @@
+﻿<ContentDialog
+    x:Class="RostalProjectUWP.Views.Book.Manage.NewCategorieCD"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RostalProjectUWP.Views.Book.Manage"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" 
+    x:Name="_dialog"
+    PrimaryButtonText="Ajouter"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick" IsSecondaryButtonEnabled="False" CloseButtonText="Annuler">
+    <ContentDialog.TitleTemplate>
+        <DataTemplate>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC8;" FontSize="24"/>
+                <TextBlock Text="{Binding  ElementName=_dialog, Path=Title}"/>
+            </StackPanel>
+        </DataTemplate>
+    </ContentDialog.TitleTemplate>
+    <ContentDialog.CornerRadius>
+        <CornerRadius>8</CornerRadius>
+    </ContentDialog.CornerRadius>
+    <Grid RowSpacing="8" Margin="0 8 0 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" TextWrapping="Wrap">
+             <Run Text="Entrez le nom de la"/>
+             <Run Text="{x:Bind ArgName}"/>
+        </TextBlock>
+        <TextBox Grid.Row="1" Text="{x:Bind Value, Mode=TwoWay}" />
+    </Grid>
+</ContentDialog>

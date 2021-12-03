@@ -199,7 +199,7 @@
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
                                         </Button>
                                     </Grid>
-                                    <ListView x:Name="LBX_TitresOeuvre" Grid.Row="1" ItemsSource="{x:Bind ViewModel.TitresOeuvre}" Height="190" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True"/>
+                                    <ListView x:Name="LBX_TitresOeuvre" Grid.Row="1" ItemsSource="{x:Bind ViewModel.TitresOeuvre}" Height="190" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True" Background="{ThemeResource SystemControlAcrylicElementBrush}"/>
                                 </Grid>
                                 <Grid Style="{StaticResource WrapGridChildStyle}">
                                     <Grid.RowDefinitions>
@@ -224,7 +224,7 @@
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
                                         </Button>
                                     </Grid>
-                                    <ListView x:Name="LBX_Auteurs" Grid.Row="1" ItemsSource="{x:Bind ViewModel.Auteurs}" Height="190" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True"/>
+                                    <ListView x:Name="LBX_Auteurs" Grid.Row="1" ItemsSource="{x:Bind ViewModel.Auteurs}" Height="190" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True" Background="{ThemeResource SystemControlAcrylicElementBrush}"/>
                                 </Grid>
                             </VariableSizedWrapGrid>
                         </Grid>
@@ -232,6 +232,5 @@
                 </MUIXC:Expander>
             </Grid>
         </ScrollViewer>
-
     </Grid>
 </Page>

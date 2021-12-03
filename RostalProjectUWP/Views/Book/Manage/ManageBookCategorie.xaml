@@ -1,0 +1,148 @@
+﻿<Page
+    x:Class="RostalProjectUWP.Views.Book.Manage.ManageBookCategorie"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RostalProjectUWP.Views.Book.Manage"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:customConverters="using:RostalProjectUWP.Code.Converters"
+    xmlns:generalVM="using:RostalProjectUWP.ViewModels.General"
+    xmlns:viewModels="using:RostalProjectUWP.ViewModels"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI">
+    <Page.Resources>
+        <customConverters:SizeDiviserConverter x:Key="sizeDiviverConverter"/>
+        <customConverters:NullableBooleanToVisibility x:Key="NullableBoolToVisibilityConverterVOD" />
+        <customConverters:NullableBooleanToInvertBoolean x:Key="NullableBoolToInvertBooleanConverter" />
+        <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+        <MTUUConverters:BoolToObjectConverter x:Key="invertBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+        <XamlUICommand x:Name="AddNewCategorieXamlUICommand" 
+                       ExecuteRequested="AddNewCategorieXamlUICommand_ExecuteRequested"
+                       Description="Ajoute une nouvelle catégorie au noeud" 
+                       Label="Ajouter une nouvelle catégorie">
+        </XamlUICommand>
+        <XamlUICommand x:Name="AddNewSubCategorieXamlUICommand" 
+                       ExecuteRequested="AddNewSubCategorieXamlUICommand_ExecuteRequested"
+                       Description="Ajoute une nouvelle sous-catégorie au noeud" 
+                       Label="Ajouter une nouvelle sous-catégorie">
+        </XamlUICommand>
+    </Page.Resources>
+    <Grid>
+        <Grid Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <!--Titles-->
+            <MUIXC:Expander x:Name="ExpanderTitle" Grid.Row="0" IsExpanded="True" ExpandDirection="Down" VerticalAlignment="Top" HorizontalAlignment="Stretch" 
+                                HorizontalContentAlignment="Stretch">
+                <MUIXC:Expander.Header>
+                    <Grid ColumnSpacing="8" Margin="0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0" FontFamily="Segoe MDL2 Assets" Glyph="&#xE8EC;" FontSize="24"/>
+                        <StackPanel Grid.Column="1" Orientation="Vertical">
+                            <TextBlock Text="Catégories" FontSize="16" FontWeight="SemiBold"/>
+                            <TextBlock Text="Gère les informations générales du livre, etc..." TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <!--<Button x:Name="BtnTitlesErrors" Grid.Column="2" Margin="2, 0" Command="{StaticResource ErrorClickXamlUICommand}"
+                                         ToolTipService.ToolTip="Appliquer">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7BA;" Foreground="OrangeRed"/>
+                                    <TextBlock Foreground="OrangeRed">
+                                        <Run Text="{x:Bind PageViewModel.ErrorList.Count, Mode=OneWay}" />
+                                        <Run Text="erreur(s)" />
+                                    </TextBlock>
+                                </StackPanel>
+                                <Button.Flyout>
+                                    <Flyout>
+                                        <ScrollViewer MaxHeight="500">
+                                            <ItemsControl ItemsSource="{x:Bind PageViewModel.ErrorList, Mode=OneWay}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <ItemsStackPanel Orientation="Vertical"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="generalVM:OperationStateVM">
+                                                        <TextBlock Text="{x:Bind Message}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>-->
+                    </Grid>
+                </MUIXC:Expander.Header>
+                <MUIXC:Expander.Content>
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                        <Grid Margin="15,20, 15, 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0"  Padding="5">
+                                <MUIXC:TreeView ItemsSource="{x:Bind ViewModel.Categories, Mode=OneWay}">
+                                    <MUIXC:TreeView.ItemTemplate>
+                                        <DataTemplate x:DataType="viewModels:CategorieLivreVM">
+                                            <MUIXC:TreeViewItem ItemsSource="{x:Bind SubCategorieLivres, Mode=OneWay}" Content="{x:Bind Name}"></MUIXC:TreeViewItem>
+                                        </DataTemplate>
+                                    </MUIXC:TreeView.ItemTemplate>
+
+                                </MUIXC:TreeView>
+                            </Grid>
+                            <!--Column Grid Splitter-->
+                            <MTUUControls:GridSplitter Grid.Column="1" Width="5" ResizeBehavior="BasedOnAlignment"
+            ResizeDirection="Auto" Background="Transparent" Foreground="White" FontSize="13">
+                                <MTUUControls:GridSplitter.Element>
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Center" IsHitTestVisible="False" VerticalAlignment="Center"  
+                               Text="&#xE784;" Foreground="Black" FontFamily="Segoe MDL2 Assets">
+                                        </TextBlock>
+                                    </Grid>
+                                </MTUUControls:GridSplitter.Element>
+                            </MTUUControls:GridSplitter>
+                            <Grid Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <!--CommandBar-->
+                                <CommandBar Grid.Row="0" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Right" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
+                                    <AppBarButton Label="Ajouter une catégorie" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewCategorieXamlUICommand}">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xF003;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton Label="Ajouter une sous-catégorie" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewSubCategorieXamlUICommand}">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xF003;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton Icon="OpenLocal" Label="Ouvrir le dossier" ToolTipService.ToolTip="Ouvre le dossier conteneur" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                    <AppBarSeparator/>
+                                    <AppBarButton Icon="Delete" Label="Supprimer" ToolTipService.ToolTip="Supprimer la ressource" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                    <CommandBar.Content>
+                                        <TextBlock Margin="0 15 0 0" VerticalAlignment="Center" Text="" FontSize="20"/>
+                                    </CommandBar.Content>
+                                </CommandBar>
+                                <ContentControl x:Name="ImagePosterContainer" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    
+                                </ContentControl>
+                            </Grid>
+                        </Grid>
+                    </ScrollViewer>
+                </MUIXC:Expander.Content>
+            </MUIXC:Expander>
+        </Grid>
+    </Grid>
+</Page>

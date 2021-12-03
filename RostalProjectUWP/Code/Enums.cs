@@ -20,10 +20,10 @@ namespace RostalProjectUWP.Code
         Logo,
     }
 
-    public enum MainFolder
+    public enum CategorieType
     {
-        Anime,
-        Society,
+        Categorie,
+        SubCategorie,
     }
 
     public enum ManagePage
