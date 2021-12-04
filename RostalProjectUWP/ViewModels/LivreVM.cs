@@ -169,66 +169,6 @@ namespace RostalProjectUWP.ViewModels
         }
     }
 
-    public class CategorieLivreVM : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-        public int Id { get; set; }
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        private CategorieType _CategorieType;
-        public CategorieType CategorieType
-        {
-            get => _CategorieType;
-            set
-            {
-                if (_CategorieType != value)
-                {
-                    _CategorieType = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private ObservableCollection<CategorieLivreVM> _SubCategorieLivres;
-        public ObservableCollection<CategorieLivreVM> SubCategorieLivres
-        {
-            get => SubCategorieLivres;
-            set
-            {
-                if (SubCategorieLivres != value)
-                {
-                    SubCategorieLivres = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public List<LivreVM> Livres { get; set; }
-
-        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    public class SubCategorieLivreVM : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public List<LivreVM> Livres { get; set; }
-
-        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
 
     public class PretLivreVM
     {

@@ -122,7 +122,7 @@ namespace RostalProjectUWP
                     return;
                 }
 
-                if (item.Tag != null && item.Tag.ToString() != "animesParentItem")
+                if (item.Tag != null)
                 {
                     await NavigateToViewAsync(item.Tag.ToString(), item);
                 }
@@ -226,21 +226,35 @@ namespace RostalProjectUWP
         {
             try
             {
-                ManagePage managePage = ManagePage.Book;
-                var dialog = new NewElementCD(managePage);
+                var dialog = new NewElementCD();
 
                 var result = await dialog.ShowAsync();
                 if (result == ContentDialogResult.Primary)
                 {
-                    ManageBookParametersVM manageBookParameters = new ManageBookParametersVM()
+                    if (dialog.ManagePage == ManagePage.Library)
                     {
-                        EditMode = EditMode.Create,
-                        ViewModel = new LivreVM()
+                        ManageLibraryParametersVM manageBookParameters = new ManageLibraryParametersVM()
                         {
+                            EditMode = EditMode.Create,
+                            ViewModel = new BibliothequeVM()
+                            {
 
-                        },
-                    };
-                    OpenManageBookPage(manageBookParameters);
+                            },
+                        };
+                        OpenManageLibraryPage(manageBookParameters);
+                    }
+                    else if (dialog.ManagePage == ManagePage.Book)
+                    {
+                        ManageBookParametersVM manageBookParameters = new ManageBookParametersVM()
+                        {
+                            EditMode = EditMode.Create,
+                            ViewModel = new LivreVM()
+                            {
+
+                            },
+                        };
+                        OpenManageBookPage(manageBookParameters);
+                    }
                 }
                 else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                 {
@@ -251,6 +265,26 @@ namespace RostalProjectUWP
             {
 
                 throw;
+            }
+        }
+
+        public bool OpenManageLibraryPage(ManageLibraryParametersVM parameters)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (parameters == null || parameters.ViewModel == null)
+                {
+                    Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : Le ViewModel est null.");
+                    return false;
+                }
+
+                return NavigateToView("ManageContainerPage", parameters);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return false;
             }
         }
 

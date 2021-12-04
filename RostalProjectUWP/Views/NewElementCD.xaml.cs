@@ -20,7 +20,7 @@ namespace RostalProjectUWP.Views
 {
     public sealed partial class NewElementCD : ContentDialog
     {
-        private ManagePage ManagePage { get; set; }
+        public ManagePage ManagePage { get; set; }
         public NewElementCD()
         {
             this.InitializeComponent();

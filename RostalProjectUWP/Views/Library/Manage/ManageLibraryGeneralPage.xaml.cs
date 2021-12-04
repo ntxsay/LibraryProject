@@ -1,7 +1,7 @@
-﻿using RostalProjectUWP.Code.Helpers;
+﻿using RostalProjectUWP.Code.Services.ES;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
-using RostalProjectUWP.Code.Services.ES;
+using RostalProjectUWP.Views.Book.Manage;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,17 +24,18 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace RostalProjectUWP.Views.Book.Manage
+namespace RostalProjectUWP.Views.Library.Manage
 {
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.
     /// </summary>
-    public sealed partial class ManageBookCategorie : Page
+    public sealed partial class ManageLibraryGeneralPage : Page
     {
-        private ManageBookPage _parentPage;
-        private LivreVM ViewModel { get; set; }
+        private ManageLibraryPage _parentPage;
+        private BibliothequeVM ViewModel { get; set; }
+        private ObservableCollection<BibliothequeVM> ViewModelList { get; set; } = new ObservableCollection<BibliothequeVM>();
         public ManageBookCategorieViewModel PageViewModel { get; set; } = new ManageBookCategorieViewModel();
-        public ManageBookCategorie()
+        public ManageLibraryGeneralPage()
         {
             this.InitializeComponent();
         }
@@ -42,15 +43,14 @@ namespace RostalProjectUWP.Views.Book.Manage
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is ManageBookParentChildVM parameters)
+            if (e.Parameter is ManageLibraryParentChildVM parameters)
             {
                 ViewModel = parameters.ViewModel;
                 _parentPage = parameters.ParentPage;
-                
+
             }
         }
 
-        #region TreeView
         private CategorieLivreVM GetParentCategorie()
         {
             try
@@ -71,35 +71,180 @@ namespace RostalProjectUWP.Views.Book.Manage
             }
         }
 
-        private async void AddNewCategorieXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void AddNewLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                string newCategorie = string.Empty;
-                var dialog = new NewCategorieCD(new ManageCategorieDialogParametersVM()
+                var dialog = new NewLibraryCD(new ManageLibraryDialogParametersVM()
                 {
-                    Value = newCategorie,
                     EditMode = Code.EditMode.Create,
-                    Type = Code.CategorieType.Categorie,
-                    ViewModelList = ViewModel.Categories,
+                    ViewModelList = ViewModelList,
                 });
 
                 var result = await dialog.ShowAsync();
                 if (result == ContentDialogResult.Primary)
                 {
-                    newCategorie = dialog.Value?.Trim();
-                    ViewModel.Categories.Add(new CategorieLivreVM()
+                    var value = dialog.Value?.Trim();
+                    var description = dialog.Description?.Trim();
+                    ViewModelList.Add(new BibliothequeVM()
                     {
-                        Name = newCategorie,
-                        CategorieType = Code.CategorieType.Categorie,
-                        SubCategorieLivres = new ObservableCollection<CategorieLivreVM>()
+                        Name = value,
+                        Description = description,
                     });
                 }
                 else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                 {
                     return;
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
+            }
+        }
+
+        private async void RenameLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (PageViewModel.SelectedLibrary != null && ListviewLibrary.SelectedItem != null && ListviewLibrary.SelectedItem is BibliothequeVM _viewModel &&
+                    _viewModel == PageViewModel.SelectedLibrary)
+                {
+                    var parentViewModel = GetParentCategorie();
+                    var dialog = new NewLibraryCD(new ManageLibraryDialogParametersVM()
+                    {
+                        Value = _viewModel.Name,
+                        Description = _viewModel.Description,
+                        EditMode = Code.EditMode.Edit,
+                        ViewModelList = ViewModelList,
+                    });
+
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        var newValue = dialog.Value?.Trim();
+                        var newDescription = dialog.Description?.Trim();
+
+                        //_viewModel.Name = newValue;
+                        PageViewModel.SelectedLibrary.Name = newValue;
+                        PageViewModel.SelectedLibrary.Description = newDescription;
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    RenameLibraryTeachingTip.Target = ABBRenameLibrary;
+                    RenameLibraryTeachingTip.Title = ABBRenameLibrary.Label;
+                    RenameLibraryTeachingTip.Subtitle = "Pour renommer une bibliothèque, ajoutez ou cliquez d'abord sur une bibliothèque dans la liste ci-dessous puis cliquez de nouveau sur ce bouton.";
+                    RenameLibraryTeachingTip.IsOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
+            }
+        }
+
+        private void DeleteLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (PageViewModel.SelectedLibrary != null && ListviewLibrary.SelectedItem != null && ListviewLibrary.SelectedItem is BibliothequeVM _viewModel &&
+                    _viewModel == PageViewModel.SelectedLibrary)
+                {
+                    ViewModelList.Remove(_viewModel);
+                }
+                else
+                {
+                    RenameLibraryTeachingTip.Target = ABBDeleteLibrary;
+                    RenameLibraryTeachingTip.Title = ABBDeleteLibrary.Label;
+                    RenameLibraryTeachingTip.Subtitle = "Pour supprimer une bibliothèque, cliquez d'abord sur une bibliothèque dans la liste ci-dessous puis cliquez de nouveau sur ce bouton.";
+                    RenameLibraryTeachingTip.IsOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
+            }
+        }
+
+        private async void ExportLibraryToJsonXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var suggestedFileName = $"Rostalotheque_Bibliothèques_{DateTime.Now:yyyyMMddHHmmss}";
+
+                var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
+                {
+                    {"JavaScript Object Notation", new List<string>() { ".json" } }
+                }, suggestedFileName);
+
+                if (savedFile == null)
+                {
+                    Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : Le fichier n'a pas pû être créé.");
+                    return;
+                }
+
+                //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
+                bool isFileSaved = await Files.Serialization.Json.SerializeAsync(ViewModelList, savedFile);
+                if (isFileSaved == false)
+                {
+                    Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : Le flux n'a pas été enregistré dans le fichier.");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return;
+            }
+        }
+
+        #region TreeView
+        private async void AddNewCategorieXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (PageViewModel.SelectedLibrary != null && ListviewLibrary.SelectedItem != null && ListviewLibrary.SelectedItem is BibliothequeVM _viewModel &&
+                    _viewModel == PageViewModel.SelectedLibrary)
+                {
+                    var dialog = new NewCategorieCD(new ManageCategorieDialogParametersVM()
+                    {
+                        EditMode = Code.EditMode.Create,
+                        Type = Code.CategorieType.Categorie,
+                        ViewModelList = _viewModel.Categories,
+                    });
+
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        var value = dialog.Value?.Trim();
+                        var description = dialog.Description?.Trim();
+                        _viewModel.Categories.Add(new CategorieLivreVM()
+                        {
+                            Name = value,
+                            Description = description,
+                            CategorieType = Code.CategorieType.Categorie,
+                            SubCategorieLivres = new ObservableCollection<CategorieLivreVM>()
+                        });
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return;
+                    }
+                }
+                
             }
             catch (Exception ex)
             {
@@ -115,10 +260,8 @@ namespace RostalProjectUWP.Views.Book.Manage
             {
                 if (TreeCategorie.SelectedItem != null && TreeCategorie.SelectedItem is CategorieLivreVM viewModel && viewModel.CategorieType == Code.CategorieType.Categorie)
                 {
-                    string newSubCategorie = string.Empty;
                     var dialog = new NewCategorieCD(new ManageCategorieDialogParametersVM()
                     {
-                        Value = newSubCategorie,
                         EditMode = Code.EditMode.Create,
                         Type = Code.CategorieType.SubCategorie,
                         ViewModelList = viewModel.SubCategorieLivres,
@@ -128,10 +271,12 @@ namespace RostalProjectUWP.Views.Book.Manage
                     var result = await dialog.ShowAsync();
                     if (result == ContentDialogResult.Primary)
                     {
-                        newSubCategorie = dialog.Value?.Trim();
+                        var value = dialog.Value?.Trim();
+                        var description = dialog.Description?.Trim();
                         viewModel.SubCategorieLivres.Add(new CategorieLivreVM()
                         {
-                            Name = newSubCategorie,
+                            Name = value,
+                            Description = description,
                             CategorieType = Code.CategorieType.SubCategorie,
                         });
                     }
@@ -153,7 +298,6 @@ namespace RostalProjectUWP.Views.Book.Manage
                 return;
             }
         }
-
         private async void RenameSCategorieXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -166,6 +310,7 @@ namespace RostalProjectUWP.Views.Book.Manage
                     var dialog = new NewCategorieCD(new ManageCategorieDialogParametersVM()
                     {
                         Value = _viewModel.Name,
+                        Description = _viewModel.Description,
                         EditMode = Code.EditMode.Edit,
                         Type = _viewModel.CategorieType,
                         ViewModelList = _viewModel.CategorieType == Code.CategorieType.SubCategorie ? parentViewModel?.SubCategorieLivres : ViewModel.Categories,
@@ -176,6 +321,7 @@ namespace RostalProjectUWP.Views.Book.Manage
                     if (result == ContentDialogResult.Primary)
                     {
                         var newValue = dialog.Value?.Trim();
+                        var newDescription = dialog.Description?.Trim();
                         var _container = this.TreeCategorie.ContainerFromItem(this.TreeCategorie.SelectedItem);
                         if (_container is Microsoft.UI.Xaml.Controls.TreeViewItem treeviewItem)
                         {
@@ -183,6 +329,7 @@ namespace RostalProjectUWP.Views.Book.Manage
                         }
 
                         _viewModel.Name = newValue;
+                        _viewModel.Description = newDescription;
                         PageViewModel.SelectedCategorie = null;
                         PageViewModel.SelectedCategorie = _viewModel;
                     }
@@ -230,8 +377,9 @@ namespace RostalProjectUWP.Views.Book.Manage
                 Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
                 return;
             }
-        } 
+        }
         #endregion
+
 
         private void ErrorClickXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -247,23 +395,7 @@ namespace RostalProjectUWP.Views.Book.Manage
             }
         }
 
-        private void TbxCategorieDescription_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender is TextBox tb && PageViewModel.SelectedCategorie != null)
-                {
-                    PageViewModel.SelectedCategorie.Description = tb.Text;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
-                return;
-            }
-        }
-
+        
         
     }
 
@@ -309,6 +441,20 @@ namespace RostalProjectUWP.Views.Book.Manage
                 if (_SelectedCategorie != value)
                 {
                     _SelectedCategorie = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private BibliothequeVM _SelectedLibrary;
+        public BibliothequeVM SelectedLibrary
+        {
+            get => _SelectedLibrary;
+            set
+            {
+                if (_SelectedLibrary != value)
+                {
+                    _SelectedLibrary = value;
                     OnPropertyChanged();
                 }
             }

@@ -7,6 +7,7 @@ using RostalProjectUWP.Code;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.Views;
 using RostalProjectUWP.Views.Book;
+using RostalProjectUWP.Views.Library;
 
 namespace RostalProjectUWP.ViewModels.General
 {
@@ -19,18 +20,26 @@ namespace RostalProjectUWP.ViewModels.General
         public ManageContainerPage ParentPage { get; set; }
     }
 
-    //public class ManageBookContainerParentVM
-    //{
-    //    public LivreVM ViewModel { get; set; }
-    //    public ManageContainerPage ParentPage { get; set; }
-    //    public ManageBookParametersVM Parameters { get; set; }
-    //}
+    public class ManageLibraryParametersVM
+    {
+        public BibliothequeVM ViewModel { get; set; }
+        public EditMode EditMode { get; set; }
+        public string ImageBackgroundPath { get; set; }
+        public ManageContainerPage ParentPage { get; set; }
+    }
 
     public class ManageBookParentChildVM
     {
         public LivreVM ViewModel { get; set; }
         public ManageBookPage ParentPage { get; set; }
         public ManageBookParametersVM Parameters { get; set; }
+    }
+
+    public class ManageLibraryParentChildVM
+    {
+        public BibliothequeVM ViewModel { get; set; }
+        public ManageLibraryPage ParentPage { get; set; }
+        public ManageLibraryParametersVM Parameters { get; set; }
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.Views.Book;
+using RostalProjectUWP.Views.Library;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,6 +29,7 @@ namespace RostalProjectUWP.Views
     public sealed partial class ManageContainerPage : Page
     {
         private ManageBookParametersVM BookParameters { get; set; }
+        private ManageLibraryParametersVM LibraryParameters { get; set; }
         public ManageContainerPage()
         {
             this.InitializeComponent();
@@ -36,7 +38,12 @@ namespace RostalProjectUWP.Views
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is ManageBookParametersVM bookParameters)
+            if (e.Parameter is ManageLibraryParametersVM libraryParameters)
+            {
+                LibraryParameters = libraryParameters;
+                NavigateToView(typeof(ManageLibraryPage), new ManageLibraryParametersVM() { ParentPage = this, ViewModel = libraryParameters.ViewModel, EditMode = libraryParameters.EditMode });
+            }
+            else if (e.Parameter is ManageBookParametersVM bookParameters)
             {
                 BookParameters = bookParameters;
                 NavigateToView(typeof(ManageBookPage), new ManageBookParametersVM() { ParentPage = this, ViewModel = bookParameters.ViewModel, EditMode = bookParameters.EditMode });

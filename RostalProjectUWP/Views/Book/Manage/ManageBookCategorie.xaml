@@ -14,11 +14,17 @@
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI">
     <Page.Resources>
+        <customConverters:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
         <customConverters:SizeDiviserConverter x:Key="sizeDiviverConverter"/>
         <customConverters:NullableBooleanToVisibility x:Key="NullableBoolToVisibilityConverterVOD" />
         <customConverters:NullableBooleanToInvertBoolean x:Key="NullableBoolToInvertBooleanConverter" />
         <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="invertBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+        <XamlUICommand x:Name="ErrorClickXamlUICommand" 
+                       ExecuteRequested="ErrorClickXamlUICommand_ExecuteRequested"
+                       Description="Custom XamlUICommand" 
+                       Label="Ajouter ce titre">
+        </XamlUICommand>
         <XamlUICommand x:Name="AddNewCategorieXamlUICommand" 
                        ExecuteRequested="AddNewCategorieXamlUICommand_ExecuteRequested"
                        Description="Ajoute une nouvelle catégorie au noeud" 
@@ -28,6 +34,16 @@
                        ExecuteRequested="AddNewSubCategorieXamlUICommand_ExecuteRequested"
                        Description="Ajoute une nouvelle sous-catégorie au noeud" 
                        Label="Ajouter une nouvelle sous-catégorie">
+        </XamlUICommand>
+        <XamlUICommand x:Name="RenameSCategorieXamlUICommand" 
+                       ExecuteRequested="RenameSCategorieXamlUICommand_ExecuteRequested"
+                       Description="Custom XamlUICommand" 
+                       Label="Ajouter ce titre">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ExportTreeToJsonXamlUICommand" 
+                       ExecuteRequested="ExportTreeToJsonXamlUICommand_ExecuteRequested"
+                       Description="Custom XamlUICommand" 
+                       Label="Ajouter ce titre">
         </XamlUICommand>
     </Page.Resources>
     <Grid>
@@ -52,7 +68,7 @@
                             <TextBlock Text="Catégories" FontSize="16" FontWeight="SemiBold"/>
                             <TextBlock Text="Gère les informations générales du livre, etc..." TextWrapping="Wrap"/>
                         </StackPanel>
-                        <!--<Button x:Name="BtnTitlesErrors" Grid.Column="2" Margin="2, 0" Command="{StaticResource ErrorClickXamlUICommand}"
+                        <Button x:Name="BtnTitlesErrors" Grid.Column="2" Margin="2, 0" Command="{StaticResource ErrorClickXamlUICommand}"
                                          ToolTipService.ToolTip="Appliquer">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7BA;" Foreground="OrangeRed"/>
@@ -79,26 +95,70 @@
                                         </ScrollViewer>
                                     </Flyout>
                                 </Button.Flyout>
-                            </Button>-->
+                            </Button>
                     </Grid>
                 </MUIXC:Expander.Header>
                 <MUIXC:Expander.Content>
-                    <ScrollViewer VerticalScrollBarVisibility="Hidden">
-                        <Grid Margin="15,20, 15, 0">
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden" >
+                        <Grid MinHeight="200">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0"  Padding="5">
-                                <MUIXC:TreeView ItemsSource="{x:Bind ViewModel.Categories, Mode=OneWay}">
-                                    <MUIXC:TreeView.ItemTemplate>
-                                        <DataTemplate x:DataType="viewModels:CategorieLivreVM">
-                                            <MUIXC:TreeViewItem ItemsSource="{x:Bind SubCategorieLivres, Mode=OneWay}" Content="{x:Bind Name}"></MUIXC:TreeViewItem>
-                                        </DataTemplate>
-                                    </MUIXC:TreeView.ItemTemplate>
+                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0"  Padding="5" RowSpacing="8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <!--CommandBar-->
+                                <CommandBar Grid.Row="0" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Right" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
+                                    
+                                    <AppBarButton Label="Ajouter une catégorie" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewCategorieXamlUICommand}">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xF003;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton x:Name="ABBAddSousCategorie" Label="Ajouter une sous-catégorie" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewSubCategorieXamlUICommand}">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xF003;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <CommandBar.SecondaryCommands>
+                                        <AppBarButton Label="Exporter au format JSON" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportTreeToJsonXamlUICommand}">
+                                            <AppBarButton.Icon>
+                                                <FontIcon Glyph="&#xE74E;"/>
+                                            </AppBarButton.Icon>
+                                        </AppBarButton>
+                                    </CommandBar.SecondaryCommands>
+                                    <CommandBar.Content>
+                                        <TextBlock Margin="0 12 0 0" VerticalAlignment="Center" Text="Arborescence" FontSize="18"/>
+                                    </CommandBar.Content>
+                                </CommandBar>
+                                <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <MUIXC:TreeView x:Name="TreeCategorie" ItemsSource="{x:Bind ViewModel.Categories}" SelectedItem="{x:Bind PageViewModel.SelectedCategorie, Mode=TwoWay}"
+                                                    CanDragItems="True" AllowDrop="True">
+                                        <MUIXC:TreeView.ItemTemplate>
+                                            <DataTemplate x:DataType="viewModels:CategorieLivreVM">
+                                                <MUIXC:TreeViewItem ItemsSource="{x:Bind SubCategorieLivres}" Content="{x:Bind Name}"></MUIXC:TreeViewItem>
+                                            </DataTemplate>
+                                        </MUIXC:TreeView.ItemTemplate>
 
-                                </MUIXC:TreeView>
+                                    </MUIXC:TreeView>
+                                </Grid>
+                                <MUIXC:TeachingTip x:Name="AddSubCategorieTeachingTip"
+                                    Target="{x:Bind ABBAddSousCategorie}"
+                                    Title="Change themes without hassle"
+                                    Subtitle="It's easier than ever to see control samples in both light and dark theme!"
+                                    PreferredPlacement="Bottom">
+                                    <MUIXC:TeachingTip.HeroContent>
+                                        <Image Source="ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg" AutomationProperties.Name="Sunset" />
+                                    </MUIXC:TeachingTip.HeroContent>
+                                    <!--<MUIXC:TeachingTip.Content>
+                                        <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">To change your desktop theme visit the <Hyperlink NavigateUri="ms-settings:colors">Settings app</Hyperlink>.</TextBlock>
+                                    </MUIXC:TeachingTip.Content>-->
+                                </MUIXC:TeachingTip>
                             </Grid>
                             <!--Column Grid Splitter-->
                             <MTUUControls:GridSplitter Grid.Column="1" Width="5" ResizeBehavior="BasedOnAlignment"
@@ -118,26 +178,25 @@
                                 </Grid.RowDefinitions>
                                 <!--CommandBar-->
                                 <CommandBar Grid.Row="0" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Right" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
-                                    <AppBarButton Label="Ajouter une catégorie" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewCategorieXamlUICommand}">
-                                        <AppBarButton.Icon>
-                                            <FontIcon Glyph="&#xF003;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton Label="Ajouter une sous-catégorie" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewSubCategorieXamlUICommand}">
-                                        <AppBarButton.Icon>
-                                            <FontIcon Glyph="&#xF003;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton Icon="OpenLocal" Label="Ouvrir le dossier" ToolTipService.ToolTip="Ouvre le dossier conteneur" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                    <AppBarButton Icon="Rename" Label="Renommer" ToolTipService.ToolTip="Ouvre le dossier conteneur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource RenameSCategorieXamlUICommand}" CommandParameter="{x:Bind PageViewModel.SelectedCategorie}"/>
                                     <AppBarSeparator/>
                                     <AppBarButton Icon="Delete" Label="Supprimer" ToolTipService.ToolTip="Supprimer la ressource" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
                                     <CommandBar.Content>
-                                        <TextBlock Margin="0 15 0 0" VerticalAlignment="Center" Text="" FontSize="20"/>
+                                        <TextBlock TextWrapping="Wrap" Margin="0 15 0 0"
+                                           Foreground="{ThemeResource SystemControlForegroundAccentBrush}" Visibility="{x:Bind PageViewModel.SelectedCategorie, Converter={StaticResource nullToVisibilityConverter}, Mode=OneWay}">
+                                    <Run Text="La"/>
+                                    <Run Text="sous-catégorie"/>
+                                    <Run Text="{x:Bind PageViewModel.SelectedCategorie.Name, Mode=OneWay}" FontWeight="Bold"/>
+                                    <Run Text="est sélectionnée."/>
+                                        </TextBlock>
                                     </CommandBar.Content>
                                 </CommandBar>
-                                <ContentControl x:Name="ImagePosterContainer" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    
-                                </ContentControl>
+                                <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <TextBox VerticalAlignment="Stretch" TextWrapping="Wrap" AcceptsReturn="True" Text="{x:Bind PageViewModel.SelectedCategorie.Description, Mode=OneWay}" 
+                                             PlaceholderText="Description facultative de la catégorie ou de la sous-catégorie" TextChanged="TbxCategorieDescription_TextChanged">
+                                        
+                                    </TextBox>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </ScrollViewer>
