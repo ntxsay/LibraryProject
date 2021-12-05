@@ -10,58 +10,95 @@ using System.Threading.Tasks;
 
 namespace RostalProjectUWP.ViewModels
 {
-    public class CategorieLivreVM// : INotifyPropertyChanged
+    public class CategorieLivreVM : INotifyPropertyChanged
     {
-        //public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public long Id { get; set; }
+        public long IdLibrary { get; set; }
+        private string _Name { get; set; }
+        public string Name
+        {
+            get => _Name;
+            set
+            {
+                if (_Name != value)
+                {
+                    _Name = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-        public string Description { get; set; }
+        private string _Description;
+        public string Description
+        {
+            get => _Description;
+            set
+            {
+                if (_Description != value)
+                {
+                    _Description = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-        public CategorieType CategorieType { get; set; }
-        //public CategorieType CategorieType
-        //{
-        //    get => _CategorieType;
-        //    set
-        //    {
-        //        if (_CategorieType != value)
-        //        {
-        //            _CategorieType = value;
-        //            OnPropertyChanged();
-        //        }
-        //    }
-        //}
-
-        public ObservableCollection<CategorieLivreVM> SubCategorieLivres { get; set; } = new ObservableCollection<CategorieLivreVM>();
-        //public ObservableCollection<CategorieLivreVM> SubCategorieLivres
-        //{
-        //    get => SubCategorieLivres;
-        //    set
-        //    {
-        //        if (SubCategorieLivres != value)
-        //        {
-        //            SubCategorieLivres = value;
-        //            OnPropertyChanged();
-        //        }
-        //    }
-        //}
+        private ObservableCollection<SubCategorieLivreVM> _SubCategorieLivres = new ObservableCollection<SubCategorieLivreVM>();
+        public ObservableCollection<SubCategorieLivreVM> SubCategorieLivres
+        {
+            get => _SubCategorieLivres;
+            set
+            {
+                if (_SubCategorieLivres != value)
+                {
+                    _SubCategorieLivres = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public List<LivreVM> Livres { get; set; }
 
-        //public void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        //{
-        //    // Raise the PropertyChanged event, passing the name of the property whose value has changed.
-        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        //}
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public class SubCategorieLivreVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public long Id { get; set; }
+        public long IdCategorie { get; set; }
+        private string _Name { get; set; }
+        public string Name
+        {
+            get => _Name;
+            set
+            {
+                if (_Name != value)
+                {
+                    _Name = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private string _Description;
+        public string Description
+        {
+            get => _Description;
+            set
+            {
+                if (_Description != value)
+                {
+                    _Description = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public List<LivreVM> Livres { get; set; }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)

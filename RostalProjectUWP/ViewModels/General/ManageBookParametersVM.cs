@@ -22,7 +22,7 @@ namespace RostalProjectUWP.ViewModels.General
 
     public class ManageLibraryParametersVM
     {
-        public BibliothequeVM ViewModel { get; set; }
+        public IEnumerable<BibliothequeVM> ViewModelList { get; set; }
         public EditMode EditMode { get; set; }
         public string ImageBackgroundPath { get; set; }
         public ManageContainerPage ParentPage { get; set; }
@@ -38,6 +38,7 @@ namespace RostalProjectUWP.ViewModels.General
     public class ManageLibraryParentChildVM
     {
         public BibliothequeVM ViewModel { get; set; }
+        public IEnumerable<BibliothequeVM> ViewModelList { get; set; }
         public ManageLibraryPage ParentPage { get; set; }
         public ManageLibraryParametersVM Parameters { get; set; }
     }

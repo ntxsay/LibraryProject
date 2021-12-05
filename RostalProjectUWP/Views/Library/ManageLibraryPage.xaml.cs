@@ -36,7 +36,7 @@ namespace RostalProjectUWP.Views.Library
     {
         private ManageContainerPage _parentPage;
         public ManageLibraryPageViewModel PageViewModel { get; set; } = new ManageLibraryPageViewModel();
-        private BibliothequeVM ViewModel { get; set; }
+        public IEnumerable<BibliothequeVM> ViewModelList { get; set; }
         public EditMode Mode { get; set; }
         public string Title { get; set; }
         public string _actionButtonName;
@@ -50,10 +50,11 @@ namespace RostalProjectUWP.Views.Library
             base.OnNavigatedTo(e);
             if (e.Parameter is ManageLibraryParametersVM parameters)
             {
-                ViewModel = parameters.ViewModel;
+                ViewModelList = parameters.ViewModelList;
                 Mode = parameters.EditMode;
                 _parentPage = parameters.ParentPage;
-                Initialize(parameters.ViewModel, parameters.EditMode);
+                Mode = parameters.EditMode;
+                Title = "Gestionnaire de bibliothèques";
             }
         }
 
@@ -61,40 +62,6 @@ namespace RostalProjectUWP.Views.Library
         {
             InitializeFirstItem();
         }
-
-        private void Initialize(BibliothequeVM viewModel, EditMode editMode)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                //ThemeListener.ThemeChanged += Listener_ThemeChanged;
-
-                if (viewModel != null)
-                {
-                    ViewModel = viewModel;
-                    Mode = editMode;
-                    switch (Mode)
-                    {
-                        case EditMode.Create:
-                            Title = "Ajouter une bibliothèque";
-                            _actionButtonName = "Créer";
-                            break;
-                        case EditMode.Edit:
-                            Title = $"Editer le livre {(!viewModel.Name.IsStringNullOrEmptyOrWhiteSpace() ? viewModel.Name : "sans nom")}";
-                            _actionButtonName = "Mettre à jour";
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
-                return;
-            }
-        }
-
 
         #region Navigation
         private void InitializeFirstItem()
@@ -109,7 +76,7 @@ namespace RostalProjectUWP.Views.Library
                     MyNavigationView.SelectedItem = first;
                 }
 
-                this.NavigateToView(typeof(ManageLibraryGeneralPage), new ManageLibraryParentChildVM() { ViewModel = ViewModel, ParentPage = this });
+                this.NavigateToView(typeof(ManageLibraryGeneralPage), new ManageLibraryParentChildVM() { ViewModelList = ViewModelList, ParentPage = this });
             }
             catch (Exception ex)
             {
@@ -135,7 +102,7 @@ namespace RostalProjectUWP.Views.Library
 
                 if (itemTag == PageViewModel.GeneralMenuItem.Tag)
                 {
-                    this.NavigateToView(typeof(ManageLibraryGeneralPage), new ManageLibraryParentChildVM() { ViewModel = ViewModel, ParentPage = this });
+                    this.NavigateToView(typeof(ManageLibraryGeneralPage), new ManageLibraryParentChildVM() { ViewModelList = ViewModelList, ParentPage = this });
                 }
                 //else if (itemTag == PageViewModel.CategorieMenuItem.Tag)
                 //{

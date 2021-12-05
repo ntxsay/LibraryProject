@@ -1,4 +1,7 @@
-﻿using RostalProjectUWP.ViewModels.General;
+﻿using RostalProjectUWP.Code.Services.Db;
+using RostalProjectUWP.Models.Local;
+using RostalProjectUWP.ViewModels;
+using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.Views.Book;
 using RostalProjectUWP.Views.Library;
 using System;
@@ -41,7 +44,7 @@ namespace RostalProjectUWP.Views
             if (e.Parameter is ManageLibraryParametersVM libraryParameters)
             {
                 LibraryParameters = libraryParameters;
-                NavigateToView(typeof(ManageLibraryPage), new ManageLibraryParametersVM() { ParentPage = this, ViewModel = libraryParameters.ViewModel, EditMode = libraryParameters.EditMode });
+                NavigateToView(typeof(ManageLibraryPage), new ManageLibraryParametersVM() { ParentPage = this, ViewModelList = libraryParameters.ViewModelList, EditMode = libraryParameters.EditMode });
             }
             else if (e.Parameter is ManageBookParametersVM bookParameters)
             {

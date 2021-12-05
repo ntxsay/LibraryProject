@@ -11,10 +11,20 @@ namespace RostalProjectUWP.ViewModels.General
     {
         public string Value { get; set; }
         public string Description { get; set; }
-        public string ParentName { get; set; }//Seulement pour les sous-catégories
+        //public string ParentName { get; set; }//Seulement pour les sous-catégories
         public IEnumerable<CategorieLivreVM> ViewModelList { get; set; }
         public EditMode EditMode { get; set; }
-        public CategorieType Type { get; set; }
+        //public CategorieType Type { get; set; }
+    }
+
+    public class ManageSubCategorieDialogParametersVM
+    {
+        public string Value { get; set; }
+        public string Description { get; set; }
+        public CategorieLivreVM Categorie { get; set; }//Seulement pour les sous-catégories
+        public IEnumerable<SubCategorieLivreVM> ViewModelList { get; set; }
+        public EditMode EditMode { get; set; }
+        //public CategorieType Type { get; set; }
     }
 
     public class ManageLibraryDialogParametersVM

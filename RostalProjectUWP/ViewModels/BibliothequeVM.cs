@@ -12,8 +12,37 @@ namespace RostalProjectUWP.ViewModels
     public class BibliothequeVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public int Id { get; set; }
-        
+        public long Id { get; set; }
+        public Guid Guid { get; set; } = Guid.NewGuid();
+
+        private DateTime _DateAjout = DateTime.UtcNow;
+        public DateTime DateAjout
+        {
+            get => _DateAjout;
+            set
+            {
+                if (_DateAjout != value)
+                {
+                    _DateAjout = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private DateTime? _DateEdition;
+        public DateTime? DateEdition
+        {
+            get => _DateEdition;
+            set
+            {
+                if (_DateEdition != value)
+                {
+                    _DateEdition = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _Name;
         public string Name
         {

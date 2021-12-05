@@ -23,6 +23,7 @@ namespace RostalProjectUWP.Views.Book.Manage
     public sealed partial class NewCategorieCD : ContentDialog
     {
         private readonly ManageCategorieDialogParametersVM _parameters;
+        private readonly ManageSubCategorieDialogParametersVM _subparameters;
         public string ErrorMessage { get; set; }
         private string ArgName { get; set; }
         public string Value { get; set; }
@@ -36,8 +37,18 @@ namespace RostalProjectUWP.Views.Book.Manage
         {
             this.InitializeComponent();
             _parameters = parameters;
-            Title = parameters.Type == Code.CategorieType.SubCategorie ? $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Renommer")} une sous-catégorie" : $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Renommer")} une catégorie";
-            ArgName = parameters.Type == Code.CategorieType.SubCategorie ? "sous-catégorie" : "catégorie";
+            Title =  $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Renommer")} une catégorie";
+            ArgName = "catégorie";
+            Value = parameters.Value;
+            Description = parameters.Description;
+        }
+
+        public NewCategorieCD(ManageSubCategorieDialogParametersVM parameters)
+        {
+            this.InitializeComponent();
+            _subparameters = parameters;
+            Title = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Renommer")} une sous-catégorie";
+            ArgName = "sous-catégorie";
             Value = parameters.Value;
             Description = parameters.Description;
         }
@@ -48,24 +59,37 @@ namespace RostalProjectUWP.Views.Book.Manage
             {
                 if (Value.IsStringNullOrEmptyOrWhiteSpace())
                 {
-                    TbxErrorMessage.Text = $"Le nom de la {(_parameters.Type == Code.CategorieType.SubCategorie ? "sous-catégorie" : "catégorie")} ne peut pas être vide\nou ne contenir que des espaces blancs.";
+                    TbxErrorMessage.Text = $"Le nom de la {(_subparameters != null ? "sous-catégorie" : "catégorie")} ne peut pas être vide\nou ne contenir que des espaces blancs.";
                     args.Cancel = true;
                     return;
                 }
 
-                if (_parameters.Type == Code.CategorieType.SubCategorie && !_parameters.ParentName.IsStringNullOrEmptyOrWhiteSpace() && _parameters.ParentName.ToLower() == Value.Trim().ToLower())
+                if (_subparameters != null && !_subparameters.Categorie.Name.IsStringNullOrEmptyOrWhiteSpace() && _subparameters.Categorie.Name.ToLower() == Value.Trim().ToLower())
                 {
-                    TbxErrorMessage.Text = $"Le nom de la {(_parameters.Type == Code.CategorieType.SubCategorie ? "sous-catégorie" : "catégorie")} ne peut pas avoir \nle même nom que son parent.";
+                    TbxErrorMessage.Text = $"Le nom de la sous-catégorie ne peut pas avoir \nle même nom que son parent.";
                     args.Cancel = true;
                     return;
                 }
 
-                if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(a => a.Name.ToLower() == Value.Trim().ToLower()))
+                if (_parameters != null)
                 {
-                    TbxErrorMessage.Text = $"Cette {(_parameters.Type == Code.CategorieType.SubCategorie ? "sous-catégorie" : "catégorie")} existe déjà.";
-                    args.Cancel = true;
-                    return;
+                    if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(a => a.Name.ToLower() == Value.Trim().ToLower()))
+                    {
+                        TbxErrorMessage.Text = $"Cette catégorie existe déjà.";
+                        args.Cancel = true;
+                        return;
+                    }
                 }
+                else if (_subparameters != null)
+                {
+                    if (_subparameters.ViewModelList != null && _subparameters.ViewModelList.Any(a => a.Name.ToLower() == Value.Trim().ToLower()))
+                    {
+                        TbxErrorMessage.Text = $"Cette sous-catégorie existe déjà.";
+                        args.Cancel = true;
+                        return;
+                    }
+                }
+                
 
                 TbxErrorMessage.Text = string.Empty;
             }

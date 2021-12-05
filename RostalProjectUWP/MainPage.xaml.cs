@@ -1,5 +1,7 @@
 ﻿using RostalProjectUWP.Code;
 using RostalProjectUWP.Code.Helpers;
+using RostalProjectUWP.Code.Services.Db;
+using RostalProjectUWP.Models.Local;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.Views;
@@ -233,13 +235,12 @@ namespace RostalProjectUWP
                 {
                     if (dialog.ManagePage == ManagePage.Library)
                     {
+                        var libraryList = await DbServices.AllVMAsync<Tlibrary, BibliothequeVM>();
+
                         ManageLibraryParametersVM manageBookParameters = new ManageLibraryParametersVM()
                         {
                             EditMode = EditMode.Create,
-                            ViewModel = new BibliothequeVM()
-                            {
-
-                            },
+                            ViewModelList = libraryList,
                         };
                         OpenManageLibraryPage(manageBookParameters);
                     }
@@ -273,7 +274,7 @@ namespace RostalProjectUWP
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (parameters == null || parameters.ViewModel == null)
+                if (parameters == null)
                 {
                     Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : Le ViewModel est null.");
                     return false;

@@ -8,6 +8,7 @@
     mc:Ignorable="d"
     xmlns:customConverters="using:RostalProjectUWP.Code.Converters"
     xmlns:generalVM="using:RostalProjectUWP.ViewModels.General"
+    xmlns:dTemplateSelectors="using:RostalProjectUWP.Code.DataTemplatesSelector"
     xmlns:viewModels="using:RostalProjectUWP.ViewModels"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
@@ -65,6 +66,36 @@
                        Description="Custom XamlUICommand" 
                        Label="Ajouter ce titre">
         </XamlUICommand>
+        <DataTemplate x:Key="CategorieTemplate" x:DataType="viewModels:CategorieLivreVM">
+            <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}"
+            ItemsSource="{x:Bind SubCategorieLivres, Mode=OneWay}" IsExpanded="True">
+                <Grid RowSpacing="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" ColumnSpacing="8" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0" Glyph="&#xE81E;"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind Name, Mode=OneWay}" FontSize="18"/>
+                    </Grid>
+                    <Rectangle Grid.Row="1" Fill="Black" Height="1" HorizontalAlignment="Stretch"/>
+                </Grid>
+            </MUIXC:TreeViewItem>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SubCategorieTemplate" x:DataType="viewModels:SubCategorieLivreVM">
+            <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
+                <TextBlock Margin="12 0 0 0" Text="{x:Bind Name, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}"/>
+            </MUIXC:TreeViewItem>
+        </DataTemplate>
+        <dTemplateSelectors:CategoriesDataTemplateSelector x:Key="categorieTemplateSelector"
+        CategorieTemplate="{StaticResource CategorieTemplate}"
+        SubCategorieTemplate="{StaticResource SubCategorieTemplate}" />
+
     </Page.Resources>
     <Grid>
         <Grid Margin="5">
@@ -131,9 +162,10 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <!--CommandBar-->
-                                <CommandBar Grid.Row="0" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Right" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
+                                <CommandBar Grid.Row="0" VerticalAlignment="Top" IsSticky="False" DefaultLabelPosition="Right" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
                                     <AppBarButton Label="Ajouter une bibliothèque" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewLibraryXamlUICommand}">
                                         <AppBarButton.Icon>
                                             <FontIcon Glyph="&#xE710;"/>
@@ -173,7 +205,7 @@
                                     </CommandBar.Content>
                                 </CommandBar>
                                 <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <ListView x:Name="ListviewLibrary" ItemsSource="{x:Bind ViewModelList, Mode=TwoWay}" SelectedItem="{x:Bind PageViewModel.SelectedLibrary, Mode=TwoWay}" Background="{ThemeResource SystemControlAcrylicElementBrush}">
+                                    <ListView x:Name="ListviewLibrary" ItemsSource="{x:Bind PageViewModel.ViewModelList, Mode=TwoWay}" SelectedItem="{x:Bind PageViewModel.SelectedLibrary, Mode=TwoWay}" Background="{ThemeResource SystemControlAcrylicElementBrush}">
                                         <ListView.ItemTemplate>
                                             <DataTemplate x:DataType="viewModels:BibliothequeVM">
                                                 <Grid ColumnSpacing="8" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}">
@@ -258,20 +290,15 @@
                                     </CommandBar.Content>
                                 </CommandBar>
                                 <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <MUIXC:TreeView x:Name="TreeCategorie" ItemsSource="{x:Bind PageViewModel.SelectedLibrary.Categories, Mode=OneWay}" SelectedItem="{x:Bind PageViewModel.SelectedCategorie, Mode=TwoWay}">
-                                        <MUIXC:TreeView.ItemTemplate>
-                                            <DataTemplate x:DataType="viewModels:CategorieLivreVM">
-                                                <MUIXC:TreeViewItem ItemsSource="{x:Bind SubCategorieLivres, Mode=OneWay}" Content="{x:Bind Name, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}"></MUIXC:TreeViewItem>
-                                            </DataTemplate>
-                                        </MUIXC:TreeView.ItemTemplate>
-
+                                    <MUIXC:TreeView x:Name="TreeCategorie" ItemsSource="{x:Bind PageViewModel.SelectedLibrary.Categories, Mode=OneWay}" SelectedItem="{x:Bind PageViewModel.SelectedCategorie, Mode=TwoWay}"
+                                                    ItemTemplateSelector="{StaticResource categorieTemplateSelector}">
                                     </MUIXC:TreeView>
                                 </Grid>
                                 <TextBlock Grid.Row="2" TextWrapping="Wrap" Margin="0 15 0 0"
                                            Foreground="{ThemeResource SystemControlForegroundAccentBrush}" Visibility="{x:Bind PageViewModel.SelectedCategorie, Converter={StaticResource nullToVisibilityConverter}, Mode=OneWay}">
                                     <Run Text="La"/>
-                                    <Run Text="catégorie"/>
-                                    <Run Text="{x:Bind PageViewModel.SelectedCategorie.Name, Mode=OneWay}" FontWeight="Bold"/>
+                                    <Run Text="catégorie/sous-catégorie"/>
+                                    <Run Text="{x:Bind PageViewModel.SelectedSCategorieName, Mode=OneWay}" FontWeight="Bold"/>
                                     <Run Text="de la bibliothèque"/>
                                     <Run Text="{x:Bind PageViewModel.SelectedLibrary.Name, Mode=OneWay}" FontWeight="Bold"/>
                                     <Run Text="est sélectionnée."/>

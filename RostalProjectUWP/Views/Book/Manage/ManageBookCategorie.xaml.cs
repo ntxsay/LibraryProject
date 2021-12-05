@@ -76,30 +76,7 @@ namespace RostalProjectUWP.Views.Book.Manage
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                string newCategorie = string.Empty;
-                var dialog = new NewCategorieCD(new ManageCategorieDialogParametersVM()
-                {
-                    Value = newCategorie,
-                    EditMode = Code.EditMode.Create,
-                    Type = Code.CategorieType.Categorie,
-                    ViewModelList = ViewModel.Categories,
-                });
-
-                var result = await dialog.ShowAsync();
-                if (result == ContentDialogResult.Primary)
-                {
-                    newCategorie = dialog.Value?.Trim();
-                    ViewModel.Categories.Add(new CategorieLivreVM()
-                    {
-                        Name = newCategorie,
-                        CategorieType = Code.CategorieType.Categorie,
-                        SubCategorieLivres = new ObservableCollection<CategorieLivreVM>()
-                    });
-                }
-                else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                {
-                    return;
-                }
+                
             }
             catch (Exception ex)
             {
@@ -113,39 +90,7 @@ namespace RostalProjectUWP.Views.Book.Manage
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (TreeCategorie.SelectedItem != null && TreeCategorie.SelectedItem is CategorieLivreVM viewModel && viewModel.CategorieType == Code.CategorieType.Categorie)
-                {
-                    string newSubCategorie = string.Empty;
-                    var dialog = new NewCategorieCD(new ManageCategorieDialogParametersVM()
-                    {
-                        Value = newSubCategorie,
-                        EditMode = Code.EditMode.Create,
-                        Type = Code.CategorieType.SubCategorie,
-                        ViewModelList = viewModel.SubCategorieLivres,
-                        ParentName = viewModel.Name,
-                    });
-
-                    var result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.Primary)
-                    {
-                        newSubCategorie = dialog.Value?.Trim();
-                        viewModel.SubCategorieLivres.Add(new CategorieLivreVM()
-                        {
-                            Name = newSubCategorie,
-                            CategorieType = Code.CategorieType.SubCategorie,
-                        });
-                    }
-                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    AddSubCategorieTeachingTip.Title = ABBAddSousCategorie.Label;
-                    AddSubCategorieTeachingTip.Subtitle = "Pour ajouter une sous-catégorie, ajoutez ou cliquez d'abord sur une catégorie dans l'arborescence à gauche puis cliquez de nouveau sur ce bouton.\n\nAttention : il n'est pas possible d'ajouter une sous-catégorie à une autre sous-catégorie.";
-                    AddSubCategorieTeachingTip.IsOpen = true;
-                }
+                
             }
             catch (Exception ex)
             {
@@ -159,38 +104,7 @@ namespace RostalProjectUWP.Views.Book.Manage
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (PageViewModel.SelectedCategorie != null && TreeCategorie.SelectedItem != null && TreeCategorie.SelectedItem is CategorieLivreVM _viewModel &&
-                    _viewModel == PageViewModel.SelectedCategorie)
-                {
-                    var parentViewModel = GetParentCategorie();
-                    var dialog = new NewCategorieCD(new ManageCategorieDialogParametersVM()
-                    {
-                        Value = _viewModel.Name,
-                        EditMode = Code.EditMode.Edit,
-                        Type = _viewModel.CategorieType,
-                        ViewModelList = _viewModel.CategorieType == Code.CategorieType.SubCategorie ? parentViewModel?.SubCategorieLivres : ViewModel.Categories,
-                        ParentName = _viewModel.CategorieType == Code.CategorieType.SubCategorie ? parentViewModel?.Name : String.Empty,
-                    });
-
-                    var result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.Primary)
-                    {
-                        var newValue = dialog.Value?.Trim();
-                        var _container = this.TreeCategorie.ContainerFromItem(this.TreeCategorie.SelectedItem);
-                        if (_container is Microsoft.UI.Xaml.Controls.TreeViewItem treeviewItem)
-                        {
-                            treeviewItem.Content = newValue;
-                        }
-
-                        _viewModel.Name = newValue;
-                        PageViewModel.SelectedCategorie = null;
-                        PageViewModel.SelectedCategorie = _viewModel;
-                    }
-                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                    {
-                        return;
-                    }
-                }
+                
             }
             catch (Exception ex)
             {
