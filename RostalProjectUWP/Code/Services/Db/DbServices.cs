@@ -38,31 +38,68 @@ namespace RostalProjectUWP.Code.Services.Db
             };
         }
 
-        internal static string DbFile
+        internal static async Task<string> DbFileAsync()
         {
-            get
+            try
             {
-                try
-                {
-                    //StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
-                    StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                //StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
 
-                    StorageFile file = localFolder.GetFileAsync("RostalDB.db").AsTask().GetAwaiter().GetResult();
-                    if (file == null)
-                    {
-                        //ToastServices.PopToast("Le chemin d'accès à la base de données n'est pas valide ou n'a pas été trouvé. Veuillez vérifier vos paramètres.");
-                        throw new Exception("Le chemin d'accès à la base de données n'est pas valide ou n'a pas été trouvé. Veuillez vérifier vos paramètres.");
-                        //return null;
-                    }
-                    Debug.WriteLine(file.Path);
-                    return file.Path;
-                }
-                catch (Exception ex)
+                var destinatedDbFile = await localFolder.TryGetItemAsync("RostalDB.db");
+                if (destinatedDbFile != null && destinatedDbFile.IsOfType(StorageItemTypes.File))
                 {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
-                    return null;
+                    return destinatedDbFile.Path;
                 }
+
+                StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                var originalDbFile = await installedLocation.TryGetItemAsync("RostalDB.db");
+                if (originalDbFile != null && originalDbFile.IsOfType(StorageItemTypes.File))
+                {
+                    var file = await installedLocation.GetFileAsync("RostalDB.db");
+                    if (file != null)
+                    {
+                        var copiedDbFile =  await file.CopyAsync(localFolder);
+                        if (copiedDbFile != null)
+                        {
+                            return copiedDbFile.Path;
+                        }
+                    }
+                }
+
+                throw new Exception("Le chemin d'accès à la base de données n'est pas valide ou n'a pas été trouvé. Veuillez vérifier vos paramètres.");
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return null;
+            }
+        }
+
+        internal static string DbFile()
+        {
+            try
+            {
+                //StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+
+                StorageFile file = localFolder.GetFileAsync("RostalDB.db").AsTask().GetAwaiter().GetResult();
+                if (file == null)
+                {
+                    StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
+
+                    //ToastServices.PopToast("Le chemin d'accès à la base de données n'est pas valide ou n'a pas été trouvé. Veuillez vérifier vos paramètres.");
+                    throw new Exception("Le chemin d'accès à la base de données n'est pas valide ou n'a pas été trouvé. Veuillez vérifier vos paramètres.");
+                    //return null;
+                }
+                Debug.WriteLine(file.Path);
+                return file.Path;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                return null;
             }
         }
 
