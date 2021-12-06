@@ -18,8 +18,6 @@ namespace RostalProjectUWP.Code.Services.Db
         internal const string ViewModelNullOrEmptyMessage = "Le modèle de vue est null ou ne contient aucun élément.";
         internal const string ParentIdNullOrEmptyMessage = "L'id parent n'est pas renseigné.";
         internal const string UnsupportedTParameter = "Le type du paramètre T n'est pas supporté.";
-        internal const string AnimeNotExists = "Impossible de trouver cet animé.";
-        internal const string AnimeLinkNotExists = "L'animé en lien n'existe pas.";
         //internal static readonly RostalDbContext Context = new RostalDbContext();
 
         internal static OperationStateVM ViewModelEmpty

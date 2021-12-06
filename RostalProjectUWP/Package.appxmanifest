@@ -8,7 +8,7 @@
   IgnorableNamespaces="uap mp rescap">
 
   <Identity
-    Name="c684c2eb-9229-4d9a-8fec-e0579a2bbbe7"
+    Name="Rostalotheque"
     Publisher="CN=AKATSUKI"
     Version="1.0.0.0" />
 
@@ -16,7 +16,7 @@
 
   <Properties>
     <DisplayName>RostalProjectUWP</DisplayName>
-    <PublisherDisplayName>AKATSUKI</PublisherDisplayName>
+    <PublisherDisplayName>ntxsay</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

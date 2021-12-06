@@ -93,9 +93,10 @@ namespace RostalProjectUWP.Views.Library.Manage
                         Description = description,
                     };
 
-                    var creationResult = await DbServices.CreateAsync<Tlibrary, BibliothequeVM>(newViewModel);
+                    var creationResult = await DbServices.Library.CreateAsync(newViewModel);
                     if (creationResult.IsSuccess)
                     {
+                        newViewModel.Id = creationResult.Id;
                         PageViewModel.ViewModelList.Add(newViewModel);
                     }
                     else
@@ -138,9 +139,25 @@ namespace RostalProjectUWP.Views.Library.Manage
                         var newValue = dialog.Value?.Trim();
                         var newDescription = dialog.Description?.Trim();
 
-                        //_viewModel.Name = newValue;
-                        PageViewModel.SelectedLibrary.Name = newValue;
-                        PageViewModel.SelectedLibrary.Description = newDescription;
+                        var updatedViewModel = new BibliothequeVM()
+                        {
+                            Id = _viewModel.Id,
+                            Name = newValue,
+                            Description = newDescription,
+                            DateEdition = DateTime.UtcNow,
+                        };
+
+                        var updateResult = await DbServices.Library.UpdateAsync(updatedViewModel);
+                        if (updateResult.IsSuccess)
+                        {
+                            //_viewModel.Name = newValue;
+                            PageViewModel.SelectedLibrary.Name = newValue;
+                            PageViewModel.SelectedLibrary.Description = newDescription;
+                        }
+                        else
+                        {
+                            //Erreur
+                        }
                     }
                     else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                     {
@@ -247,7 +264,7 @@ namespace RostalProjectUWP.Views.Library.Manage
                             Description = description,
                         };
 
-                        var creationResult = await DbServices.CreateAsync<TlibraryCategorie, CategorieLivreVM>(newViewModel);
+                        var creationResult = await DbServices.Categorie.CreateAsync(newViewModel);
                         if (creationResult.IsSuccess)
                         {
                             newViewModel.Id = creationResult.Id;
@@ -300,7 +317,7 @@ namespace RostalProjectUWP.Views.Library.Manage
                             Description = description,
                         };
 
-                        var creationResult = await DbServices.CreateAsync<TlibrarySubCategorie, SubCategorieLivreVM>(newViewModel);
+                        var creationResult = await DbServices.SubCategorie.CreateAsync(newViewModel);
                         if (creationResult.IsSuccess)
                         {
                             newViewModel.Id = creationResult.Id;
@@ -334,7 +351,7 @@ namespace RostalProjectUWP.Views.Library.Manage
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ListviewLibrary.SelectedItem != null && ListviewLibrary.SelectedItem is BibliothequeVM _viewModel && _viewModel == PageViewModel.SelectedLibrary && TreeCategorie.SelectedItem != null)
+                if (ListviewLibrary.SelectedItem != null && ListviewLibrary.SelectedItem is BibliothequeVM _viewModelLibrary && _viewModelLibrary == PageViewModel.SelectedLibrary && TreeCategorie.SelectedItem != null)
                 {
                     if (TreeCategorie.SelectedItem is CategorieLivreVM _viewModelCategorie && _viewModelCategorie == PageViewModel.SelectedCategorie)
                     {
@@ -344,7 +361,7 @@ namespace RostalProjectUWP.Views.Library.Manage
                             Value = _viewModelCategorie.Name,
                             Description = _viewModelCategorie.Description,
                             EditMode = Code.EditMode.Edit,
-                            ViewModelList = _viewModel.Categories,
+                            ViewModelList = _viewModelLibrary.Categories,
                         });
 
                         var result = await dialog.ShowAsync();
@@ -353,8 +370,24 @@ namespace RostalProjectUWP.Views.Library.Manage
                             var newValue = dialog.Value?.Trim();
                             var newDescription = dialog.Description?.Trim();
 
-                            _viewModelCategorie.Name = newValue;
-                            _viewModelCategorie.Description = newDescription;
+                            var updatedViewModel = new CategorieLivreVM()
+                            {
+                                Id = _viewModelCategorie.Id,
+                                IdLibrary = _viewModelLibrary.Id,
+                                Name = newValue,
+                                Description = newDescription,
+                            };
+
+                            var updateResult = await DbServices.Categorie.UpdateAsync(updatedViewModel);
+                            if (updateResult.IsSuccess)
+                            {
+                                _viewModelCategorie.Name = newValue;
+                                _viewModelCategorie.Description = newDescription;
+                            }
+                            else
+                            {
+                                //Erreur
+                            }
                         }
                         else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                         {
@@ -363,14 +396,19 @@ namespace RostalProjectUWP.Views.Library.Manage
                     }
                     else if (TreeCategorie.SelectedItem is SubCategorieLivreVM _viewModelSubCategorie && _viewModelSubCategorie == PageViewModel.SelectedCategorie)
                     {
-                        CategorieLivreVM parentViewModel = GetParentCategorie();
+                        CategorieLivreVM viewModelParentCategorie = GetParentCategorie();
+                        if (viewModelParentCategorie == null)
+                        {
+                            return;
+                        }
+
                         var dialog = new NewCategorieCD(new ManageSubCategorieDialogParametersVM()
                         {
                             Value = _viewModelSubCategorie.Name,
                             Description = _viewModelSubCategorie.Description,
                             EditMode = Code.EditMode.Edit,
-                            ViewModelList = parentViewModel?.SubCategorieLivres,
-                            Categorie = parentViewModel,
+                            ViewModelList = viewModelParentCategorie?.SubCategorieLivres,
+                            Categorie = viewModelParentCategorie,
                         });
 
                         var result = await dialog.ShowAsync();
@@ -379,8 +417,24 @@ namespace RostalProjectUWP.Views.Library.Manage
                             var newValue = dialog.Value?.Trim();
                             var newDescription = dialog.Description?.Trim();
 
-                            _viewModelSubCategorie.Name = newValue;
-                            _viewModelSubCategorie.Description = newDescription;
+                            var updatedViewModel = new SubCategorieLivreVM()
+                            {
+                                Id = _viewModelSubCategorie.Id,
+                                IdCategorie = viewModelParentCategorie.Id,
+                                Name = newValue,
+                                Description = newDescription,
+                            };
+
+                            var updateResult = await DbServices.SubCategorie.UpdateAsync(updatedViewModel);
+                            if (updateResult.IsSuccess)
+                            {
+                                _viewModelSubCategorie.Name = newValue;
+                                _viewModelSubCategorie.Description = newDescription;
+                            }
+                            else
+                            {
+                                //Erreur
+                            }
                         }
                         else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                         {

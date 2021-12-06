@@ -73,7 +73,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Grid.Column="1" Spacing="8" Visibility="{x:Bind PrincipalNaviguation.IsPaneOpen, Mode=OneWay, Converter={StaticResource InvertBoolToVisibilityConverter}}">
                     <Image Source="Assets/Square44x44Logo.png"  HorizontalAlignment="Left" Width="20" Height="20"/>
-                    <TextBlock Text="Projet LNA" Margin="0,6,0,0"/>
+                    <TextBlock Text="Rostalothèque" Margin="0,6,0,0"/>
                 </StackPanel>
             </Grid>
             <Grid Grid.Column="1" Background="Transparent"/>

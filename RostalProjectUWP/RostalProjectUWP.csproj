@@ -128,12 +128,16 @@
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
     <Compile Include="Code\Helpers\VisualViewHelpers.cs" />
+    <Compile Include="Code\Services\Db\SubCategorie_db.cs" />
     <Compile Include="Code\Services\Db\DbServices.cs" />
+    <Compile Include="Code\Services\Db\General_db..cs" />
+    <Compile Include="Code\Services\Db\Categorie_db.cs" />
     <Compile Include="Code\Services\Db\Library_db.cs" />
     <Compile Include="Code\Services\ES\EsViewModel.cs" />
     <Compile Include="Code\Services\ES\Files.cs" />
     <Compile Include="Code\Services\ES\Files_JsonSerialization.cs" />
     <Compile Include="Code\Services\ES\Folders.cs" />
+    <Compile Include="Code\Services\Logging\Logs.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

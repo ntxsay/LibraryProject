@@ -235,7 +235,7 @@ namespace RostalProjectUWP
                 {
                     if (dialog.ManagePage == ManagePage.Library)
                     {
-                        var libraryList = await DbServices.AllVMAsync<Tlibrary, BibliothequeVM>();
+                        var libraryList = await DbServices.Library.AllVMAsync();
 
                         ManageLibraryParametersVM manageBookParameters = new ManageLibraryParametersVM()
                         {
