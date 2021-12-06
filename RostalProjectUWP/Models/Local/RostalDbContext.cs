@@ -13,7 +13,7 @@ namespace RostalProjectUWP.Models.Local
     {
         public RostalDbContext()
         {
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
         }
 
         public RostalDbContext(DbContextOptions<RostalDbContext> options)
@@ -29,11 +29,12 @@ namespace RostalProjectUWP.Models.Local
         public virtual DbSet<TlibraryCategorie> TlibraryCategorie { get; set; }
         public virtual DbSet<TlibrarySubCategorie> TlibrarySubCategorie { get; set; }
 
-        protected override async void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite($"Data Source={await DbServices.DbFileAsync()}");
+                var dbFile = DbServices.DbFile();
+                optionsBuilder.UseSqlite($"Data Source={dbFile}");
             }
         }
 

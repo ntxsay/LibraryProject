@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.Models.Local;
 using RostalProjectUWP.ViewModels.General;
 using Windows.Storage;
@@ -13,6 +14,7 @@ namespace RostalProjectUWP.Code.Services.Db
 {
     internal partial class DbServices
     {
+        internal const string DbName = "RostalDB.db";
         internal const string RecordNotExistMessage = "Cet enregistrement n'existe pas.";
         internal const string RecordAlreadyExistMessage = "Cet enregistrement existe déjà.";
         internal const string ViewModelNullOrEmptyMessage = "Le modèle de vue est null ou ne contient aucun élément.";
@@ -42,23 +44,21 @@ namespace RostalProjectUWP.Code.Services.Db
         {
             try
             {
-                //StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
                 StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-
-                var destinatedDbFile = await localFolder.TryGetItemAsync("RostalDB.db");
+                var destinatedDbFile = await localFolder.TryGetItemAsync(DbName);
                 if (destinatedDbFile != null && destinatedDbFile.IsOfType(StorageItemTypes.File))
                 {
                     return destinatedDbFile.Path;
                 }
 
                 StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
-                var originalDbFile = await installedLocation.TryGetItemAsync("RostalDB.db");
+                var originalDbFile = await installedLocation.TryGetItemAsync(DbName);
                 if (originalDbFile != null && originalDbFile.IsOfType(StorageItemTypes.File))
                 {
-                    var file = await installedLocation.GetFileAsync("RostalDB.db");
+                    var file = await installedLocation.GetFileAsync(DbName);
                     if (file != null)
                     {
-                        var copiedDbFile =  await file.CopyAsync(localFolder);
+                        var copiedDbFile = await file.CopyAsync(localFolder);
                         if (copiedDbFile != null)
                         {
                             return copiedDbFile.Path;
@@ -71,7 +71,7 @@ namespace RostalProjectUWP.Code.Services.Db
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                Debug.WriteLine(Logs.GetLog(ex, m));
                 return null;
             }
         }
@@ -80,29 +80,39 @@ namespace RostalProjectUWP.Code.Services.Db
         {
             try
             {
-                //StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
                 StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-
-                StorageFile file = localFolder.GetFileAsync("RostalDB.db").AsTask().GetAwaiter().GetResult();
-                if (file == null)
+                var destinatedDbFile = localFolder.TryGetItemAsync(DbName).AsTask().GetAwaiter().GetResult();
+                if (destinatedDbFile != null && destinatedDbFile.IsOfType(StorageItemTypes.File))
                 {
-                    StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
-
-                    //ToastServices.PopToast("Le chemin d'accès à la base de données n'est pas valide ou n'a pas été trouvé. Veuillez vérifier vos paramètres.");
-                    throw new Exception("Le chemin d'accès à la base de données n'est pas valide ou n'a pas été trouvé. Veuillez vérifier vos paramètres.");
-                    //return null;
+                    return destinatedDbFile.Path;
                 }
-                Debug.WriteLine(file.Path);
-                return file.Path;
+
+                StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                var originalDbFile = installedLocation.TryGetItemAsync(DbName).AsTask().GetAwaiter().GetResult();
+                if (originalDbFile != null && originalDbFile.IsOfType(StorageItemTypes.File))
+                {
+                    var file = installedLocation.GetFileAsync(DbName).AsTask().GetAwaiter().GetResult();
+                    if (file != null)
+                    {
+                        var copiedDbFile = file.CopyAsync(localFolder).AsTask().GetAwaiter().GetResult();
+                        if (copiedDbFile != null)
+                        {
+                            return copiedDbFile.Path;
+                        }
+                    }
+                }
+
+                throw new Exception("Le chemin d'accès à la base de données n'est pas valide ou n'a pas été trouvé. Veuillez vérifier vos paramètres.");
             }
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                Debug.WriteLine(Logs.GetLog(ex, m));
                 return null;
             }
         }
 
+        #region Aide-mémoire
         //public RostalDbContext()
         //{
         //    Database.EnsureCreated();
@@ -116,7 +126,17 @@ namespace RostalProjectUWP.Code.Services.Db
         //    }
         //}
 
-        //ValueGeneratedNever ==> ValueGeneratedOnAdd
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
+        //        var dbFile = DbServices.DbFile();
+        //        optionsBuilder.UseSqlite($"Data Source={dbFile}");
+        //    }
+        //}
+
+        //ValueGeneratedNever ==> ValueGeneratedOnAdd 
+        #endregion
     }
 
 }
