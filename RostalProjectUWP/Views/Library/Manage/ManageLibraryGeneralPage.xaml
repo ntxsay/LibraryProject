@@ -171,7 +171,7 @@
                                             <FontIcon Glyph="&#xE710;"/>
                                         </AppBarButton.Icon>
                                     </AppBarButton>
-                                    <AppBarButton x:Name="ABBRenameLibrary" Icon="Rename" Label="Renommer" ToolTipService.ToolTip="Ouvre le dossier conteneur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource RenameLibraryXamlUICommand}" CommandParameter="{x:Bind PageViewModel.SelectedCategorie}"/>
+                                    <AppBarButton x:Name="ABBRenameLibrary" Icon="Edit" Label="Editer" ToolTipService.ToolTip="Ouvre le dossier conteneur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource RenameLibraryXamlUICommand}" CommandParameter="{x:Bind PageViewModel.SelectedCategorie}"/>
                                     <AppBarButton x:Name="ABBDeleteLibrary" Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Visibility="{x:Bind PageViewModel.SelectedLibrary, Converter={StaticResource nullToVisibilityConverter}, Mode=OneWay}">
                                         <AppBarButton.Flyout>
                                             <Flyout>
@@ -276,7 +276,7 @@
                                         </AppBarButton.Icon>
                                     </AppBarButton>
                                     <AppBarSeparator/>
-                                    <AppBarButton Icon="Rename" Label="Renommer" ToolTipService.ToolTip="Ouvre le dossier conteneur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource RenameSCategorieXamlUICommand}" CommandParameter="{x:Bind PageViewModel.SelectedCategorie}"/>
+                                    <AppBarButton Icon="Edit" Label="Editer" ToolTipService.ToolTip="Ouvre le dossier conteneur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource RenameSCategorieXamlUICommand}" CommandParameter="{x:Bind PageViewModel.SelectedCategorie}"/>
                                     <AppBarButton Icon="Delete" Label="Supprimer" ToolTipService.ToolTip="Supprimer la ressource" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
                                     <CommandBar.SecondaryCommands>
                                         <AppBarButton Label="Exporter au format JSON" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportTreeToJsonXamlUICommand}">

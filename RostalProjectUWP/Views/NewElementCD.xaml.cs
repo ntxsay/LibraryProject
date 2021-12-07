@@ -24,12 +24,8 @@ namespace RostalProjectUWP.Views
         public NewElementCD()
         {
             this.InitializeComponent();
-        }
-
-        public NewElementCD(ManagePage managePage)
-        {
-            this.InitializeComponent();
-            ManagePage = managePage;
+            ManagePage = ManagePage.None;
+            this.PrimaryButtonText = "Faites un choix";
         }
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -41,18 +37,22 @@ namespace RostalProjectUWP.Views
                     if (listView.SelectedIndex == -1)
                     {
                         ManagePage = ManagePage.None;
+                        this.PrimaryButtonText = "Faites un choix";
                     }
                     else if (listView.SelectedIndex == 0)
                     {
                         ManagePage = ManagePage.Library;
+                        this.PrimaryButtonText = "Ouvrir";
                     }
                     else if (listView.SelectedIndex == 1)
                     {
                         ManagePage = ManagePage.Book;
+                        this.PrimaryButtonText = "Créer";
                     }
                     else if (listView.SelectedIndex == 2)
                     {
                         ManagePage = ManagePage.Contacts;
+                        this.PrimaryButtonText = "Créer";
                     }
                 }
             }
@@ -65,6 +65,19 @@ namespace RostalProjectUWP.Views
 
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+            try
+            {
+                if (ManagePage == ManagePage.None)
+                {
+                    args.Cancel = true;
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

@@ -33,7 +33,8 @@ namespace RostalProjectUWP.Views.Library.Manage
         {
             this.InitializeComponent();
             _parameters = parameters;
-            Title = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Renommer")} une bibliothèque";
+            Title = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} une bibliothèque";
+            this.PrimaryButtonText = (parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Mettre à jour");
             Value = parameters.Value;
             Description = parameters.Description;
         }

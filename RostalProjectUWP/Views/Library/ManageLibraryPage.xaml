@@ -120,10 +120,7 @@
         <Grid Grid.Row="2" Margin="8">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button x:Name="BtnCancel" Grid.Column="1" Margin="5 0 0 0" Click="BtnCancel_Click">
-                    <TextBlock Text="Annuler"/>
-                </Button>
-                <Button x:Name="BtnAction" Grid.Column="1" Margin="5 0 0 0" Click="BtnAction_Click">
-                    <TextBlock Text="{x:Bind _actionButtonName}" />
+                    <TextBlock Text="Fermer"/>
                 </Button>
             </StackPanel>
         </Grid>

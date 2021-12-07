@@ -37,7 +37,8 @@ namespace RostalProjectUWP.Views.Book.Manage
         {
             this.InitializeComponent();
             _parameters = parameters;
-            Title =  $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Renommer")} une catégorie";
+            Title =  $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} une catégorie";
+            this.PrimaryButtonText = (parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Mettre à jour");
             ArgName = "catégorie";
             Value = parameters.Value;
             Description = parameters.Description;
@@ -47,7 +48,8 @@ namespace RostalProjectUWP.Views.Book.Manage
         {
             this.InitializeComponent();
             _subparameters = parameters;
-            Title = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Renommer")} une sous-catégorie";
+            Title = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} une sous-catégorie";
+            this.PrimaryButtonText = (parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Mettre à jour");
             ArgName = "sous-catégorie";
             Value = parameters.Value;
             Description = parameters.Description;
