@@ -61,205 +61,8 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        private void InitializeModelList()
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-                {
-                    return;
-                }
-
-                this.ItemsGroupOnStartUp();
-
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        #region Groups
-        private void ItemsGroupOnStartUp()
-        {
-            try
-            {
-                var groupItems = GetGroupedItemsByNone;
-                if (groupItems == null || !groupItems.Any())
-                {
-                    return;
-                }
-
-                if (ViewModelPage.GroupedRelatedViewModel.Collection != null)
-                {
-                    foreach (IGrouping<string, BibliothequeVM> item in groupItems)
-                    {
-                        ViewModelPage.GroupedRelatedViewModel.Collection.Add(item);
-                    }
-                }
-                else
-                {
-                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(groupItems);
-                    this.Bindings.Update();
-                }
-
-                //ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.None;
-
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        private IEnumerable<IGrouping<string, BibliothequeVM>> GetGroupedItemsByNone
-        {
-            get
-            {
-                try
-                {
-                    if (ViewModelPage.ViewModelList == null || !this.ViewModelPage.ViewModelList.Any())
-                    {
-                        return Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
-                    }
-
-                    var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
-                    if (GroupingItems == null || !GroupingItems.Any()) return Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
-
-                    return GroupingItems;
-                }
-                catch (Exception)
-                {
-                    return Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
-                }
-            }
-        }
-
-        private void GroupItemsByNone()
-        {
-            try
-            {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-                {
-                    return;
-                }
-
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Any())
-                {
-                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.None;
-                    this.Bindings.Update();
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        private void GroupItemsByAlphabetic()
-        {
-            try
-            {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-                {
-                    return;
-                }
-
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Name.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
-                {
-                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.Letter;
-                    this.Bindings.Update();
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void GroupByDebutDiffusionYear()
-        {
-            try
-            {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-                {
-                    return;
-                }
-
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
-                {
-                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
-                    this.Bindings.Update();
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        #endregion
-
-        #region Group-Orders
-        private IEnumerable<BibliothequeVM> OrderItems(IEnumerable<BibliothequeVM> Collection, LibraryGroupVM.OrderBy OrderBy = LibraryGroupVM.OrderBy.Croissant, LibraryGroupVM.SortBy SortBy = LibraryGroupVM.SortBy.Name)
-        {
-            try
-            {
-                if (Collection == null || Collection.Count() == 0)
-                {
-                    return null;
-                }
-
-                if (SortBy == LibraryGroupVM.SortBy.Name)
-                {
-                    if (OrderBy == LibraryGroupVM.OrderBy.Croissant)
-                    {
-                        return Collection.Where(w => w != null && !w.Name.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.Name);
-                    }
-                    else if (OrderBy == LibraryGroupVM.OrderBy.DCroissant)
-                    {
-                        return Collection.Where(w => w != null && !w.Name.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.Name);
-                    }
-                }
-                else if (SortBy == LibraryGroupVM.SortBy.DateCreation)
-                {
-                    if (OrderBy == LibraryGroupVM.OrderBy.Croissant)
-                    {
-                        return Collection.OrderBy(o => o.DateAjout);
-                    }
-                    else if (OrderBy == LibraryGroupVM.OrderBy.DCroissant)
-                    {
-                        return Collection.OrderByDescending(o => o.DateAjout);
-                    }
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return Enumerable.Empty<BibliothequeVM>();
-            }
-        }
-
-        #endregion
-
-        public void NavigateToView(Type page, object parameters)
         #region Navigation
+        public void NavigateToView(Type page, object parameters)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -278,6 +81,11 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                if (FramePartialView.Content is LibraryCollectionGridViewPage)
+                {
+                    return;
+                }
+
                 NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
             }
             catch (Exception ex)
@@ -285,8 +93,59 @@ namespace RostalProjectUWP.Views.Library
                 Logs.Log(ex, m);
                 return;
             }
-        } 
+        }
         #endregion
+
+        private void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                {
+                    libraryCollectionGridViewPage.GroupItemsByAlphabetic();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void GroupByCreationYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                {
+                    libraryCollectionGridViewPage.GroupByCreationYear();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                {
+                    libraryCollectionGridViewPage.GroupItemsByNone();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
     }
 
     public class LibraryCollectionPageVM : INotifyPropertyChanged

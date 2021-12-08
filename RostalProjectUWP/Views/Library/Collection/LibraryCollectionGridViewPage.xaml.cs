@@ -126,7 +126,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
-        private void GroupItemsByNone()
+        public void GroupItemsByNone()
         {
             try
             {
@@ -150,7 +150,7 @@ namespace RostalProjectUWP.Views.Library.Collection
                 return;
             }
         }
-        private void GroupItemsByAlphabetic()
+        public void GroupItemsByAlphabetic()
         {
             try
             {
@@ -175,7 +175,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
-        private void GroupByDebutDiffusionYear()
+        public void GroupByCreationYear()
         {
             try
             {
@@ -253,7 +253,17 @@ namespace RostalProjectUWP.Views.Library.Collection
 
         private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            try
+            {
+               
 
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
     }
 

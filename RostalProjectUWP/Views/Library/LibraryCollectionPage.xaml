@@ -29,7 +29,16 @@
         <XamlUICommand x:Name="GridViewCollectionXamlUICommand" 
                        ExecuteRequested="GridViewCollectionXamlUICommand_ExecuteRequested"
                        Description="Affiche la vue grille des bibliothèques" 
-                       Label="Vue grille">
+                       Label="Affichage grille">
+        </XamlUICommand>
+        <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
+                       ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <XamlUICommand x:Name="GroupByCreationYearXamlUICommand" 
+                       ExecuteRequested="GroupByCreationYearXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <XamlUICommand x:Name="GroupByNoneXamlUICommand" 
+                       ExecuteRequested="GroupByNoneXamlUICommand_ExecuteRequested">
         </XamlUICommand>
     </Page.Resources>
     <Grid>
@@ -93,8 +102,10 @@
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <ToggleMenuFlyoutItem Text="Année de création"/>
-                        <ToggleMenuFlyoutItem Text="Lettre"/>
+                        <ToggleMenuFlyoutItem Text="Année de création" Command="{StaticResource GroupByCreationYearXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem Text="Lettre" Command="{StaticResource GroupByLetterXamlUICommand}"/>
+                        <MenuFlyoutSeparator/>
+                        <ToggleMenuFlyoutItem Text="Aucun" Command="{StaticResource GroupByNoneXamlUICommand}"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
