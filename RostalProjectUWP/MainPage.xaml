@@ -8,7 +8,7 @@
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    mc:Ignorable="d"
+    mc:Ignorable="d" Loaded="Page_Loaded"
     Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
     <!--Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"-->
     <Page.Resources>
@@ -24,12 +24,12 @@
                         <FontIcon Glyph="&#xe721;"/>
                     </MUIXC:NavigationViewItem.Icon>
                 </MUIXC:NavigationViewItem>
-                <MUIXC:NavigationViewItem Content="Nouvel élément" ToolTipService.ToolTip="Crée ou importe un élément" Tag="AddNewElement">
+                <MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.NewElementMenuItem.Text}" ToolTipService.ToolTip="Crée ou importe un élément" Tag="{x:Bind ViewModelPage.NewElementMenuItem.Tag}">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xe710;"/>
                     </MUIXC:NavigationViewItem.Icon>
                 </MUIXC:NavigationViewItem>
-                <MUIXC:NavigationViewItem Content="Bibliothèques" ToolTipService.ToolTip="Affiche la liste des bibliothèques de disponible" Tag="proposeGenre">
+                <MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.LibraryCollectionMenuItem.Text}" ToolTipService.ToolTip="Affiche la liste des bibliothèques de disponible" Tag="{x:Bind ViewModelPage.LibraryCollectionMenuItem.Tag}">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8F1;"/>
                     </MUIXC:NavigationViewItem.Icon>

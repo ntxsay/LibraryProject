@@ -43,4 +43,10 @@ namespace RostalProjectUWP.ViewModels.General
         public ManageLibraryParametersVM Parameters { get; set; }
     }
 
+    public class LibraryCollectionParentChildParamsVM
+    {
+        public IEnumerable<BibliothequeVM> ViewModelList { get; set; }
+        public LibraryCollectionPage ParentPage { get; set; }
+    }
+
 }

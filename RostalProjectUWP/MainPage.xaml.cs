@@ -1,6 +1,7 @@
 ﻿using RostalProjectUWP.Code;
 using RostalProjectUWP.Code.Helpers;
 using RostalProjectUWP.Code.Services.Db;
+using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.Models.Local;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
@@ -38,12 +39,29 @@ namespace RostalProjectUWP
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        public MainPageViewModel ViewModelPage { get; set; }
+        public MainPageViewModel ViewModelPage { get; set; } = new MainPageViewModel();
         public MainPage()
         {
             this.InitializeComponent();
-            ViewModelPage = new MainPageViewModel(this);
             this.TitleBarCustomization();
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (PrincipalNaviguation.MenuItems[2] is Microsoft.UI.Xaml.Controls.NavigationViewItem first)
+                {
+                    PrincipalNaviguation.SelectedItem = first;
+                }
+                await LibraryCollectionNavigationAsync();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         #region Title Bar
@@ -145,11 +163,14 @@ namespace RostalProjectUWP
                     return;
                 }
 
-                if (itemTag == "AddNewElement")
+                if (itemTag == ViewModelPage.NewElementMenuItem.Tag)
                 {
                     await AddElementNavigationAsync();
                 }
-                
+                else if (itemTag == ViewModelPage.LibraryCollectionMenuItem.Tag)
+                {
+                    await LibraryCollectionNavigationAsync();
+                }
             }
             catch (Exception)
             {
@@ -182,7 +203,7 @@ namespace RostalProjectUWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                Logs.Log(ex, m);
                 return false;
             }
         }
@@ -198,7 +219,7 @@ namespace RostalProjectUWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                Logs.Log(ex, m);
                 return;
             }
         }
@@ -217,7 +238,7 @@ namespace RostalProjectUWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                Logs.Log(ex, m);
                 return;
             }
         }
@@ -226,6 +247,7 @@ namespace RostalProjectUWP
 
         private async Task AddElementNavigationAsync()
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 var dialog = new NewElementCD();
@@ -262,10 +284,24 @@ namespace RostalProjectUWP
                     return;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
 
-                throw;
+        private async Task<bool> LibraryCollectionNavigationAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                return NavigateToView("Library.LibraryCollectionPage", null);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return false;
             }
         }
 
@@ -284,7 +320,7 @@ namespace RostalProjectUWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                Logs.Log(ex, m);
                 return false;
             }
         }
@@ -304,89 +340,35 @@ namespace RostalProjectUWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+                Logs.Log(ex, m);
                 return false;
             }
         }
 
-        //public bool OpenCollection(IEnumerable<AnimeVM> viewModelList)
-        //{
-        //    MethodBase m = MethodBase.GetCurrentMethod();
-        //    try
-        //    {
-        //        if (viewModelList == null)
-        //        {
-        //            Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : Le ViewModel est null.");
-        //            return false;
-        //        }
-
-        //        #region Header
-        //        Run runTitle = new Run()
-        //        {
-        //            Text = "Les animes",
-        //            FontWeight = FontWeights.Medium,
-        //        };
-
-        //        TextBlock header = new TextBlock();
-        //        header.Inlines.Add(runTitle);
-        //        #endregion
-
-        //        object settingViewDisplay = settingsServices.GetSetting(SettingsServices.Names.Display.ViewDisplayMode);
-        //        if (settingViewDisplay is string stringDisplayMode)
-        //        {
-        //            _displayViewModeUI.UpdateWindowTitle(settingsServices);
-        //            if (stringDisplayMode == SettingsServices.Values.Display.OnePageView)
-        //            {
-        //                MainPage mainPage = GetMainPage;
-        //                if (mainPage == null)
-        //                {
-        //                    Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : mainPage est null.");
-        //                    return false;
-        //                }
-        //                return _navigationUI.NavigateToView(NavigationUI.Path.Anime.AnimeList, viewModelList);
-        //            }
-        //            else if (stringDisplayMode == SettingsServices.Values.Display.TabView)
-        //            {
-        //                TabsUI tabs = new TabsUI("anime-local-collection", header, new AnimeCollectionPage(viewModelList),
-        //                    new Microsoft.UI.Xaml.Controls.SymbolIconSource()
-        //                    {
-        //                        Symbol = Symbol.List
-        //                    }, true);
-        //                tabs.OpenTab();
-        //                return true;
-        //            }
-        //        }
-
-        //        return false;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
-        //        return false;
-        //    }
-        //}
         #endregion
+
+        
     }
 
     public class MainPageViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        private readonly MainPage _mainPage;
         public MainPageViewModel()
         {
 
         }
 
-        public MainPageViewModel(MainPage mainPage)
+        public ItemTagContentVM NewElementMenuItem => new ItemTagContentVM()
         {
-            _mainPage = mainPage;
-        }
+            Text = "Nouvel élément",
+            Tag = "AddNewElement"
+        };
 
-
-        //public string AnimeList => NavigationUI.Path.Anime.AnimeList;
-        //public string AnimeNew => NavigationUI.Path.Anime.NewAnime;
-        //public string AnimeDashBoard => NavigationUI.Path.Anime.DashBoard;
-
+        public ItemTagContentVM LibraryCollectionMenuItem => new ItemTagContentVM()
+        {
+            Text = "Bibliothèques",
+            Tag = "library-collection"
+        };
 
 
         private Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible _IsBackArrowVisible;

@@ -156,6 +156,7 @@
     <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\General\ManageCategorieParametersVM.cs" />
+    <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
     <Compile Include="Views\Book\ManageBookPage.xaml.cs">
@@ -169,6 +170,9 @@
     </Compile>
     <Compile Include="Views\Book\Manage\NewCategorieCD.xaml.cs">
       <DependentUpon>NewCategorieCD.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Library\Collection\LibraryCollectionGridViewPage.xaml.cs">
+      <DependentUpon>LibraryCollectionGridViewPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Library\LibraryCollectionPage.xaml.cs">
       <DependentUpon>LibraryCollectionPage.xaml</DependentUpon>
@@ -230,6 +234,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Library\Collection\LibraryCollectionGridViewPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Library\LibraryCollectionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -288,6 +296,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

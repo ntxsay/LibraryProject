@@ -23,5 +23,18 @@ namespace RostalProjectUWP.Code.Services.Logging
                 return null;
             }
         }
+
+        public static void Log(Exception exception, MethodBase method)
+        {
+            try
+            {
+                Debug.WriteLine(GetLog(exception, method));
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}{(ex.InnerException?.Message == null ? string.Empty : "\nInner Exception : " + ex.InnerException?.Message) }");
+            }
+        }
     }
 }

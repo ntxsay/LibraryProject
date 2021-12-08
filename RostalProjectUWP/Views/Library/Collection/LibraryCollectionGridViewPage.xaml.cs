@@ -1,10 +1,8 @@
 ﻿using RostalProjectUWP.Code.Helpers;
-using RostalProjectUWP.Code.Services.Db;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.ViewModels.Library;
-using RostalProjectUWP.Views.Library.Collection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,20 +20,20 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace RostalProjectUWP.Views.Library
+namespace RostalProjectUWP.Views.Library.Collection
 {
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.
     /// </summary>
-    public sealed partial class LibraryCollectionPage : Page
+    public sealed partial class LibraryCollectionGridViewPage : Page
     {
         public LibraryCollectionPageVM ViewModelPage { get; set; } = new LibraryCollectionPageVM();
-        public LibraryCollectionPage()
+        private LibraryCollectionParentChildParamsVM _libraryParameters;
+        public LibraryCollectionGridViewPage()
         {
             this.InitializeComponent();
         }
@@ -43,21 +41,11 @@ namespace RostalProjectUWP.Views.Library
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-        }
-
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
+            if (e.Parameter is LibraryCollectionParentChildParamsVM libraryParameters)
             {
-                var libraryList = await DbServices.Library.AllVMAsync();
-                ViewModelPage.ViewModelList = libraryList?.ToList();
-                ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
+                _libraryParameters = libraryParameters;
+                ViewModelPage.ViewModelList = _libraryParameters.ViewModelList?.ToList();
+                InitializeModelList();
             }
         }
 
@@ -258,35 +246,15 @@ namespace RostalProjectUWP.Views.Library
 
         #endregion
 
-        public void NavigateToView(Type page, object parameters)
-        #region Navigation
+        private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                _ = FramePartialView.Navigate(page, parameters, new EntranceNavigationTransitionInfo());
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+
         }
 
-        private void GridViewCollectionXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        } 
-        #endregion
+
+        }
     }
 
     public class LibraryCollectionPageVM : INotifyPropertyChanged
