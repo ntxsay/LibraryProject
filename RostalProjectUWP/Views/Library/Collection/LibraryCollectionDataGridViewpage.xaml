@@ -1,0 +1,66 @@
+﻿<Page
+    x:Class="RostalProjectUWP.Views.Library.Collection.LibraryCollectionDataGridViewpage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RostalProjectUWP.Views.Library.Collection"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:viewModels="using:RostalProjectUWP.ViewModels"
+    xmlns:customConverters="using:RostalProjectUWP.Code.Converters"
+    xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls">
+    <Page.Resources>
+        <MTUUConverters:StringFormatConverter x:Key="StringFormatConverter"/>
+
+    </Page.Resources>
+    <Grid>
+        <!--Items-->
+        <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                               SelectionChanged="PivotItems_SelectionChanged">
+            <Pivot.OpacityTransition>
+                <ScalarTransition />
+            </Pivot.OpacityTransition>
+            <Pivot.HeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Key}"></TextBlock>
+                </DataTemplate>
+            </Pivot.HeaderTemplate>
+            <Pivot.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:BibliothequeVM">
+                    <MTUUControls:DataGrid x:Name="dataGrid" Grid.Row="1" ItemsSource="{Binding }" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 15 0 0"
+                                                           HorizontalScrollBarVisibility="Visible" SelectionChanged="dataGrid_SelectionChanged"
+                                        VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
+                                        AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
+                                        AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
+                                        MaxColumnWidth="500" FrozenColumnCount="1" GridLinesVisibility="None" HeadersVisibility="Column"
+                                        IsReadOnly="True" BorderThickness="0"
+                                        RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
+                                        RowGroupHeaderPropertyNameAlternative="Range">
+                        <MTUUControls:DataGrid.Columns>
+                            <MTUUControls:DataGridTextColumn Header="#" Binding="{Binding Id}" Tag="Rank"/>
+                            <MTUUControls:DataGridTextColumn Header="Nom" Binding="{Binding Name}" Tag="Rank"/>
+                            <MTUUControls:DataGridTemplateColumn Header="Date d'ajout" Tag="First_ascent">
+                                <MTUUControls:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DateAjout, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:dd/MM/yyy}'}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    </DataTemplate>
+                                </MTUUControls:DataGridTemplateColumn.CellTemplate>
+                                <MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <CalendarDatePicker Margin="3,4,3,3" Date="{Binding DateAjout, Mode=OneWay}"/>
+                                    </DataTemplate>
+                                </MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
+                            </MTUUControls:DataGridTemplateColumn>
+                            <MTUUControls:DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=OneWay}" Width="Auto"/>
+                        </MTUUControls:DataGrid.Columns>
+                    </MTUUControls:DataGrid>
+                </DataTemplate>
+            </Pivot.ItemTemplate>
+        </Pivot>
+
+
+    </Grid>
+</Page>

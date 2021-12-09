@@ -22,6 +22,7 @@
         <customConverters:CountOneToEnabling x:Key="CountOneToEnablingConverter" />
         <customConverters:CountToStringPhrase x:Key="CountToStringPhraseConverter" />
         <customConverters:IGroupingToValueConverter x:Key="groupingConverter" />-->
+        <customConverters:GroupToBooleanConverter x:Key="groupbyToBooleanConverter" />
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToInvertVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolConverter" TrueValue="False" FalseValue="True"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
@@ -30,6 +31,11 @@
                        ExecuteRequested="GridViewCollectionXamlUICommand_ExecuteRequested"
                        Description="Affiche la vue grille des bibliothèques" 
                        Label="Affichage grille">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DataGridViewCollectionXamlUICommand" 
+                       ExecuteRequested="DataGridViewCollectionXamlUICommand_ExecuteRequested"
+                       Description="Affiche la vue de liste des bibliothèques" 
+                       Label="Affichage liste">
         </XamlUICommand>
         <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
                        ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">
@@ -55,7 +61,7 @@
             <Grid Grid.Row="0">
                 
             </Grid>
-            <Frame x:Name="FramePartialView" Grid.Row="1">
+            <Frame x:Name="FramePartialView" Grid.Row="1" Padding="0 50 0 0">
                 
             </Frame>
         </Grid>
@@ -90,11 +96,16 @@
                 <SolidColorBrush Color="White" Opacity="0.5" />
             </CommandBar.Background>
             <!--Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"-->
-            <AppBarButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" Command="{StaticResource GridViewCollectionXamlUICommand}">
-                <AppBarButton.Icon>
+            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsDataGridView, Mode=OneWay}" Command="{StaticResource DataGridViewCollectionXamlUICommand}">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xEA37;"/>
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsGridView, Mode=OneWay}" Command="{StaticResource GridViewCollectionXamlUICommand}">
+                <AppBarToggleButton.Icon>
                     <FontIcon Glyph="&#xF0E2;"/>
-                </AppBarButton.Icon>
-            </AppBarButton>
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
             <AppBarSeparator/>
             <AppBarButton ToolTipService.ToolTip="Grouper par">
                 <AppBarButton.Icon>
@@ -102,10 +113,10 @@
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <ToggleMenuFlyoutItem Text="Année de création" Command="{StaticResource GroupByCreationYearXamlUICommand}"/>
-                        <ToggleMenuFlyoutItem Text="Lettre" Command="{StaticResource GroupByLetterXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='year', Mode=OneWay}" Text="Année de création" Command="{StaticResource GroupByCreationYearXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='letter', Mode=OneWay}" Text="Lettre" Command="{StaticResource GroupByLetterXamlUICommand}"/>
                         <MenuFlyoutSeparator/>
-                        <ToggleMenuFlyoutItem Text="Aucun" Command="{StaticResource GroupByNoneXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='none', Mode=OneWay}" Text="Aucun" Command="{StaticResource GroupByNoneXamlUICommand}"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

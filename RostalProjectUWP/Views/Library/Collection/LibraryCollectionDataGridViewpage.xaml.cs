@@ -29,11 +29,12 @@ namespace RostalProjectUWP.Views.Library.Collection
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.
     /// </summary>
-    public sealed partial class LibraryCollectionGridViewPage : Page
+    public sealed partial class LibraryCollectionDataGridViewpage : Page
     {
-        public LibraryCollectionGridViewPageVM ViewModelPage { get; set; } = new LibraryCollectionGridViewPageVM();
+        public LibraryCollectionDataGridViewPageVM ViewModelPage { get; set; } = new LibraryCollectionDataGridViewPageVM();
         private LibraryCollectionParentChildParamsVM _libraryParameters;
-        public LibraryCollectionGridViewPage()
+
+        public LibraryCollectionDataGridViewpage()
         {
             this.InitializeComponent();
         }
@@ -246,28 +247,18 @@ namespace RostalProjectUWP.Views.Library.Collection
 
         #endregion
 
+        private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
         private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }
-
-        private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-               
-
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
     }
 
-    public class LibraryCollectionGridViewPageVM : INotifyPropertyChanged
+    public class LibraryCollectionDataGridViewPageVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 

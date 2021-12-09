@@ -119,6 +119,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Code\Converters\GroupConverters.cs" />
     <Compile Include="Code\Converters\NullableBooleanConverters.cs" />
     <Compile Include="Code\Converters\SizeDiviserConverter.cs" />
     <Compile Include="Code\Converters\VisibilityConverter.cs" />
@@ -170,6 +171,9 @@
     </Compile>
     <Compile Include="Views\Book\Manage\NewCategorieCD.xaml.cs">
       <DependentUpon>NewCategorieCD.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Library\Collection\LibraryCollectionDataGridViewpage.xaml.cs">
+      <DependentUpon>LibraryCollectionDataGridViewpage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Library\Collection\LibraryCollectionGridViewPage.xaml.cs">
       <DependentUpon>LibraryCollectionGridViewPage.xaml</DependentUpon>
@@ -231,6 +235,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Book\Manage\NewCategorieCD.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Library\Collection\LibraryCollectionDataGridViewpage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

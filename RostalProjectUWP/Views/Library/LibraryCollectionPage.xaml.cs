@@ -53,6 +53,9 @@ namespace RostalProjectUWP.Views.Library
                 var libraryList = await DbServices.Library.AllVMAsync();
                 ViewModelPage.ViewModelList = libraryList?.ToList();
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
+                NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
+                ViewModelPage.IsGridView = true;
+                ViewModelPage.IsDataGridView = false;
             }
             catch (Exception ex)
             {
@@ -81,12 +84,33 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage)
+                if (!(FramePartialView.Content is LibraryCollectionGridViewPage))
                 {
-                    return;
+                    NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
                 }
 
-                NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
+                ViewModelPage.IsGridView = true;
+                ViewModelPage.IsDataGridView = false;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DataGridViewCollectionXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (!(FramePartialView.Content is LibraryCollectionDataGridViewpage))
+                {
+                    NavigateToView(typeof(LibraryCollectionDataGridViewpage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
+                }
+
+                ViewModelPage.IsGridView = false;
+                ViewModelPage.IsDataGridView = true;
             }
             catch (Exception ex)
             {
@@ -105,6 +129,10 @@ namespace RostalProjectUWP.Views.Library
                 {
                     libraryCollectionGridViewPage.GroupItemsByAlphabetic();
                 }
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewpage libraryCollectionDataGridViewPage)
+                {
+                    libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
+                }
             }
             catch (Exception ex)
             {
@@ -121,6 +149,10 @@ namespace RostalProjectUWP.Views.Library
                 if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
                 {
                     libraryCollectionGridViewPage.GroupByCreationYear();
+                }
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewpage libraryCollectionDataGridViewPage)
+                {
+                    libraryCollectionDataGridViewPage.GroupByCreationYear();
                 }
             }
             catch (Exception ex)
@@ -139,6 +171,11 @@ namespace RostalProjectUWP.Views.Library
                 {
                     libraryCollectionGridViewPage.GroupItemsByNone();
                 }
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewpage libraryCollectionDataGridViewPage)
+                {
+                    libraryCollectionDataGridViewPage.GroupItemsByNone();
+                }
+
             }
             catch (Exception ex)
             {
@@ -146,6 +183,55 @@ namespace RostalProjectUWP.Views.Library
                 return;
             }
         }
+
+        //private void RefreshItemsGrouping()
+        //{
+        //    MethodBase m = MethodBase.GetCurrentMethod();
+        //    try
+        //    {
+        //        if (ViewModelPage.GroupedRelatedViewModel.IsGroupedByNone)
+        //        {
+        //            this.GroupItemsByNone();
+        //        }
+        //        else if (this.GroupedRelatedViewModel.IsGroupedByDateDebutDiffusionYear)
+        //        {
+        //            this.GroupByDebutDiffusionYear();
+        //        }
+        //        else if (this.GroupedRelatedViewModel.IsGroupedByLetter)
+        //        {
+        //            this.GroupItemsByAlphabetic();
+        //        }
+        //        else if (this.GroupedRelatedViewModel.IsGroupedByPays)
+        //        {
+        //            this.GroupSocietysByPaysProduction();
+        //        }
+        //        else if (this.GroupedRelatedViewModel.IsGroupedByGenre)
+        //        {
+        //            this.GroupByGenre();
+        //        }
+        //        else if (this.GroupedRelatedViewModel.IsGroupedBySeason)
+        //        {
+        //            this.GroupBySeason();
+        //        }
+        //        else if (this.GroupedRelatedViewModel.IsGroupedByStudio)
+        //        {
+        //            this.GroupByStudio();
+        //        }
+        //        else if (this.GroupedRelatedViewModel.IsGroupedByEditeur)
+        //        {
+        //            this.GroupByEditeur();
+        //        }
+        //        else
+        //        {
+        //            this.GroupItemsByNone();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
     }
 
     public class LibraryCollectionPageVM : INotifyPropertyChanged
@@ -175,6 +261,34 @@ namespace RostalProjectUWP.Views.Library
                 if (this._GroupedBy != value)
                 {
                     this._GroupedBy = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsDataGridView;
+        public bool IsDataGridView
+        {
+            get => this._IsDataGridView;
+            set
+            {
+                if (_IsDataGridView != value)
+                {
+                    this._IsDataGridView = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsGridView;
+        public bool IsGridView
+        {
+            get => this._IsGridView;
+            set
+            {
+                if (_IsGridView != value)
+                {
+                    this._IsGridView = value;
                     this.OnPropertyChanged();
                 }
             }
