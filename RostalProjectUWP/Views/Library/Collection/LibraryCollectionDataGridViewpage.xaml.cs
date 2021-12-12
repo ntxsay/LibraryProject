@@ -29,12 +29,12 @@ namespace RostalProjectUWP.Views.Library.Collection
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.
     /// </summary>
-    public sealed partial class LibraryCollectionDataGridViewpage : Page
+    public sealed partial class LibraryCollectionDataGridViewPage : Page
     {
         public LibraryCollectionDataGridViewPageVM ViewModelPage { get; set; } = new LibraryCollectionDataGridViewPageVM();
         private LibraryCollectionParentChildParamsVM _libraryParameters;
 
-        public LibraryCollectionDataGridViewpage()
+        public LibraryCollectionDataGridViewPage()
         {
             this.InitializeComponent();
         }

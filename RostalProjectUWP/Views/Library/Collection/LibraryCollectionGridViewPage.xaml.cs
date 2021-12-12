@@ -248,14 +248,26 @@ namespace RostalProjectUWP.Views.Library.Collection
 
         private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            try
+            {
+                _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = 0;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
-               
+                if (sender is GridView gridView)
+                {
+                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = gridView.SelectedItems.Count;
+                }
 
             }
             catch (Exception ex)

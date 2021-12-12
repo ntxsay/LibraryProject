@@ -79,13 +79,13 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
                     <Run Text="Nombre de bibliothèques :" />
-                    <Run Text="0" />
+                    <Run Text="{x:Bind ViewModelPage.ViewModelList.Count, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
                     <Run Text="Elements sélectionnés :" />
-                    <Run Text="0" />
+                    <Run Text="{x:Bind ViewModelPage.CountSelectedItems, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
             </StackPanel>
@@ -98,7 +98,7 @@
             <!--Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"-->
             <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsDataGridView, Mode=OneWay}" Command="{StaticResource DataGridViewCollectionXamlUICommand}">
                 <AppBarToggleButton.Icon>
-                    <FontIcon Glyph="&#xEA37;"/>
+                    <FontIcon Glyph="&#xE8FD;"/>
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
             <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsGridView, Mode=OneWay}" Command="{StaticResource GridViewCollectionXamlUICommand}">

@@ -104,9 +104,9 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (!(FramePartialView.Content is LibraryCollectionDataGridViewpage))
+                if (!(FramePartialView.Content is LibraryCollectionDataGridViewPage))
                 {
-                    NavigateToView(typeof(LibraryCollectionDataGridViewpage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
+                    NavigateToView(typeof(LibraryCollectionDataGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
                 }
 
                 ViewModelPage.IsGridView = false;
@@ -129,10 +129,12 @@ namespace RostalProjectUWP.Views.Library
                 {
                     libraryCollectionGridViewPage.GroupItemsByAlphabetic();
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewpage libraryCollectionDataGridViewPage)
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
                 {
                     libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
                 }
+
+                ViewModelPage.CountSelectedItems = 0;
             }
             catch (Exception ex)
             {
@@ -150,10 +152,12 @@ namespace RostalProjectUWP.Views.Library
                 {
                     libraryCollectionGridViewPage.GroupByCreationYear();
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewpage libraryCollectionDataGridViewPage)
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
                 {
                     libraryCollectionDataGridViewPage.GroupByCreationYear();
                 }
+
+                ViewModelPage.CountSelectedItems = 0;
             }
             catch (Exception ex)
             {
@@ -171,11 +175,12 @@ namespace RostalProjectUWP.Views.Library
                 {
                     libraryCollectionGridViewPage.GroupItemsByNone();
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewpage libraryCollectionDataGridViewPage)
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
                 {
                     libraryCollectionDataGridViewPage.GroupItemsByNone();
                 }
 
+                ViewModelPage.CountSelectedItems = 0;
             }
             catch (Exception ex)
             {

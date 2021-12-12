@@ -8,10 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RostalProjectUWP.Code.Helpers;
+using RostalProjectUWP.Code.Services.ES;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.Models.Local;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
+using Windows.Storage;
 
 namespace RostalProjectUWP.Code.Services.Db
 {
@@ -156,6 +158,8 @@ namespace RostalProjectUWP.Code.Services.Db
                     await context.Tlibrary.AddAsync(record);
                     await context.SaveChangesAsync();
 
+                    await CreateFolderAsync(viewModel.Guid);
+
                     return new OperationStateVM()
                     {
                         IsSuccess = true,
@@ -165,12 +169,36 @@ namespace RostalProjectUWP.Code.Services.Db
                 catch (Exception ex)
                 {
                     MethodBase m = MethodBase.GetCurrentMethod();
-                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    Logs.Log(ex, m);
                     return new OperationStateVM()
                     {
                         IsSuccess = false,
                         Message = $"Exception : {ex.Message}",
                     };
+                }
+            }
+
+            internal static async Task CreateFolderAsync(Guid guid)
+            {
+                try
+                {
+                    if (guid == Guid.Empty)
+                    {
+                        return;
+                    }
+
+                    var libraryFolder = await EsLibrary.GetLibraryItemFolderAsync(guid);
+                    if (libraryFolder == null)
+                    {
+                        return;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return;
                 }
             }
 

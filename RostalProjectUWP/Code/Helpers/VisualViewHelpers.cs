@@ -4,12 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
 namespace RostalProjectUWP.Code.Helpers
 {
     public class VisualViewHelpers
     {
+        public abstract class MainControlsUI
+        {
+            public static MainPage MainPage => (Window.Current.Content as Frame).Content as MainPage;
+            public MainPage GetMainPage => (Window.Current.Content as Frame).Content as MainPage;
+            public Frame GetMainFrameContainer => GetMainPage.MainFrameContainer;
+            public static Frame MainFrameContainer => MainPage.MainFrameContainer;
+        }
+
         public static T FindVisualChild<T>(DependencyObject elementCible) where T : DependencyObject
         {
             try

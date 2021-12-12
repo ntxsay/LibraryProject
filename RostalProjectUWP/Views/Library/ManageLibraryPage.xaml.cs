@@ -1,5 +1,6 @@
 ﻿using RostalProjectUWP.Code;
 using RostalProjectUWP.Code.Helpers;
+using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.Views.Library;
@@ -133,13 +134,18 @@ namespace RostalProjectUWP.Views.Library
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
-
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                VisualViewHelpers.MainControlsUI.MainPage.GoToBack();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
-        private void BtnAction_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 
     public class ManageLibraryPageViewModel : INotifyPropertyChanged

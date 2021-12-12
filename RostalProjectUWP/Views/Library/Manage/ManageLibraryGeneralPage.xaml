@@ -166,7 +166,7 @@
                                 </Grid.RowDefinitions>
                                 <!--CommandBar-->
                                 <CommandBar Grid.Row="0" VerticalAlignment="Top" IsSticky="False" DefaultLabelPosition="Right" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
-                                    <AppBarButton Label="Ajouter une bibliothèque" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewLibraryXamlUICommand}">
+                                    <AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewLibraryXamlUICommand}">
                                         <AppBarButton.Icon>
                                             <FontIcon Glyph="&#xE710;"/>
                                         </AppBarButton.Icon>

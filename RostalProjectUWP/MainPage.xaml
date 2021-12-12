@@ -53,7 +53,7 @@
                 </MUIXC:NavigationViewItem>
             </MUIXC:NavigationView.FooterMenuItems>
             <MUIXC:NavigationView.Content>
-                <Frame x:Name="MainFrameContainer">
+                <Frame x:Name="MainFrameContainer" x:FieldModifier="Public">
                     
                 </Frame>
             </MUIXC:NavigationView.Content>

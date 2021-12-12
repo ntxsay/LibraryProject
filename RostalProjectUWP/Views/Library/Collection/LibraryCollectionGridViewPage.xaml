@@ -14,6 +14,7 @@
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
     NavigationCacheMode="Disabled">
     <Page.Resources>
+        <ThemeShadow x:Name="BackgroundGridShadow"/>
         <!--<customConverters:SlideValueConverter x:Key="slideValueConverter" />
         <customConverters:NullableIntToDoubleConverter x:Key="NullIntToDoubleConverter" />
         <customConverters:TimeSpanToStringDisplay x:Key="TimeSpanToStringDisplayConverter" />
@@ -28,7 +29,7 @@
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
         <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ThumbnailSimpleDataTemplate">
-            <Grid  x:Name="simpleThumnailItemContainer" Height="282" Width="180">
+            <Grid  x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
                 <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" Height="282" Width="180" Tag="{x:Bind}" MTUUi:FrameworkElementExtensions.Cursor="Hand">
                     <ToolTipService.ToolTip>
                         <ToolTip>
@@ -62,7 +63,7 @@
                             <ColumnDefinition Width="2"/>
                             <ColumnDefinition Width="44"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Bind Name}" TextWrapping="WrapWholeWords" FontSize="13" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="0" Text="{x:Bind Name}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
                         <Button BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand">
                             <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
                                 <Border.BorderBrush>

@@ -134,6 +134,7 @@
     <Compile Include="Code\Services\Db\General_db..cs" />
     <Compile Include="Code\Services\Db\Categorie_db.cs" />
     <Compile Include="Code\Services\Db\Library_db.cs" />
+    <Compile Include="Code\Services\ES\EsLibrary.cs" />
     <Compile Include="Code\Services\ES\EsViewModel.cs" />
     <Compile Include="Code\Services\ES\Files.cs" />
     <Compile Include="Code\Services\ES\Files_JsonSerialization.cs" />
@@ -172,8 +173,8 @@
     <Compile Include="Views\Book\Manage\NewCategorieCD.xaml.cs">
       <DependentUpon>NewCategorieCD.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Library\Collection\LibraryCollectionDataGridViewpage.xaml.cs">
-      <DependentUpon>LibraryCollectionDataGridViewpage.xaml</DependentUpon>
+    <Compile Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml.cs">
+      <DependentUpon>LibraryCollectionDataGridViewPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Library\Collection\LibraryCollectionGridViewPage.xaml.cs">
       <DependentUpon>LibraryCollectionGridViewPage.xaml</DependentUpon>
@@ -238,7 +239,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Library\Collection\LibraryCollectionDataGridViewpage.xaml">
+    <Page Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
