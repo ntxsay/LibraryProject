@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.UI.Controls;
 using RostalProjectUWP.Code.Helpers;
+using RostalProjectUWP.Code.Services.ES;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
@@ -202,8 +203,140 @@ namespace RostalProjectUWP.Views.Library.Collection
 
         private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            try
+            {
+                _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = 0;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
+
+        private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    EsLibrary esLibrary = new EsLibrary();
+                    var result = await esLibrary.ChangeLibraryItemJaquetteAsync(viewModel);
+                    if (!result.IsSuccess)
+                    {
+                        return;
+                    }
+
+                    viewModel.JaquettePath = result.Result?.ToString() ?? "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #region Search
+        public void SearchViewModel(BibliothequeVM viewModel)
+        {
+            try
+            {
+                if (viewModel == null)
+                {
+                    return;
+                }
+
+                foreach (var pivotItem in PivotItems.Items)
+                {
+                    if (pivotItem is IGrouping<string, BibliothequeVM> group && group.Any(f => f == viewModel))
+                    {
+                        if (this.PivotItems.SelectedItem != pivotItem)
+                        {
+                            this.PivotItems.SelectedItem = pivotItem;
+                        }
+
+                        var _container = this.PivotItems.ContainerFromItem(pivotItem);
+                        DataGrid dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(_container);
+                        while (dataGrid != null && dataGrid.Name != "dataGrid")
+                        {
+                            dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(dataGrid);
+                            if (dataGrid == null)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                if (dataGrid.Name == "dataGrid")
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (dataGrid != null)
+                        {
+                            foreach (var dataGridItem in dataGrid.ItemsSource)
+                            {
+                                if (dataGridItem is BibliothequeVM _viewModel && _viewModel == viewModel)
+                                {
+                                    if (dataGrid.SelectedItem != dataGridItem)
+                                    {
+                                        dataGrid.SelectedItem = dataGridItem;
+                                    }
+
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void OpenFlyoutSearchedItem(DependencyObject _gridViewItemContainer)
+        {
+            try
+            {
+                if (_gridViewItemContainer == null)
+                {
+                    return;
+                }
+
+                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
+                if (grid != null)
+                {
+                    Grid gridActions = grid.Children.FirstOrDefault(f => f is Grid _gridActions && _gridActions.Name == "GridActions") as Grid;
+                    if (gridActions != null)
+                    {
+                        Button buttonActions = gridActions.Children.FirstOrDefault(f => f is Button _buttonActions && _buttonActions.Name == "BtnActions") as Button;
+                        if (buttonActions != null)
+                        {
+                            buttonActions.Flyout.ShowAt(buttonActions, new FlyoutShowOptions()
+                            {
+                                Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
+                                ShowMode = FlyoutShowMode.Auto
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
     }
 
     public class LibraryCollectionDataGridViewPageVM : INotifyPropertyChanged

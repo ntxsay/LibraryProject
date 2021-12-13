@@ -359,11 +359,13 @@ namespace RostalProjectUWP.Views.Library
 
                 var FilteredItems = new List<BibliothequeVM>();
                 var splitSearchTerm = sender.Text.ToLower().Split(" ");
+                
                 foreach (var value in ViewModelPage.ViewModelList)
                 {
-                    if (value.Name == null) continue;
+                    if (value.Name.IsStringNullOrEmptyOrWhiteSpace()) continue;
+                    
                     var found = splitSearchTerm.All((key) => {
-                        return value.Name.Contains(key.ToLower());
+                        return value.Name.ToLower().Contains(key.ToLower());
                     });
 
                     if (found)
@@ -372,14 +374,15 @@ namespace RostalProjectUWP.Views.Library
                     }
                 }
 
-                if (FilteredItems.Count == 0)
-                {
-                    FilteredItems.Add(new BibliothequeVM()
-                    {
-                        Id = -1,
-                        Name = "Aucun résultat trouvé",
-                    });
-                }
+                //if (!FilteredItems.Any())
+                //{
+                //    FilteredItems.Add(new BibliothequeVM()
+                //    {
+                //        Id = -1,
+                //        Name = "Aucun résultat trouvé",
+                //    });
+                //}
+
                 sender.ItemsSource = FilteredItems;
             }
             catch (Exception ex)
@@ -436,11 +439,15 @@ namespace RostalProjectUWP.Views.Library
                 {
                     return;
                 }
+
                 if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
                 {
                     libraryCollectionGridViewPage.SearchViewModel(viewModel);
                 }
-                
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                {
+                    libraryCollectionDataGridViewPage.SearchViewModel(viewModel);
+                }
             }
             catch (Exception ex)
             {

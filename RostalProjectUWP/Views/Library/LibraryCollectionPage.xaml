@@ -67,7 +67,6 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0" Height="52" Width="50" Stretch="Uniform" Tag="{x:Bind JaquettePath, Mode=OneWay}" Loaded="Image_Loaded"  HorizontalAlignment="Left"/>
                 <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="4" Padding="4,0,0,0">
@@ -85,19 +84,6 @@
                         <Run Text="Livres" />
                     </TextBlock>
                 </StackPanel>
-                <Button BorderBrush="Transparent" BorderThickness="0" Background="Transparent"  Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand">
-                    <Border CornerRadius="14" Height="22" Width="22" BorderThickness="1" HorizontalAlignment="Center">
-                        <Border.BorderBrush>
-                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                <GradientStop Color="Yellow" Offset="0.0" />
-                                <GradientStop Color="Red" Offset="0.25" />
-                                <GradientStop Color="Blue" Offset="0.75" />
-                                <GradientStop Color="LimeGreen" Offset="1.0" />
-                            </LinearGradientBrush>
-                        </Border.BorderBrush>
-                        <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
-                    </Border>
-                </Button>
             </Grid>
         </DataTemplate>
     </Page.Resources>

@@ -15,7 +15,11 @@
     NavigationCacheMode="Disabled">
     <Page.Resources>
         <MTUUConverters:StringFormatConverter x:Key="StringFormatConverter"/>
-
+        <XamlUICommand x:Name="ChangeJaquetteXamlUICommand" 
+                       ExecuteRequested="ChangeJaquetteXamlUICommand_ExecuteRequested"
+                       Description="Modifie l'image qui sert à présenter la bibliothèque" 
+                       Label="Modifier la jaquette">
+        </XamlUICommand>
     </Page.Resources>
     <Grid>
         <!--Items-->
@@ -57,11 +61,24 @@
                             </MTUUControls:DataGridTemplateColumn>
                             <MTUUControls:DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=OneWay}" Width="Auto"/>
                         </MTUUControls:DataGrid.Columns>
+                        <MTUUControls:DataGrid.RowStyle>
+                            <Style TargetType="MTUUControls:DataGridRow">
+                                <Setter Property="MTUUControls:DataGridRow.ContextFlyout">
+                                    <Setter.Value>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem Text="Modifier la jaquette" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{Binding }">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xEB9F;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </MTUUControls:DataGrid.RowStyle>
                     </MTUUControls:DataGrid>
                 </DataTemplate>
             </Pivot.ItemTemplate>
         </Pivot>
-
-
     </Grid>
 </Page>
