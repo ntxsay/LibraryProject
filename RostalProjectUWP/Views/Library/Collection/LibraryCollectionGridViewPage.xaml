@@ -24,12 +24,17 @@
         <customConverters:CountOneToEnabling x:Key="CountOneToEnablingConverter" />
         <customConverters:CountToStringPhrase x:Key="CountToStringPhraseConverter" />
         <customConverters:IGroupingToValueConverter x:Key="groupingConverter" />-->
+        <XamlUICommand x:Name="ChangeJaquetteXamlUICommand" 
+                       ExecuteRequested="ChangeJaquetteXamlUICommand_ExecuteRequested"
+                       Description="Modifie l'image qui sert à présenter la bibliothèque" 
+                       Label="Modifier la jaquette">
+        </XamlUICommand>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToInvertVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolConverter" TrueValue="False" FalseValue="True"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
         <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ThumbnailSimpleDataTemplate">
-            <Grid  x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
+            <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
                 <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" Height="282" Width="180" Tag="{x:Bind}" MTUUi:FrameworkElementExtensions.Cursor="Hand">
                     <ToolTipService.ToolTip>
                         <ToolTip>
@@ -42,7 +47,7 @@
                     </ToolTipService.ToolTip>
                     <Border Height="301" Width="192" Background="WhiteSmoke" BorderThickness="0" CornerRadius="0">
                         <Grid Height="301" Width="192">
-                            <Image Source="ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg" Stretch="UniformToFill" />
+                            <Image Source="{x:Bind JaquettePath, Mode=OneWay}" Tag="{x:Bind JaquettePath, Mode=OneWay}" Stretch="UniformToFill" Loaded="Image_Loaded"/>
                             <!--<Grid Height="150" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left">
                                 <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="LightBlue" Points="0,110, 0,70, 70,0, 110,0"/>
                                 <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="BlueViolet" Points="0,110, 0,71, 71,0, 110,0"/>
@@ -56,32 +61,39 @@
                         </Grid>
                     </Border>
                 </Viewbox>
-                <StackPanel Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Orientation="Vertical">
-                    <Grid HorizontalAlignment="Stretch" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="4, 8" BorderThickness="0" CornerRadius="0 0 0 0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="2"/>
-                            <ColumnDefinition Width="44"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Bind Name}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
-                        <Button BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand">
-                            <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
-                                <Border.BorderBrush>
-                                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                        <GradientStop Color="Yellow" Offset="0.0" />
-                                        <GradientStop Color="Red" Offset="0.25" />
-                                        <GradientStop Color="Blue" Offset="0.75" />
-                                        <GradientStop Color="LimeGreen" Offset="1.0" />
-                                    </LinearGradientBrush>
-                                </Border.BorderBrush>
-                                <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
-                            </Border>
-                        </Button>
-                    </Grid>
-                </StackPanel>
+                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="4, 8" BorderThickness="0" CornerRadius="0 0 0 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2"/>
+                        <ColumnDefinition Width="44"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{x:Bind Name}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
+                    <Button x:Name="BtnActions" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                        <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
+                            <Border.BorderBrush>
+                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                    <GradientStop Color="Yellow" Offset="0.0" />
+                                    <GradientStop Color="Red" Offset="0.25" />
+                                    <GradientStop Color="Blue" Offset="0.75" />
+                                    <GradientStop Color="LimeGreen" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                            <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
+                        </Border>
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Modifier la jaquette" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xEB9F;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </Grid>
+
             </Grid>
         </DataTemplate>
-
     </Page.Resources>
     <Grid>
         <!--Items-->

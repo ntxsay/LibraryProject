@@ -1,5 +1,6 @@
 ﻿using RostalProjectUWP.Code.Helpers;
 using RostalProjectUWP.Code.Services.Db;
+using RostalProjectUWP.Code.Services.ES;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -52,6 +54,48 @@ namespace RostalProjectUWP.Views.Library
             {
                 var libraryList = await DbServices.Library.AllVMAsync();
                 ViewModelPage.ViewModelList = libraryList?.ToList();
+                await InitializeDataAsync();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void Image_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Image imageCtrl)
+                {
+                    var bitmapImage = await Files.BitmapImageFromFileAsync(imageCtrl?.Tag?.ToString());
+                    imageCtrl.Source = bitmapImage;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async Task InitializeDataAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.ViewModelList != null && ViewModelPage.ViewModelList.Any())
+                {
+                    EsLibrary esLibrary = new EsLibrary();
+                    foreach (var library in ViewModelPage.ViewModelList)
+                    {
+                        string combinedPath = await esLibrary.GetLibraryItemJaquettePathAsync(library);
+                        library.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                    }
+                }
+
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
                 NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
                 ViewModelPage.IsGridView = true;
@@ -120,6 +164,7 @@ namespace RostalProjectUWP.Views.Library
         }
         #endregion
 
+        #region Sort - Group - Order
         private void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -189,73 +234,229 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        //private void RefreshItemsGrouping()
-        //{
-        //    MethodBase m = MethodBase.GetCurrentMethod();
-        //    try
-        //    {
-        //        if (ViewModelPage.GroupedRelatedViewModel.IsGroupedByNone)
-        //        {
-        //            this.GroupItemsByNone();
-        //        }
-        //        else if (this.GroupedRelatedViewModel.IsGroupedByDateDebutDiffusionYear)
-        //        {
-        //            this.GroupByDebutDiffusionYear();
-        //        }
-        //        else if (this.GroupedRelatedViewModel.IsGroupedByLetter)
-        //        {
-        //            this.GroupItemsByAlphabetic();
-        //        }
-        //        else if (this.GroupedRelatedViewModel.IsGroupedByPays)
-        //        {
-        //            this.GroupSocietysByPaysProduction();
-        //        }
-        //        else if (this.GroupedRelatedViewModel.IsGroupedByGenre)
-        //        {
-        //            this.GroupByGenre();
-        //        }
-        //        else if (this.GroupedRelatedViewModel.IsGroupedBySeason)
-        //        {
-        //            this.GroupBySeason();
-        //        }
-        //        else if (this.GroupedRelatedViewModel.IsGroupedByStudio)
-        //        {
-        //            this.GroupByStudio();
-        //        }
-        //        else if (this.GroupedRelatedViewModel.IsGroupedByEditeur)
-        //        {
-        //            this.GroupByEditeur();
-        //        }
-        //        else
-        //        {
-        //            this.GroupItemsByNone();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logs.Log(ex, m);
-        //        return;
-        //    }
-        //}
+        private void OrderByCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ViewModelPage.OrderedBy = LibraryGroupVM.OrderBy.Croissant;
+                this.RefreshItemsGrouping();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void OrderByDCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ViewModelPage.OrderedBy = LibraryGroupVM.OrderBy.DCroissant;
+                this.RefreshItemsGrouping();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SortByNameXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ViewModelPage.SortedBy = LibraryGroupVM.SortBy.Name;
+                this.RefreshItemsGrouping();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SortByDateCreationXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ViewModelPage.SortedBy = LibraryGroupVM.SortBy.DateCreation;
+                this.RefreshItemsGrouping();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void RefreshItemsGrouping()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                {
+                    switch (ViewModelPage.GroupedBy)
+                    {
+                        case LibraryGroupVM.GroupBy.None:
+                            libraryCollectionGridViewPage.GroupItemsByNone();
+                            break;
+                        case LibraryGroupVM.GroupBy.Letter:
+                            libraryCollectionGridViewPage.GroupItemsByAlphabetic();
+                            break;
+                        case LibraryGroupVM.GroupBy.CreationYear:
+                            libraryCollectionGridViewPage.GroupByCreationYear();
+                            break;
+                        default:
+                            libraryCollectionGridViewPage.GroupItemsByNone();
+                            break;
+                    }
+                }
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                {
+                    switch (ViewModelPage.GroupedBy)
+                    {
+                        case LibraryGroupVM.GroupBy.None:
+                            libraryCollectionDataGridViewPage.GroupItemsByNone();
+                            break;
+                        case LibraryGroupVM.GroupBy.Letter:
+                            libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
+                            break;
+                        case LibraryGroupVM.GroupBy.CreationYear:
+                            libraryCollectionDataGridViewPage.GroupByCreationYear();
+                            break;
+                        default:
+                            libraryCollectionDataGridViewPage.GroupItemsByNone();
+                            break;
+                    }
+                }
+
+                ViewModelPage.CountSelectedItems = 0;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #endregion
+
+        #region Search
+        private void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            try
+            {
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                {
+                    return;
+                }
+
+                var FilteredItems = new List<BibliothequeVM>();
+                var splitSearchTerm = sender.Text.ToLower().Split(" ");
+                foreach (var value in ViewModelPage.ViewModelList)
+                {
+                    if (value.Name == null) continue;
+                    var found = splitSearchTerm.All((key) => {
+                        return value.Name.Contains(key.ToLower());
+                    });
+
+                    if (found)
+                    {
+                        FilteredItems.Add(value);
+                    }
+                }
+
+                if (FilteredItems.Count == 0)
+                {
+                    FilteredItems.Add(new BibliothequeVM()
+                    {
+                        Id = -1,
+                        Name = "Aucun résultat trouvé",
+                    });
+                }
+                sender.ItemsSource = FilteredItems;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ASB_SearchItem_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            try
+            {
+                if (args.SelectedItem != null && args.SelectedItem is BibliothequeVM value)
+                {
+                    sender.Text = value.Name;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ASB_SearchItem_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            try
+            {
+                if (args.ChosenSuggestion != null &&  args.ChosenSuggestion is BibliothequeVM viewModel)
+                {
+                    this.SearchViewModel(viewModel);
+                }
+                else
+                {
+                    //
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SearchViewModel(BibliothequeVM viewModel)
+        {
+            try
+            {
+                if (viewModel == null)
+                {
+                    return;
+                }
+                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                {
+                    libraryCollectionGridViewPage.SearchViewModel(viewModel);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+        
     }
 
     public class LibraryCollectionPageVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        private LibraryGroupVM _GroupedRelatedViewModel = new LibraryGroupVM();
-        public LibraryGroupVM GroupedRelatedViewModel
-        {
-            get => this._GroupedRelatedViewModel;
-            set
-            {
-                if (this._GroupedRelatedViewModel != value)
-                {
-                    this._GroupedRelatedViewModel = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
 
         private LibraryGroupVM.GroupBy _GroupedBy = LibraryGroupVM.GroupBy.None;
         public LibraryGroupVM.GroupBy GroupedBy
@@ -266,6 +467,34 @@ namespace RostalProjectUWP.Views.Library
                 if (this._GroupedBy != value)
                 {
                     this._GroupedBy = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private LibraryGroupVM.SortBy _SortedBy = LibraryGroupVM.SortBy.Name;
+        public LibraryGroupVM.SortBy SortedBy
+        {
+            get => this._SortedBy;
+            set
+            {
+                if (this._SortedBy != value)
+                {
+                    this._SortedBy = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private LibraryGroupVM.OrderBy _OrderedBy = LibraryGroupVM.OrderBy.Croissant;
+        public LibraryGroupVM.OrderBy OrderedBy
+        {
+            get => this._OrderedBy;
+            set
+            {
+                if (this._OrderedBy != value)
+                {
+                    this._OrderedBy = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -299,21 +528,7 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        private double _loadItemPurcentValue;
-
-        public double LoadItemPurcentValue
-        {
-            get => this._loadItemPurcentValue;
-            set
-            {
-                if (_loadItemPurcentValue != value)
-                {
-                    this._loadItemPurcentValue = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
+        
         private Visibility _SearchingLibraryVisibility = Visibility.Visible;
         public Visibility SearchingLibraryVisibility
         {

@@ -1,4 +1,7 @@
 ﻿using RostalProjectUWP.Code.Helpers;
+using RostalProjectUWP.Code.Services.Logging;
+using RostalProjectUWP.ViewModels;
+using RostalProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,17 +15,119 @@ namespace RostalProjectUWP.Code.Services.ES
 {
     internal class EsLibrary
     {
-        public class DefaultPath
+        readonly EsGeneral _EsGeneral = new EsGeneral();
+
+        public async Task<OperationStateVM> ChangeLibraryItemJaquetteAsync(BibliothequeVM viewModel)
         {
-            public const string Libraries = "Libraries";
-            public const string Books = "Books";
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModel == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le modèle de vue est null.",
+                    };
+                }
+
+                var storageFile = await Files.OpenStorageFileAsync(Files.ImageExtensions);
+                if (storageFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le fichier n'a pas pas pû être récupéré par le sélecteur de fichier.",
+                    };
+                }
+
+                var folderItem = await this.GetLibraryItemFolderAsync(viewModel.Guid);
+                if (folderItem == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le répertoire de la bibliothèque \"{viewModel.Name}\" n'a pas pû être trouvé.",
+                    };
+                }
+
+                string baseFile = "Library_Jaquette";
+
+                var deleteResult = await _EsGeneral.RemoveFileAsync(baseFile, folderItem, EsGeneral.SearchOptions.StartWith);
+                if (!deleteResult.IsSuccess)
+                {
+                    return deleteResult;
+                }
+
+                var newCopyFile = await storageFile.CopyAsync(folderItem, baseFile + System.IO.Path.GetExtension(storageFile.Path), NameCollisionOption.ReplaceExisting);
+                if (newCopyFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = "Le fichier n'a pû être copié dans le répertoire de l'application.",
+                    };
+                }
+
+                return new OperationStateVM()
+                {
+                    IsSuccess = true,
+                    Result = newCopyFile.Path,
+                };
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return new OperationStateVM()
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        public async Task<string> GetLibraryItemJaquettePathAsync(BibliothequeVM viewModel)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModel == null)
+                {
+                    return null;
+                }
+
+                var folderItem = await this.GetLibraryItemFolderAsync(viewModel.Guid);
+                if (folderItem == null)
+                {
+                    return null;
+                }
+
+                foreach (var ext in Files.ImageExtensions)
+                {
+                    string fileName = $"Library_Jaquette{ext}";
+                    var storageItem = await folderItem.TryGetItemAsync(fileName);
+                    if (storageItem == null || !storageItem.IsOfType(StorageItemTypes.File))
+                    {
+                        continue;
+                    }
+
+                    return storageItem.Path;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
         }
 
         /// <summary>
         /// Crée le dossier d'une bibliothèque dans le dossier "Libraries" et/ou renvoie l'objet <see cref="StorageFolder"/> 
         /// </summary>
         /// <returns></returns>
-        public static async Task<StorageFolder> GetLibraryItemFolderAsync(Guid guid)
+        public async Task<StorageFolder> GetLibraryItemFolderAsync(Guid guid)
         {
             try
             {
@@ -55,11 +160,11 @@ namespace RostalProjectUWP.Code.Services.ES
         /// Crée le dossier "Libraries" et/ou renvoie l'objet <see cref="StorageFolder"/> 
         /// </summary>
         /// <returns></returns>
-        public static async Task<StorageFolder> GetLibrariesFolderAsync()
+        public async Task<StorageFolder> GetLibrariesFolderAsync()
         {
             try
             {
-                var folder = await CreateFolderInLocalFolderAppAsync(DefaultPath.Libraries, CreationCollisionOption.OpenIfExists);
+                var folder = await _EsGeneral.CreateFolderInLocalFolderAppAsync(EsGeneral.DefaultPath.Libraries, CreationCollisionOption.OpenIfExists);
                 return folder;
             }
             catch (Exception)
@@ -72,11 +177,11 @@ namespace RostalProjectUWP.Code.Services.ES
         /// Crée le dossier "Books" et/ou renvoie l'objet <see cref="StorageFolder"/> 
         /// </summary>
         /// <returns></returns>
-        public static async Task<StorageFolder> GetBooksFolderAsync()
+        public async Task<StorageFolder> GetBooksFolderAsync()
         {
             try
             {
-                var folder = await CreateFolderInLocalFolderAppAsync(DefaultPath.Books, CreationCollisionOption.OpenIfExists);
+                var folder = await _EsGeneral.CreateFolderInLocalFolderAppAsync(EsGeneral.DefaultPath.Books, CreationCollisionOption.OpenIfExists);
                 return folder;
             }
             catch (Exception)
@@ -85,30 +190,6 @@ namespace RostalProjectUWP.Code.Services.ES
             }
         }
 
-        public static async Task<StorageFolder> CreateFolderInLocalFolderAppAsync(string NomDuDossierACreer, CreationCollisionOption creationCollisionOption = CreationCollisionOption.OpenIfExists)
-        {
-            try
-            {
-                if (NomDuDossierACreer.IsStringNullOrEmptyOrWhiteSpace())
-                {
-                    return null;
-                }
-
-                StorageFolder mediaStorage = ApplicationData.Current.LocalFolder;
-                if (mediaStorage == null)
-                {
-                    return null;
-                }
-
-                StorageFolder folder = await mediaStorage.CreateFolderAsync(NomDuDossierACreer, creationCollisionOption);
-                return folder ?? null;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}\nInner Exception : {ex.InnerException?.Message}");
-                return null;
-            }
-        }
+        
     }
 }

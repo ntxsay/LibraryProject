@@ -1,4 +1,5 @@
-﻿using RostalProjectUWP.Code.Helpers;
+﻿using Microsoft.Toolkit.Uwp.UI.Controls;
+using RostalProjectUWP.Code.Helpers;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
@@ -55,13 +56,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-                {
-                    return;
-                }
-
-                this.ItemsGroupOnStartUp();
-
+                _libraryParameters.ParentPage.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -71,62 +66,6 @@ namespace RostalProjectUWP.Views.Library.Collection
         }
 
         #region Groups
-        private void ItemsGroupOnStartUp()
-        {
-            try
-            {
-                var groupItems = GetGroupedItemsByNone;
-                if (groupItems == null || !groupItems.Any())
-                {
-                    return;
-                }
-
-                if (ViewModelPage.GroupedRelatedViewModel.Collection != null)
-                {
-                    foreach (IGrouping<string, BibliothequeVM> item in groupItems)
-                    {
-                        ViewModelPage.GroupedRelatedViewModel.Collection.Add(item);
-                    }
-                }
-                else
-                {
-                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(groupItems);
-                    this.Bindings.Update();
-                }
-
-                //ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.None;
-
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        private IEnumerable<IGrouping<string, BibliothequeVM>> GetGroupedItemsByNone
-        {
-            get
-            {
-                try
-                {
-                    if (ViewModelPage.ViewModelList == null || !this.ViewModelPage.ViewModelList.Any())
-                    {
-                        return Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
-                    }
-
-                    var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
-                    if (GroupingItems == null || !GroupingItems.Any()) return Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
-
-                    return GroupingItems;
-                }
-                catch (Exception)
-                {
-                    return Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
-                }
-            }
-        }
-
         public void GroupItemsByNone()
         {
             try
@@ -136,11 +75,10 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _libraryParameters.ParentPage.ViewModelPage.OrderedBy, _libraryParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.None;
                     _libraryParameters.ParentPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.None;
                 }
             }
@@ -160,11 +98,10 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Name.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _libraryParameters.ParentPage.ViewModelPage.OrderedBy, _libraryParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Name.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.Letter;
                     _libraryParameters.ParentPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.Letter;
                 }
             }
@@ -185,11 +122,10 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _libraryParameters.ParentPage.ViewModelPage.OrderedBy, _libraryParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
                     _libraryParameters.ParentPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
                 }
             }
@@ -249,7 +185,19 @@ namespace RostalProjectUWP.Views.Library.Collection
 
         private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            try
+            {
+                if (sender is DataGrid dataGrid)
+                {
+                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = dataGrid.SelectedItems.Count;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)

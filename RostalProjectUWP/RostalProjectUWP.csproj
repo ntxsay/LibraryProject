@@ -119,6 +119,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Code\Converters\DateTimeConverter.cs" />
     <Compile Include="Code\Converters\GroupConverters.cs" />
     <Compile Include="Code\Converters\NullableBooleanConverters.cs" />
     <Compile Include="Code\Converters\SizeDiviserConverter.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="Code\Services\Db\General_db..cs" />
     <Compile Include="Code\Services\Db\Categorie_db.cs" />
     <Compile Include="Code\Services\Db\Library_db.cs" />
+    <Compile Include="Code\Services\ES\EsGeneral.cs" />
     <Compile Include="Code\Services\ES\EsLibrary.cs" />
     <Compile Include="Code\Services\ES\EsViewModel.cs" />
     <Compile Include="Code\Services\ES\Files.cs" />

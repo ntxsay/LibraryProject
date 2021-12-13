@@ -1,4 +1,5 @@
 ﻿using RostalProjectUWP.Code.Helpers;
+using RostalProjectUWP.Code.Services.ES;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
@@ -54,13 +55,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-                {
-                    return;
-                }
-
-                this.ItemsGroupOnStartUp();
-
+                _libraryParameters.ParentPage.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -70,62 +65,6 @@ namespace RostalProjectUWP.Views.Library.Collection
         }
 
         #region Groups
-        private void ItemsGroupOnStartUp()
-        {
-            try
-            {
-                var groupItems = GetGroupedItemsByNone;
-                if (groupItems == null || !groupItems.Any())
-                {
-                    return;
-                }
-
-                if (ViewModelPage.GroupedRelatedViewModel.Collection != null)
-                {
-                    foreach (IGrouping<string, BibliothequeVM> item in groupItems)
-                    {
-                        ViewModelPage.GroupedRelatedViewModel.Collection.Add(item);
-                    }
-                }
-                else
-                {
-                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(groupItems);
-                    this.Bindings.Update();
-                }
-
-                //ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.None;
-
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        private IEnumerable<IGrouping<string, BibliothequeVM>> GetGroupedItemsByNone
-        {
-            get
-            {
-                try
-                {
-                    if (ViewModelPage.ViewModelList == null || !this.ViewModelPage.ViewModelList.Any())
-                    {
-                        return Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
-                    }
-
-                    var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
-                    if (GroupingItems == null || !GroupingItems.Any()) return Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
-
-                    return GroupingItems;
-                }
-                catch (Exception)
-                {
-                    return Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
-                }
-            }
-        }
-
         public void GroupItemsByNone()
         {
             try
@@ -135,11 +74,10 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _libraryParameters.ParentPage.ViewModelPage.OrderedBy, _libraryParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.None;
                     _libraryParameters.ParentPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.None;
                 }
             }
@@ -159,11 +97,10 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Name.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _libraryParameters.ParentPage.ViewModelPage.OrderedBy, _libraryParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Name.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.Letter;
                     _libraryParameters.ParentPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.Letter;
                 }
             }
@@ -184,11 +121,10 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, ViewModelPage.GroupedRelatedViewModel.OrderedBy, ViewModelPage.GroupedRelatedViewModel.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _libraryParameters.ParentPage.ViewModelPage.OrderedBy, _libraryParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    ViewModelPage.GroupedRelatedViewModel.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
                     _libraryParameters.ParentPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
                 }
             }
@@ -268,7 +204,146 @@ namespace RostalProjectUWP.Views.Library.Collection
                 {
                     _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = gridView.SelectedItems.Count;
                 }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
 
+        private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    EsLibrary esLibrary = new EsLibrary();
+                    var result = await esLibrary.ChangeLibraryItemJaquetteAsync(viewModel);
+                    if (!result.IsSuccess)
+                    {
+                        return;
+                    }
+
+                    viewModel.JaquettePath = result.Result?.ToString() ?? "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void Image_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Image imageCtrl)
+                {
+                    var bitmapImage = await Files.BitmapImageFromFileAsync(imageCtrl.Tag.ToString());
+                    imageCtrl.Source = bitmapImage;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void SearchViewModel(BibliothequeVM viewModel)
+        {
+            try
+            {
+                if (viewModel == null)
+                {
+                    return;
+                }
+
+                foreach (var pivotItem in PivotItems.Items)
+                {
+                    if (pivotItem is IGrouping<string, BibliothequeVM> group && group.Any(f => f == viewModel))
+                    {
+                        if (this.PivotItems.SelectedItem != pivotItem)
+                        {
+                            this.PivotItems.SelectedItem = pivotItem;
+                        }
+
+                        var _container = this.PivotItems.ContainerFromItem(pivotItem);
+                        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
+                        while (gridView != null && gridView.Name != "GridViewItems")
+                        {
+                            gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
+                            if (gridView == null)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                if (gridView.Name == "GridViewItems")
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (gridView != null)
+                        {
+                            foreach (var gridViewItem in gridView.Items)
+                            {
+                                if (gridViewItem is BibliothequeVM _viewModel && _viewModel == viewModel)
+                                {
+                                    if (gridView.SelectedItem != gridViewItem)
+                                    {
+                                        gridView.SelectedItem = gridViewItem;
+                                    }
+
+                                    var _gridViewItemContainer = gridView.ContainerFromItem(gridViewItem);
+                                    OpenFlyoutSearchedItem(_gridViewItemContainer);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void OpenFlyoutSearchedItem(DependencyObject _gridViewItemContainer)
+        {
+            try
+            {
+                if (_gridViewItemContainer == null)
+                {
+                    return;
+                }
+
+                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
+                if (grid != null)
+                {
+                    Grid gridActions = grid.Children.FirstOrDefault(f => f is Grid _gridActions && _gridActions.Name == "GridActions") as Grid;
+                    if (gridActions != null)
+                    {
+                        Button buttonActions = gridActions.Children.FirstOrDefault(f => f is Button _buttonActions && _buttonActions.Name == "BtnActions") as Button;
+                        if (buttonActions != null)
+                        {
+                            buttonActions.Flyout.ShowAt(buttonActions,new FlyoutShowOptions() 
+                            { 
+                                Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft, 
+                                ShowMode = FlyoutShowMode.Auto
+                            });
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {

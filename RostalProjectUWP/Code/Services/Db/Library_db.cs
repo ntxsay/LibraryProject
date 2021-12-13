@@ -187,7 +187,9 @@ namespace RostalProjectUWP.Code.Services.Db
                         return;
                     }
 
-                    var libraryFolder = await EsLibrary.GetLibraryItemFolderAsync(guid);
+                    EsLibrary esLibrary = new EsLibrary();
+
+                    var libraryFolder = await esLibrary.GetLibraryItemFolderAsync(guid);
                     if (libraryFolder == null)
                     {
                         return;
