@@ -86,6 +86,20 @@ namespace RostalProjectUWP.ViewModels
             }
         }
 
+        private bool _IsSelected;
+        public bool IsSelected
+        {
+            get => _IsSelected;
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _JaquettePath;
         public string JaquettePath
         {

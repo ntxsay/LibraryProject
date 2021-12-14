@@ -136,11 +136,7 @@
             </StackPanel>
         </Grid>
         <!--CommandBar-->
-        <CommandBar x:Name="MyCommand" VerticalAlignment="Top" IsSticky="True"  DefaultLabelPosition="Right">
-            <CommandBar.Background>
-                <SolidColorBrush Color="White" Opacity="0.5" />
-            </CommandBar.Background>
-            <!--Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"-->
+        <CommandBar x:Name="MyCommand" VerticalAlignment="Top" IsSticky="True" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" DefaultLabelPosition="Right">
             <AppBarButton x:Name="ABBtn_SelectedItems" ToolTipService.ToolTip="Bibliothèque(s) sélectionnée(s)" Label="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToStringPhraseConverter}, ConverterParameter='counter bibliothèque(s) sélectionnée(s)', Mode=OneWay}"
                           IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToEnablingConverter}, Mode=OneWay}">
                 <AppBarButton.Icon>

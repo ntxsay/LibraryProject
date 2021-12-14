@@ -1,9 +1,11 @@
 ﻿using RostalProjectUWP.Code.Helpers;
+using RostalProjectUWP.Code.Services.Db;
 using RostalProjectUWP.Code.Services.ES;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.ViewModels.Library;
+using RostalProjectUWP.Views.Library.Manage;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -265,6 +267,59 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
+        private async void EditLibraryInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    var dialog = new NewLibraryCD(new ManageLibraryDialogParametersVM()
+                    {
+                        Value = viewModel.Name,
+                        Description = viewModel.Description,
+                        EditMode = Code.EditMode.Edit,
+                        ViewModelList = _libraryParameters.ParentPage.ViewModelPage.ViewModelList,
+                    });
+
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        var newValue = dialog.Value?.Trim();
+                        var newDescription = dialog.Description?.Trim();
+
+                        var updatedViewModel = new BibliothequeVM()
+                        {
+                            Id = viewModel.Id,
+                            Name = newValue,
+                            Description = newDescription,
+                            DateEdition = DateTime.UtcNow,
+                        };
+
+                        var updateResult = await DbServices.Library.UpdateAsync(updatedViewModel);
+                        if (updateResult.IsSuccess)
+                        {
+                            viewModel.Name = newValue;
+                            viewModel.Description = newDescription;
+                        }
+                        else
+                        {
+                            //Erreur
+                        }
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         public void SearchViewModel(BibliothequeVM viewModel)
         {
             try
@@ -363,6 +418,21 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
+        private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            try
+            {
+               
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        
     }
 
     public class LibraryCollectionGridViewPageVM : INotifyPropertyChanged

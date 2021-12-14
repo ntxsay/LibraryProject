@@ -29,13 +29,18 @@
                        Description="Modifie l'image qui sert à présenter la bibliothèque" 
                        Label="Modifier la jaquette">
         </XamlUICommand>
+        <XamlUICommand x:Name="EditLibraryInfosXamlUICommand" 
+                       ExecuteRequested="EditLibraryInfosXamlUICommand_ExecuteRequested"
+                       Description="Edite les informations de base de la bibliothèque" 
+                       Label="Editer les informations">
+        </XamlUICommand>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToInvertVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolConverter" TrueValue="False" FalseValue="True"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
         <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ThumbnailSimpleDataTemplate">
             <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
-                <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" Height="282" Width="180" Tag="{x:Bind}" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" Height="282" Width="180" Tag="{x:Bind}" MTUUi:FrameworkElementExtensions.Cursor="Hand" PointerPressed="ViewboxSimpleThumnailDatatemplate_PointerPressed">
                     <ToolTipService.ToolTip>
                         <ToolTip>
                             <TextBlock>
@@ -66,7 +71,7 @@
                         <ColumnDefinition Width="2"/>
                         <ColumnDefinition Width="44"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{x:Bind Name}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="{x:Bind Name, Mode=OneWay}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
                     <Button x:Name="BtnActions" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand">
                         <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
                             <Border.BorderBrush>
@@ -80,17 +85,33 @@
                             <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
                         </Border>
                         <Button.Flyout>
-                            <MenuFlyout>
+                            <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                <MenuFlyoutItem Text="Ouvrir la bibliothèque">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE8A7;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Text="Modifier la jaquette" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xEB9F;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Editer les informations" Command="{StaticResource EditLibraryInfosXamlUICommand}" CommandParameter="{x:Bind }">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE70F;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem Text="Supprimer la bibliothèque" Foreground="OrangeRed">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74D;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                             </MenuFlyout>
                         </Button.Flyout>
                     </Button>
                 </Grid>
-
             </Grid>
         </DataTemplate>
     </Page.Resources>
@@ -114,7 +135,7 @@
                         </Grid.RowDefinitions>
                         <ScrollViewer x:Name="scrollItems" HorizontalScrollMode="Disabled" Grid.Row="0">
                             <GridView x:Name="GridViewItems" ItemsSource="{Binding }" SelectionMode="Extended" IsItemClickEnabled="False" Padding="4,14" SelectionChanged="GridViewItems_SelectionChanged"
-                                  ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled">
+                                  ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled" IsMultiSelectCheckBoxEnabled="True" SingleSelectionFollowsFocus="True">
                                 <GridView.ItemContainerStyle>
                                     <Style TargetType="GridViewItem" >
                                         <Setter Property="Margin" Value="7" />
