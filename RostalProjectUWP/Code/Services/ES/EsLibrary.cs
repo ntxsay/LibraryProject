@@ -15,6 +15,7 @@ namespace RostalProjectUWP.Code.Services.ES
 {
     internal class EsLibrary
     {
+        internal const string LibraryDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
         readonly EsGeneral _EsGeneral = new EsGeneral();
 
         public async Task<OperationStateVM> ChangeLibraryItemJaquetteAsync(BibliothequeVM viewModel)

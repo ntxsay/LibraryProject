@@ -46,6 +46,16 @@
                        Description="Actualise les données depuis la base de données" 
                        Label="Actualiser les données">
         </XamlUICommand>
+        <XamlUICommand x:Name="NewLibraryXamlUICommand" 
+                       ExecuteRequested="NewLibraryXamlUICommand_ExecuteRequested"
+                       Description="Ajoute une nouvelle bibliothèque" 
+                       Label="Ajouter une bibliothèque">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ImportLibraryXamlUICommand" 
+                       ExecuteRequested="ImportLibraryXamlUICommand_ExecuteRequested"
+                       Description="Importe une bibliothèque existante" 
+                       Label="Importer une bibliothèque">
+        </XamlUICommand>
         <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
                        ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">
         </XamlUICommand>
@@ -241,20 +251,35 @@
             </AppBarToggleButton>
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter une société">
-                
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Ajouter une bibliothèque" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Add" Command="{StaticResource NewLibraryXamlUICommand}">
+                            
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Importer une bibliothèque" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Import" Command="{StaticResource ImportLibraryXamlUICommand}">
+
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
             </AppBarButton>
-            <AppBarButton Icon="RepeatAll" LabelPosition="Collapsed" Command="{StaticResource ReloadDataXamlUICommand}"/>
+            <AppBarSeparator/>
+            <AppBarButton Icon="RepeatAll" LabelPosition="Collapsed" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ReloadDataXamlUICommand}"/>
+            <AppBarSeparator/>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Label="Exporter au format JSON" MTUUi:FrameworkElementExtensions.Cursor="Hand" >
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE74E;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal" Spacing="4">
-                    <AutoSuggestBox x:Name="ASB_SearchItem" Width="310" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,6,0,4" 
+                    <AutoSuggestBox x:Name="ASB_SearchItem" Width="310" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,8,0,4" 
                     PlaceholderText="Rechercher une bibliothèque" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}"
                                     TextChanged="ASB_SearchItem_TextChanged" SuggestionChosen="ASB_SearchItem_SuggestionChosen" QuerySubmitted="ASB_SearchItem_QuerySubmitted">
                         <AutoSuggestBox.QueryIcon>
                             <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
                         </AutoSuggestBox.QueryIcon>
-                        <!--<AutoSuggestBox.CornerRadius>
-                                    <CornerRadius>14</CornerRadius>
-                                </AutoSuggestBox.CornerRadius>-->
                     </AutoSuggestBox>
                 </StackPanel>
             </CommandBar.Content>

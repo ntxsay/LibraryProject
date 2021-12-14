@@ -5,7 +5,9 @@ using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.ViewModels.Library;
+using RostalProjectUWP.Views.Book.Manage;
 using RostalProjectUWP.Views.Library.Collection;
+using RostalProjectUWP.Views.Library.Manage;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -495,7 +497,67 @@ namespace RostalProjectUWP.Views.Library
 
         }
 
-        
+        private async void NewLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var dialog = new NewLibraryCD(new ManageLibraryDialogParametersVM()
+                {
+                    EditMode = Code.EditMode.Create,
+                    ViewModelList = ViewModelPage.ViewModelList,
+                });
+
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    var value = dialog.Value?.Trim();
+                    var description = dialog.Description?.Trim();
+
+                    var newViewModel = new BibliothequeVM()
+                    {
+                        Name = value,
+                        Description = description,
+                    };
+
+                    var creationResult = await DbServices.Library.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        ViewModelPage.ViewModelList.Add(newViewModel);
+
+                        if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                        {
+                            libraryCollectionGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        }
+                        else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                        {
+                            libraryCollectionDataGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        }
+
+                        this.RefreshItemsGrouping();
+                    }
+                    else
+                    {
+                        //Erreur
+                    }
+                }
+                else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ImportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
     }
 
     public class LibraryCollectionPageVM : INotifyPropertyChanged

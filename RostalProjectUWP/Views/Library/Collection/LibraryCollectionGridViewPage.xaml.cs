@@ -111,9 +111,9 @@ namespace RostalProjectUWP.Views.Library.Collection
         {
             try
             {
-                if (sender is Image imageCtrl)
+                if (sender is Image imageCtrl && imageCtrl.Tag is string path)
                 {
-                    var bitmapImage = await Files.BitmapImageFromFileAsync(imageCtrl.Tag.ToString());
+                    var bitmapImage = await Files.BitmapImageFromFileAsync(path);
                     imageCtrl.Source = bitmapImage;
                 }
             }

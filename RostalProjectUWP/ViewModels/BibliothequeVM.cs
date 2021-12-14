@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RostalProjectUWP.Code.Services.ES;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -100,7 +101,7 @@ namespace RostalProjectUWP.ViewModels
             }
         }
 
-        private string _JaquettePath;
+        private string _JaquettePath = EsLibrary.LibraryDefaultJaquette;
         public string JaquettePath
         {
             get => this._JaquettePath;
