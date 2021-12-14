@@ -128,9 +128,13 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (!(FramePartialView.Content is LibraryCollectionGridViewPage))
+                if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
                 {
-                    NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
+                    NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() 
+                    { 
+                        ParentPage = this, 
+                        ViewModelList = ViewModelPage.ViewModelList, 
+                    });
                 }
 
                 ViewModelPage.IsGridView = true;
@@ -148,9 +152,13 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (!(FramePartialView.Content is LibraryCollectionDataGridViewPage))
+                if (FramePartialView.Content is LibraryCollectionGridViewPage)
                 {
-                    NavigateToView(typeof(LibraryCollectionDataGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
+                    NavigateToView(typeof(LibraryCollectionDataGridViewPage), new LibraryCollectionParentChildParamsVM() 
+                    { 
+                        ParentPage = this, 
+                        ViewModelList = ViewModelPage.ViewModelList, 
+                    });
                 }
 
                 ViewModelPage.IsGridView = false;
@@ -534,7 +542,6 @@ namespace RostalProjectUWP.Views.Library
                 }
             }
         }
-
         
         private Visibility _SearchingLibraryVisibility = Visibility.Visible;
         public Visibility SearchingLibraryVisibility
@@ -564,6 +571,20 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
+        private int _SelectedPivotIndex;
+        public int SelectedPivotIndex
+        {
+            get => this._SelectedPivotIndex;
+            set
+            {
+                if (_SelectedPivotIndex != value)
+                {
+                    this._SelectedPivotIndex = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         private int _countSelectedItems;
         public int CountSelectedItems
         {
@@ -578,6 +599,20 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
+        private ICollection<BibliothequeVM> _SelectedItems;
+        public ICollection<BibliothequeVM> SelectedItems
+        {
+            get => this._SelectedItems;
+            set
+            {
+                if (_SelectedItems != value)
+                {
+                    this._SelectedItems = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+        
         private List<BibliothequeVM> _ViewModelList;
         public List<BibliothequeVM> ViewModelList
         {

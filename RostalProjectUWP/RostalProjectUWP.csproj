@@ -119,6 +119,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Code\Converters\CountToStringPhraseConverter.cs" />
     <Compile Include="Code\Converters\DateTimeConverter.cs" />
     <Compile Include="Code\Converters\GroupConverters.cs" />
     <Compile Include="Code\Converters\NullableBooleanConverters.cs" />

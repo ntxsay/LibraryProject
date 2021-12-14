@@ -12,7 +12,7 @@
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
-    NavigationCacheMode="Disabled">
+    NavigationCacheMode="Disabled" Loaded="Page_Loaded">
     <Page.Resources>
         <MTUUConverters:StringFormatConverter x:Key="StringFormatConverter"/>
         <XamlUICommand x:Name="ChangeJaquetteXamlUICommand" 
@@ -23,8 +23,7 @@
     </Page.Resources>
     <Grid>
         <!--Items-->
-        <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                               SelectionChanged="PivotItems_SelectionChanged">
+        <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <Pivot.OpacityTransition>
                 <ScalarTransition />
             </Pivot.OpacityTransition>

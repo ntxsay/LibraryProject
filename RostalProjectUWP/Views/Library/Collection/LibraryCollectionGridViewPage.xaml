@@ -12,7 +12,7 @@
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
-    NavigationCacheMode="Disabled">
+    NavigationCacheMode="Disabled" Loaded="Page_Loaded">
     <Page.Resources>
         <ThemeShadow x:Name="BackgroundGridShadow"/>
         <!--<customConverters:SlideValueConverter x:Key="slideValueConverter" />
@@ -97,8 +97,7 @@
     </Page.Resources>
     <Grid>
         <!--Items-->
-        <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                               SelectionChanged="PivotItems_SelectionChanged">
+        <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <Pivot.OpacityTransition>
                 <ScalarTransition />
             </Pivot.OpacityTransition>

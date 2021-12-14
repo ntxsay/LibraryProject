@@ -46,8 +46,12 @@ namespace RostalProjectUWP.Views.Library.Collection
             {
                 _libraryParameters = libraryParameters;
                 ViewModelPage.ViewModelList = _libraryParameters.ViewModelList?.ToList();
-                InitializeModelList();
             }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitializeModelList();
         }
 
         private void InitializeModelList()
@@ -56,9 +60,65 @@ namespace RostalProjectUWP.Views.Library.Collection
             try
             {
                 _libraryParameters.ParentPage.RefreshItemsGrouping();
+                this.PivotItems.SelectedIndex = _libraryParameters.ParentPage.ViewModelPage.SelectedPivotIndex;
+                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
             catch (Exception ex)
             {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is Pivot pivot)
+                {
+                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = 0;
+                    _libraryParameters.ParentPage.ViewModelPage.SelectedPivotIndex = pivot.SelectedIndex;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is GridView gridView)
+                {
+                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = gridView.SelectedItems.Count;
+                    _libraryParameters.ParentPage.ViewModelPage.SelectedItems = gridView.SelectedItems.Cast<BibliothequeVM>().ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void Image_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Image imageCtrl)
+                {
+                    var bitmapImage = await Files.BitmapImageFromFileAsync(imageCtrl.Tag.ToString());
+                    imageCtrl.Source = bitmapImage;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
             }
@@ -182,37 +242,6 @@ namespace RostalProjectUWP.Views.Library.Collection
 
         #endregion
 
-        private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = 0;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                if (sender is GridView gridView)
-                {
-                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = gridView.SelectedItems.Count;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
@@ -227,24 +256,6 @@ namespace RostalProjectUWP.Views.Library.Collection
                     }
 
                     viewModel.JaquettePath = result.Result?.ToString() ?? "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void Image_Loaded(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is Image imageCtrl)
-                {
-                    var bitmapImage = await Files.BitmapImageFromFileAsync(imageCtrl.Tag.ToString());
-                    imageCtrl.Source = bitmapImage;
                 }
             }
             catch (Exception ex)
@@ -352,6 +363,7 @@ namespace RostalProjectUWP.Views.Library.Collection
                 return;
             }
         }
+
     }
 
     public class LibraryCollectionGridViewPageVM : INotifyPropertyChanged
@@ -381,21 +393,6 @@ namespace RostalProjectUWP.Views.Library.Collection
                 if (this._GroupedBy != value)
                 {
                     this._GroupedBy = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private double _loadItemPurcentValue;
-
-        public double LoadItemPurcentValue
-        {
-            get => this._loadItemPurcentValue;
-            set
-            {
-                if (_loadItemPurcentValue != value)
-                {
-                    this._loadItemPurcentValue = value;
                     this.OnPropertyChanged();
                 }
             }

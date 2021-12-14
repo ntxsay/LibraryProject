@@ -125,7 +125,7 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
                     <Run Text="Elements sélectionnés :" />
-                    <Run Text="{x:Bind ViewModelPage.CountSelectedItems, Mode=OneWay}" />
+                    <Run Text="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
             </StackPanel>

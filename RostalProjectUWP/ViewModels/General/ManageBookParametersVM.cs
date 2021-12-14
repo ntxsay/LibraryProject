@@ -46,6 +46,7 @@ namespace RostalProjectUWP.ViewModels.General
     public class LibraryCollectionParentChildParamsVM
     {
         public IEnumerable<BibliothequeVM> ViewModelList { get; set; }
+        public IGrouping<string, BibliothequeVM> SelectedGroupedItem { get; set; }
         public LibraryCollectionPage ParentPage { get; set; }
     }
 

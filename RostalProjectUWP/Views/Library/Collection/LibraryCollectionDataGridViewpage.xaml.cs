@@ -48,8 +48,12 @@ namespace RostalProjectUWP.Views.Library.Collection
             {
                 _libraryParameters = libraryParameters;
                 ViewModelPage.ViewModelList = _libraryParameters.ViewModelList?.ToList();
-                InitializeModelList();
             }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitializeModelList();
         }
 
         private void InitializeModelList()
@@ -58,9 +62,47 @@ namespace RostalProjectUWP.Views.Library.Collection
             try
             {
                 _libraryParameters.ParentPage.RefreshItemsGrouping();
+                this.PivotItems.SelectedIndex = _libraryParameters.ParentPage.ViewModelPage.SelectedPivotIndex;
+                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
             catch (Exception ex)
             {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is Pivot pivot)
+                {
+                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = 0;
+                    _libraryParameters.ParentPage.ViewModelPage.SelectedPivotIndex = pivot.SelectedIndex;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is DataGrid dataGrid)
+                {
+                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = dataGrid.SelectedItems.Count;
+                    _libraryParameters.ParentPage.ViewModelPage.SelectedItems = dataGrid.SelectedItems.Cast<BibliothequeVM>().ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
             }
@@ -183,37 +225,6 @@ namespace RostalProjectUWP.Views.Library.Collection
         }
 
         #endregion
-
-        private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                if (sender is DataGrid dataGrid)
-                {
-                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = dataGrid.SelectedItems.Count;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = 0;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
 
         private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -366,21 +377,6 @@ namespace RostalProjectUWP.Views.Library.Collection
                 if (this._GroupedBy != value)
                 {
                     this._GroupedBy = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private double _loadItemPurcentValue;
-
-        public double LoadItemPurcentValue
-        {
-            get => this._loadItemPurcentValue;
-            set
-            {
-                if (_loadItemPurcentValue != value)
-                {
-                    this._loadItemPurcentValue = value;
                     this.OnPropertyChanged();
                 }
             }
