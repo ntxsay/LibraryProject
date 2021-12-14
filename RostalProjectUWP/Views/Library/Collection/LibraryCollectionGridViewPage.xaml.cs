@@ -76,7 +76,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             {
                 if (sender is Pivot pivot)
                 {
-                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = 0;
+                    _libraryParameters.ParentPage.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
                     _libraryParameters.ParentPage.ViewModelPage.SelectedPivotIndex = pivot.SelectedIndex;
                 }
             }
@@ -94,7 +94,6 @@ namespace RostalProjectUWP.Views.Library.Collection
             {
                 if (sender is GridView gridView)
                 {
-                    _libraryParameters.ParentPage.ViewModelPage.CountSelectedItems = gridView.SelectedItems.Count;
                     _libraryParameters.ParentPage.ViewModelPage.SelectedItems = gridView.SelectedItems.Cast<BibliothequeVM>().ToList();
                 }
             }

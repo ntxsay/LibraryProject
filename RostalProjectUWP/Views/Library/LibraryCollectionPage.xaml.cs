@@ -49,18 +49,12 @@ namespace RostalProjectUWP.Views.Library
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var libraryList = await DbServices.Library.AllVMAsync();
-                ViewModelPage.ViewModelList = libraryList?.ToList();
-                await InitializeDataAsync();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            await LoadDataAsync();
+        }
+
+        private async void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            await LoadDataAsync();
         }
 
         private async void Image_Loaded(object sender, RoutedEventArgs e)
@@ -76,6 +70,22 @@ namespace RostalProjectUWP.Views.Library
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async Task LoadDataAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var libraryList = await DbServices.Library.AllVMAsync();
+                ViewModelPage.ViewModelList = libraryList?.ToList();
+                await InitializeDataAsync();
+            }
+            catch (Exception ex)
+            {
                 Logs.Log(ex, m);
                 return;
             }
@@ -137,6 +147,7 @@ namespace RostalProjectUWP.Views.Library
                     });
                 }
 
+                this.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
                 ViewModelPage.IsGridView = true;
                 ViewModelPage.IsDataGridView = false;
             }
@@ -161,6 +172,7 @@ namespace RostalProjectUWP.Views.Library
                     });
                 }
 
+                this.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
                 ViewModelPage.IsGridView = false;
                 ViewModelPage.IsDataGridView = true;
             }
@@ -186,8 +198,6 @@ namespace RostalProjectUWP.Views.Library
                 {
                     libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
                 }
-
-                ViewModelPage.CountSelectedItems = 0;
             }
             catch (Exception ex)
             {
@@ -209,8 +219,6 @@ namespace RostalProjectUWP.Views.Library
                 {
                     libraryCollectionDataGridViewPage.GroupByCreationYear();
                 }
-
-                ViewModelPage.CountSelectedItems = 0;
             }
             catch (Exception ex)
             {
@@ -232,8 +240,6 @@ namespace RostalProjectUWP.Views.Library
                 {
                     libraryCollectionDataGridViewPage.GroupItemsByNone();
                 }
-
-                ViewModelPage.CountSelectedItems = 0;
             }
             catch (Exception ex)
             {
@@ -343,8 +349,6 @@ namespace RostalProjectUWP.Views.Library
                             break;
                     }
                 }
-
-                ViewModelPage.CountSelectedItems = 0;
             }
             catch (Exception ex)
             {
@@ -465,6 +469,32 @@ namespace RostalProjectUWP.Views.Library
             }
         }
         #endregion
+
+        private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void Btn_SelectAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Btn_UnSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Btn_OpenAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         
     }
 
@@ -557,20 +587,6 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        private int _countItems;
-        public int CountItems
-        {
-            get => this._countItems;
-            set
-            {
-                if (_countItems != value)
-                {
-                    this._countItems = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
         private int _SelectedPivotIndex;
         public int SelectedPivotIndex
         {
@@ -585,21 +601,7 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        private int _countSelectedItems;
-        public int CountSelectedItems
-        {
-            get => this._countSelectedItems;
-            set
-            {
-                if (_countSelectedItems != value)
-                {
-                    this._countSelectedItems = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private ICollection<BibliothequeVM> _SelectedItems;
+        private ICollection<BibliothequeVM> _SelectedItems = new List<BibliothequeVM>();
         public ICollection<BibliothequeVM> SelectedItems
         {
             get => this._SelectedItems;

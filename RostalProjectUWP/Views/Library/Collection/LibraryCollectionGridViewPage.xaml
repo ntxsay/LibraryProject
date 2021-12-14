@@ -39,9 +39,8 @@
                     <ToolTipService.ToolTip>
                         <ToolTip>
                             <TextBlock>
-                                <Run Text="Ouvrir" />
+                                <Run Text="Ouvrir la bibliothèque de" />
                                 <Run Text="{x:Bind Name}" FontWeight="Medium"/>
-                                <Run Text="dans un onglet" />
                             </TextBlock>
                         </ToolTip>
                     </ToolTipService.ToolTip>

@@ -19,10 +19,10 @@
         <customConverters:TimeSpanToStringDisplay x:Key="TimeSpanToStringDisplayConverter" />
         <customConverters:StringTimeToStringDisplay x:Key="StringTimeToStringDisplayConverter"/>
         <customConverters:ListTypeToString x:Key="ListTypeToStringConverter" />
-        <customConverters:CountToEnabling x:Key="CountToEnablingConverter" />
-        <customConverters:CountOneToEnabling x:Key="CountOneToEnablingConverter" />
-        <customConverters:CountToStringPhrase x:Key="CountToStringPhraseConverter" />
         <customConverters:IGroupingToValueConverter x:Key="groupingConverter" />-->
+        <customConverters:CountToEnablingConverter x:Key="CountToEnablingConverter" />
+        <customConverters:CountOneToEnablingConverter x:Key="CountOneToEnablingConverter" />
+        <customConverters:CountToStringPhrase x:Key="CountToStringPhraseConverter" />
         <customConverters:DateTimeToStringDisplay x:Key="dateTimeToStringDisplay" />
         <customConverters:GroupToBooleanConverter x:Key="groupbyToBooleanConverter" />
         <customConverters:SortToBooleanConverter x:Key="sortbyToBooleanConverter" />
@@ -40,6 +40,11 @@
                        ExecuteRequested="DataGridViewCollectionXamlUICommand_ExecuteRequested"
                        Description="Affiche la vue de liste des bibliothèques" 
                        Label="Affichage liste">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ReloadDataXamlUICommand" 
+                       ExecuteRequested="ReloadDataXamlUICommand_ExecuteRequested"
+                       Description="Actualise les données depuis la base de données" 
+                       Label="Actualiser les données">
         </XamlUICommand>
         <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
                        ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">
@@ -136,16 +141,72 @@
                 <SolidColorBrush Color="White" Opacity="0.5" />
             </CommandBar.Background>
             <!--Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"-->
-            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsDataGridView, Mode=OneWay}" Command="{StaticResource DataGridViewCollectionXamlUICommand}">
-                <AppBarToggleButton.Icon>
-                    <FontIcon Glyph="&#xE8FD;"/>
-                </AppBarToggleButton.Icon>
-            </AppBarToggleButton>
-            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsGridView, Mode=OneWay}" Command="{StaticResource GridViewCollectionXamlUICommand}">
-                <AppBarToggleButton.Icon>
-                    <FontIcon Glyph="&#xF0E2;"/>
-                </AppBarToggleButton.Icon>
-            </AppBarToggleButton>
+            <AppBarButton x:Name="ABBtn_SelectedItems" ToolTipService.ToolTip="Bibliothèque(s) sélectionnée(s)" Label="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToStringPhraseConverter}, ConverterParameter='counter bibliothèque(s) sélectionnée(s)', Mode=OneWay}"
+                          IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToEnablingConverter}, Mode=OneWay}">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xe762;"/>
+                </AppBarButton.Icon>
+                <AppBarButton.Flyout>
+                    <Flyout Placement="BottomEdgeAlignedRight">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="1" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="Btn_SelectAll" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_SelectAll_Click">
+                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8b3;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Sélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                </Button>
+                                <Button x:Name="Btn_UnSelectAll" Grid.Column="1" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_UnSelectAll_Click">
+                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8e6;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Désélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                </Button>
+                                <Button x:Name="Btn_OpenAll" Grid.Column="2" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_OpenAll_Click">
+                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8A7;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Ouvrir les fiches fiches sélectionnées" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                </Button>
+                                <Button x:Name="Btn_DeleteAll" Grid.Column="3" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_DeleteAll_Click">
+                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74D;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Supprimer les fiches fiches sélectionnées" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                    <Button.Flyout>
+                                        <Flyout>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="*" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" MaxWidth="400" FontSize="13" FontWeight="Medium" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" TextWrapping="Wrap" Padding="4">
+                                                        <Run Text="Êtes-vous sûr de vouloir supprimer toutes les bibliothèques sélectionnées ? Cette action est irréversible." />
+                                                </TextBlock>
+                                                <TextBlock Grid.Row="1" MaxWidth="400" FontSize="12" TextWrapping="WrapWholeWords" Padding="4">
+                                                        <Run Text='Cliquez sur "' />
+                                                        <Run FontWeight="Medium" Text="Supprimer tout" />
+                                                        <Run Text='" pour supprimer toutes les fiches,' />
+                                                        <Run Text="sinon cliquez simplement sur la fiche que vous souhaitez supprimer." />
+                                                </TextBlock>
+                                                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+                                                    <Button Content="Annuler" HorizontalAlignment="Right" Margin="0,4" />
+                                                    <Button Content="Supprimer tout" HorizontalAlignment="Right" Margin="0,4"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Flyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </Grid>
+                            <Rectangle Height="1" Grid.Row="1" Fill="{ThemeResource SystemColorControlAccentBrush}"/>
+                            <ListView x:Name="Lv_SelectedItems" Margin="0,5,0,0" HorizontalAlignment="Stretch" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.SelectedItems, Mode=OneWay}" MaxHeight="500"
+                                      ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}" IsItemClickEnabled="False" SelectionMode="Single" SelectionChanged="Lv_SelectedItems_SelectionChanged">
+
+                            </ListView>
+                        </Grid>
+                    </Flyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
             <AppBarSeparator/>
             <AppBarButton ToolTipService.ToolTip="Grouper par">
                 <AppBarButton.Icon>
@@ -172,17 +233,21 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarButton x:Name="ABBtn_SelectedItems" ToolTipService.ToolTip="Fiche(s) sélectionnée(s)">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xe762;"/>
-                </AppBarButton.Icon>
-                
-            </AppBarButton>
+            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsDataGridView, Mode=OneWay}" Command="{StaticResource DataGridViewCollectionXamlUICommand}">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xE8FD;"/>
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsGridView, Mode=OneWay}" Command="{StaticResource GridViewCollectionXamlUICommand}">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xF0E2;"/>
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter une société">
                 
             </AppBarButton>
-            <AppBarToggleButton Icon="RepeatAll" ToolTipService.ToolTip="Repeat"/>
+            <AppBarButton Icon="RepeatAll" LabelPosition="Collapsed" Command="{StaticResource ReloadDataXamlUICommand}"/>
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <AutoSuggestBox x:Name="ASB_SearchItem" Width="310" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,6,0,4" 
