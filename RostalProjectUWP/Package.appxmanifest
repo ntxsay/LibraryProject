@@ -9,7 +9,7 @@
 
   <Identity
     Name="Rostalotheque"
-    Publisher="CN=loicbastaraud"
+    Publisher="CN=AKATSUKI"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="c684c2eb-9229-4d9a-8fec-e0579a2bbbe7" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
