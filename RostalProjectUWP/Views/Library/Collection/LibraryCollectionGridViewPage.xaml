@@ -86,22 +86,29 @@
                         </Border>
                         <Button.Flyout>
                             <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                <MenuFlyoutItem Text="Modifier la jaquette" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xEB9F;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Text="Ouvrir la bibliothèque">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE8A7;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Modifier la jaquette" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xEB9F;"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
                                 <MenuFlyoutItem Text="Editer les informations" Command="{StaticResource EditLibraryInfosXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE70F;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutSubItem Text="Editer les catégories" Loaded="MenuFlyoutSubItem_Categorie_Loaded" Tag="{x:Bind Mode=OneWay}">
+                                    <MenuFlyoutSubItem.Icon>
+                                        <FontIcon Glyph="&#xE81E;"/>
+                                    </MenuFlyoutSubItem.Icon>
+                                </MenuFlyoutSubItem>
                                 <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Text="Supprimer la bibliothèque" Foreground="OrangeRed">
                                     <MenuFlyoutItem.Icon>

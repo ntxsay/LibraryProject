@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,6 +18,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -537,7 +539,133 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
-        
+        private void MenuFlyoutSubItem_Categorie_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is MenuFlyoutSubItem subItem && subItem.Tag is BibliothequeVM viewModel)
+                {
+                    PopulateCategoriesMenuItems(subItem, viewModel);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void PopulateCategoriesMenuItems(MenuFlyoutSubItem subItem, BibliothequeVM viewModel)
+        {
+            try
+            {
+                subItem.Items.Clear();
+                //Add button
+                var AddCategoryMenuItem = new MenuFlyoutItem()
+                {
+                    Text = "Ajouter une catégorie",
+                    Icon = new SymbolIcon(Symbol.Add),
+                };
+
+                AddCategoryMenuItem.Click += AddSubCategoryMenuItem_Click;
+                subItem.Items.Add(AddCategoryMenuItem);
+
+
+
+                if (viewModel.Categories != null && viewModel.Categories.Any())
+                {
+                    subItem.Items.Add(new MenuFlyoutSeparator());
+
+                    foreach (var category in viewModel.Categories)
+                    {
+                        //Main Category MenuItem
+                        var CategoryMenuItem = new MenuFlyoutSubItem()
+                        {
+                            Text = category.Name,
+                            Icon = new FontIcon() { Glyph = "\uE81E" }
+
+                        };
+
+                        //Add button
+                        var AddSubCategoryMenuItem = new MenuFlyoutItem()
+                        {
+                            Text = "Ajouter une sous-catégorie",
+                            Icon = new SymbolIcon(Symbol.Add),
+                        };
+                        AddSubCategoryMenuItem.Click += AddSubCategoryMenuItem_Click;
+                        CategoryMenuItem.Items.Add(AddSubCategoryMenuItem);
+
+                        //Remove button
+                        var RemoveCategoryMenuItem = new MenuFlyoutItem()
+                        {
+                            Text = $"Supprimer « {category.Name} »",
+                            Icon = new SymbolIcon(Symbol.Delete),
+                            Foreground = new SolidColorBrush(Colors.OrangeRed),
+                        };
+                        RemoveCategoryMenuItem.Click += RemoveCategoryMenuItem_Click;
+                        CategoryMenuItem.Items.Add(RemoveCategoryMenuItem);
+
+                        subItem.Items.Add(CategoryMenuItem);
+
+                        PopulateSubCategoriesMenuItems(CategoryMenuItem, category);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void RemoveCategoryMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PopulateSubCategoriesMenuItems(MenuFlyoutSubItem categorieSubMenuItem, CategorieLivreVM categorieVM)
+        {
+            try
+            {
+                if (categorieVM.SubCategorieLivres != null && categorieVM.SubCategorieLivres.Any())
+                {
+                    categorieSubMenuItem.Items.Add(new MenuFlyoutSeparator());
+
+                    foreach (var category in categorieVM.SubCategorieLivres)
+                    {
+                        //Main Sub-Category MenuItem
+                        var SubCategoryMenuItem = new MenuFlyoutItem()
+                        {
+                            Text = category.Name,
+                            Icon = new FontIcon() { Glyph = "\uE81E" }
+
+                        };
+                        SubCategoryMenuItem.Click += SubCategoryMenuItem_Click;
+
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void SubCategoryMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RemoveSubCategoryMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void AddSubCategoryMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
     }
 
     public class LibraryCollectionGridViewPageVM : INotifyPropertyChanged
