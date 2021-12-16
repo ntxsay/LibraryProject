@@ -19,7 +19,7 @@
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
-    <PackageCertificateThumbprint>E003F5E4BB1E3608C7FAE6F22E76D180D478564B</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>376A14A0D37AC1CE8831F71FFE182FEE5143BB85</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
@@ -202,6 +202,9 @@
     <Compile Include="Views\Library\Manage\ManageLibraryGeneralPage.xaml.cs">
       <DependentUpon>ManageLibraryGeneralPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Library\Manage\NewEditCategoryUC.xaml.cs">
+      <DependentUpon>NewEditCategoryUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Library\Manage\NewLibraryCD.xaml.cs">
       <DependentUpon>NewLibraryCD.xaml</DependentUpon>
     </Compile>
@@ -270,6 +273,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Library\Manage\ManageLibraryGeneralPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Library\Manage\NewEditCategoryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
