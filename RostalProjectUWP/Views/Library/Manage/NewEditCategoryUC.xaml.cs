@@ -12,10 +12,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
@@ -54,8 +56,9 @@ namespace RostalProjectUWP.Views.Library.Manage
             ViewModelPage.NamePlaceHolderText = "Nom de la catégorie";
             ViewModelPage.DescriptionPlaceHolderText = "Description facultative de la catégorie";
             ViewModelPage.ArgName = "catégorie";
-            ViewModelPage.Value = parameters.CurrentCategorie.Name;
-            ViewModelPage.Description = parameters.CurrentCategorie.Description;
+            ViewModelPage.Value = parameters?.CurrentCategorie?.Name;
+            ViewModelPage.Description = parameters?.CurrentCategorie?.Description;
+            InitializeActionInfos();
         }
 
         public NewEditCategoryUC(ManageSubCategorieDialogParametersVM parameters)
@@ -69,14 +72,95 @@ namespace RostalProjectUWP.Views.Library.Manage
             ViewModelPage.ArgName = "sous-catégorie";
             ViewModelPage.Value = parameters.Value;
             ViewModelPage.Description = parameters.Description;
+            InitializeActionInfos();
+        }
+
+        private void InitializeActionInfos()
+        {
+            try
+            {
+                Run runTitle = new Run()
+                {
+                    Text = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une nouvelle" : "d'éditer la")} {ViewModelPage.ArgName}",
+                    //FontWeight = FontWeights.Medium,
+                };
+                TbcInfos.Inlines.Add(runTitle);
+                
+                if (_categorieParameters != null)
+                {
+                    if (ViewModelPage.EditMode == EditMode.Edit)
+                    {
+                        Run runCategorie = new Run()
+                        {
+                            Text = " " + _categorieParameters?.CurrentCategorie?.Name,
+                            FontWeight = FontWeights.Medium,
+                        };
+                        TbcInfos.Inlines.Add(runCategorie);
+                    }
+
+                    Run runInLibrary = new Run()
+                    {
+                        Text = " dans la bibliothèque",
+                    };
+                    TbcInfos.Inlines.Add(runInLibrary);
+                    
+                    Run runLibrary = new Run()
+                    {
+                        Text = " « " + _categorieParameters?.ParentLibrary?.Name + " »",
+                        FontWeight = FontWeights.Medium,
+                    };
+                    TbcInfos.Inlines.Add(runLibrary);
+                }
+                else if (_subCategorieParameters != null)
+                {
+                    if (ViewModelPage.EditMode == EditMode.Edit)
+                    {
+                        Run runSubCategorie = new Run()
+                        {
+                            Text = " " + _subCategorieParameters?.Value,
+                            FontWeight = FontWeights.Medium,
+                        };
+                        TbcInfos.Inlines.Add(runSubCategorie);
+                    }
+
+                    Run runInCategorie = new Run()
+                    {
+                        Text = " dans la catégorie",
+                    };
+                    TbcInfos.Inlines.Add(runInCategorie);
+
+                    Run runCategorieName = new Run()
+                    {
+                        Text = " « " + _subCategorieParameters?.Categorie?.Name + " »",
+                        FontWeight = FontWeights.Medium,
+                    };
+                    TbcInfos.Inlines.Add(runCategorieName);
+
+                    Run runInLibrary = new Run()
+                    {
+                        Text = " dans la bibliothèque",
+                    };
+                    TbcInfos.Inlines.Add(runInLibrary);
+
+                    Run runLibrary = new Run()
+                    {
+                        Text = " « " + _subCategorieParameters?.Categorie?.Name + " »",
+                        FontWeight = FontWeights.Medium,
+                    };
+                    TbcInfos.Inlines.Add(runLibrary);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            if (CancelModificationRequested != null)
-            {
-                CancelModificationRequested(this, args);
-            }
+            CancelModificationRequested?.Invoke(this, args);
         }
 
         private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -112,10 +196,7 @@ namespace RostalProjectUWP.Views.Library.Manage
                     return;
                 }
 
-                if (UpdateItemRequested != null)
-                {
-                    UpdateItemRequested(this, args);
-                }
+                UpdateItemRequested?.Invoke(this, args);
             }
             catch (Exception ex)
             {

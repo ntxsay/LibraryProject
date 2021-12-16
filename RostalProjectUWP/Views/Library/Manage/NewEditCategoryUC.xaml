@@ -49,6 +49,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+                    <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
                     <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.Value, Mode=TwoWay}" PlaceholderText="{x:Bind ViewModelPage.NamePlaceHolderText, Mode=OneWay}"/>
                     <TextBox Grid.Row="2" Text="{x:Bind ViewModelPage.Description, Mode=TwoWay}" MinHeight="100" PlaceholderText="{x:Bind ViewModelPage.DescriptionPlaceHolderText, Mode=OneWay}"
                  TextWrapping="Wrap" AcceptsReturn="True"/>
