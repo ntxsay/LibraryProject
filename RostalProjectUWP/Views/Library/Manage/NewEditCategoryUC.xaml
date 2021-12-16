@@ -12,8 +12,8 @@
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignHeight="800"
+    d:DesignWidth="510">
     <UserControl.Resources>
         <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
         <XamlUICommand x:Name="CancelModificationXUiCommand" 
@@ -42,7 +42,11 @@
                 <TextBlock Text="{x:Bind ViewModelPage.Header, Mode=OneWay}" FontSize="16" />
             </PivotItem.Header>
             <Grid>
-                <Grid RowSpacing="8" Margin="0 8 0 0" VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" RowSpacing="8" Margin="0 8 0 0" VerticalAlignment="Top">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -55,15 +59,24 @@
                  TextWrapping="Wrap" AcceptsReturn="True"/>
                     <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="OrangeRed" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ErrorMessage, Mode=OneWay}"/>
                 </Grid>
-                <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+                <StackPanel Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
                     <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
-                        <TextBlock Text="Créer" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
+                            <TextBlock Text="Créer" />
+                        </StackPanel>
                     </Button>
                     <Button Command="{StaticResource UpdateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">
-                        <TextBlock Text="Mettre à jour" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEB7E;"/>
+                            <TextBlock Text="Mettre à jour" />
+                        </StackPanel>
                     </Button>
                     <Button Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">
-                        <TextBlock Text="Supprimer" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+                            <TextBlock Text="Supprimer" />
+                        </StackPanel>
                         <Button.Flyout>
                             <Flyout>
                                 <Grid>
@@ -86,7 +99,10 @@
                         </Button.Flyout>
                     </Button>
                     <Button Command="{StaticResource CancelModificationXUiCommand}">
-                        <TextBlock Text="Annuler" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;"/>
+                            <TextBlock Text="Annuler" />
+                        </StackPanel>
                     </Button>
                 </StackPanel>
             </Grid>
