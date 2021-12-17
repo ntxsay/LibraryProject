@@ -179,19 +179,27 @@ namespace RostalProjectUWP.Views.Library.Manage
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (CancelModificationRequested != null)
+            try
             {
-                CancelModificationRequested = null;
-            }
+                if (CancelModificationRequested != null)
+                {
+                    CancelModificationRequested = null;
+                }
 
-            if (CreateItemRequested != null)
-            {
-                CreateItemRequested = null;
-            }
+                if (CreateItemRequested != null)
+                {
+                    CreateItemRequested = null;
+                }
 
-            if (UpdateItemRequested != null)
+                if (UpdateItemRequested != null)
+                {
+                    UpdateItemRequested = null;
+                }
+            }
+            catch (Exception)
             {
-                UpdateItemRequested = null;
+
+                throw;
             }
         }
     }

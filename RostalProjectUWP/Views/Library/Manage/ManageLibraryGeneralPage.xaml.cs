@@ -31,6 +31,7 @@ namespace RostalProjectUWP.Views.Library.Manage
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.
     /// </summary>
+    [Obsolete]
     public sealed partial class ManageLibraryGeneralPage : Page
     {
         private ManageLibraryPage _parentPage;

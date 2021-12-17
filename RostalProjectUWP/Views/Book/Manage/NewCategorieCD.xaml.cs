@@ -20,6 +20,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace RostalProjectUWP.Views.Book.Manage
 {
+    [Obsolete]
     public sealed partial class NewCategorieCD : ContentDialog
     {
         private readonly ManageCategorieDialogParametersVM _parameters;

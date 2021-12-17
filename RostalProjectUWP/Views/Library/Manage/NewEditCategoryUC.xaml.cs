@@ -256,6 +256,32 @@ namespace RostalProjectUWP.Views.Library.Manage
         {
 
         }
+
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (CancelModificationRequested != null)
+                {
+                    CancelModificationRequested = null;
+                }
+
+                if (CreateItemRequested != null)
+                {
+                    CreateItemRequested = null;
+                }
+
+                if (UpdateItemRequested != null)
+                {
+                    UpdateItemRequested = null;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 
     public class NewEditCategoryUCVM : INotifyPropertyChanged

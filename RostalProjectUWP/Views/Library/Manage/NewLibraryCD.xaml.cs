@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace RostalProjectUWP.Views.Library.Manage
 {
+    [Obsolete]
     public sealed partial class NewLibraryCD : ContentDialog
     {
         private readonly ManageLibraryDialogParametersVM _parameters;
