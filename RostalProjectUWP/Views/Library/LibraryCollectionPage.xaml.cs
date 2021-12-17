@@ -497,27 +497,53 @@ namespace RostalProjectUWP.Views.Library
 
         }
 
-        private async void NewLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void NewLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
+            NewEditLibraryUC userControl = null;
             try
             {
-                var dialog = new NewLibraryCD(new ManageLibraryDialogParametersVM()
+                userControl = new NewEditLibraryUC(new ManageLibraryDialogParametersVM()
                 {
                     EditMode = Code.EditMode.Create,
                     ViewModelList = ViewModelPage.ViewModelList,
                 });
 
-                var result = await dialog.ShowAsync();
-                if (result == ContentDialogResult.Primary)
+                userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
+                userControl.CreateItemRequested += NewEditLibraryUC_CreateItemRequested;
+
+                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
                 {
-                    var value = dialog.Value?.Trim();
-                    var description = dialog.Description?.Trim();
+                    libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                    libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                }
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                {
+                    //libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                    //libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditLibraryUC_CreateItemRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    var newValue = sender.ViewModelPage.Value?.Trim();
+                    var newDescription = sender.ViewModelPage.Description?.Trim();
 
                     var newViewModel = new BibliothequeVM()
                     {
-                        Name = value,
-                        Description = description,
+                        Name = newValue,
+                        Description = newDescription,
                     };
 
                     var creationResult = await DbServices.Library.CreateAsync(newViewModel);
@@ -540,11 +566,49 @@ namespace RostalProjectUWP.Views.Library
                     else
                     {
                         //Erreur
+                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
+                        return;
                     }
                 }
-                else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+
+                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
+                sender.UpdateItemRequested -= NewEditLibraryUC_CreateItemRequested;
+
+                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage2)
                 {
-                    return;
+                    libraryCollectionGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
+                    libraryCollectionGridViewPage2.ViewModelPage.SplitViewContent = null;
+                }
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage2)
+                {
+                    //libraryCollectionDataGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
+                    //libraryCollectionDataGridViewPage2.ViewModelPage.SplitViewContent = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditLibraryUC_CancelModificationRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
+
+                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                {
+                    libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
+                    libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
+                }
+                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                {
+                    //libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
+                    //libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
                 }
             }
             catch (Exception ex)

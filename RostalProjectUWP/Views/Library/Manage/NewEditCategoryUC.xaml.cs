@@ -70,8 +70,8 @@ namespace RostalProjectUWP.Views.Library.Manage
             ViewModelPage.NamePlaceHolderText = "Nom de la sous-catégorie";
             ViewModelPage.DescriptionPlaceHolderText = "Description facultative de la sous-catégorie";
             ViewModelPage.ArgName = "sous-catégorie";
-            ViewModelPage.Value = parameters.Value;
-            ViewModelPage.Description = parameters.Description;
+            ViewModelPage.Value = parameters?.CurrentSubCategorie?.Name;
+            ViewModelPage.Description = parameters?.CurrentSubCategorie?.Description;
             InitializeActionInfos();
         }
 
@@ -117,7 +117,7 @@ namespace RostalProjectUWP.Views.Library.Manage
                     {
                         Run runSubCategorie = new Run()
                         {
-                            Text = " " + _subCategorieParameters?.Value,
+                            Text = " " + _subCategorieParameters?.CurrentSubCategorie?.Name,
                             FontWeight = FontWeights.Medium,
                         };
                         TbcInfos.Inlines.Add(runSubCategorie);

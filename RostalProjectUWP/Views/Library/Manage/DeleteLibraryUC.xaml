@@ -31,7 +31,10 @@
         </Pivot.OpacityTransition>
         <PivotItem>
             <PivotItem.Header>
-                <TextBlock Text="{x:Bind ViewModelPage.Header, Mode=OneWay}" FontSize="16" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8F1;" FontSize="20"/>
+                    <TextBlock Text="{x:Bind ViewModelPage.Header, Mode=OneWay}" FontSize="16" />
+                </StackPanel>
             </PivotItem.Header>
             <Grid>
                 <Grid RowSpacing="8" Margin="0 8 0 0" VerticalAlignment="Top">
