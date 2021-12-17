@@ -1,0 +1,95 @@
+﻿<UserControl
+    x:Class="RostalProjectUWP.Views.Library.Manage.NewEditLibraryUC"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RostalProjectUWP.Views.Library.Manage"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="using:RostalProjectUWP.ViewModels"
+    xmlns:customConverters="using:RostalProjectUWP.Code.Converters"
+    xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400" Unloaded="UserControl_Unloaded">
+    <UserControl.Resources>
+        <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
+        <XamlUICommand x:Name="CancelModificationXUiCommand" 
+                       ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
+                       Description="Annule toutes les modifications apportées à l'item">
+        </XamlUICommand>
+        <XamlUICommand x:Name="CreateItemXUiCommand" 
+                       ExecuteRequested="CreateItemXUiCommand_ExecuteRequested"
+                       Description="Crée un nouvel item">
+        </XamlUICommand>
+        <XamlUICommand x:Name="UpdateItemXUiCommand" 
+                       ExecuteRequested="UpdateItemXUiCommand_ExecuteRequested"
+                       Description="Met à jour l'item">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DeleteItemXUiCommand" 
+                       ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
+                       Description="Supprime l'item">
+        </XamlUICommand>
+    </UserControl.Resources>
+    <Pivot x:Name="PivotItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Pivot.OpacityTransition>
+            <ScalarTransition />
+        </Pivot.OpacityTransition>
+        <PivotItem>
+            <PivotItem.Header>
+                <TextBlock Text="{x:Bind ViewModelPage.Header, Mode=OneWay}" FontSize="16" />
+            </PivotItem.Header>
+            <Grid>
+                <Grid RowSpacing="8" Margin="0 8 0 0" VerticalAlignment="Top">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
+                    <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.Value, Mode=TwoWay}" PlaceholderText="{x:Bind ViewModelPage.NamePlaceHolderText, Mode=OneWay}"/>
+                    <TextBox Grid.Row="2" Text="{x:Bind ViewModelPage.Description, Mode=TwoWay}" MinHeight="100" PlaceholderText="{x:Bind ViewModelPage.DescriptionPlaceHolderText, Mode=OneWay}"
+                 TextWrapping="Wrap" AcceptsReturn="True"/>
+                    <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="OrangeRed" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ErrorMessage, Mode=OneWay}"/>
+                </Grid>
+                <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+                    <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
+                        <TextBlock Text="Créer" />
+                    </Button>
+                    <Button Command="{StaticResource UpdateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">
+                        <TextBlock Text="Mettre à jour" />
+                    </Button>
+                    <Button Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">
+                        <TextBlock Text="Supprimer" />
+                        <Button.Flyout>
+                            <Flyout>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" TextWrapping="Wrap" MaxWidth="320">
+                                                        <Run Text="Êtes-vous sûr de vouloir supprimer la" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="Bold"/>
+                                                        <Run Text="{x:Bind ViewModelPage.ArgName, Mode=OneWay}" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="Bold"/>
+                                                        <Run Text="{x:Bind ViewModelPage.Value, Mode=OneWay}" FontWeight="Bold" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                                        <Run Text="?" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="Bold"/>
+                                                        <LineBreak />
+                                                        <LineBreak />
+                                                        <Run Text="Cette action est irréverssible, la bibliothèque et ce qu'elle contient sera suprimée." />
+                                    </TextBlock>
+                                    <Button Grid.Row="1" Content="Supprimer quand même" HorizontalAlignment="Right" Command="{StaticResource DeleteItemXUiCommand}"></Button>
+                                </Grid>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button Command="{StaticResource CancelModificationXUiCommand}">
+                        <TextBlock Text="Annuler" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </PivotItem>
+    </Pivot>
+</UserControl>

@@ -33,9 +33,13 @@ namespace RostalProjectUWP.ViewModels.General
 
     public class ManageLibraryDialogParametersVM
     {
+        [Obsolete]
         public string Value { get; set; }
+
+        [Obsolete]
         public string Description { get; set; }
         public IEnumerable<BibliothequeVM> ViewModelList { get; set; }
+        public BibliothequeVM CurrentLibrary { get; set; }
         public EditMode EditMode { get; set; }
     }
 }

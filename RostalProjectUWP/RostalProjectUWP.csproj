@@ -202,6 +202,9 @@
     <Compile Include="Views\Library\Manage\ManageLibraryGeneralPage.xaml.cs">
       <DependentUpon>ManageLibraryGeneralPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Library\Manage\NewEditLibraryUC.xaml.cs">
+      <DependentUpon>NewEditLibraryUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Library\Manage\NewEditCategoryUC.xaml.cs">
       <DependentUpon>NewEditCategoryUC.xaml</DependentUpon>
     </Compile>
@@ -275,6 +278,10 @@
     <Page Include="Views\Library\Manage\ManageLibraryGeneralPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Library\Manage\NewEditLibraryUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Library\Manage\NewEditCategoryUC.xaml">
       <SubType>Designer</SubType>
