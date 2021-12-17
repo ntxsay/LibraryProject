@@ -34,6 +34,11 @@
                        Description="Edite les informations de base de la bibliothèque" 
                        Label="Editer les informations">
         </XamlUICommand>
+        <XamlUICommand x:Name="DeleteLibraryXamlUICommand" 
+                       ExecuteRequested="DeleteLibraryXamlUICommand_ExecuteRequested"
+                       Description="Supprime définitivement la bibliothèque actuelle" 
+                       Label="Supprimer la bibliothèque">
+        </XamlUICommand>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToInvertVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolConverter" TrueValue="False" FalseValue="True"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
@@ -107,6 +112,12 @@
                                 <MenuFlyoutItem Text="Editer la bibliothèque" Command="{StaticResource EditLibraryInfosXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE70F;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem Text="Supprimer la bibliothèque" Command="{StaticResource DeleteLibraryXamlUICommand}" CommandParameter="{x:Bind }" Foreground="OrangeRed">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74D;" Foreground="OrangeRed"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                             </MenuFlyout>

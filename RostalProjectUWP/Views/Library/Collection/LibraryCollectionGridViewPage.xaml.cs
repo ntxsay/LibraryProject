@@ -276,6 +276,40 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
+        private void DeleteLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            DeleteLibraryUC userControl = null;
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    userControl = new DeleteLibraryUC(viewModel);
+
+                    userControl.CancelModificationRequested += DeleteLibraryUC_CancelModificationRequested; ;
+                    userControl.DeleteItemRequested += DeleteLibraryUC_DeleteItemRequested;
+
+                    ViewModelPage.SplitViewContent = userControl;
+                    ViewModelPage.IsSplitViewOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DeleteLibraryUC_DeleteItemRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DeleteLibraryUC_CancelModificationRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         private void EditLibraryInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             NewEditLibraryUC userControl = null;
