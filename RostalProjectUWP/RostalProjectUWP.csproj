@@ -175,6 +175,7 @@
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
+    <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
     <Compile Include="Views\Book\ManageBookPage.xaml.cs">
       <DependentUpon>ManageBookPage.xaml</DependentUpon>
     </Compile>

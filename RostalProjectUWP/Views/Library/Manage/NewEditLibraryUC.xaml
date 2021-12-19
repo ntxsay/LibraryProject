@@ -28,10 +28,6 @@
                        ExecuteRequested="UpdateItemXUiCommand_ExecuteRequested"
                        Description="Met à jour l'item">
         </XamlUICommand>
-        <XamlUICommand x:Name="DeleteItemXUiCommand" 
-                       ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
-                       Description="Supprime l'item">
-        </XamlUICommand>
     </UserControl.Resources>
     <Pivot x:Name="PivotItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Pivot.OpacityTransition>
@@ -70,31 +66,6 @@
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEB7E;"/>
                             <TextBlock Text="Mettre à jour" />
                         </StackPanel>
-                    </Button>
-                    <Button Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" Foreground="OrangeRed"/>
-                            <TextBlock Text="Supprimer" Foreground="OrangeRed"/>
-                        </StackPanel>
-                        <Button.Flyout>
-                            <Flyout>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" TextWrapping="Wrap" MaxWidth="320">
-                                                        <Run Text="Êtes-vous sûr de vouloir supprimer la bibliothèque" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="Bold"/>
-                                                        <Run Text="{x:Bind _parameters.CurrentLibrary.Name}" FontWeight="Bold" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                                        <Run Text="?" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="Bold"/>
-                                                        <LineBreak />
-                                                        <LineBreak />
-                                                        <Run Text="Cette action est irréverssible, la bibliothèque et ce qu'elle contient sera suprimée." />
-                                    </TextBlock>
-                                    <Button Grid.Row="1" Margin="0 10 0 0" Content="Supprimer quand même" HorizontalAlignment="Right" Command="{StaticResource DeleteItemXUiCommand}"></Button>
-                                </Grid>
-                            </Flyout>
-                        </Button.Flyout>
                     </Button>
                     <Button Command="{StaticResource CancelModificationXUiCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="8">

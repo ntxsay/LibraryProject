@@ -11,6 +11,7 @@
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    xmlns:dTemplateSelectors="using:RostalProjectUWP.Code.DataTemplatesSelector"
     mc:Ignorable="d"
     d:DesignHeight="800"
     d:DesignWidth="510" Unloaded="UserControl_Unloaded">
@@ -24,6 +25,36 @@
                        ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
                        Description="Supprime l'item">
         </XamlUICommand>
+        <DataTemplate x:Key="CategorieTemplate" x:DataType="viewModels:CategorieLivreVM">
+            <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}"
+            ItemsSource="{x:Bind SubCategorieLivres, Mode=OneWay}" IsExpanded="True">
+                <Grid RowSpacing="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" ColumnSpacing="8" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0" Glyph="&#xE81E;"/>
+                        <TextBlock Grid.Column="1" Text="{x:Bind Name, Mode=OneWay}" FontSize="18"/>
+                    </Grid>
+                    <Rectangle Grid.Row="1" Fill="Black" Height="1" HorizontalAlignment="Stretch"/>
+                </Grid>
+            </MUIXC:TreeViewItem>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SubCategorieTemplate" x:DataType="viewModels:SubCategorieLivreVM">
+            <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
+                <TextBlock Margin="12 0 0 0" Text="{x:Bind Name, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}"/>
+            </MUIXC:TreeViewItem>
+        </DataTemplate>
+        
+        <dTemplateSelectors:CategoriesDataTemplateSelector x:Key="categorieTemplateSelector"
+        CategorieTemplate="{StaticResource CategorieTemplate}"
+        SubCategorieTemplate="{StaticResource SubCategorieTemplate}" />
     </UserControl.Resources>
     <Pivot x:Name="PivotItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Pivot.OpacityTransition>
@@ -37,20 +68,28 @@
                 </StackPanel>
             </PivotItem.Header>
             <Grid>
-                <Grid RowSpacing="8" Margin="0 8 0 0" VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" RowSpacing="8" Margin="0 8 0 0" VerticalAlignment="Top">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Margin="0 20" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
+                    <TextBlock Grid.Row="0" Margin="0 15 0 20" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
                         <Run Text="Vous êtes sur le point de supprimer la bibliothèque"/>
                         <Run Text="{x:Bind ViewModelPage.ViewModel.Name}" FontWeight="Bold"/><Run Text="."/>
                         <LineBreak /><Run Text="La bibliothèque et les livres qu'elle contient seront supprimés. Notez que cette action est irréverssible !"/>
                     </TextBlock>
+                    <TextBlock Grid.Row="1" Text="Récapitulatif des livres qui seront définitivement supprimés :" />
+                    <ListView Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.ViewModel.Books, Mode=OneWay}" IsItemClickEnabled="False" SelectionMode="None">
+                        
+                    </ListView>
                 </Grid>
-                <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+                <StackPanel Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
                     <Button>
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" Foreground="OrangeRed"/>
@@ -64,9 +103,12 @@
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" MaxWidth="320" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
-                                        <Run Text="La bibliothèque et les livres qu'elle contient seront supprimés, cette action est irréverssible ! Voulez-vous tout de même la supprimer ?"/>
+                                        <Run Text="Souhaitez-vous effectuer une sauvegarde de la bibliothèque avant sa suppression ?"/>
                                     </TextBlock>
-                                    <Button Grid.Row="1" Margin="0 10 0 0" Content="Supprimer quand même" HorizontalAlignment="Right" Command="{StaticResource DeleteItemXUiCommand}"></Button>
+                                    <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="Sauvegarder" Command="{StaticResource DeleteItemXUiCommand}"></Button>
+                                        <Button Content="Ne pas sauvegarder" Command="{StaticResource DeleteItemXUiCommand}"></Button>
+                                    </StackPanel>
                                 </Grid>
                             </Flyout>
                         </Button.Flyout>

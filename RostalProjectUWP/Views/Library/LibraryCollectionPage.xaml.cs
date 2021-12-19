@@ -572,7 +572,7 @@ namespace RostalProjectUWP.Views.Library
                 }
 
                 sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
-                sender.UpdateItemRequested -= NewEditLibraryUC_CreateItemRequested;
+                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
 
                 if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage2)
                 {

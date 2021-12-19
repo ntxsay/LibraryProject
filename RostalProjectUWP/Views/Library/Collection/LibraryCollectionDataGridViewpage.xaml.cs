@@ -5,6 +5,8 @@ using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.ViewModels.Library;
+using RostalProjectUWP.ViewModels.UI;
+using RostalProjectUWP.Views.Library.Manage;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,6 +37,7 @@ namespace RostalProjectUWP.Views.Library.Collection
     {
         public LibraryCollectionDataGridViewPageVM ViewModelPage { get; set; } = new LibraryCollectionDataGridViewPageVM();
         private LibraryCollectionParentChildParamsVM _libraryParameters;
+        LibraryCollectionCommonViewVM _commonView;
 
         public LibraryCollectionDataGridViewPage()
         {
@@ -47,6 +50,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             if (e.Parameter is LibraryCollectionParentChildParamsVM libraryParameters)
             {
                 _libraryParameters = libraryParameters;
+                _commonView = new LibraryCollectionCommonViewVM(this, libraryParameters.ParentPage);
                 ViewModelPage.ViewModelList = _libraryParameters.ViewModelList?.ToList();
             }
         }
@@ -249,6 +253,56 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
+        private void MenuFlyoutSubItem_Categorie_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is MenuFlyoutSubItem subItem && subItem.Tag is BibliothequeVM viewModel)
+                {
+                    _commonView.PopulateCategoriesMenuItems(subItem, viewModel);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void EditLibraryInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    _commonView.EditLibrary(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DeleteLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    _commonView.DeleteLibrary(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #region Search
         public void SearchViewModel(BibliothequeVM viewModel)
         {
@@ -432,6 +486,34 @@ namespace RostalProjectUWP.Views.Library.Collection
                 if (_ViewModelList != value)
                 {
                     this._ViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsSplitViewOpen;
+        public bool IsSplitViewOpen
+        {
+            get => this._IsSplitViewOpen;
+            set
+            {
+                if (_IsSplitViewOpen != value)
+                {
+                    this._IsSplitViewOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private UserControl _SplitViewContent;
+        public UserControl SplitViewContent
+        {
+            get => this._SplitViewContent;
+            set
+            {
+                if (_SplitViewContent != value)
+                {
+                    this._SplitViewContent = value;
                     this.OnPropertyChanged();
                 }
             }

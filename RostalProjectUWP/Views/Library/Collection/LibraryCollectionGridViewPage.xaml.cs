@@ -5,6 +5,7 @@ using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
 using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.ViewModels.Library;
+using RostalProjectUWP.ViewModels.UI;
 using RostalProjectUWP.Views.Book.Manage;
 using RostalProjectUWP.Views.Library.Manage;
 using System;
@@ -39,6 +40,7 @@ namespace RostalProjectUWP.Views.Library.Collection
     {
         public LibraryCollectionGridViewPageVM ViewModelPage { get; set; } = new LibraryCollectionGridViewPageVM();
         private LibraryCollectionParentChildParamsVM _libraryParameters;
+        LibraryCollectionCommonViewVM _commonView;
         public LibraryCollectionGridViewPage()
         {
             this.InitializeComponent();
@@ -50,6 +52,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             if (e.Parameter is LibraryCollectionParentChildParamsVM libraryParameters)
             {
                 _libraryParameters = libraryParameters;
+                _commonView = new LibraryCollectionCommonViewVM(this, libraryParameters.ParentPage);
                 ViewModelPage.ViewModelList = _libraryParameters.ViewModelList?.ToList();
             }
         }
@@ -278,18 +281,11 @@ namespace RostalProjectUWP.Views.Library.Collection
 
         private void DeleteLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            DeleteLibraryUC userControl = null;
             try
             {
                 if (args.Parameter is BibliothequeVM viewModel)
                 {
-                    userControl = new DeleteLibraryUC(viewModel);
-
-                    userControl.CancelModificationRequested += DeleteLibraryUC_CancelModificationRequested; ;
-                    userControl.DeleteItemRequested += DeleteLibraryUC_DeleteItemRequested;
-
-                    ViewModelPage.SplitViewContent = userControl;
-                    ViewModelPage.IsSplitViewOpen = true;
+                    _commonView.DeleteLibrary(viewModel);
                 }
             }
             catch (Exception ex)
@@ -300,35 +296,36 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
-        private void DeleteLibraryUC_DeleteItemRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        //private void DeleteLibraryUC_DeleteItemRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        private void DeleteLibraryUC_CancelModificationRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        //private void DeleteLibraryUC_CancelModificationRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    MethodBase m = MethodBase.GetCurrentMethod();
+        //    try
+        //    {
+        //        sender.CancelModificationRequested -= DeleteLibraryUC_CancelModificationRequested;
+        //        sender.DeleteItemRequested -= DeleteLibraryUC_DeleteItemRequested;
+
+        //        ViewModelPage.IsSplitViewOpen = false;
+        //        ViewModelPage.SplitViewContent = null;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
         private void EditLibraryInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            NewEditLibraryUC userControl = null;
             try
             {
                 if (args.Parameter is BibliothequeVM viewModel)
                 {
-                    userControl = new NewEditLibraryUC(new ManageLibraryDialogParametersVM()
-                    {
-                        CurrentLibrary = viewModel,
-                        EditMode = Code.EditMode.Edit,
-                        ViewModelList = _libraryParameters.ParentPage.ViewModelPage.ViewModelList,
-                    });
-
-                    userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
-                    userControl.UpdateItemRequested += NewEditLibraryUC_UpdateItemRequested;
-
-                    ViewModelPage.SplitViewContent = userControl;
-                    ViewModelPage.IsSplitViewOpen = true;
+                    _commonView.EditLibrary(viewModel);
                 }
             }
             catch (Exception ex)
@@ -337,66 +334,70 @@ namespace RostalProjectUWP.Views.Library.Collection
                 Logs.Log(ex, m);
                 return;
             }
-            //try
-            //{
-            //    if (args.Parameter is BibliothequeVM viewModel)
-            //    {
-            //        var dialog = new NewLibraryCD(new ManageLibraryDialogParametersVM()
-            //        {
-            //            Value = viewModel.Name,
-            //            Description = viewModel.Description,
-            //            EditMode = Code.EditMode.Edit,
-            //            ViewModelList = _libraryParameters.ParentPage.ViewModelPage.ViewModelList,
-            //        });
-
-            //        var result = await dialog.ShowAsync();
-            //        if (result == ContentDialogResult.Primary)
-            //        {
-            //            var newValue = dialog.Value?.Trim();
-            //            var newDescription = dialog.Description?.Trim();
-
-            //            var updatedViewModel = new BibliothequeVM()
-            //            {
-            //                Id = viewModel.Id,
-            //                Name = newValue,
-            //                Description = newDescription,
-            //                DateEdition = DateTime.UtcNow,
-            //            };
-
-            //            var updateResult = await DbServices.Library.UpdateAsync(updatedViewModel);
-            //            if (updateResult.IsSuccess)
-            //            {
-            //                viewModel.Name = newValue;
-            //                viewModel.Description = newDescription;
-            //            }
-            //            else
-            //            {
-            //                //Erreur
-            //            }
-            //        }
-            //        else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-            //        {
-            //            return;
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    MethodBase m = MethodBase.GetCurrentMethod();
-            //    Logs.Log(ex, m);
-            //    return;
-            //}
         }
 
-        private void NewEditLibraryUC_UpdateItemRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        //private async void NewEditLibraryUC_UpdateItemRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    MethodBase m = MethodBase.GetCurrentMethod();
+        //    try
+        //    {
+        //        if (sender._parameters != null)
+        //        {
+        //            var newValue = sender.ViewModelPage.Value?.Trim();
+        //            var newDescription = sender.ViewModelPage.Description?.Trim();
 
-        private void NewEditLibraryUC_CancelModificationRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        //            var updatedViewModel = new BibliothequeVM()
+        //            {
+        //                Id = sender._parameters.CurrentLibrary.Id,
+        //                Name = newValue,
+        //                Description = newDescription,
+        //                DateEdition = DateTime.UtcNow,
+        //            };
+
+        //            var updateResult = await DbServices.Library.UpdateAsync(updatedViewModel);
+        //            if (updateResult.IsSuccess)
+        //            {
+        //                sender._parameters.CurrentLibrary.Name = newValue;
+        //                sender._parameters.CurrentLibrary.Description = newDescription;
+        //            }
+        //            else
+        //            {
+        //                //Erreur
+        //                sender.ViewModelPage.ErrorMessage = updateResult.Message;
+        //                return;
+        //            }
+        //        }
+
+        //        ViewModelPage.IsSplitViewOpen = false;
+        //        ViewModelPage.SplitViewContent = null;
+                
+        //        sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
+        //        sender.UpdateItemRequested -= NewEditLibraryUC_UpdateItemRequested;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
+
+        //private void NewEditLibraryUC_CancelModificationRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    MethodBase m = MethodBase.GetCurrentMethod();
+        //    try
+        //    {
+        //        sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
+        //        sender.UpdateItemRequested -= NewEditLibraryUC_UpdateItemRequested;
+
+        //        ViewModelPage.IsSplitViewOpen = false;
+        //        ViewModelPage.SplitViewContent = null;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
         public void SearchViewModel(BibliothequeVM viewModel)
         {
@@ -615,7 +616,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             {
                 if (sender is MenuFlyoutSubItem subItem && subItem.Tag is BibliothequeVM viewModel)
                 {
-                    PopulateCategoriesMenuItems(subItem, viewModel);
+                    _commonView.PopulateCategoriesMenuItems(subItem, viewModel);
                 }
             }
             catch (Exception)
@@ -625,410 +626,410 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
-        private void PopulateCategoriesMenuItems(MenuFlyoutSubItem subItem, BibliothequeVM viewModel)
-        {
-            try
-            {
-                subItem.Items.Clear();
-                //Add button
-                var AddCategoryMenuItem = new MenuFlyoutItem()
-                {
-                    Text = "Ajouter une catégorie",
-                    Icon = new SymbolIcon(Symbol.Add),
-                };
+        //private void PopulateCategoriesMenuItems(MenuFlyoutSubItem subItem, BibliothequeVM viewModel)
+        //{
+        //    try
+        //    {
+        //        subItem.Items.Clear();
+        //        //Add button
+        //        var AddCategoryMenuItem = new MenuFlyoutItem()
+        //        {
+        //            Text = "Ajouter une catégorie",
+        //            Icon = new SymbolIcon(Symbol.Add),
+        //        };
 
-                AddCategoryMenuItem.Click +=(BibliothequeVM,e) => AddCategoryMenuItem_Click(viewModel, e);
-                subItem.Items.Add(AddCategoryMenuItem);
+        //        AddCategoryMenuItem.Click +=(BibliothequeVM,e) => AddCategoryMenuItem_Click(viewModel, e);
+        //        subItem.Items.Add(AddCategoryMenuItem);
 
-                if (viewModel.Categories != null && viewModel.Categories.Any())
-                {
-                    subItem.Items.Add(new MenuFlyoutSeparator());
+        //        if (viewModel.Categories != null && viewModel.Categories.Any())
+        //        {
+        //            subItem.Items.Add(new MenuFlyoutSeparator());
 
-                    foreach (var category in viewModel.Categories)
-                    {
-                        //Main Category MenuItem
-                        var CategoryMenuItem = new MenuFlyoutSubItem()
-                        {
-                            Text = category.Name,
-                            Icon = new FontIcon() { Glyph = "\uE81E" }
-                        };
+        //            foreach (var category in viewModel.Categories)
+        //            {
+        //                //Main Category MenuItem
+        //                var CategoryMenuItem = new MenuFlyoutSubItem()
+        //                {
+        //                    Text = category.Name,
+        //                    Icon = new FontIcon() { Glyph = "\uE81E" }
+        //                };
 
-                        //Add sub categorie button
-                        var AddSubCategoryMenuItem = new MenuFlyoutItem()
-                        {
-                            Text = "Ajouter une sous-catégorie",
-                            Icon = new SymbolIcon(Symbol.Add),
-                        };
-                        AddSubCategoryMenuItem.Click +=(CategorieLivreVM, e) => AddSubCategoryMenuItem_Click(category,e);
-                        CategoryMenuItem.Items.Add(AddSubCategoryMenuItem);
+        //                //Add sub categorie button
+        //                var AddSubCategoryMenuItem = new MenuFlyoutItem()
+        //                {
+        //                    Text = "Ajouter une sous-catégorie",
+        //                    Icon = new SymbolIcon(Symbol.Add),
+        //                };
+        //                AddSubCategoryMenuItem.Click +=(CategorieLivreVM, e) => AddSubCategoryMenuItem_Click(category,e);
+        //                CategoryMenuItem.Items.Add(AddSubCategoryMenuItem);
 
-                        //Remove categorie button
-                        var EditCategoryMenuItem = new MenuFlyoutItem()
-                        {
-                            Text = $"Editer « {category.Name} »",
-                            Icon = new SymbolIcon(Symbol.Edit),
-                        };
-                        EditCategoryMenuItem.Click += (BibliothequeVM, e) => EditCategoryMenuItem_Click(new Tuple<BibliothequeVM, CategorieLivreVM>(viewModel, category), e);
-                        CategoryMenuItem.Items.Add(EditCategoryMenuItem);
+        //                //Remove categorie button
+        //                var EditCategoryMenuItem = new MenuFlyoutItem()
+        //                {
+        //                    Text = $"Editer « {category.Name} »",
+        //                    Icon = new SymbolIcon(Symbol.Edit),
+        //                };
+        //                EditCategoryMenuItem.Click += (BibliothequeVM, e) => EditCategoryMenuItem_Click(new Tuple<BibliothequeVM, CategorieLivreVM>(viewModel, category), e);
+        //                CategoryMenuItem.Items.Add(EditCategoryMenuItem);
 
-                        subItem.Items.Add(CategoryMenuItem);
+        //                subItem.Items.Add(CategoryMenuItem);
 
-                        PopulateSubCategoriesMenuItems(CategoryMenuItem, category);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        private void PopulateSubCategoriesMenuItems(MenuFlyoutSubItem categorieSubMenuItem, CategorieLivreVM categorieVM)
-        {
-            try
-            {
-                if (categorieVM.SubCategorieLivres != null && categorieVM.SubCategorieLivres.Any())
-                {
-                    categorieSubMenuItem.Items.Add(new MenuFlyoutSeparator());
+        //                PopulateSubCategoriesMenuItems(CategoryMenuItem, category);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MethodBase m = MethodBase.GetCurrentMethod();
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
+        //private void PopulateSubCategoriesMenuItems(MenuFlyoutSubItem categorieSubMenuItem, CategorieLivreVM categorieVM)
+        //{
+        //    try
+        //    {
+        //        if (categorieVM.SubCategorieLivres != null && categorieVM.SubCategorieLivres.Any())
+        //        {
+        //            categorieSubMenuItem.Items.Add(new MenuFlyoutSeparator());
 
-                    foreach (var subCategory in categorieVM.SubCategorieLivres)
-                    {
-                        //Main Sub-Category MenuItem
-                        var SubCategoryMenuItem = new MenuFlyoutItem()
-                        {
-                            Text = subCategory.Name,
-                            Icon = new FontIcon() { Glyph = "\uE81E" }
-                        };
+        //            foreach (var subCategory in categorieVM.SubCategorieLivres)
+        //            {
+        //                //Main Sub-Category MenuItem
+        //                var SubCategoryMenuItem = new MenuFlyoutItem()
+        //                {
+        //                    Text = subCategory.Name,
+        //                    Icon = new FontIcon() { Glyph = "\uE81E" }
+        //                };
 
-                        SubCategoryMenuItem.Click += (CategorieLivreVM, e) => EditSubCategoryMenuItem_Click(new Tuple<CategorieLivreVM, SubCategorieLivreVM>(categorieVM, subCategory), e);
-                        categorieSubMenuItem.Items.Add(SubCategoryMenuItem);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        //                SubCategoryMenuItem.Click += (CategorieLivreVM, e) => EditSubCategoryMenuItem_Click(new Tuple<CategorieLivreVM, SubCategorieLivreVM>(categorieVM, subCategory), e);
+        //                categorieSubMenuItem.Items.Add(SubCategoryMenuItem);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MethodBase m = MethodBase.GetCurrentMethod();
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
-        #region Events Categorie
-        private void AddCategoryMenuItem_Click(BibliothequeVM sender, RoutedEventArgs e)
-        {
-            NewEditCategoryUC userControl = null;
-            try
-            {
-                userControl = new NewEditCategoryUC(new ManageCategorieDialogParametersVM()
-                {
-                    EditMode = Code.EditMode.Create,
-                    ParentLibrary = sender,
-                });
+        //#region Events Categorie
+        //private void AddCategoryMenuItem_Click(BibliothequeVM sender, RoutedEventArgs e)
+        //{
+        //    NewEditCategoryUC userControl = null;
+        //    try
+        //    {
+        //        userControl = new NewEditCategoryUC(new ManageCategorieDialogParametersVM()
+        //        {
+        //            EditMode = Code.EditMode.Create,
+        //            ParentLibrary = sender,
+        //        });
 
-                userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
-                userControl.CreateItemRequested += NewEditCategoryUC_CreateItemRequested;
+        //        userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
+        //        userControl.CreateItemRequested += NewEditCategoryUC_CreateItemRequested;
 
-                ViewModelPage.SplitViewContent = userControl;
-                ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        //        ViewModelPage.SplitViewContent = userControl;
+        //        ViewModelPage.IsSplitViewOpen = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MethodBase m = MethodBase.GetCurrentMethod();
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
-        private void EditCategoryMenuItem_Click(Tuple<BibliothequeVM, CategorieLivreVM> sender, RoutedEventArgs e)
-        {
-            NewEditCategoryUC userControl = null;
-            try
-            {
-                userControl = new NewEditCategoryUC(new ManageCategorieDialogParametersVM()
-                {
-                    CurrentCategorie = sender.Item2,
-                    EditMode = Code.EditMode.Edit,
-                    ParentLibrary = sender.Item1,
-                });
+        //private void EditCategoryMenuItem_Click(Tuple<BibliothequeVM, CategorieLivreVM> sender, RoutedEventArgs e)
+        //{
+        //    NewEditCategoryUC userControl = null;
+        //    try
+        //    {
+        //        userControl = new NewEditCategoryUC(new ManageCategorieDialogParametersVM()
+        //        {
+        //            CurrentCategorie = sender.Item2,
+        //            EditMode = Code.EditMode.Edit,
+        //            ParentLibrary = sender.Item1,
+        //        });
 
-                userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
-                userControl.UpdateItemRequested += NewEditCategoryUC_UpdateItemRequested;
+        //        userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
+        //        userControl.UpdateItemRequested += NewEditCategoryUC_UpdateItemRequested;
 
-                ViewModelPage.SplitViewContent = userControl;
-                ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        //        ViewModelPage.SplitViewContent = userControl;
+        //        ViewModelPage.IsSplitViewOpen = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MethodBase m = MethodBase.GetCurrentMethod();
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
 
-        private async void NewEditCategoryUC_CreateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
-        {
-            try
-            {
-                if (sender._categorieParameters != null)
-                {
-                    var value = sender.ViewModelPage.Value?.Trim();
-                    var description = sender.ViewModelPage.Description?.Trim();
+        //private async void NewEditCategoryUC_CreateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (sender._categorieParameters != null)
+        //        {
+        //            var value = sender.ViewModelPage.Value?.Trim();
+        //            var description = sender.ViewModelPage.Description?.Trim();
 
-                    var newViewModel = new CategorieLivreVM()
-                    {
-                        IdLibrary = sender._categorieParameters.ParentLibrary.Id,
-                        Name = value,
-                        Description = description,
-                    };
+        //            var newViewModel = new CategorieLivreVM()
+        //            {
+        //                IdLibrary = sender._categorieParameters.ParentLibrary.Id,
+        //                Name = value,
+        //                Description = description,
+        //            };
 
-                    var creationResult = await DbServices.Categorie.CreateAsync(newViewModel);
-                    if (creationResult.IsSuccess)
-                    {
-                        newViewModel.Id = creationResult.Id;
-                        sender._categorieParameters.ParentLibrary.Categories.Add(newViewModel);
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
-                        return;
-                    }
-                }
+        //            var creationResult = await DbServices.Categorie.CreateAsync(newViewModel);
+        //            if (creationResult.IsSuccess)
+        //            {
+        //                newViewModel.Id = creationResult.Id;
+        //                sender._categorieParameters.ParentLibrary.Categories.Add(newViewModel);
+        //            }
+        //            else
+        //            {
+        //                //Erreur
+        //                sender.ViewModelPage.ErrorMessage = creationResult.Message;
+        //                return;
+        //            }
+        //        }
 
-                sender.CancelModificationRequested -= NewEditCategoryUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditCategoryUC_CreateItemRequested;
+        //        sender.CancelModificationRequested -= NewEditCategoryUC_CancelModificationRequested;
+        //        sender.CreateItemRequested -= NewEditCategoryUC_CreateItemRequested;
 
-                ViewModelPage.IsSplitViewOpen = false;
-                ViewModelPage.SplitViewContent = null;
-            }
-            catch (Exception)
-            {
+        //        ViewModelPage.IsSplitViewOpen = false;
+        //        ViewModelPage.SplitViewContent = null;
+        //    }
+        //    catch (Exception)
+        //    {
 
-                throw;
-            }
-        }
+        //        throw;
+        //    }
+        //}
 
-        private async void NewEditCategoryUC_UpdateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
-        {
-            try
-            {
-                if (sender._categorieParameters != null)
-                {
-                    var newValue = sender.ViewModelPage.Value?.Trim();
-                    var newDescription = sender.ViewModelPage.Description?.Trim();
+        //private async void NewEditCategoryUC_UpdateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (sender._categorieParameters != null)
+        //        {
+        //            var newValue = sender.ViewModelPage.Value?.Trim();
+        //            var newDescription = sender.ViewModelPage.Description?.Trim();
 
-                    var updatedViewModel = new CategorieLivreVM()
-                    {
-                        Id = sender._categorieParameters.CurrentCategorie.Id,
-                        IdLibrary = sender._categorieParameters.ParentLibrary.Id,
-                        Name = newValue,
-                        Description = newDescription,
-                    };
+        //            var updatedViewModel = new CategorieLivreVM()
+        //            {
+        //                Id = sender._categorieParameters.CurrentCategorie.Id,
+        //                IdLibrary = sender._categorieParameters.ParentLibrary.Id,
+        //                Name = newValue,
+        //                Description = newDescription,
+        //            };
 
-                    var updateResult = await DbServices.Categorie.UpdateAsync(updatedViewModel);
-                    if (updateResult.IsSuccess)
-                    {
-                        sender._categorieParameters.CurrentCategorie.Name = newValue;
-                        sender._categorieParameters.CurrentCategorie.Description = newDescription;
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ErrorMessage = updateResult.Message;
-                        return;
-                    }
-                }
+        //            var updateResult = await DbServices.Categorie.UpdateAsync(updatedViewModel);
+        //            if (updateResult.IsSuccess)
+        //            {
+        //                sender._categorieParameters.CurrentCategorie.Name = newValue;
+        //                sender._categorieParameters.CurrentCategorie.Description = newDescription;
+        //            }
+        //            else
+        //            {
+        //                //Erreur
+        //                sender.ViewModelPage.ErrorMessage = updateResult.Message;
+        //                return;
+        //            }
+        //        }
 
-                sender.CancelModificationRequested -= NewEditCategoryUC_CancelModificationRequested;
-                sender.UpdateItemRequested -= NewEditCategoryUC_UpdateItemRequested;
+        //        sender.CancelModificationRequested -= NewEditCategoryUC_CancelModificationRequested;
+        //        sender.UpdateItemRequested -= NewEditCategoryUC_UpdateItemRequested;
 
-                ViewModelPage.IsSplitViewOpen = false;
-                ViewModelPage.SplitViewContent = null;
-            }
-            catch (Exception)
-            {
+        //        ViewModelPage.IsSplitViewOpen = false;
+        //        ViewModelPage.SplitViewContent = null;
+        //    }
+        //    catch (Exception)
+        //    {
 
-                throw;
-            }
-        }
+        //        throw;
+        //    }
+        //}
 
-        private void NewEditCategoryUC_CancelModificationRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
-        {
-            try
-            {
-                sender.CancelModificationRequested -= NewEditCategoryUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditCategoryUC_CreateItemRequested;
-                sender.UpdateItemRequested -= NewEditCategoryUC_UpdateItemRequested;
+        //private void NewEditCategoryUC_CancelModificationRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        sender.CancelModificationRequested -= NewEditCategoryUC_CancelModificationRequested;
+        //        sender.CreateItemRequested -= NewEditCategoryUC_CreateItemRequested;
+        //        sender.UpdateItemRequested -= NewEditCategoryUC_UpdateItemRequested;
 
-                ViewModelPage.IsSplitViewOpen = false;
-                ViewModelPage.SplitViewContent = null;
-            }
-            catch (Exception)
-            {
+        //        ViewModelPage.IsSplitViewOpen = false;
+        //        ViewModelPage.SplitViewContent = null;
+        //    }
+        //    catch (Exception)
+        //    {
 
-                throw;
-            }
-        } 
-        #endregion
+        //        throw;
+        //    }
+        //} 
+        //#endregion
 
-        #region Events Sub Categorie
-        private void AddSubCategoryMenuItem_Click(CategorieLivreVM sender, RoutedEventArgs e)
-        {
-            NewEditCategoryUC userControl = null;
-            try
-            {
-                userControl = new NewEditCategoryUC(new ManageSubCategorieDialogParametersVM()
-                {
-                    EditMode = Code.EditMode.Create,
-                    Categorie = sender,
-                });
+        //#region Events Sub Categorie
+        //private void AddSubCategoryMenuItem_Click(CategorieLivreVM sender, RoutedEventArgs e)
+        //{
+        //    NewEditCategoryUC userControl = null;
+        //    try
+        //    {
+        //        userControl = new NewEditCategoryUC(new ManageSubCategorieDialogParametersVM()
+        //        {
+        //            EditMode = Code.EditMode.Create,
+        //            Categorie = sender,
+        //        });
 
-                userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
-                userControl.CreateItemRequested += NewEditSubCategoryUC_CreateItemRequested;
+        //        userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
+        //        userControl.CreateItemRequested += NewEditSubCategoryUC_CreateItemRequested;
 
-                ViewModelPage.SplitViewContent = userControl;
-                ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        //        ViewModelPage.SplitViewContent = userControl;
+        //        ViewModelPage.IsSplitViewOpen = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MethodBase m = MethodBase.GetCurrentMethod();
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
-        private void EditSubCategoryMenuItem_Click(Tuple<CategorieLivreVM, SubCategorieLivreVM> sender, RoutedEventArgs e)
-        {
-            NewEditCategoryUC userControl = null;
-            try
-            {
-                userControl = new NewEditCategoryUC(new ManageSubCategorieDialogParametersVM()
-                {
-                    EditMode = Code.EditMode.Edit,
-                    Categorie = sender.Item1,
-                    CurrentSubCategorie = sender.Item2,
-                });
+        //private void EditSubCategoryMenuItem_Click(Tuple<CategorieLivreVM, SubCategorieLivreVM> sender, RoutedEventArgs e)
+        //{
+        //    NewEditCategoryUC userControl = null;
+        //    try
+        //    {
+        //        userControl = new NewEditCategoryUC(new ManageSubCategorieDialogParametersVM()
+        //        {
+        //            EditMode = Code.EditMode.Edit,
+        //            Categorie = sender.Item1,
+        //            CurrentSubCategorie = sender.Item2,
+        //        });
 
-                userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
-                userControl.UpdateItemRequested += NewEditSubCategoryUC_UpdateItemRequested;
+        //        userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
+        //        userControl.UpdateItemRequested += NewEditSubCategoryUC_UpdateItemRequested;
 
-                ViewModelPage.SplitViewContent = userControl;
-                ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        //        ViewModelPage.SplitViewContent = userControl;
+        //        ViewModelPage.IsSplitViewOpen = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MethodBase m = MethodBase.GetCurrentMethod();
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
-        private async void NewEditSubCategoryUC_CreateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
-        {
-            try
-            {
-                if (sender._subCategorieParameters != null)
-                {
-                    var value = sender.ViewModelPage.Value?.Trim();
-                    var description = sender.ViewModelPage.Description?.Trim();
+        //private async void NewEditSubCategoryUC_CreateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (sender._subCategorieParameters != null)
+        //        {
+        //            var value = sender.ViewModelPage.Value?.Trim();
+        //            var description = sender.ViewModelPage.Description?.Trim();
 
-                    var newViewModel = new SubCategorieLivreVM()
-                    {
-                        IdCategorie = sender._subCategorieParameters.Categorie.Id,
-                        Name = value,
-                        Description = description,
-                    };
+        //            var newViewModel = new SubCategorieLivreVM()
+        //            {
+        //                IdCategorie = sender._subCategorieParameters.Categorie.Id,
+        //                Name = value,
+        //                Description = description,
+        //            };
 
-                    var creationResult = await DbServices.SubCategorie.CreateAsync(newViewModel);
-                    if (creationResult.IsSuccess)
-                    {
-                        newViewModel.Id = creationResult.Id;
-                        sender._subCategorieParameters.Categorie.SubCategorieLivres.Add(newViewModel);
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
-                        return;
-                    }
-                }
+        //            var creationResult = await DbServices.SubCategorie.CreateAsync(newViewModel);
+        //            if (creationResult.IsSuccess)
+        //            {
+        //                newViewModel.Id = creationResult.Id;
+        //                sender._subCategorieParameters.Categorie.SubCategorieLivres.Add(newViewModel);
+        //            }
+        //            else
+        //            {
+        //                //Erreur
+        //                sender.ViewModelPage.ErrorMessage = creationResult.Message;
+        //                return;
+        //            }
+        //        }
 
-                sender.CancelModificationRequested -= NewEditSubCategoryUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditSubCategoryUC_CreateItemRequested;
+        //        sender.CancelModificationRequested -= NewEditSubCategoryUC_CancelModificationRequested;
+        //        sender.CreateItemRequested -= NewEditSubCategoryUC_CreateItemRequested;
 
-                ViewModelPage.IsSplitViewOpen = false;
-                ViewModelPage.SplitViewContent = null;
-            }
-            catch (Exception)
-            {
+        //        ViewModelPage.IsSplitViewOpen = false;
+        //        ViewModelPage.SplitViewContent = null;
+        //    }
+        //    catch (Exception)
+        //    {
 
-                throw;
-            }
-        }
+        //        throw;
+        //    }
+        //}
 
-        private async void NewEditSubCategoryUC_UpdateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
-        {
-            try
-            {
-                if (sender._subCategorieParameters != null)
-                {
-                    var newValue = sender.ViewModelPage.Value?.Trim();
-                    var newDescription = sender.ViewModelPage.Description?.Trim();
-                    var updatedViewModel = new SubCategorieLivreVM()
-                    {
-                        Id = sender._subCategorieParameters.CurrentSubCategorie.Id,
-                        IdCategorie = sender._subCategorieParameters.Categorie.Id,
-                        Name = newValue,
-                        Description = newDescription,
-                    };
+        //private async void NewEditSubCategoryUC_UpdateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (sender._subCategorieParameters != null)
+        //        {
+        //            var newValue = sender.ViewModelPage.Value?.Trim();
+        //            var newDescription = sender.ViewModelPage.Description?.Trim();
+        //            var updatedViewModel = new SubCategorieLivreVM()
+        //            {
+        //                Id = sender._subCategorieParameters.CurrentSubCategorie.Id,
+        //                IdCategorie = sender._subCategorieParameters.Categorie.Id,
+        //                Name = newValue,
+        //                Description = newDescription,
+        //            };
 
-                    var updateResult = await DbServices.SubCategorie.UpdateAsync(updatedViewModel);
-                    if (updateResult.IsSuccess)
-                    {
-                        sender._subCategorieParameters.CurrentSubCategorie.Name = newValue;
-                        sender._subCategorieParameters.CurrentSubCategorie.Description = newDescription;
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ErrorMessage = updateResult.Message;
-                        return;
-                    }
-                }
+        //            var updateResult = await DbServices.SubCategorie.UpdateAsync(updatedViewModel);
+        //            if (updateResult.IsSuccess)
+        //            {
+        //                sender._subCategorieParameters.CurrentSubCategorie.Name = newValue;
+        //                sender._subCategorieParameters.CurrentSubCategorie.Description = newDescription;
+        //            }
+        //            else
+        //            {
+        //                //Erreur
+        //                sender.ViewModelPage.ErrorMessage = updateResult.Message;
+        //                return;
+        //            }
+        //        }
 
-                sender.CancelModificationRequested -= NewEditSubCategoryUC_CancelModificationRequested;
-                sender.UpdateItemRequested -= NewEditSubCategoryUC_UpdateItemRequested;
+        //        sender.CancelModificationRequested -= NewEditSubCategoryUC_CancelModificationRequested;
+        //        sender.UpdateItemRequested -= NewEditSubCategoryUC_UpdateItemRequested;
 
-                ViewModelPage.IsSplitViewOpen = false;
-                ViewModelPage.SplitViewContent = null;
-            }
-            catch (Exception)
-            {
+        //        ViewModelPage.IsSplitViewOpen = false;
+        //        ViewModelPage.SplitViewContent = null;
+        //    }
+        //    catch (Exception)
+        //    {
 
-                throw;
-            }
-        }
+        //        throw;
+        //    }
+        //}
 
-        private void NewEditSubCategoryUC_CancelModificationRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
-        {
-            try
-            {
-                sender.CancelModificationRequested -= NewEditSubCategoryUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditSubCategoryUC_CreateItemRequested;
-                sender.UpdateItemRequested -= NewEditSubCategoryUC_UpdateItemRequested;
+        //private void NewEditSubCategoryUC_CancelModificationRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        sender.CancelModificationRequested -= NewEditSubCategoryUC_CancelModificationRequested;
+        //        sender.CreateItemRequested -= NewEditSubCategoryUC_CreateItemRequested;
+        //        sender.UpdateItemRequested -= NewEditSubCategoryUC_UpdateItemRequested;
 
-                ViewModelPage.IsSplitViewOpen = false;
-                ViewModelPage.SplitViewContent = null;
-            }
-            catch (Exception)
-            {
+        //        ViewModelPage.IsSplitViewOpen = false;
+        //        ViewModelPage.SplitViewContent = null;
+        //    }
+        //    catch (Exception)
+        //    {
 
-                throw;
-            }
-        } 
-        #endregion
+        //        throw;
+        //    }
+        //} 
+        //#endregion
 
     }
 

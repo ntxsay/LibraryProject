@@ -20,21 +20,33 @@
                        Description="Modifie l'image qui sert à présenter la bibliothèque" 
                        Label="Modifier la jaquette">
         </XamlUICommand>
+        <XamlUICommand x:Name="EditLibraryInfosXamlUICommand" 
+                       ExecuteRequested="EditLibraryInfosXamlUICommand_ExecuteRequested"
+                       Description="Edite les informations de base de la bibliothèque" 
+                       Label="Editer les informations">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DeleteLibraryXamlUICommand" 
+                       ExecuteRequested="DeleteLibraryXamlUICommand_ExecuteRequested"
+                       Description="Supprime définitivement la bibliothèque actuelle" 
+                       Label="Supprimer la bibliothèque">
+        </XamlUICommand>
     </Page.Resources>
     <Grid>
-        <!--Items-->
-        <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-            <Pivot.OpacityTransition>
-                <ScalarTransition />
-            </Pivot.OpacityTransition>
-            <Pivot.HeaderTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Key}"></TextBlock>
-                </DataTemplate>
-            </Pivot.HeaderTemplate>
-            <Pivot.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:BibliothequeVM">
-                    <MTUUControls:DataGrid x:Name="dataGrid" Grid.Row="1" ItemsSource="{Binding }" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 15 0 0"
+        <SplitView PaneBackground="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Pane="{x:Bind ViewModelPage.SplitViewContent, Mode=OneWay}"
+                IsPaneOpen="{x:Bind ViewModelPage.IsSplitViewOpen, Mode=OneWay}" PanePlacement="Right" OpenPaneLength="400" CompactPaneLength="88" DisplayMode="Inline">
+            <!--Items-->
+            <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Pivot.OpacityTransition>
+                    <ScalarTransition />
+                </Pivot.OpacityTransition>
+                <Pivot.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Key}"></TextBlock>
+                    </DataTemplate>
+                </Pivot.HeaderTemplate>
+                <Pivot.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:BibliothequeVM">
+                        <MTUUControls:DataGrid x:Name="dataGrid" Grid.Row="1" ItemsSource="{Binding }" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 15 0 0"
                                                            HorizontalScrollBarVisibility="Visible" SelectionChanged="dataGrid_SelectionChanged"
                                         VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
                                         AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
@@ -43,41 +55,66 @@
                                         IsReadOnly="True" BorderThickness="0"
                                         RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
                                         RowGroupHeaderPropertyNameAlternative="Range">
-                        <MTUUControls:DataGrid.Columns>
-                            <MTUUControls:DataGridTextColumn Header="#" Binding="{Binding Id}" Tag="Rank"/>
-                            <MTUUControls:DataGridTextColumn Header="Nom" Binding="{Binding Name}" Tag="Rank"/>
-                            <MTUUControls:DataGridTemplateColumn Header="Date d'ajout" Tag="First_ascent">
-                                <MTUUControls:DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding DateAjout, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:dd/MM/yyy}'}" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                                    </DataTemplate>
-                                </MTUUControls:DataGridTemplateColumn.CellTemplate>
-                                <MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate>
-                                        <CalendarDatePicker Margin="3,4,3,3" Date="{Binding DateAjout, Mode=OneWay}"/>
-                                    </DataTemplate>
-                                </MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
-                            </MTUUControls:DataGridTemplateColumn>
-                            <MTUUControls:DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=OneWay}" Width="Auto"/>
-                        </MTUUControls:DataGrid.Columns>
-                        <MTUUControls:DataGrid.RowStyle>
-                            <Style TargetType="MTUUControls:DataGridRow">
-                                <Setter Property="MTUUControls:DataGridRow.ContextFlyout">
-                                    <Setter.Value>
-                                        <MenuFlyout>
-                                            <MenuFlyoutItem Text="Modifier la jaquette" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{Binding }">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xEB9F;"/>
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                        </MenuFlyout>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </MTUUControls:DataGrid.RowStyle>
-                    </MTUUControls:DataGrid>
-                </DataTemplate>
-            </Pivot.ItemTemplate>
-        </Pivot>
+                            <MTUUControls:DataGrid.Columns>
+                                <MTUUControls:DataGridTextColumn Header="#" Binding="{Binding Id}" Tag="Rank"/>
+                                <MTUUControls:DataGridTextColumn Header="Nom" Binding="{Binding Name}" Tag="Rank"/>
+                                <MTUUControls:DataGridTemplateColumn Header="Date d'ajout" Tag="First_ascent">
+                                    <MTUUControls:DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding DateAjout, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:dd/MM/yyy}'}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                        </DataTemplate>
+                                    </MTUUControls:DataGridTemplateColumn.CellTemplate>
+                                    <MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <CalendarDatePicker Margin="3,4,3,3" Date="{Binding DateAjout, Mode=OneWay}"/>
+                                        </DataTemplate>
+                                    </MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
+                                </MTUUControls:DataGridTemplateColumn>
+                                <MTUUControls:DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=OneWay}" Width="Auto"/>
+                            </MTUUControls:DataGrid.Columns>
+                            <MTUUControls:DataGrid.RowStyle>
+                                <Style TargetType="MTUUControls:DataGridRow">
+                                    <Setter Property="MTUUControls:DataGridRow.ContextFlyout">
+                                        <Setter.Value>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem Text="Modifier la jaquette" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{Binding }">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon Glyph="&#xEB9F;"/>
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                                <MenuFlyoutSeparator />
+                                                <MenuFlyoutSubItem Text="Catégories" Loaded="MenuFlyoutSubItem_Categorie_Loaded" Tag="{Binding Mode=OneWay}">
+                                                    <MenuFlyoutSubItem.Icon>
+                                                        <FontIcon Glyph="&#xE81E;"/>
+                                                    </MenuFlyoutSubItem.Icon>
+                                                </MenuFlyoutSubItem>
+                                                <MenuFlyoutSeparator />
+                                                <MenuFlyoutItem Text="Ouvrir la bibliothèque">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon Glyph="&#xE8A7;"/>
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                                <MenuFlyoutSeparator />
+                                                <MenuFlyoutItem Text="Editer la bibliothèque" Command="{StaticResource EditLibraryInfosXamlUICommand}" CommandParameter="{Binding }">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon Glyph="&#xE70F;"/>
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                                <MenuFlyoutSeparator />
+                                                <MenuFlyoutItem Text="Supprimer la bibliothèque" Command="{StaticResource DeleteLibraryXamlUICommand}" CommandParameter="{Binding }" Foreground="OrangeRed">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon Glyph="&#xE74D;" Foreground="OrangeRed"/>
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                            </MenuFlyout>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </MTUUControls:DataGrid.RowStyle>
+                        </MTUUControls:DataGrid>
+                    </DataTemplate>
+                </Pivot.ItemTemplate>
+            </Pivot>
+        </SplitView>
     </Grid>
 </Page>

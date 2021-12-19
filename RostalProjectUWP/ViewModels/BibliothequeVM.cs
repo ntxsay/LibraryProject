@@ -71,8 +71,19 @@ namespace RostalProjectUWP.ViewModels
                 }
             }
         }
-        public List<LivreVM> Livres { get; set; }
-
+        private ObservableCollection<LivreVM> _Books = new ObservableCollection<LivreVM>();
+        public ObservableCollection<LivreVM> Books
+        {
+            get => _Books;
+            set
+            {
+                if (_Books != value)
+                {
+                    _Books = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         private ObservableCollection<CategorieLivreVM> _Categories = new ObservableCollection<CategorieLivreVM>();
         public ObservableCollection<CategorieLivreVM> Categories
         {
