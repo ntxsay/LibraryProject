@@ -42,6 +42,30 @@ CREATE TABLE IF NOT EXISTS "TLibrarySubCategorie" (
 );
 
 ----------------------------------------------------------------------------------------------------
+--Contact emprunteur -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TContact";
+--Crée la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TContact" (
+	"Id" INTEGER NOT NULL UNIQUE,
+    "Guid" TEXT NOT NULL UNIQUE,--Si le dossier ce crée
+    "DateAjout" TEXT NOT NULL,
+    "DateEdition" TEXT NULL,
+    "NomNaissance" TEXT NOT NULL,
+    "NomUsage" TEXT NULL,
+    "Prenom" TEXT NOT NULL,
+    "AutresPrenoms" TEXT NULL,
+    "AdressPostal" TEXT NULL,
+    "Ville" TEXT NULL,
+    "CodePostal" TEXT NULL,
+    "MailAdress" TEXT NULL,
+    "NoTelephone" TEXT NULL,
+    "NoMobile" TEXT NULL,
+    "Observation" TEXT NULL,
+	PRIMARY KEY("Id" AUTOINCREMENT)
+);
+
+----------------------------------------------------------------------------------------------------
 --Livres -- 
 --Supprime la Table si existe
 DROP TABLE IF EXISTS "TBooks";
@@ -49,12 +73,18 @@ DROP TABLE IF EXISTS "TBooks";
 CREATE TABLE IF NOT EXISTS "TBooks" (
 	"Id" INTEGER NOT NULL UNIQUE,
     "Guid" TEXT NOT NULL UNIQUE,--Si le dossier ce crée
-    "ISBN" TEXT NULL UNIQUE,
-    "Cotation" TEXT NULL UNIQUE,
-    "AnneeParution" INTEGER NULL,
-    "Description" TEXT NULL,
     "DateAjout" TEXT NOT NULL,
+    "DateAjoutUser" TEXT NOT NULL,
     "DateEdition" TEXT NULL,
+    "CountOpening" INTEGER NOT NULL DEFAULT 0,
+    "ISBN" TEXT NULL UNIQUE,
+    "ISSN" TEXT NULL UNIQUE,
+    "Cotation" TEXT NULL UNIQUE,
+    "NumberOfPages" INTEGER NULL,
+    "AnneeParution" INTEGER NULL,
+    "DateParution" TEXT NULL,
+    "Description" TEXT NULL,
+    "Notes" TEXT NULL,
 	PRIMARY KEY("Id" AUTOINCREMENT)
 );
 
@@ -73,6 +103,19 @@ CREATE TABLE IF NOT EXISTS "TBookTitle" (
 );
 
 ----------------------------------------------------------------------------------------------------
+-- Langues Livres -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TBookLangue";
+--Crée la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TBookLangue" (
+	"Id" INTEGER NOT NULL UNIQUE,
+	"IdBook" INTEGER NOT NULL,
+    "Langue" TEXT NOT NULL,
+	PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("IdBook") REFERENCES "TBooks"("Id") ON DELETE CASCADE
+);
+
+----------------------------------------------------------------------------------------------------
 -- Auteurs Livres -- 
 --Supprime la Table si existe
 DROP TABLE IF EXISTS "TBookAuthor";
@@ -80,8 +123,38 @@ DROP TABLE IF EXISTS "TBookAuthor";
 CREATE TABLE IF NOT EXISTS "TBookAuthor" (
 	"Id" INTEGER NOT NULL UNIQUE,
 	"IdBook" INTEGER NOT NULL,
-    "Name" TEXT NOT NULL UNIQUE,
+    "Name" TEXT NOT NULL,
 	PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("IdBook") REFERENCES "TBooks"("Id") ON DELETE CASCADE
+);
+
+----------------------------------------------------------------------------------------------------
+-- Livre Prix -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TBookPrice";
+--Crée la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TBookPrice" (
+	"Id" INTEGER NOT NULL UNIQUE,
+	"IdBook" INTEGER NOT NULL,
+    "Price" REAL NOT NULL,
+	"DeviceName" TEXT NOT NULL,
+	"DeviceChar" TEXT NOT NULL,
+    PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("IdBook") REFERENCES "TBooks"("Id") ON DELETE CASCADE
+);
+
+----------------------------------------------------------------------------------------------------
+-- Livre Etat -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TBookEtat";
+--Crée la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TBookEtat" (
+	"Id" INTEGER NOT NULL UNIQUE,
+	"IdBook" INTEGER NOT NULL,
+    "DateAjout" TEXT NOT NULL,
+	"Etat" TEXT NOT NULL,
+	"Observation" TEXT NULL,
+    PRIMARY KEY("Id" AUTOINCREMENT)
     FOREIGN KEY("IdBook") REFERENCES "TBooks"("Id") ON DELETE CASCADE
 );
 
@@ -102,4 +175,54 @@ CREATE TABLE IF NOT EXISTS "TLibraryBookConnector" (
     FOREIGN KEY("IdSubCategorie") REFERENCES "TLibrarySubCategorie"("Id") ON DELETE CASCADE
     FOREIGN KEY("IdBook") REFERENCES "TBooks"("Id") ON DELETE CASCADE
 );
+
+----------------------------------------------------------------------------------------------------
+-- Editeurs Livres -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TBookEditeur";
+--Crée la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TBookEditeur" (
+	"Id" INTEGER NOT NULL UNIQUE,
+    "Name" TEXT NOT NULL UNIQUE,
+    "Adress" TEXT NOT NULL,
+	PRIMARY KEY("Id" AUTOINCREMENT)
+);
+
+
+----------------------------------------------------------------------------------------------------
+-- Connecteur Editeur/Livres -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TEditorsBookConnector";
+--Crée la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TEditorsBookConnector" (
+	"Id" INTEGER NOT NULL UNIQUE,
+	"IdEditeur" INTEGER NOT NULL,
+	"IdBook" INTEGER NOT NULL,
+	PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("IdEditeur") REFERENCES "TBookEditeur"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdBook") REFERENCES "TBooks"("Id") ON DELETE CASCADE
+);
+
+----------------------------------------------------------------------------------------------------
+-- Pret Livre -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TBookPret";
+--Crée la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TBookPret" (
+	"Id" INTEGER NOT NULL UNIQUE,
+	"IdBook" INTEGER NOT NULL,
+	"IdContact" INTEGER NOT NULL,
+	"IdEtatBefore" INTEGER NOT NULL,
+	"IdEtatAfter" INTEGER NULL,
+    "DatePret" TEXT NOT NULL,
+    "DateRemise" TEXT NULL,
+    "Observation" TEXT NULL,
+
+	PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("IdContact") REFERENCES "TContact"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdEtatBefore") REFERENCES "TBookEtat"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdEtatAfter") REFERENCES "TBookEtat"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdBook") REFERENCES "TBooks"("Id") ON DELETE CASCADE
+);
+
 
