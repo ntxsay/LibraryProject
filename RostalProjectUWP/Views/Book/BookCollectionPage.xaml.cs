@@ -3,14 +3,11 @@ using RostalProjectUWP.Code.Services.Db;
 using RostalProjectUWP.Code.Services.ES;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
+using RostalProjectUWP.ViewModels.Book;
 using RostalProjectUWP.ViewModels.General;
-using RostalProjectUWP.ViewModels.Library;
-using RostalProjectUWP.Views.Book.Manage;
-using RostalProjectUWP.Views.Library.Collection;
-using RostalProjectUWP.Views.Library.Manage;
+using RostalProjectUWP.Views.Book.Collection;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -31,15 +28,15 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace RostalProjectUWP.Views.Library
+namespace RostalProjectUWP.Views.Book
 {
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.
     /// </summary>
-    public sealed partial class LibraryCollectionPage : Page
+    public sealed partial class BookCollectionPage : Page
     {
-        public LibraryCollectionPageVM ViewModelPage { get; set; } = new LibraryCollectionPageVM();
-        public LibraryCollectionPage()
+        public BookCollectionPageVM ViewModelPage { get; set; } = new BookCollectionPageVM();
+        public BookCollectionPage()
         {
             this.InitializeComponent();
         }
@@ -82,8 +79,9 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var libraryList = await DbServices.Library.AllVMAsync();
-                ViewModelPage.ViewModelList = libraryList?.ToList();
+#warning Mettre à jour la base données
+                //var libraryList = await DbServices.Library.AllVMAsync();
+                //ViewModelPage.ViewModelList = libraryList?.ToList();
                 await InitializeDataAsync();
             }
             catch (Exception ex)
@@ -100,16 +98,16 @@ namespace RostalProjectUWP.Views.Library
             {
                 if (ViewModelPage.ViewModelList != null && ViewModelPage.ViewModelList.Any())
                 {
-                    EsLibrary esLibrary = new EsLibrary();
-                    foreach (var library in ViewModelPage.ViewModelList)
+                    EsBook esBook = new EsBook();
+                    foreach (var book in ViewModelPage.ViewModelList)
                     {
-                        string combinedPath = await esLibrary.GetLibraryItemJaquettePathAsync(library);
-                        library.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                        string combinedPath = await esBook.GetBookItemJaquettePathAsync(book);
+                        book.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
                     }
                 }
 
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
-                NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
+                NavigateToView(typeof(BookCollectionGdViewPage), new BookCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
                 ViewModelPage.IsGridView = true;
                 ViewModelPage.IsDataGridView = false;
             }
@@ -140,16 +138,16 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
                 {
-                    NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() 
-                    { 
-                        ParentPage = this, 
-                        ViewModelList = ViewModelPage.ViewModelList, 
+                    NavigateToView(typeof(BookCollectionGdViewPage), new BookCollectionParentChildParamsVM()
+                    {
+                        ParentPage = this,
+                        ViewModelList = ViewModelPage.ViewModelList,
                     });
                 }
 
-                this.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
+                this.ViewModelPage.SelectedItems = new List<LivreVM>();
                 ViewModelPage.IsGridView = true;
                 ViewModelPage.IsDataGridView = false;
             }
@@ -165,16 +163,16 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage)
+                if (FramePartialView.Content is BookCollectionGdViewPage)
                 {
-                    NavigateToView(typeof(LibraryCollectionDataGridViewPage), new LibraryCollectionParentChildParamsVM() 
-                    { 
-                        ParentPage = this, 
-                        ViewModelList = ViewModelPage.ViewModelList, 
+                    NavigateToView(typeof(BookCollectionDgViewPage), new BookCollectionParentChildParamsVM()
+                    {
+                        ParentPage = this,
+                        ViewModelList = ViewModelPage.ViewModelList,
                     });
                 }
 
-                this.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
+                this.ViewModelPage.SelectedItems = new List<LivreVM>();
                 ViewModelPage.IsGridView = false;
                 ViewModelPage.IsDataGridView = true;
             }
@@ -192,13 +190,13 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
                 {
-                    libraryCollectionGridViewPage.GroupItemsByAlphabetic();
+                    BookCollectionGdViewPage.GroupItemsByAlphabetic();
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
                 {
-                    libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
+                    //BookCollectionDgViewPage.GroupItemsByAlphabetic();
                 }
             }
             catch (Exception ex)
@@ -213,13 +211,13 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
                 {
-                    libraryCollectionGridViewPage.GroupByCreationYear();
+                    BookCollectionGdViewPage.GroupByCreationYear();
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
                 {
-                    libraryCollectionDataGridViewPage.GroupByCreationYear();
+                    //BookCollectionDgViewPage.GroupByCreationYear();
                 }
             }
             catch (Exception ex)
@@ -234,13 +232,13 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
                 {
-                    libraryCollectionGridViewPage.GroupItemsByNone();
+                    BookCollectionGdViewPage.GroupItemsByNone();
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
                 {
-                    libraryCollectionDataGridViewPage.GroupItemsByNone();
+                    //BookCollectionDgViewPage.GroupItemsByNone();
                 }
             }
             catch (Exception ex)
@@ -255,7 +253,7 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.OrderedBy = LibraryGroupVM.OrderBy.Croissant;
+                ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
                 this.RefreshItemsGrouping();
             }
             catch (Exception ex)
@@ -270,7 +268,7 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.OrderedBy = LibraryGroupVM.OrderBy.DCroissant;
+                ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
                 this.RefreshItemsGrouping();
             }
             catch (Exception ex)
@@ -285,7 +283,7 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.SortedBy = LibraryGroupVM.SortBy.Name;
+                ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
                 this.RefreshItemsGrouping();
             }
             catch (Exception ex)
@@ -300,7 +298,7 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.SortedBy = LibraryGroupVM.SortBy.DateCreation;
+                ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
                 this.RefreshItemsGrouping();
             }
             catch (Exception ex)
@@ -315,39 +313,39 @@ namespace RostalProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
                 {
                     switch (ViewModelPage.GroupedBy)
                     {
-                        case LibraryGroupVM.GroupBy.None:
-                            libraryCollectionGridViewPage.GroupItemsByNone();
+                        case BookGroupVM.GroupBy.None:
+                            BookCollectionGdViewPage.GroupItemsByNone();
                             break;
-                        case LibraryGroupVM.GroupBy.Letter:
-                            libraryCollectionGridViewPage.GroupItemsByAlphabetic();
+                        case BookGroupVM.GroupBy.Letter:
+                            BookCollectionGdViewPage.GroupItemsByAlphabetic();
                             break;
-                        case LibraryGroupVM.GroupBy.CreationYear:
-                            libraryCollectionGridViewPage.GroupByCreationYear();
+                        case BookGroupVM.GroupBy.CreationYear:
+                            BookCollectionGdViewPage.GroupByCreationYear();
                             break;
                         default:
-                            libraryCollectionGridViewPage.GroupItemsByNone();
+                            BookCollectionGdViewPage.GroupItemsByNone();
                             break;
                     }
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
                 {
                     switch (ViewModelPage.GroupedBy)
                     {
-                        case LibraryGroupVM.GroupBy.None:
-                            libraryCollectionDataGridViewPage.GroupItemsByNone();
+                        case BookGroupVM.GroupBy.None:
+                            //BookCollectionDgViewPage.GroupItemsByNone();
                             break;
-                        case LibraryGroupVM.GroupBy.Letter:
-                            libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
+                        case BookGroupVM.GroupBy.Letter:
+                            //BookCollectionDgViewPage.GroupItemsByAlphabetic();
                             break;
-                        case LibraryGroupVM.GroupBy.CreationYear:
-                            libraryCollectionDataGridViewPage.GroupByCreationYear();
+                        case BookGroupVM.GroupBy.CreationYear:
+                            //BookCollectionDgViewPage.GroupByCreationYear();
                             break;
                         default:
-                            libraryCollectionDataGridViewPage.GroupItemsByNone();
+                            //BookCollectionDgViewPage.GroupItemsByNone();
                             break;
                     }
                 }
@@ -371,32 +369,22 @@ namespace RostalProjectUWP.Views.Library
                     return;
                 }
 
-                var FilteredItems = new List<BibliothequeVM>();
+                var FilteredItems = new List<LivreVM>();
                 var splitSearchTerm = sender.Text.ToLower().Split(" ");
-                
+
                 foreach (var value in ViewModelPage.ViewModelList)
                 {
-                    if (value.Name.IsStringNullOrEmptyOrWhiteSpace()) continue;
-                    
-                    var found = splitSearchTerm.All((key) => {
-                        return value.Name.ToLower().Contains(key.ToLower());
-                    });
+                    //if (value.Name.IsStringNullOrEmptyOrWhiteSpace()) continue;
 
-                    if (found)
-                    {
-                        FilteredItems.Add(value);
-                    }
+                    //var found = splitSearchTerm.All((key) => {
+                    //    return value.Name.ToLower().Contains(key.ToLower());
+                    //});
+
+                    //if (found)
+                    //{
+                    //    FilteredItems.Add(value);
+                    //}
                 }
-
-                //if (!FilteredItems.Any())
-                //{
-                //    FilteredItems.Add(new BibliothequeVM()
-                //    {
-                //        Id = -1,
-                //        Name = "Aucun résultat trouvé",
-                //    });
-                //}
-
                 sender.ItemsSource = FilteredItems;
             }
             catch (Exception ex)
@@ -411,9 +399,9 @@ namespace RostalProjectUWP.Views.Library
         {
             try
             {
-                if (args.SelectedItem != null && args.SelectedItem is BibliothequeVM value)
+                if (args.SelectedItem != null && args.SelectedItem is LivreVM value)
                 {
-                    sender.Text = value.Name;
+                    //sender.Text = value.Name;
                 }
             }
             catch (Exception ex)
@@ -428,7 +416,7 @@ namespace RostalProjectUWP.Views.Library
         {
             try
             {
-                if (args.ChosenSuggestion != null &&  args.ChosenSuggestion is BibliothequeVM viewModel)
+                if (args.ChosenSuggestion != null && args.ChosenSuggestion is LivreVM viewModel)
                 {
                     this.SearchViewModel(viewModel);
                 }
@@ -445,7 +433,7 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        private void SearchViewModel(BibliothequeVM viewModel)
+        private void SearchViewModel(LivreVM viewModel)
         {
             try
             {
@@ -454,13 +442,13 @@ namespace RostalProjectUWP.Views.Library
                     return;
                 }
 
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
                 {
-                    libraryCollectionGridViewPage.SearchViewModel(viewModel);
+                    BookCollectionGdViewPage.SearchViewModel(viewModel);
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
                 {
-                    libraryCollectionDataGridViewPage.SearchViewModel(viewModel);
+                    //BookCollectionDgViewPage.SearchViewModel(viewModel);
                 }
             }
             catch (Exception ex)
@@ -500,28 +488,9 @@ namespace RostalProjectUWP.Views.Library
         private void NewLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
-            NewEditLibraryUC userControl = null;
             try
             {
-                userControl = new NewEditLibraryUC(new ManageLibraryDialogParametersVM()
-                {
-                    EditMode = Code.EditMode.Create,
-                    ViewModelList = ViewModelPage.ViewModelList,
-                });
-
-                userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
-                userControl.CreateItemRequested += NewEditLibraryUC_CreateItemRequested;
-
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
-                {
-                    libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-                {
-                    libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                
             }
             catch (Exception ex)
             {
@@ -537,7 +506,7 @@ namespace RostalProjectUWP.Views.Library
             {
                 if (ViewModelPage.ViewModelList != null)
                 {
-                    var suggestedFileName = $"Rostalotheque_Bibliotheques_All_{DateTime.Now:yyyyMMddHHmmss}";
+                    var suggestedFileName = $"Rostalotheque_Livres_All_{DateTime.Now:yyyyMMddHHmmss}";
 
                     var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
                     {
@@ -566,109 +535,19 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        private async void NewEditLibraryUC_CreateItemRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender._parameters != null)
-                {
-                    var newValue = sender.ViewModelPage.Value?.Trim();
-                    var newDescription = sender.ViewModelPage.Description?.Trim();
-
-                    var newViewModel = new BibliothequeVM()
-                    {
-                        Name = newValue,
-                        Description = newDescription,
-                    };
-
-                    var creationResult = await DbServices.Library.CreateAsync(newViewModel);
-                    if (creationResult.IsSuccess)
-                    {
-                        newViewModel.Id = creationResult.Id;
-                        ViewModelPage.ViewModelList.Add(newViewModel);
-
-                        if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
-                        {
-                            libraryCollectionGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
-                        }
-                        else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-                        {
-                            libraryCollectionDataGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
-                        }
-
-                        this.RefreshItemsGrouping();
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
-                        return;
-                    }
-                }
-
-                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
-
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage2)
-                {
-                    libraryCollectionGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
-                    libraryCollectionGridViewPage2.ViewModelPage.SplitViewContent = null;
-                }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage2)
-                {
-                    libraryCollectionDataGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
-                    libraryCollectionDataGridViewPage2.ViewModelPage.SplitViewContent = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void NewEditLibraryUC_CancelModificationRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
-
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
-                {
-                    libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-                {
-                    libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         private void ImportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
         }
-
-        
     }
 
-    public class LibraryCollectionPageVM : INotifyPropertyChanged
+    public class BookCollectionPageVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
 
-        private LibraryGroupVM.GroupBy _GroupedBy = LibraryGroupVM.GroupBy.None;
-        public LibraryGroupVM.GroupBy GroupedBy
+        private BookGroupVM.GroupBy _GroupedBy = BookGroupVM.GroupBy.None;
+        public BookGroupVM.GroupBy GroupedBy
         {
             get => this._GroupedBy;
             set
@@ -681,8 +560,8 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        private LibraryGroupVM.SortBy _SortedBy = LibraryGroupVM.SortBy.Name;
-        public LibraryGroupVM.SortBy SortedBy
+        private BookGroupVM.SortBy _SortedBy = BookGroupVM.SortBy.Name;
+        public BookGroupVM.SortBy SortedBy
         {
             get => this._SortedBy;
             set
@@ -695,8 +574,8 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        private LibraryGroupVM.OrderBy _OrderedBy = LibraryGroupVM.OrderBy.Croissant;
-        public LibraryGroupVM.OrderBy OrderedBy
+        private BookGroupVM.OrderBy _OrderedBy = BookGroupVM.OrderBy.Croissant;
+        public BookGroupVM.OrderBy OrderedBy
         {
             get => this._OrderedBy;
             set
@@ -736,7 +615,7 @@ namespace RostalProjectUWP.Views.Library
                 }
             }
         }
-        
+
         private Visibility _SearchingLibraryVisibility = Visibility.Visible;
         public Visibility SearchingLibraryVisibility
         {
@@ -765,8 +644,8 @@ namespace RostalProjectUWP.Views.Library
             }
         }
 
-        private ICollection<BibliothequeVM> _SelectedItems = new List<BibliothequeVM>();
-        public ICollection<BibliothequeVM> SelectedItems
+        private ICollection<LivreVM> _SelectedItems = new List<LivreVM>();
+        public ICollection<LivreVM> SelectedItems
         {
             get => this._SelectedItems;
             set
@@ -778,9 +657,9 @@ namespace RostalProjectUWP.Views.Library
                 }
             }
         }
-        
-        private List<BibliothequeVM> _ViewModelList;
-        public List<BibliothequeVM> ViewModelList
+
+        private List<LivreVM> _ViewModelList;
+        public List<LivreVM> ViewModelList
         {
             get => this._ViewModelList;
             set

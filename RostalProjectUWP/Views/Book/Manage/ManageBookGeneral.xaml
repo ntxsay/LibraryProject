@@ -167,7 +167,7 @@
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
-                                        <DatePicker Grid.Row="0" x:Name="DP_DateDebutDiffusion" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModel.DateAjout, Mode=TwoWay}" 
+                                        <DatePicker Grid.Row="0" x:Name="DP_DateDebutDiffusion" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModel.DateAjoutUser, Mode=TwoWay}" 
                                                     HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" FontSize="16" RequestedTheme="Default"/>
                                     </Grid>
                                 </Grid>

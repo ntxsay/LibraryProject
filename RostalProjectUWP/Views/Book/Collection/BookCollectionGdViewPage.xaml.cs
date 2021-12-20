@@ -1,18 +1,14 @@
 ﻿using RostalProjectUWP.Code.Helpers;
-using RostalProjectUWP.Code.Services.Db;
 using RostalProjectUWP.Code.Services.ES;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels;
+using RostalProjectUWP.ViewModels.Book;
 using RostalProjectUWP.ViewModels.General;
-using RostalProjectUWP.ViewModels.Library;
 using RostalProjectUWP.ViewModels.UI;
-using RostalProjectUWP.Views.Book.Manage;
-using RostalProjectUWP.Views.Library.Manage;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -20,7 +16,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -31,17 +26,17 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace RostalProjectUWP.Views.Library.Collection
+namespace RostalProjectUWP.Views.Book.Collection
 {
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.
     /// </summary>
-    public sealed partial class LibraryCollectionGridViewPage : Page
+    public sealed partial class BookCollectionGdViewPage : Page
     {
-        public LibraryCollectionGridViewPageVM ViewModelPage { get; set; } = new LibraryCollectionGridViewPageVM();
-        private LibraryCollectionParentChildParamsVM _libraryParameters;
-        LibraryCollectionCommonViewVM _commonView;
-        public LibraryCollectionGridViewPage()
+        public BookCollectionGdViewPageVM ViewModelPage { get; set; } = new BookCollectionGdViewPageVM();
+        private BookCollectionParentChildParamsVM _bookParameters;
+        BookCollectionCommonViewVM _commonView;
+        public BookCollectionGdViewPage()
         {
             this.InitializeComponent();
         }
@@ -49,11 +44,11 @@ namespace RostalProjectUWP.Views.Library.Collection
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is LibraryCollectionParentChildParamsVM libraryParameters)
+            if (e.Parameter is BookCollectionParentChildParamsVM bookParameters)
             {
-                _libraryParameters = libraryParameters;
-                _commonView = new LibraryCollectionCommonViewVM(this, libraryParameters.ParentPage);
-                ViewModelPage.ViewModelList = _libraryParameters.ViewModelList?.ToList();
+                _bookParameters = bookParameters;
+                _commonView = new BookCollectionCommonViewVM(this, _bookParameters.ParentPage);
+                ViewModelPage.ViewModelList = _bookParameters.ViewModelList?.ToList();
             }
         }
 
@@ -67,8 +62,8 @@ namespace RostalProjectUWP.Views.Library.Collection
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                _libraryParameters.ParentPage.RefreshItemsGrouping();
-                this.PivotItems.SelectedIndex = _libraryParameters.ParentPage.ViewModelPage.SelectedPivotIndex;
+                _bookParameters.ParentPage.RefreshItemsGrouping();
+                this.PivotItems.SelectedIndex = _bookParameters.ParentPage.ViewModelPage.SelectedPivotIndex;
                 this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
             catch (Exception ex)
@@ -84,8 +79,8 @@ namespace RostalProjectUWP.Views.Library.Collection
             {
                 if (sender is Pivot pivot)
                 {
-                    _libraryParameters.ParentPage.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
-                    _libraryParameters.ParentPage.ViewModelPage.SelectedPivotIndex = pivot.SelectedIndex;
+                    _bookParameters.ParentPage.ViewModelPage.SelectedItems = new List<LivreVM>();
+                    _bookParameters.ParentPage.ViewModelPage.SelectedPivotIndex = pivot.SelectedIndex;
                 }
             }
             catch (Exception ex)
@@ -102,34 +97,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             {
                 if (sender is GridView gridView)
                 {
-                    _libraryParameters.ParentPage.ViewModelPage.SelectedItems = gridView.SelectedItems.Cast<BibliothequeVM>().ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        /// <summary>
-        /// Ouvre la liste des livre de la bibliothèque
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is Viewbox viewbox && viewbox.Tag is BibliothequeVM viewModel)
-                {
-                    VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
-                    var mainPage = mainControlsUI.GetMainPage;
-                    if (mainPage != null)
-                    {
-                        mainPage.BookCollectionNavigationAsync();
-                    }
+                    _bookParameters.ParentPage.ViewModelPage.SelectedItems = gridView.SelectedItems.Cast<LivreVM>().ToList();
                 }
             }
             catch (Exception ex)
@@ -168,11 +136,11 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _libraryParameters.ParentPage.ViewModelPage.OrderedBy, _libraryParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _bookParameters.ParentPage.ViewModelPage.OrderedBy, _bookParameters.ParentPage.ViewModelPage.SortedBy).Where(w => w.TitresOeuvre != null && w.TitresOeuvre.Any())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
                 {
-                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    _libraryParameters.ParentPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.None;
+                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    _bookParameters.ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
                 }
             }
             catch (Exception ex)
@@ -191,11 +159,11 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _libraryParameters.ParentPage.ViewModelPage.OrderedBy, _libraryParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Name.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _bookParameters.ParentPage.ViewModelPage.OrderedBy, _bookParameters.ParentPage.ViewModelPage.SortedBy).Where(w => w.TitresOeuvre != null && w.TitresOeuvre.Any())?.GroupBy(s => s.TitresOeuvre.FirstOrDefault()?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
-                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    _libraryParameters.ParentPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.Letter;
+                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    _bookParameters.ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
                 }
             }
             catch (Exception ex)
@@ -215,11 +183,11 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _libraryParameters.ParentPage.ViewModelPage.OrderedBy, _libraryParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _bookParameters.ParentPage.ViewModelPage.OrderedBy, _bookParameters.ParentPage.ViewModelPage.SortedBy).Where(w => w.TitresOeuvre != null && w.TitresOeuvre.Any())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
-                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
-                    _libraryParameters.ParentPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
+                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    _bookParameters.ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
                 }
             }
             catch (Exception ex)
@@ -232,7 +200,7 @@ namespace RostalProjectUWP.Views.Library.Collection
         #endregion
 
         #region Group-Orders
-        private IEnumerable<BibliothequeVM> OrderItems(IEnumerable<BibliothequeVM> Collection, LibraryGroupVM.OrderBy OrderBy = LibraryGroupVM.OrderBy.Croissant, LibraryGroupVM.SortBy SortBy = LibraryGroupVM.SortBy.Name)
+        private IEnumerable<LivreVM> OrderItems(IEnumerable<LivreVM> Collection, BookGroupVM.OrderBy OrderBy = BookGroupVM.OrderBy.Croissant, BookGroupVM.SortBy SortBy = BookGroupVM.SortBy.Name)
         {
             try
             {
@@ -241,24 +209,24 @@ namespace RostalProjectUWP.Views.Library.Collection
                     return null;
                 }
 
-                if (SortBy == LibraryGroupVM.SortBy.Name)
+                if (SortBy == BookGroupVM.SortBy.Name)
                 {
-                    if (OrderBy == LibraryGroupVM.OrderBy.Croissant)
+                    if (OrderBy == BookGroupVM.OrderBy.Croissant)
                     {
-                        return Collection.Where(w => w != null && !w.Name.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.Name);
+                        return Collection.Where(w => w != null && w.TitresOeuvre != null && w.TitresOeuvre.Any()).OrderBy(o => o.TitresOeuvre);
                     }
-                    else if (OrderBy == LibraryGroupVM.OrderBy.DCroissant)
+                    else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
                     {
-                        return Collection.Where(w => w != null && !w.Name.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.Name);
+                        return Collection.Where(w => w != null && w.TitresOeuvre != null && w.TitresOeuvre.Any()).OrderByDescending(o => o.TitresOeuvre);
                     }
                 }
-                else if (SortBy == LibraryGroupVM.SortBy.DateCreation)
+                else if (SortBy == BookGroupVM.SortBy.DateCreation)
                 {
-                    if (OrderBy == LibraryGroupVM.OrderBy.Croissant)
+                    if (OrderBy == BookGroupVM.OrderBy.Croissant)
                     {
                         return Collection.OrderBy(o => o.DateAjout);
                     }
-                    else if (OrderBy == LibraryGroupVM.OrderBy.DCroissant)
+                    else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
                     {
                         return Collection.OrderByDescending(o => o.DateAjout);
                     }
@@ -270,7 +238,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
-                return Enumerable.Empty<BibliothequeVM>();
+                return Enumerable.Empty<LivreVM>();
             }
         }
 
@@ -280,10 +248,10 @@ namespace RostalProjectUWP.Views.Library.Collection
         {
             try
             {
-                if (args.Parameter is BibliothequeVM viewModel)
+                if (args.Parameter is LivreVM viewModel)
                 {
-                    EsLibrary esLibrary = new EsLibrary();
-                    var result = await esLibrary.ChangeLibraryItemJaquetteAsync(viewModel);
+                    EsBook esBook = new EsBook();
+                    var result = await esBook.ChangeBookItemJaquetteAsync(viewModel);
                     if (!result.IsSuccess)
                     {
                         return;
@@ -310,9 +278,9 @@ namespace RostalProjectUWP.Views.Library.Collection
         {
             try
             {
-                if (args.Parameter is BibliothequeVM viewModel)
+                if (args.Parameter is LivreVM viewModel)
                 {
-                    await _commonView.ExportLibraryAsync(viewModel);
+                    //await _commonView.ExportLibraryAsync(viewModel);
                 }
             }
             catch (Exception ex)
@@ -327,9 +295,9 @@ namespace RostalProjectUWP.Views.Library.Collection
         {
             try
             {
-                if (args.Parameter is BibliothequeVM viewModel)
+                if (args.Parameter is LivreVM viewModel)
                 {
-                    _commonView.DeleteLibrary(viewModel);
+                   // _commonView.DeleteLibrary(viewModel);
                 }
             }
             catch (Exception ex)
@@ -343,9 +311,9 @@ namespace RostalProjectUWP.Views.Library.Collection
         {
             try
             {
-                if (args.Parameter is BibliothequeVM viewModel)
+                if (args.Parameter is LivreVM viewModel)
                 {
-                    _commonView.EditLibrary(viewModel);
+                    //_commonView.EditLibrary(viewModel);
                 }
             }
             catch (Exception ex)
@@ -356,7 +324,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
-        public void SearchViewModel(BibliothequeVM viewModel)
+        public void SearchViewModel(LivreVM viewModel)
         {
             try
             {
@@ -367,7 +335,7 @@ namespace RostalProjectUWP.Views.Library.Collection
 
                 foreach (var pivotItem in PivotItems.Items)
                 {
-                    if (pivotItem is IGrouping<string, BibliothequeVM> group && group.Any(f => f == viewModel))
+                    if (pivotItem is IGrouping<string, LivreVM> group && group.Any(f => f == viewModel))
                     {
                         if (this.PivotItems.SelectedItem != pivotItem)
                         {
@@ -396,7 +364,7 @@ namespace RostalProjectUWP.Views.Library.Collection
                         {
                             foreach (var gridViewItem in gridView.Items)
                             {
-                                if (gridViewItem is BibliothequeVM _viewModel && _viewModel == viewModel)
+                                if (gridViewItem is LivreVM _viewModel && _viewModel == viewModel)
                                 {
                                     if (gridView.SelectedItem != gridViewItem)
                                     {
@@ -437,9 +405,9 @@ namespace RostalProjectUWP.Views.Library.Collection
                         Button buttonActions = gridActions.Children.FirstOrDefault(f => f is Button _buttonActions && _buttonActions.Name == "BtnActions") as Button;
                         if (buttonActions != null)
                         {
-                            buttonActions.Flyout.ShowAt(buttonActions,new FlyoutShowOptions() 
-                            { 
-                                Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft, 
+                            buttonActions.Flyout.ShowAt(buttonActions, new FlyoutShowOptions()
+                            {
+                                Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
                                 ShowMode = FlyoutShowMode.Auto
                             });
                         }
@@ -454,7 +422,7 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
-        private Image GetSelectedThumbnailImage(BibliothequeVM viewModel)
+        private Image GetSelectedThumbnailImage(LivreVM viewModel)
         {
             try
             {
@@ -465,9 +433,9 @@ namespace RostalProjectUWP.Views.Library.Collection
 
                 if (this.PivotItems.SelectedItem != null)
                 {
-                    if (this.PivotItems.SelectedItem is IGrouping<string, BibliothequeVM> group && group.Any(f => f == viewModel))
+                    if (this.PivotItems.SelectedItem is IGrouping<string, LivreVM> group && group.Any(f => f == viewModel))
                     {
-                        
+
                         var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
                         var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
                         while (gridView != null && gridView.Name != "GridViewItems")
@@ -490,7 +458,7 @@ namespace RostalProjectUWP.Views.Library.Collection
                         {
                             foreach (var gridViewItem in gridView.Items)
                             {
-                                if (gridViewItem is BibliothequeVM _viewModel && _viewModel == viewModel)
+                                if (gridViewItem is LivreVM _viewModel && _viewModel == viewModel)
                                 {
                                     if (gridView.SelectedItem != gridViewItem)
                                     {
@@ -553,13 +521,27 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
+        private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void MenuFlyoutSubItem_Categorie_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (sender is MenuFlyoutSubItem subItem && subItem.Tag is BibliothequeVM viewModel)
+                if (sender is MenuFlyoutSubItem subItem && subItem.Tag is LivreVM viewModel)
                 {
-                    _commonView.PopulateCategoriesMenuItems(subItem, viewModel);
+                    //_commonView.PopulateCategoriesMenuItems(subItem, viewModel);
                 }
             }
             catch (Exception)
@@ -568,18 +550,14 @@ namespace RostalProjectUWP.Views.Library.Collection
                 throw;
             }
         }
-
-        
-
-
     }
 
-    public class LibraryCollectionGridViewPageVM : INotifyPropertyChanged
+    public class BookCollectionGdViewPageVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        private LibraryGroupVM _GroupedRelatedViewModel = new LibraryGroupVM();
-        public LibraryGroupVM GroupedRelatedViewModel
+        private BookGroupVM _GroupedRelatedViewModel = new BookGroupVM();
+        public BookGroupVM GroupedRelatedViewModel
         {
             get => this._GroupedRelatedViewModel;
             set
@@ -620,8 +598,8 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
-        private LibraryGroupVM.GroupBy _GroupedBy = LibraryGroupVM.GroupBy.None;
-        public LibraryGroupVM.GroupBy GroupedBy
+        private BookGroupVM.GroupBy _GroupedBy = BookGroupVM.GroupBy.None;
+        public BookGroupVM.GroupBy GroupedBy
         {
             get => this._GroupedBy;
             set
@@ -676,8 +654,8 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
-        private List<BibliothequeVM> _ViewModelList;
-        public List<BibliothequeVM> ViewModelList
+        private List<LivreVM> _ViewModelList;
+        public List<LivreVM> ViewModelList
         {
             get => this._ViewModelList;
             set
@@ -696,5 +674,4 @@ namespace RostalProjectUWP.Views.Library.Collection
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
 }

@@ -147,6 +147,7 @@
     <Compile Include="Code\Services\Db\General_db..cs" />
     <Compile Include="Code\Services\Db\Categorie_db.cs" />
     <Compile Include="Code\Services\Db\Library_db.cs" />
+    <Compile Include="Code\Services\ES\EsBook.cs" />
     <Compile Include="Code\Services\ES\EsGeneral.cs" />
     <Compile Include="Code\Services\ES\EsLibrary.cs" />
     <Compile Include="Code\Services\ES\EsViewModel.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="Models\Local\TlibrarySubCategorie.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\BibliothequeVM.cs" />
+    <Compile Include="ViewModels\Book\BookGroupVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
     <Compile Include="ViewModels\ContactVM.cs" />
     <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
@@ -175,7 +177,17 @@
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
+    <Compile Include="ViewModels\UI\BookCollectionCommonViewVM.cs" />
     <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
+    <Compile Include="Views\Book\BookCollectionPage.xaml.cs">
+      <DependentUpon>BookCollectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Book\Collection\BookCollectionDgViewPage.xaml.cs">
+      <DependentUpon>BookCollectionDgViewPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Book\Collection\BookCollectionGdViewPage.xaml.cs">
+      <DependentUpon>BookCollectionGdViewPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\ManageBookPage.xaml.cs">
       <DependentUpon>ManageBookPage.xaml</DependentUpon>
     </Compile>
@@ -246,6 +258,18 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Book\BookCollectionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\Collection\BookCollectionDgViewPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\Collection\BookCollectionGdViewPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Book\ManageBookPage.xaml">
       <SubType>Designer</SubType>

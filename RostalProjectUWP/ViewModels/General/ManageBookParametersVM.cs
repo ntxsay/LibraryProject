@@ -50,4 +50,10 @@ namespace RostalProjectUWP.ViewModels.General
         public LibraryCollectionPage ParentPage { get; set; }
     }
 
+    public class BookCollectionParentChildParamsVM
+    {
+        public IEnumerable<LivreVM> ViewModelList { get; set; }
+        public BookCollectionPage ParentPage { get; set; }
+    }
+
 }

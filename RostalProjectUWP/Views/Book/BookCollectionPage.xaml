@@ -1,8 +1,8 @@
 ﻿<Page
-    x:Class="RostalProjectUWP.Views.Library.LibraryCollectionPage"
+    x:Class="RostalProjectUWP.Views.Book.BookCollectionPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:RostalProjectUWP.Views.Library"
+    xmlns:local="using:RostalProjectUWP.Views.Book"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -118,10 +118,10 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
-                
+
             </Grid>
             <Frame x:Name="FramePartialView" Grid.Row="1" Padding="0 50 0 0">
-                
+
             </Frame>
         </Grid>
         <!--Statusbar-->
@@ -133,11 +133,11 @@
                 <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind ViewModelPage.SearchingLibraryVisibility, Mode=OneWay}">
                     <MUIXC:ProgressRing IsIndeterminate="True" Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" Height="20" Width="20"/>
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium"
-                               Text="Recherche de bibliothèques en cours ..."/>
+                               Text="Recherche de livres en cours ..."/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
-                    <Run Text="Nombre de bibliothèques :" />
+                    <Run Text="Nombre de livre :" />
                     <Run Text="{x:Bind ViewModelPage.ViewModelList.Count, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
@@ -258,7 +258,7 @@
                 <AppBarButton.Flyout>
                     <MenuFlyout>
                         <MenuFlyoutItem Text="Ajouter une bibliothèque" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Add" Command="{StaticResource NewLibraryXamlUICommand}">
-                            
+
                         </MenuFlyoutItem>
                         <MenuFlyoutItem Text="Importer une bibliothèque" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Import" Command="{StaticResource ImportLibraryXamlUICommand}">
 
@@ -279,7 +279,7 @@
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <AutoSuggestBox x:Name="ASB_SearchItem" Width="310" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,8,0,4" 
-                    PlaceholderText="Rechercher une bibliothèque" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}"
+                    PlaceholderText="Rechercher un livre" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}"
                                     TextChanged="ASB_SearchItem_TextChanged" SuggestionChosen="ASB_SearchItem_SuggestionChosen" QuerySubmitted="ASB_SearchItem_QuerySubmitted">
                         <AutoSuggestBox.QueryIcon>
                             <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>

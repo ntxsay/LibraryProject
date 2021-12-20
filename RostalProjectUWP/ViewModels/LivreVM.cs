@@ -1,4 +1,5 @@
 ﻿using RostalProjectUWP.Code;
+using RostalProjectUWP.Code.Services.ES;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,8 +15,10 @@ namespace RostalProjectUWP.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public int Id { get; set; }
-        
+        public long Id { get; set; }
+        public Guid Guid { get; set; } = Guid.NewGuid();
+
+
         private string _Cotation;
         public string Cotation
         {
@@ -130,9 +133,9 @@ namespace RostalProjectUWP.ViewModels
                 }
             }
         }
-        
-        private DateTimeOffset? _DateAjout = new DateTimeOffset(DateTime.Now);
-        public DateTimeOffset? DateAjout
+
+        private DateTime _DateAjout = DateTime.UtcNow;
+        public DateTime DateAjout
         {
             get => _DateAjout;
             set
@@ -141,6 +144,48 @@ namespace RostalProjectUWP.ViewModels
                 {
                     _DateAjout = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        private DateTimeOffset? _DateAjoutUser = DateTime.UtcNow;
+        public DateTimeOffset? DateAjoutUser
+        {
+            get => _DateAjoutUser;
+            set
+            {
+                if (_DateAjoutUser != value)
+                {
+                    _DateAjoutUser = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private DateTime? _DateEdition;
+        public DateTime? DateEdition
+        {
+            get => _DateEdition;
+            set
+            {
+                if (_DateEdition != value)
+                {
+                    _DateEdition = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _JaquettePath = EsLibrary.LibraryDefaultJaquette;
+        public string JaquettePath
+        {
+            get => this._JaquettePath;
+            set
+            {
+                if (this._JaquettePath != value)
+                {
+                    this._JaquettePath = value;
+                    this.OnPropertyChanged();
                 }
             }
         }

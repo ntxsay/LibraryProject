@@ -11,7 +11,7 @@ namespace RostalProjectUWP.Code.Helpers
 {
     public class VisualViewHelpers
     {
-        public abstract class MainControlsUI
+        public class MainControlsUI
         {
             public static MainPage MainPage => (Window.Current.Content as Frame).Content as MainPage;
             public MainPage GetMainPage => (Window.Current.Content as Frame).Content as MainPage;

@@ -55,7 +55,8 @@ namespace RostalProjectUWP
                 {
                     PrincipalNaviguation.SelectedItem = first;
                 }
-                await LibraryCollectionNavigationAsync();
+                
+                LibraryCollectionNavigationAsync();
             }
             catch (Exception ex)
             {
@@ -169,7 +170,7 @@ namespace RostalProjectUWP
                 }
                 else if (itemTag == ViewModelPage.LibraryCollectionMenuItem.Tag)
                 {
-                    await LibraryCollectionNavigationAsync();
+                    LibraryCollectionNavigationAsync();
                 }
             }
             catch (Exception)
@@ -291,12 +292,26 @@ namespace RostalProjectUWP
             }
         }
 
-        private async Task<bool> LibraryCollectionNavigationAsync()
+        private bool LibraryCollectionNavigationAsync()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 return NavigateToView("Library.LibraryCollectionPage", null);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return false;
+            }
+        }
+
+        internal bool BookCollectionNavigationAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                return NavigateToView("Book.BookCollectionPage", null);
             }
             catch (Exception ex)
             {
