@@ -35,8 +35,11 @@ namespace RostalProjectUWP.Views.Library.Manage
         public delegate void CancelModificationEventHandler(DeleteLibraryUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
 
-        public delegate void DeleteItemEventHandler(DeleteLibraryUC sender, ExecuteRequestedEventArgs e);
-        public event DeleteItemEventHandler DeleteItemRequested;
+        public delegate void DeleteLibraryWithSaveEventHandler(DeleteLibraryUC sender, ExecuteRequestedEventArgs e);
+        public event DeleteLibraryWithSaveEventHandler DeleteLibraryWithSaveRequested;
+
+        public delegate void DeleteLibraryWithOutSaveEventHandler(DeleteLibraryUC sender, ExecuteRequestedEventArgs e);
+        public event DeleteLibraryWithOutSaveEventHandler DeleteLibraryWithOutSaveRequested;
 
         public DeleteLibraryUC()
         {
@@ -56,23 +59,6 @@ namespace RostalProjectUWP.Views.Library.Manage
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                
-
-                DeleteItemRequested?.Invoke(this, args);
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             try
@@ -82,15 +68,49 @@ namespace RostalProjectUWP.Views.Library.Manage
                     CancelModificationRequested = null;
                 }
 
-                if (DeleteItemRequested != null)
+                if (DeleteLibraryWithOutSaveRequested != null)
                 {
-                    DeleteItemRequested = null;
+                    DeleteLibraryWithOutSaveRequested = null;
+                }
+
+                if (DeleteLibraryWithSaveRequested != null)
+                {
+                    DeleteLibraryWithSaveRequested = null;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
 
-                throw;
+        private void DeleteItemWithOutSaveXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                DeleteLibraryWithOutSaveRequested?.Invoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DeleteItemWithSaveXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                DeleteLibraryWithSaveRequested?.Invoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
     }

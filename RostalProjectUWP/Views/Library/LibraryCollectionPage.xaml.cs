@@ -519,8 +519,8 @@ namespace RostalProjectUWP.Views.Library
                 }
                 else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
                 {
-                    //libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    //libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                    libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                    libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
                 }
             }
             catch (Exception ex)
@@ -581,8 +581,8 @@ namespace RostalProjectUWP.Views.Library
                 }
                 else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage2)
                 {
-                    //libraryCollectionDataGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
-                    //libraryCollectionDataGridViewPage2.ViewModelPage.SplitViewContent = null;
+                    libraryCollectionDataGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
+                    libraryCollectionDataGridViewPage2.ViewModelPage.SplitViewContent = null;
                 }
             }
             catch (Exception ex)
@@ -607,8 +607,8 @@ namespace RostalProjectUWP.Views.Library
                 }
                 else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
                 {
-                    //libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    //libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
+                    libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
+                    libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
                 }
             }
             catch (Exception ex)

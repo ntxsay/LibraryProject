@@ -13,6 +13,19 @@ namespace RostalProjectUWP.Code.Services.ES
 {
     public partial class Folders
     {
+        public static bool IsEsPickAuthorized()
+        {
+            try
+            {
+                StorageFolder folder = KnownFolders.DocumentsLibrary;
+                return !(folder == null);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public static async Task<StorageFolder> PickFolderAsync()
         {
             try

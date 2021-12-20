@@ -21,9 +21,13 @@
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
         </XamlUICommand>
-        <XamlUICommand x:Name="DeleteItemXUiCommand" 
-                       ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
-                       Description="Supprime l'item">
+        <XamlUICommand x:Name="DeleteItemWithOutSaveXUiCommand" 
+                       ExecuteRequested="DeleteItemWithOutSaveXUiCommand_ExecuteRequested"
+                       Description="Supprime la bibliothèque sans sauvegarde">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DeleteItemWithSaveXUiCommand" 
+                       ExecuteRequested="DeleteItemWithSaveXUiCommand_ExecuteRequested"
+                       Description="Supprime la bibliothèque avec sauvegarde">
         </XamlUICommand>
         <DataTemplate x:Key="CategorieTemplate" x:DataType="viewModels:CategorieLivreVM">
             <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}"
@@ -106,8 +110,8 @@
                                         <Run Text="Souhaitez-vous effectuer une sauvegarde de la bibliothèque avant sa suppression ?"/>
                                     </TextBlock>
                                     <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <Button Content="Sauvegarder" Command="{StaticResource DeleteItemXUiCommand}"></Button>
-                                        <Button Content="Ne pas sauvegarder" Command="{StaticResource DeleteItemXUiCommand}"></Button>
+                                        <Button Content="Sauvegarder" Command="{StaticResource DeleteItemWithSaveXUiCommand}"></Button>
+                                        <Button Content="Ne pas sauvegarder" Command="{StaticResource DeleteItemWithOutSaveXUiCommand}"></Button>
                                     </StackPanel>
                                 </Grid>
                             </Flyout>

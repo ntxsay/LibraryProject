@@ -269,6 +269,23 @@ namespace RostalProjectUWP.Views.Library.Collection
             }
         }
 
+        private async void ExportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    await _commonView.ExportLibraryAsync(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void EditLibraryInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try

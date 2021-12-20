@@ -1,4 +1,5 @@
 ﻿using RostalProjectUWP.Code.Services.Db;
+using RostalProjectUWP.Code.Services.ES;
 using RostalProjectUWP.Code.Services.Logging;
 using RostalProjectUWP.ViewModels.General;
 using RostalProjectUWP.Views.Library;
@@ -32,6 +33,39 @@ namespace RostalProjectUWP.ViewModels.UI
         {
             _libraryCollectionDataGridViewPage = libraryCollectionDataGridViewPage;
             _parentPage = parentPage;
+        }
+
+        internal async Task ExportLibraryAsync(BibliothequeVM viewModel)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var suggestedFileName = $"Rostalotheque_Bibliotheque_{viewModel.Name}_{DateTime.Now:yyyyMMddHHmmss}";
+
+                var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
+                    {
+                        {"JavaScript Object Notation", new List<string>() { ".json" } }
+                    }, suggestedFileName);
+
+                if (savedFile == null)
+                {
+                    Logs.Log(m, "Le fichier n'a pas pû être créé.");
+                    return;
+                }
+
+                //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
+                bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModel, savedFile);// savedFile.Path
+                if (isFileSaved == false)
+                {
+                    Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         internal void EditLibrary(BibliothequeVM viewModel)
@@ -154,7 +188,8 @@ namespace RostalProjectUWP.ViewModels.UI
                 DeleteLibraryUC userControl = new DeleteLibraryUC(viewModel);
 
                 userControl.CancelModificationRequested += DeleteLibraryUC_CancelModificationRequested; ;
-                userControl.DeleteItemRequested += DeleteLibraryUC_DeleteItemRequested;
+                userControl.DeleteLibraryWithOutSaveRequested += DeleteLibraryUC_DeleteLibraryWithOutSaveRequested;
+                userControl.DeleteLibraryWithSaveRequested += DeleteLibraryUC_DeleteLibraryWithSaveRequested;
 
                 if (_libraryCollectionDataGridViewPage != null)
                 {
@@ -175,10 +210,29 @@ namespace RostalProjectUWP.ViewModels.UI
             }
         }
 
-        private void DeleteLibraryUC_DeleteItemRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
+        private async void DeleteLibraryUC_DeleteLibraryWithSaveRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender.ViewModelPage.ViewModel != null)
+                {
+                    await ExportLibraryAsync(sender.ViewModelPage.ViewModel);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DeleteLibraryUC_DeleteLibraryWithOutSaveRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
         {
             throw new NotImplementedException();
         }
+
 
         private void DeleteLibraryUC_CancelModificationRequested(DeleteLibraryUC sender, ExecuteRequestedEventArgs e)
         {
@@ -186,7 +240,8 @@ namespace RostalProjectUWP.ViewModels.UI
             try
             {
                 sender.CancelModificationRequested -= DeleteLibraryUC_CancelModificationRequested;
-                sender.DeleteItemRequested -= DeleteLibraryUC_DeleteItemRequested;
+                sender.DeleteLibraryWithOutSaveRequested -= DeleteLibraryUC_DeleteLibraryWithOutSaveRequested;
+                sender.DeleteLibraryWithSaveRequested -= DeleteLibraryUC_DeleteLibraryWithSaveRequested;
 
                 if (_libraryCollectionDataGridViewPage != null)
                 {

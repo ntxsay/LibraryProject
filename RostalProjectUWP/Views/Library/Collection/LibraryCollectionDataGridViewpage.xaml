@@ -30,6 +30,10 @@
                        Description="Supprime définitivement la bibliothèque actuelle" 
                        Label="Supprimer la bibliothèque">
         </XamlUICommand>
+        <XamlUICommand x:Name="ExportLibraryXamlUICommand"
+                       ExecuteRequested="ExportLibraryXamlUICommand_ExecuteRequested"
+                       Description="Exporte la bibliothèque et son contenu dans un dossier">
+        </XamlUICommand>
     </Page.Resources>
     <Grid>
         <SplitView PaneBackground="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Pane="{x:Bind ViewModelPage.SplitViewContent, Mode=OneWay}"
@@ -89,12 +93,16 @@
                                                     </MenuFlyoutSubItem.Icon>
                                                 </MenuFlyoutSubItem>
                                                 <MenuFlyoutSeparator />
+                                                <MenuFlyoutItem Text="Exporter la bibliothèque" Command="{StaticResource ExportLibraryXamlUICommand}" CommandParameter="{Binding }">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon Glyph="&#xEDE1;"/>
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
                                                 <MenuFlyoutItem Text="Ouvrir la bibliothèque">
                                                     <MenuFlyoutItem.Icon>
                                                         <FontIcon Glyph="&#xE8A7;"/>
                                                     </MenuFlyoutItem.Icon>
                                                 </MenuFlyoutItem>
-                                                <MenuFlyoutSeparator />
                                                 <MenuFlyoutItem Text="Editer la bibliothèque" Command="{StaticResource EditLibraryInfosXamlUICommand}" CommandParameter="{Binding }">
                                                     <MenuFlyoutItem.Icon>
                                                         <FontIcon Glyph="&#xE70F;"/>
