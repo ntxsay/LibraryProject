@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.810.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RostalConsoleHelpers", "RostalConsoleHelpers.csproj", "{4B5C8D13-939C-4BA3-BF27-867D176C3367}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B5C8D13-939C-4BA3-BF27-867D176C3367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B5C8D13-939C-4BA3-BF27-867D176C3367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B5C8D13-939C-4BA3-BF27-867D176C3367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B5C8D13-939C-4BA3-BF27-867D176C3367}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A2092DF4-D504-41C9-B0B5-F7A93ABF5E83}
+	EndGlobalSection
+EndGlobal
