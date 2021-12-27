@@ -19,7 +19,7 @@
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
-    <PackageCertificateThumbprint>376A14A0D37AC1CE8831F71FFE182FEE5143BB85</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>4FB76FB855CFBAE67BA62F5E1E5FFACB46AA4B4A</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
@@ -369,10 +369,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="LibraryProjectUWP_TemporaryKey.pfx" />
     <None Include="RostalDB.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="RostalProjectUWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
