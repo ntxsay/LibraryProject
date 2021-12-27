@@ -1,5 +1,5 @@
-﻿using RostalProjectUWP.Code;
-using RostalProjectUWP.Code.Services.ES;
+﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Services.ES;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RostalProjectUWP.ViewModels
+namespace LibraryProjectUWP.ViewModels
 {
     public  class LivreVM : INotifyPropertyChanged
     {

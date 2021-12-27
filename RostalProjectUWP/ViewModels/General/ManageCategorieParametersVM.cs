@@ -1,11 +1,11 @@
-﻿using RostalProjectUWP.Code;
+﻿using LibraryProjectUWP.Code;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RostalProjectUWP.ViewModels.General
+namespace LibraryProjectUWP.ViewModels.General
 {
     public class ManageCategorieDialogParametersVM
     {

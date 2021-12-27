@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RostalProjectUWP.Code.Services.Logging
+namespace LibraryProjectUWP.Code.Services.Logging
 {
     internal class Logs
     {

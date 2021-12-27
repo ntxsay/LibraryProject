@@ -7,13 +7,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using RostalProjectUWP.Code.Helpers;
-using RostalProjectUWP.Code.Services.Logging;
-using RostalProjectUWP.Models.Local;
-using RostalProjectUWP.ViewModels;
-using RostalProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Models.Local;
+using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.General;
 
-namespace RostalProjectUWP.Code.Services.Db
+namespace LibraryProjectUWP.Code.Services.Db
 {
     internal partial class DbServices
     {

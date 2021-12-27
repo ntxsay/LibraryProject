@@ -1,8 +1,8 @@
 ﻿<ContentDialog
-    x:Class="RostalProjectUWP.Views.Library.Manage.NewLibraryCD"
+    x:Class="LibraryProjectUWP.Views.Library.Manage.NewLibraryCD"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:RostalProjectUWP.Views.Library.Manage"
+    xmlns:local="using:LibraryProjectUWP.Views.Library.Manage"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"

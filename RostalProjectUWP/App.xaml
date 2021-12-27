@@ -1,8 +1,8 @@
 ﻿<Application
-    x:Class="RostalProjectUWP.App"
+    x:Class="LibraryProjectUWP.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:RostalProjectUWP">
+    xmlns:local="using:LibraryProjectUWP">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

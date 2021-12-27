@@ -1,6 +1,6 @@
-﻿using RostalProjectUWP.Code.Helpers;
-using RostalProjectUWP.ViewModels;
-using RostalProjectUWP.ViewModels.General;
+﻿using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +18,7 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Boîte de dialogue de contenu, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace RostalProjectUWP.Views.Book.Manage
+namespace LibraryProjectUWP.Views.Book.Manage
 {
     [Obsolete]
     public sealed partial class NewCategorieCD : ContentDialog

@@ -5,12 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using RostalProjectUWP.Code.Services.Logging;
-using RostalProjectUWP.Models.Local;
-using RostalProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Models.Local;
+using LibraryProjectUWP.ViewModels.General;
 using Windows.Storage;
 
-namespace RostalProjectUWP.Code.Services.Db
+namespace LibraryProjectUWP.Code.Services.Db
 {
     internal partial class DbServices
     {

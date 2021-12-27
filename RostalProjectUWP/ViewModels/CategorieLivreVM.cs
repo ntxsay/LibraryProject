@@ -1,4 +1,4 @@
-﻿using RostalProjectUWP.Code;
+﻿using LibraryProjectUWP.Code;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RostalProjectUWP.ViewModels
+namespace LibraryProjectUWP.ViewModels
 {
     public class CategorieLivreVM : INotifyPropertyChanged
     {

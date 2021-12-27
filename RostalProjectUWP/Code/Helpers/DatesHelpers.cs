@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RostalProjectUWP.Code.Helpers
+namespace LibraryProjectUWP.Code.Helpers
 {
     internal class DatesHelpers
     {

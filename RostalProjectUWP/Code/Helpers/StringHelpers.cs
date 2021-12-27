@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RostalProjectUWP.Code.Helpers
+namespace LibraryProjectUWP.Code.Helpers
 {
     public static class StringHelpersExtension
     {

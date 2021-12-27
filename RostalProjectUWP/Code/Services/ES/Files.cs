@@ -1,4 +1,4 @@
-﻿using RostalProjectUWP.Code.Helpers;
+﻿using LibraryProjectUWP.Code.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +12,7 @@ using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Web.Http;
 
-namespace RostalProjectUWP.Code.Services.ES
+namespace LibraryProjectUWP.Code.Services.ES
 {
     public partial class Files
     {

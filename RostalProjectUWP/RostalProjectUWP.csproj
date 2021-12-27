@@ -7,8 +7,8 @@
     <ProjectGuid>{BF814E22-5D87-4727-AD51-FF65D31C24C9}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RostalProjectUWP</RootNamespace>
-    <AssemblyName>RostalProjectUWP</AssemblyName>
+    <RootNamespace>LibraryProjectUWP</RootNamespace>
+    <AssemblyName>LibraryProjectUWP</AssemblyName>
     <DefaultLanguage>fr-FR</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.22000.0</TargetPlatformVersion>
@@ -129,6 +129,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Class1.cs" />
     <Compile Include="Code\Converters\CountToEnablingConverter.cs" />
     <Compile Include="Code\Converters\CountToStringPhraseConverter.cs" />
     <Compile Include="Code\Converters\DateTimeConverter.cs" />

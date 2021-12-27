@@ -1,8 +1,8 @@
-﻿using RostalProjectUWP.Code;
-using RostalProjectUWP.Code.Helpers;
-using RostalProjectUWP.Code.Services.Logging;
-using RostalProjectUWP.ViewModels;
-using RostalProjectUWP.ViewModels.General;
+﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,7 +25,7 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour en savoir plus sur le modèle d'élément Contrôle utilisateur, consultez la page https://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace RostalProjectUWP.Views.Library.Manage
+namespace LibraryProjectUWP.Views.Library.Manage
 {
     public sealed partial class DeleteLibraryUC : UserControl
     {

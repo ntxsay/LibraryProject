@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RostalProjectUWP.Code.Helpers
+namespace LibraryProjectUWP.Code.Helpers
 {
     public partial class StringHelpers
     {

@@ -1,11 +1,11 @@
-﻿using RostalProjectUWP.Code;
-using RostalProjectUWP.Code.Helpers;
-using RostalProjectUWP.Code.Services.Db;
-using RostalProjectUWP.Code.Services.Logging;
-using RostalProjectUWP.Models.Local;
-using RostalProjectUWP.ViewModels;
-using RostalProjectUWP.ViewModels.General;
-using RostalProjectUWP.Views;
+﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Models.Local;
+using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,7 +32,7 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
-namespace RostalProjectUWP
+namespace LibraryProjectUWP
 {
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.
@@ -191,7 +191,7 @@ namespace RostalProjectUWP
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                Type view = Assembly.GetExecutingAssembly().GetType($"RostalProjectUWP.Views.{clickedView}");
+                Type view = Assembly.GetExecutingAssembly().GetType($"LibraryProjectUWP.Views.{clickedView}");
 
                 if (string.IsNullOrWhiteSpace(clickedView) || view == null)
                 {

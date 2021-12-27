@@ -1,4 +1,4 @@
-﻿using RostalProjectUWP.ViewModels;
+﻿using LibraryProjectUWP.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace RostalProjectUWP.Code.DataTemplatesSelector
+namespace LibraryProjectUWP.Code.DataTemplatesSelector
 {
     public class CategoriesDataTemplateSelector : DataTemplateSelector
     {

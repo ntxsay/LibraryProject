@@ -1,4 +1,4 @@
-﻿using RostalProjectUWP.ViewModels.Library;
+﻿using LibraryProjectUWP.ViewModels.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Data;
 
-namespace RostalProjectUWP.Code.Converters
+namespace LibraryProjectUWP.Code.Converters
 {
     public class GroupToBooleanConverter : IValueConverter
     {

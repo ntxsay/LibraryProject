@@ -1,4 +1,4 @@
-﻿using RostalProjectUWP.Code;
+﻿using LibraryProjectUWP.Code;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +16,7 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Boîte de dialogue de contenu, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace RostalProjectUWP.Views
+namespace LibraryProjectUWP.Views
 {
     public sealed partial class NewElementCD : ContentDialog
     {

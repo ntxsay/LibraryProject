@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using RostalProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace RostalProjectUWP.Code.Services.ES
+namespace LibraryProjectUWP.Code.Services.ES
 {
     public partial class Files
     {

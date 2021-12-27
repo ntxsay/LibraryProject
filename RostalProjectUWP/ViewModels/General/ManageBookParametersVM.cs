@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RostalProjectUWP.Code;
-using RostalProjectUWP.ViewModels;
-using RostalProjectUWP.Views;
-using RostalProjectUWP.Views.Book;
-using RostalProjectUWP.Views.Library;
+using LibraryProjectUWP.Code;
+using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.Views;
+using LibraryProjectUWP.Views.Book;
+using LibraryProjectUWP.Views.Library;
 
-namespace RostalProjectUWP.ViewModels.General
+namespace LibraryProjectUWP.ViewModels.General
 {
 
     public class ManageBookParametersVM

@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RostalProjectUWP.ViewModels.Library
+namespace LibraryProjectUWP.ViewModels.Library
 {
     public class LibraryGroupVM : INotifyPropertyChanged
     {

@@ -1,4 +1,4 @@
-﻿using RostalProjectUWP.Code.Helpers;
+﻿using LibraryProjectUWP.Code.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Search;
 
-namespace RostalProjectUWP.Code.Services.ES
+namespace LibraryProjectUWP.Code.Services.ES
 {
     public partial class Folders
     {

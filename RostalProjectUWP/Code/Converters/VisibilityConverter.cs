@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
-namespace RostalProjectUWP.Code.Converters
+namespace LibraryProjectUWP.Code.Converters
 {
     public class NullToVisibilityConverter : IValueConverter
     {

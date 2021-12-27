@@ -1,11 +1,11 @@
-﻿using RostalProjectUWP.Code.Helpers;
-using RostalProjectUWP.Code.Services.Db;
-using RostalProjectUWP.Code.Services.ES;
-using RostalProjectUWP.Code.Services.Logging;
-using RostalProjectUWP.ViewModels;
-using RostalProjectUWP.ViewModels.Book;
-using RostalProjectUWP.ViewModels.General;
-using RostalProjectUWP.Views.Book.Collection;
+﻿using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.Code.Services.ES;
+using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book.Collection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,7 +28,7 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace RostalProjectUWP.Views.Book
+namespace LibraryProjectUWP.Views.Book
 {
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.

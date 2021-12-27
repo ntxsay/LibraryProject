@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RostalProjectUWP.ViewModels.General
+namespace LibraryProjectUWP.ViewModels.General
 {
     public class ItemTagContentVM
     {

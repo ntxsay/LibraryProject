@@ -1,6 +1,6 @@
-﻿using RostalProjectUWP.Code.Helpers;
-using RostalProjectUWP.Code.Services.Logging;
-using RostalProjectUWP.ViewModels.General;
+﻿using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Search;
 
-namespace RostalProjectUWP.Code.Services.ES
+namespace LibraryProjectUWP.Code.Services.ES
 {
     internal partial class EsGeneral
     {

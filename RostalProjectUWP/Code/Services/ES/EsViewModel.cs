@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace RostalProjectUWP.Code.Services.ES
+namespace LibraryProjectUWP.Code.Services.ES
 {
     public class EsOperationState
     {

@@ -1,12 +1,12 @@
-﻿using RostalProjectUWP.Code.Services.Db;
-using RostalProjectUWP.Code.Services.ES;
-using RostalProjectUWP.Code.Services.Logging;
-using RostalProjectUWP.ViewModels.General;
-using RostalProjectUWP.Views.Book;
-using RostalProjectUWP.Views.Book.Collection;
-using RostalProjectUWP.Views.Library;
-using RostalProjectUWP.Views.Library.Collection;
-using RostalProjectUWP.Views.Library.Manage;
+﻿using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.Code.Services.ES;
+using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book;
+using LibraryProjectUWP.Views.Book.Collection;
+using LibraryProjectUWP.Views.Library;
+using LibraryProjectUWP.Views.Library.Collection;
+using LibraryProjectUWP.Views.Library.Manage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
-namespace RostalProjectUWP.ViewModels.UI
+namespace LibraryProjectUWP.ViewModels.UI
 {
     internal class BookCollectionCommonViewVM
     {

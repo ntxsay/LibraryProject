@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Data;
 
-namespace RostalProjectUWP.Code.Converters
+namespace LibraryProjectUWP.Code.Converters
 {
     public class SizeDiviserConverter : IValueConverter
     {
