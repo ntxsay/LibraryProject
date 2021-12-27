@@ -200,6 +200,9 @@
     <Compile Include="Views\Book\Manage\NewCategorieCD.xaml.cs">
       <DependentUpon>NewCategorieCD.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Contact\ContactCollectionPage.xaml.cs">
+      <DependentUpon>ContactCollectionPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml.cs">
       <DependentUpon>LibraryCollectionDataGridViewPage.xaml</DependentUpon>
     </Compile>
@@ -284,6 +287,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Book\Manage\NewCategorieCD.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Contact\ContactCollectionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
