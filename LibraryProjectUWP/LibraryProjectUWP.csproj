@@ -19,7 +19,7 @@
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
-    <PackageCertificateThumbprint>4FB76FB855CFBAE67BA62F5E1E5FFACB46AA4B4A</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>77A79284111EA5302D779E2E29E98A57E20BD90F</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
@@ -172,6 +172,8 @@
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
     <Compile Include="ViewModels\ContactVM.cs" />
+    <Compile Include="ViewModels\Contact\ContactGroupVM.cs" />
+    <Compile Include="ViewModels\Contact\ContactVM.cs" />
     <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\General\ManageCategorieParametersVM.cs" />
@@ -201,8 +203,14 @@
     <Compile Include="Views\Book\Manage\NewCategorieCD.xaml.cs">
       <DependentUpon>NewCategorieCD.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Contact\Collection\ContactCollectionGdViewPage.xaml.cs">
+      <DependentUpon>ContactCollectionGdViewPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Contact\ContactCollectionPage.xaml.cs">
       <DependentUpon>ContactCollectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Contact\Manage\NewEditContactUC.xaml.cs">
+      <DependentUpon>NewEditContactUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml.cs">
       <DependentUpon>LibraryCollectionDataGridViewPage.xaml</DependentUpon>
@@ -291,7 +299,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Contact\Collection\ContactCollectionGdViewPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Contact\ContactCollectionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Contact\Manage\NewEditContactUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

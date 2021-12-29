@@ -172,6 +172,10 @@ namespace LibraryProjectUWP
                 {
                     LibraryCollectionNavigationAsync();
                 }
+                else if (itemTag == ViewModelPage.ContactCollectionMenuItem.Tag)
+                {
+                    ContactCollectionNavigationAsync();
+                }
             }
             catch (Exception)
             {
@@ -306,6 +310,20 @@ namespace LibraryProjectUWP
             }
         }
 
+        private bool ContactCollectionNavigationAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                return NavigateToView("Contact.ContactCollectionPage", null);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return false;
+            }
+        }
+
         internal bool BookCollectionNavigationAsync()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -383,6 +401,12 @@ namespace LibraryProjectUWP
         {
             Text = "Bibliothèques",
             Tag = "library-collection"
+        };
+
+        public ItemTagContentVM ContactCollectionMenuItem => new ItemTagContentVM()
+        {
+            Text = "Contacts",
+            Tag = "contact-collection"
         };
 
 

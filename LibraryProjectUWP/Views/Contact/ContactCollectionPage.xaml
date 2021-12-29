@@ -6,9 +6,291 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
+    xmlns:contactVm="using:LibraryProjectUWP.ViewModels.Contact"
+    xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
+    xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls" Margin="0 38 0 0" Loaded="Page_Loaded">
+    <Page.Resources>
+        <!--<customConverters:SlideValueConverter x:Key="slideValueConverter" />
+        <customConverters:NullableIntToDoubleConverter x:Key="NullIntToDoubleConverter" />
+        <customConverters:TimeSpanToStringDisplay x:Key="TimeSpanToStringDisplayConverter" />
+        <customConverters:StringTimeToStringDisplay x:Key="StringTimeToStringDisplayConverter"/>
+        <customConverters:ListTypeToString x:Key="ListTypeToStringConverter" />
+        <customConverters:IGroupingToValueConverter x:Key="groupingConverter" />-->
+        <customConverters:CountToEnablingConverter x:Key="CountToEnablingConverter" />
+        <customConverters:CountOneToEnablingConverter x:Key="CountOneToEnablingConverter" />
+        <customConverters:CountToStringPhrase x:Key="CountToStringPhraseConverter" />
+        <customConverters:DateTimeToStringDisplay x:Key="dateTimeToStringDisplay" />
+        <customConverters:GroupToBooleanConverter x:Key="groupbyToBooleanConverter" />
+        <customConverters:SortToBooleanConverter x:Key="sortbyToBooleanConverter" />
+        <customConverters:OrderByToBooleanConverter x:Key="orderbyToBooleanConverter" />
+        <MTUUConverters:BoolToObjectConverter x:Key="BoolToInvertVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+        <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolConverter" TrueValue="False" FalseValue="True"/>
+        <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
+        <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
+        <XamlUICommand x:Name="GridViewCollectionXamlUICommand" 
+                       ExecuteRequested="GridViewCollectionXamlUICommand_ExecuteRequested"
+                       Description="Affiche la vue grille des contacts" 
+                       Label="Affichage grille">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DataGridViewCollectionXamlUICommand" 
+                       ExecuteRequested="DataGridViewCollectionXamlUICommand_ExecuteRequested"
+                       Description="Affiche la vue de liste des contacts" 
+                       Label="Affichage liste">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ReloadDataXamlUICommand" 
+                       ExecuteRequested="ReloadDataXamlUICommand_ExecuteRequested"
+                       Description="Actualise les données depuis la base de données" 
+                       Label="Actualiser les données">
+        </XamlUICommand>
+        <XamlUICommand x:Name="NewLibraryXamlUICommand" 
+                       ExecuteRequested="NewLibraryXamlUICommand_ExecuteRequested"
+                       Description="Ajoute un nouveau contact" 
+                       Label="Ajouter un contact">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ImportLibraryXamlUICommand" 
+                       ExecuteRequested="ImportLibraryXamlUICommand_ExecuteRequested"
+                       Description="Importe un contact existante" 
+                       Label="Importer un contact">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ExportAllLibraryXamlUICommand" 
+                       ExecuteRequested="ExportAllLibraryXamlUICommand_ExecuteRequested"
+                       Description="Exporte tous les contacts existantes">
+        </XamlUICommand>
+        <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
+                       ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <XamlUICommand x:Name="GroupByCreationYearXamlUICommand" 
+                       ExecuteRequested="GroupByCreationYearXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <XamlUICommand x:Name="GroupByNoneXamlUICommand" 
+                       ExecuteRequested="GroupByNoneXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <XamlUICommand x:Name="OrderByCroissantXamlUICommand" 
+                       ExecuteRequested="OrderByCroissantXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <XamlUICommand x:Name="OrderByDCroissantXamlUICommand" 
+                       ExecuteRequested="OrderByDCroissantXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <XamlUICommand x:Name="SortByNameXamlUICommand" 
+                       ExecuteRequested="SortByNameXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <XamlUICommand x:Name="SortByDateCreationXamlUICommand" 
+                       ExecuteRequested="SortByDateCreationXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <DataTemplate x:DataType="contactVm:ContactVM" x:Key="ItemAutoSuggestDataTemplate">
+            <Grid Margin="0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Height="52" Width="50" Stretch="Uniform" Tag="{x:Bind JaquettePath, Mode=OneWay}" Loaded="Image_Loaded"  HorizontalAlignment="Left"/>
+                <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="4" Padding="4,0,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" FontWeight="Medium" HorizontalAlignment="Left">
+                            <Run Text="{x:Bind NomNaissance}" />
+                            <Run Text="{x:Bind Prenom}" />
+                        </TextBlock>
+                    </Grid>
+                    <TextBlock HorizontalAlignment="Stretch" TextAlignment="Left" Foreground="#616161" FontSize="12">
+                        <Run Text="{x:Bind DateAjout, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='ddd dd MMM yyyy'}" />
+                        <Run Text="&#x000B7;" FontSize="16" FontWeight="Bold"/>
+                        <Run Text="0" />
+                        <Run Text="Livres" />
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Image Source="ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="1"/>
+        <Grid Grid.Row="0" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
 
+            </Grid>
+            <Frame x:Name="FramePartialView" Grid.Row="1" Padding="0 50 0 0">
+
+            </Frame>
+        </Grid>
+        <!--Statusbar-->
+        <Grid x:Name="GridStatusBar" Grid.Row="1" VerticalAlignment="Bottom" Height="28" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
+            <!--<Grid.Background>
+                <SolidColorBrush Color="White" Opacity="0.5" />
+            </Grid.Background>-->
+            <StackPanel Orientation="Horizontal" Spacing="18" Padding="5, 0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind ViewModelPage.SearchingLibraryVisibility, Mode=OneWay}">
+                    <MUIXC:ProgressRing IsIndeterminate="True" Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" Height="20" Width="20"/>
+                    <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium"
+                               Text="Recherche de contacts en cours ..."/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
+                    <Run Text="Nombre de contacts :" />
+                    <Run Text="{x:Bind ViewModelPage.ViewModelList.Count, Mode=OneWay}" />
+                    </TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
+                    <Run Text="Elements sélectionnés :" />
+                    <Run Text="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay}" />
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <!--CommandBar-->
+        <CommandBar x:Name="MyCommand" VerticalAlignment="Top" IsSticky="True" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" DefaultLabelPosition="Right">
+            <AppBarButton x:Name="ABBtn_SelectedItems" ToolTipService.ToolTip="Contact(s) sélectionné(s)" Label="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToStringPhraseConverter}, ConverterParameter='counter contact(s) sélectionnée(s)', Mode=OneWay}"
+                          IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToEnablingConverter}, Mode=OneWay}">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xe762;"/>
+                </AppBarButton.Icon>
+                <AppBarButton.Flyout>
+                    <Flyout Placement="BottomEdgeAlignedRight">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="1" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="Btn_SelectAll" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_SelectAll_Click">
+                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8b3;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Sélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                </Button>
+                                <Button x:Name="Btn_UnSelectAll" Grid.Column="1" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_UnSelectAll_Click">
+                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8e6;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Désélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                </Button>
+                                <Button x:Name="Btn_OpenAll" Grid.Column="2" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_OpenAll_Click">
+                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8A7;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Ouvrir les fiches fiches sélectionnées" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                </Button>
+                                <Button x:Name="Btn_DeleteAll" Grid.Column="3" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_DeleteAll_Click">
+                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74D;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Supprimer les fiches fiches sélectionnées" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+                                    <Button.Flyout>
+                                        <Flyout>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="*" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" MaxWidth="400" FontSize="13" FontWeight="Medium" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" TextWrapping="Wrap" Padding="4">
+                                                        <Run Text="Êtes-vous sûr de vouloir supprimer tous les contacts sélectionnés ? Cette action est irréversible." />
+                                                </TextBlock>
+                                                <TextBlock Grid.Row="1" MaxWidth="400" FontSize="12" TextWrapping="WrapWholeWords" Padding="4">
+                                                        <Run Text='Cliquez sur "' />
+                                                        <Run FontWeight="Medium" Text="Supprimer tout" />
+                                                        <Run Text='" pour supprimer toutes les fiches,' />
+                                                        <Run Text="sinon cliquez simplement sur la fiche que vous souhaitez supprimer." />
+                                                </TextBlock>
+                                                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+                                                    <Button Content="Annuler" HorizontalAlignment="Right" Margin="0,4" />
+                                                    <Button Content="Supprimer tout" HorizontalAlignment="Right" Margin="0,4"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Flyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </Grid>
+                            <Rectangle Height="1" Grid.Row="1" Fill="{ThemeResource SystemColorControlAccentBrush}"/>
+                            <ListView x:Name="Lv_SelectedItems" Margin="0,5,0,0" HorizontalAlignment="Stretch" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.SelectedItems, Mode=OneWay}" MaxHeight="500"
+                                      ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}" IsItemClickEnabled="False" SelectionMode="Single" SelectionChanged="Lv_SelectedItems_SelectionChanged">
+
+                            </ListView>
+                        </Grid>
+                    </Flyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarSeparator/>
+            <AppBarButton ToolTipService.ToolTip="Grouper par">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xF168;"/>
+                </AppBarButton.Icon>
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='year', Mode=OneWay}" Text="Année de création" Command="{StaticResource GroupByCreationYearXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='letter', Mode=OneWay}" Text="Lettre" Command="{StaticResource GroupByLetterXamlUICommand}"/>
+                        <MenuFlyoutSeparator/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='none', Mode=OneWay}" Text="Aucun" Command="{StaticResource GroupByNoneXamlUICommand}"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarButton Icon="Filter" ToolTipService.ToolTip="Trier par">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource orderbyToBooleanConverter}, ConverterParameter='croissant', Mode=OneWay}" Text="Croissant" Command="{StaticResource OrderByCroissantXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource orderbyToBooleanConverter}, ConverterParameter='dCroissant', Mode=OneWay}" Text="Décroissant" Command="{StaticResource OrderByDCroissantXamlUICommand}"/>
+                        <MenuFlyoutSeparator/>
+                        <ToggleMenuFlyoutItem Text="Nom" IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource sortbyToBooleanConverter}, ConverterParameter='name', Mode=OneWay}" Command="{StaticResource SortByNameXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem Text="Date de création" IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource sortbyToBooleanConverter}, ConverterParameter='dateCreation', Mode=OneWay}" Command="{StaticResource SortByDateCreationXamlUICommand}"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarSeparator/>
+            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsDataGridView, Mode=OneWay}" Command="{StaticResource DataGridViewCollectionXamlUICommand}">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xE8FD;"/>
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsGridView, Mode=OneWay}" Command="{StaticResource GridViewCollectionXamlUICommand}">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xF0E2;"/>
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+            <AppBarSeparator/>
+            <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter une société">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Ajouter un contact" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Add" Command="{StaticResource NewLibraryXamlUICommand}">
+
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Importer un contact" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Import" Command="{StaticResource ImportLibraryXamlUICommand}">
+
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarSeparator/>
+            <AppBarButton Icon="RepeatAll" LabelPosition="Collapsed" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ReloadDataXamlUICommand}"/>
+            <AppBarSeparator/>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Label="Exporter tous les contacts" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportAllLibraryXamlUICommand}">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xEDE1;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
+            <CommandBar.Content>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <AutoSuggestBox x:Name="ASB_SearchItem" Width="310" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,8,0,4" 
+                    PlaceholderText="Rechercher un contact" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}"
+                                    TextChanged="ASB_SearchItem_TextChanged" SuggestionChosen="ASB_SearchItem_SuggestionChosen" QuerySubmitted="ASB_SearchItem_QuerySubmitted">
+                        <AutoSuggestBox.QueryIcon>
+                            <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
+                        </AutoSuggestBox.QueryIcon>
+                    </AutoSuggestBox>
+                </StackPanel>
+            </CommandBar.Content>
+        </CommandBar>
     </Grid>
 </Page>
