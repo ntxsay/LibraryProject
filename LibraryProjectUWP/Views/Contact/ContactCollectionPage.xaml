@@ -54,12 +54,12 @@
         </XamlUICommand>
         <XamlUICommand x:Name="ImportLibraryXamlUICommand" 
                        ExecuteRequested="ImportLibraryXamlUICommand_ExecuteRequested"
-                       Description="Importe un contact existante" 
+                       Description="Importe un contact existant" 
                        Label="Importer un contact">
         </XamlUICommand>
         <XamlUICommand x:Name="ExportAllLibraryXamlUICommand" 
                        ExecuteRequested="ExportAllLibraryXamlUICommand_ExecuteRequested"
-                       Description="Exporte tous les contacts existantes">
+                       Description="Exporte tous les contacts existants">
         </XamlUICommand>
         <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
                        ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">

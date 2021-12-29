@@ -78,7 +78,7 @@ namespace LibraryProjectUWP.Views.Contact
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var libraryList = await DbServices.Library.AllVMAsync();
+                var contactsList = await DbServices.Library.AllVMAsync();
                 //ViewModelPage.ViewModelList = libraryList?.ToList();
                 await InitializeDataAsync();
             }

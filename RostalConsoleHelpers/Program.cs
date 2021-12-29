@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RostalConsoleHelpers
+namespace DbConsoleHelpers
 {
     internal class Program
     {
