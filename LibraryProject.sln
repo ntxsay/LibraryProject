@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryProjectUWP", "LibraryProjectUWP\LibraryProjectUWP.csproj", "{BF814E22-5D87-4727-AD51-FF65D31C24C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbConsoleHelpers", "RostalConsoleHelpers\DbConsoleHelpers.csproj", "{F762EB75-50C0-4593-BF21-7C5851953EFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbConsoleHelpers", "DbConsoleHelpers\DbConsoleHelpers.csproj", "{F762EB75-50C0-4593-BF21-7C5851953EFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
