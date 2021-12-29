@@ -31,7 +31,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
 
                     var collection = await context.TlibraryCategorie.ToListAsync();
                     if (collection == null || !collection.Any()) return Enumerable.Empty<TlibraryCategorie>().ToList();
@@ -74,7 +74,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
                     return await context.TlibraryCategorie.Select(s => s.Id).ToListAsync();
                 }
                 catch (Exception ex)
@@ -89,7 +89,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
                     return await context.TlibraryCategorie.Where(w => w.IdLibrary == idLibrary).Select(s => s.Id).ToListAsync();
                 }
                 catch (Exception ex)
@@ -106,7 +106,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
 
                     var collection = await context.TlibraryCategorie.Where(w => w.IdLibrary == idLibrary).ToListAsync();
                     if (collection == null || !collection.Any()) return Enumerable.Empty<TlibraryCategorie>().ToList();
@@ -151,7 +151,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
 
                     var s = await context.TlibraryCategorie.SingleOrDefaultAsync(d => d.Id == id);
                     if (s == null) return null;
@@ -201,7 +201,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
                     
                     var isExist = await context.TlibraryCategorie.AnyAsync(c => c.IdLibrary == viewModel.IdLibrary && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
                     if (isExist)
@@ -270,7 +270,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
 
                     var record = await context.TlibraryCategorie.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
                     if (record == null)
@@ -327,7 +327,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
 
                     var record = await context.TlibraryCategorie.SingleOrDefaultAsync(a => a.Id == Id);
                     if (record == null)

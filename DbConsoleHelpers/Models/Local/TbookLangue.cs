@@ -7,12 +7,12 @@ using System.Collections.Generic;
 
 namespace DbConsoleHelpers.Models.Local
 {
-    public partial class TbookTitle
+    public partial class TbookLangue
     {
         public long Id { get; set; }
         public long IdBook { get; set; }
-        public string Name { get; set; }
+        public string Langue { get; set; }
 
-        public virtual Tbooks IdBookNavigation { get; set; }
+        public virtual Tbook IdBookNavigation { get; set; }
     }
 }

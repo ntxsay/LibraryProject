@@ -7,12 +7,17 @@ using System.Collections.Generic;
 
 namespace LibraryProjectUWP.Models.Local
 {
-    public partial class TbookTitle
+    public partial class Tcollection
     {
-        public long Id { get; set; }
-        public long IdBook { get; set; }
-        public string Name { get; set; }
+        public Tcollection()
+        {
+            TbookCollectionConnector = new HashSet<TbookCollectionConnector>();
+        }
 
-        public virtual Tbooks IdBookNavigation { get; set; }
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        public virtual ICollection<TbookCollectionConnector> TbookCollectionConnector { get; set; }
     }
 }

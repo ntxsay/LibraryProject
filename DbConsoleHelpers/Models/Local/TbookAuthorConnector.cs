@@ -7,12 +7,13 @@ using System.Collections.Generic;
 
 namespace DbConsoleHelpers.Models.Local
 {
-    public partial class TbookAuthor
+    public partial class TbookAuthorConnector
     {
         public long Id { get; set; }
         public long IdBook { get; set; }
-        public string Name { get; set; }
+        public long IdAuthor { get; set; }
 
-        public virtual Tbooks IdBookNavigation { get; set; }
+        public virtual Tauthor IdAuthorNavigation { get; set; }
+        public virtual Tbook IdBookNavigation { get; set; }
     }
 }

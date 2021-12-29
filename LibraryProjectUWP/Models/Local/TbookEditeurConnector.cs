@@ -7,17 +7,13 @@ using System.Collections.Generic;
 
 namespace LibraryProjectUWP.Models.Local
 {
-    public partial class TlibraryBookConnector
+    public partial class TbookEditeurConnector
     {
         public long Id { get; set; }
-        public long IdLibrary { get; set; }
-        public long? IdCategorie { get; set; }
-        public long? IdSubCategorie { get; set; }
+        public long IdEditeur { get; set; }
         public long IdBook { get; set; }
 
         public virtual Tbook IdBookNavigation { get; set; }
-        public virtual TlibraryCategorie IdCategorieNavigation { get; set; }
-        public virtual Tlibrary IdLibraryNavigation { get; set; }
-        public virtual TlibrarySubCategorie IdSubCategorieNavigation { get; set; }
+        public virtual Tediteur IdEditeurNavigation { get; set; }
     }
 }

@@ -33,7 +33,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
 
                     var collection = await context.Tlibrary.ToListAsync();
                     if (collection == null || !collection.Any()) return Enumerable.Empty<Tlibrary>().ToList();
@@ -84,7 +84,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
 
                     var s = await context.Tlibrary.SingleOrDefaultAsync(d => d.Id == id);
                     if (s == null) return null;
@@ -134,7 +134,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
                     
                     var isExist = await context.Tlibrary.AnyAsync(c => c.Name.ToLower() == viewModel.Name.Trim().ToLower());
                     if (isExist)
@@ -233,7 +233,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
 
                     var record = await context.Tlibrary.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
                     if (record == null)
@@ -291,7 +291,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    RostalDbContext context = new RostalDbContext();
+                    LibraryDbContext context = new LibraryDbContext();
 
                     var record = await context.Tlibrary.SingleOrDefaultAsync(a => a.Id == Id);
                     if (record == null)

@@ -14,13 +14,13 @@ namespace LibraryProjectUWP.Code.Services.Db
 {
     internal partial class DbServices
     {
-        internal const string DbName = "RostalDB.db";
+        internal const string DbName = "LibraryDB.db";
         internal const string RecordNotExistMessage = "Cet enregistrement n'existe pas.";
         internal const string RecordAlreadyExistMessage = "Cet enregistrement existe déjà.";
         internal const string ViewModelNullOrEmptyMessage = "Le modèle de vue est null ou ne contient aucun élément.";
         internal const string ParentIdNullOrEmptyMessage = "L'id parent n'est pas renseigné.";
         internal const string UnsupportedTParameter = "Le type du paramètre T n'est pas supporté.";
-        //internal static readonly RostalDbContext Context = new RostalDbContext();
+        //internal static readonly LibraryDbContext Context = new LibraryDbContext();
 
         internal static OperationStateVM ViewModelEmpty
         {
@@ -113,7 +113,7 @@ namespace LibraryProjectUWP.Code.Services.Db
         }
 
         #region Aide-mémoire
-        //public RostalDbContext()
+        //public LibraryDbContext()
         //{
         //    Database.EnsureCreated();
         //}

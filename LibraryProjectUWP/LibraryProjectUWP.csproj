@@ -158,10 +158,22 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\Local\RostalDbContext.cs" />
-    <Compile Include="Models\Local\TbookAuthor.cs" />
-    <Compile Include="Models\Local\Tbooks.cs" />
-    <Compile Include="Models\Local\TbookTitle.cs" />
+    <Compile Include="Models\Local\LibraryDbContext.cs" />
+    <Compile Include="Models\Local\Tauthor.cs" />
+    <Compile Include="Models\Local\Tbook.cs" />
+    <Compile Include="Models\Local\TbookAuthorConnector.cs" />
+    <Compile Include="Models\Local\TbookCollectionConnector.cs" />
+    <Compile Include="Models\Local\TbookEditeurConnector.cs" />
+    <Compile Include="Models\Local\TbookEtat.cs" />
+    <Compile Include="Models\Local\TbookFormat.cs" />
+    <Compile Include="Models\Local\TbookIdentification.cs" />
+    <Compile Include="Models\Local\TbookLangue.cs" />
+    <Compile Include="Models\Local\TbookOtherTitle.cs" />
+    <Compile Include="Models\Local\TbookPret.cs" />
+    <Compile Include="Models\Local\TbookPrice.cs" />
+    <Compile Include="Models\Local\Tcollection.cs" />
+    <Compile Include="Models\Local\Tcontact.cs" />
+    <Compile Include="Models\Local\Tediteur.cs" />
     <Compile Include="Models\Local\Tlibrary.cs" />
     <Compile Include="Models\Local\TlibraryBookConnector.cs" />
     <Compile Include="Models\Local\TlibraryCategorie.cs" />
@@ -384,10 +396,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="LibraryProjectUWP_TemporaryKey.pfx" />
-    <None Include="RostalDB.db">
+    <None Include="LibraryDB.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="LibraryProjectUWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

@@ -7,12 +7,15 @@ using System.Collections.Generic;
 
 namespace LibraryProjectUWP.Models.Local
 {
-    public partial class TbookAuthor
+    public partial class TbookFormat
     {
         public long Id { get; set; }
-        public long IdBook { get; set; }
-        public string Name { get; set; }
+        public string Format { get; set; }
+        public long? NbOfPages { get; set; }
+        public double? Largeur { get; set; }
+        public double? Hauteur { get; set; }
+        public double? Epaisseur { get; set; }
 
-        public virtual Tbooks IdBookNavigation { get; set; }
+        public virtual Tbook IdNavigation { get; set; }
     }
 }
