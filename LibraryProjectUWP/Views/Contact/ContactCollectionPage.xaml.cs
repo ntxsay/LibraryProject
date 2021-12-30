@@ -104,7 +104,7 @@ namespace LibraryProjectUWP.Views.Contact
                 //    }
                 //}
 
-                ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
+                ViewModelPage.SearchingItemVisibility = Visibility.Collapsed;
                 //NavigateToView(typeof(ContactCollectionGdViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
                 ViewModelPage.IsGridView = true;
                 ViewModelPage.IsDataGridView = false;
@@ -281,7 +281,7 @@ namespace LibraryProjectUWP.Views.Contact
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.SortedBy = ContactGroupVM.SortBy.Name;
+                ViewModelPage.SortedBy = ContactGroupVM.SortBy.Prenom;
                 this.RefreshItemsGrouping();
             }
             catch (Exception ex)
@@ -517,7 +517,7 @@ namespace LibraryProjectUWP.Views.Contact
 
         }
 
-        private void NewLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void NewItemXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             //MethodBase m = MethodBase.GetCurrentMethod();
             //NewEditContactUC userControl = null;
@@ -550,7 +550,7 @@ namespace LibraryProjectUWP.Views.Contact
             //}
         }
 
-        private async void ExportAllLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void ExportAllItemXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -674,7 +674,7 @@ namespace LibraryProjectUWP.Views.Contact
             //}
         }
 
-        private void ImportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ImportItemXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
         }
@@ -699,7 +699,7 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private ContactGroupVM.SortBy _SortedBy = ContactGroupVM.SortBy.Name;
+        private ContactGroupVM.SortBy _SortedBy = ContactGroupVM.SortBy.Prenom;
         public ContactGroupVM.SortBy SortedBy
         {
             get => this._SortedBy;
@@ -755,15 +755,15 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private Visibility _SearchingLibraryVisibility = Visibility.Visible;
-        public Visibility SearchingLibraryVisibility
+        private Visibility _SearchingItemVisibility = Visibility.Visible;
+        public Visibility SearchingItemVisibility
         {
-            get => this._SearchingLibraryVisibility;
+            get => this._SearchingItemVisibility;
             set
             {
-                if (_SearchingLibraryVisibility != value)
+                if (_SearchingItemVisibility != value)
                 {
-                    this._SearchingLibraryVisibility = value;
+                    this._SearchingItemVisibility = value;
                     this.OnPropertyChanged();
                 }
             }

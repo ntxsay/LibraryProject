@@ -43,6 +43,20 @@ namespace LibraryProjectUWP.ViewModels.Contact
             }
         }
 
+        private string _TitreCivilite;
+        public string TitreCivilite
+        {
+            get => _TitreCivilite;
+            set
+            {
+                if (_TitreCivilite != value)
+                {
+                    _TitreCivilite = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _NomNaissance;
         public string NomNaissance
         {

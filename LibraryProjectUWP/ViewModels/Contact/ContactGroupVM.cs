@@ -16,13 +16,15 @@ namespace LibraryProjectUWP.ViewModels.Contact
         public enum GroupBy
         {
             None,
-            Letter,
+            LetterNomNaissance,
+            LetterPrenom,
             CreationYear,
         }
 
         public enum SortBy
         {
-            Name,
+            NomNaissance,
+            Prenom,
             DateCreation,
         }
 
@@ -32,9 +34,14 @@ namespace LibraryProjectUWP.ViewModels.Contact
             DCroissant
         }
 
-        public bool IsSortedByName
+        public bool IsSortedByNomNaissance
         {
-            get => this.SortedBy == SortBy.Name;
+            get => this.SortedBy == SortBy.NomNaissance;
+        }
+
+        public bool IsSortedByPrenom
+        {
+            get => this.SortedBy == SortBy.Prenom;
         }
 
         public bool IsSortedByDateDebutDiffusion
@@ -85,9 +92,14 @@ namespace LibraryProjectUWP.ViewModels.Contact
             get => this.GroupedBy == GroupBy.None;
         }
 
-        public bool IsGroupedByLetter
+        public bool IsGroupedByLetterNomNaissance
         {
-            get => this.GroupedBy == GroupBy.Letter;
+            get => this.GroupedBy == GroupBy.LetterNomNaissance;
+        }
+
+        public bool IsGroupedByLetterPrenom
+        {
+            get => this.GroupedBy == GroupBy.LetterPrenom;
         }
 
         public bool IsGroupedByDateCreationYear
@@ -120,7 +132,8 @@ namespace LibraryProjectUWP.ViewModels.Contact
                     this._Collection = value;
                     this.OnPropertyChanged();
                     this.OnPropertyChanged(nameof(IsGroupedByNone));
-                    this.OnPropertyChanged(nameof(IsGroupedByLetter));
+                    this.OnPropertyChanged(nameof(IsGroupedByLetterNomNaissance));
+                    this.OnPropertyChanged(nameof(IsGroupedByLetterPrenom));
                     this.OnPropertyChanged(nameof(IsGroupedByDateCreationYear));
                 }
             }

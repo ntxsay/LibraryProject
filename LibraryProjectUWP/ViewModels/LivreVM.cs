@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Services.ES;
+using LibraryProjectUWP.ViewModels.Contact;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

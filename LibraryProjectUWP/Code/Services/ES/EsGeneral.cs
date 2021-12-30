@@ -23,10 +23,27 @@ namespace LibraryProjectUWP.Code.Services.ES
             Egal
         }
 
+        [Obsolete("Utilisez DefaultPathName")]
         public class DefaultPath
         {
             public const string Libraries = "Libraries";
             public const string Books = "Books";
+        }
+
+        public class DefaultPathName
+        {
+            public const string Libraries = "Libraries";
+            public const string Books = "Books";
+            public const string Contacts = "Contacts";
+        }
+
+        public enum MainPathEnum
+        {
+            Libraries,
+            Books,
+            Contacts,
+            Authors,
+            Editors
         }
 
         public async Task<OperationStateVM> RemoveFileAsync(string baseName, StorageFolder Folder, SearchOptions options = SearchOptions.StartWith)
@@ -114,6 +131,81 @@ namespace LibraryProjectUWP.Code.Services.ES
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Crée le dossier d'une bibliothèque dans le dossier "Libraries" et/ou renvoie l'objet <see cref="StorageFolder"/> 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<StorageFolder> GetChildItemFolderAsync(Guid guid, MainPathEnum mainPathEnum)
+        {
+            try
+            {
+                if (guid == Guid.Empty)
+                {
+                    return null;
+                }
+
+                string folderName = null;
+                switch (mainPathEnum)
+                {
+                    case MainPathEnum.Libraries:
+                        folderName = DefaultPathName.Libraries;
+                        break;
+                    case MainPathEnum.Books:
+                        folderName = DefaultPathName.Books;
+                        break;
+                    case MainPathEnum.Contacts:
+                        folderName = DefaultPathName.Contacts;
+                        break;
+                    case MainPathEnum.Authors:
+                        break;
+                    case MainPathEnum.Editors:
+                        break;
+                    default:
+                        break;
+                }
+
+                if (folderName == null)
+                {
+                    return null;
+                }
+
+                var mainFolder = await GetParentItemFolderAsync(folderName);
+                if (mainFolder == null)
+                {
+                    return null;
+                }
+
+                var libraryFolder = await mainFolder.CreateFolderAsync(guid.ToString(), CreationCollisionOption.OpenIfExists);
+                if (libraryFolder == null)
+                {
+                    return null;
+                }
+
+                return libraryFolder;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Crée le dossier en question et/ou renvoie l'objet <see cref="StorageFolder"/> 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<StorageFolder> GetParentItemFolderAsync(string pathName)
+        {
+            try
+            {
+                var folder = await CreateFolderInLocalFolderAppAsync(pathName, CreationCollisionOption.OpenIfExists);
+                return folder;
+            }
+            catch (Exception)
+            {
                 return null;
             }
         }
