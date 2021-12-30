@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS "TContact" (
     "Guid" TEXT NOT NULL UNIQUE,--Si le dossier ce cree
     "DateAjout" TEXT NOT NULL,
     "DateEdition" TEXT NULL,
+    "TitreCivilite" TEXT NOT NULL,
     "NomNaissance" TEXT NOT NULL,
     "NomUsage" TEXT NULL,
     "Prenom" TEXT NOT NULL,
@@ -99,6 +100,7 @@ CREATE TABLE IF NOT EXISTS "TAuthor" (
     "Guid" TEXT NOT NULL UNIQUE,--Si le dossier ce cree
     "DateAjout" TEXT NOT NULL,
     "DateEdition" TEXT NULL,
+    "TitreCivilite" TEXT NOT NULL,
     "NomNaissance" TEXT NOT NULL,
     "NomUsage" TEXT NULL,
     "Prenom" TEXT NOT NULL,

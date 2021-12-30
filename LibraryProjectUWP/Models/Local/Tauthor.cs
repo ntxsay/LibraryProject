@@ -18,6 +18,7 @@ namespace LibraryProjectUWP.Models.Local
         public string Guid { get; set; }
         public string DateAjout { get; set; }
         public string DateEdition { get; set; }
+        public string TitreCivilite { get; set; }
         public string NomNaissance { get; set; }
         public string NomUsage { get; set; }
         public string Prenom { get; set; }

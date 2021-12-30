@@ -138,8 +138,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     }
 
                     LibraryDbContext context = new LibraryDbContext();
-#warning Ajouter le titre de civilité dans la BdD
-                    var isExist = await context.Tcontact.AnyAsync(c => c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
+                    var isExist = await context.Tcontact.AnyAsync(c => c.TitreCivilite.ToLower() == viewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
                                                                   c.NomUsage.ToLower() == viewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == viewModel.AutresPrenoms.Trim().ToLower());
                     if (isExist)
                     {
@@ -156,6 +155,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         DateAjout = viewModel.DateAjout.ToString(),
                         DateEdition = null,
                         Observation = viewModel.Observation,
+                        TitreCivilite = viewModel.TitreCivilite,
                         NomNaissance = viewModel.NomNaissance,
                         NomUsage = viewModel.NomUsage,
                         Prenom = viewModel.Prenom,
@@ -260,8 +260,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-#warning Ajouter le titre de civilité dans la BdD
-                    var isExist = await context.Tcontact.AnyAsync(c => c.Id != record.Id && c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
+                    var isExist = await context.Tcontact.AnyAsync(c => c.Id != record.Id && c.TitreCivilite.ToLower() == viewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
                                                                   c.NomUsage.ToLower() == viewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == viewModel.AutresPrenoms.Trim().ToLower());
                     if (isExist)
                     {
@@ -274,6 +273,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     record.DateEdition = viewModel.DateEdition?.ToString();
                     record.Observation = viewModel.Observation;
+                    record.TitreCivilite = viewModel.TitreCivilite;
                     record.NomNaissance = viewModel.NomNaissance;
                     record.NomUsage = viewModel.NomUsage;
                     record.Prenom = viewModel.Prenom;
@@ -368,14 +368,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var isGuidCorrect = Guid.TryParse(model.Guid, out Guid guid);
                     if (isGuidCorrect == false) return null;
 
-#warning Ajouter le titre de civilité dans la BdD
                     var viewModel = new ContactVM()
                     {
                         Id = model.Id,
                         DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
                         DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
                         Observation = model.Observation,
-                        //TitreCivilite = model.TitreCivilite,
+                        TitreCivilite = model.TitreCivilite,
                         NomNaissance = model.NomNaissance,
                         NomUsage = model.NomUsage,
                         Prenom = model.Prenom,

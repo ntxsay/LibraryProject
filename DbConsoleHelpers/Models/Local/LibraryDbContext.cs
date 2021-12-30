@@ -69,6 +69,8 @@ namespace DbConsoleHelpers.Models.Local
                 entity.Property(e => e.NomNaissance).IsRequired();
 
                 entity.Property(e => e.Prenom).IsRequired();
+
+                entity.Property(e => e.TitreCivilite).IsRequired();
             });
 
             modelBuilder.Entity<Tbook>(entity =>
@@ -318,6 +320,8 @@ namespace DbConsoleHelpers.Models.Local
                 entity.Property(e => e.NomNaissance).IsRequired();
 
                 entity.Property(e => e.Prenom).IsRequired();
+
+                entity.Property(e => e.TitreCivilite).IsRequired();
             });
 
             modelBuilder.Entity<Tediteur>(entity =>
