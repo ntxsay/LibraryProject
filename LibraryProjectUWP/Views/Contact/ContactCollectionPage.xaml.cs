@@ -3,6 +3,7 @@ using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Contact.Collection;
 using LibraryProjectUWP.Views.Contact.Manage;
 using System;
@@ -78,8 +79,8 @@ namespace LibraryProjectUWP.Views.Contact
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var contactsList = await DbServices.Library.AllVMAsync();
-                //ViewModelPage.ViewModelList = libraryList?.ToList();
+                var contactsList = await DbServices.Contact.AllVMAsync();
+                ViewModelPage.ViewModelList = contactsList?.ToList();
                 await InitializeDataAsync();
             }
             catch (Exception ex)
@@ -94,18 +95,18 @@ namespace LibraryProjectUWP.Views.Contact
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                //if (ViewModelPage.ViewModelList != null && ViewModelPage.ViewModelList.Any())
-                //{
-                //    EsLibrary esLibrary = new EsLibrary();
-                //    foreach (var library in ViewModelPage.ViewModelList)
-                //    {
-                //        string combinedPath = await esLibrary.GetLibraryItemJaquettePathAsync(library);
-                //        library.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-                //    }
-                //}
+                if (ViewModelPage.ViewModelList != null && ViewModelPage.ViewModelList.Any())
+                {
+                    EsContact esItem = new EsContact();
+                    foreach (var library in ViewModelPage.ViewModelList)
+                    {
+                        string combinedPath = await esItem.GetItemJaquettePathAsync(library);
+                        library.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                    }
+                }
 
                 ViewModelPage.SearchingItemVisibility = Visibility.Collapsed;
-                //NavigateToView(typeof(ContactCollectionGdViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
+                NavigateToView(typeof(ContactCollectionGdViewPage), new ContactCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
                 ViewModelPage.IsGridView = true;
                 ViewModelPage.IsDataGridView = false;
             }
@@ -308,51 +309,54 @@ namespace LibraryProjectUWP.Views.Contact
 
         public void RefreshItemsGrouping()
         {
-            //MethodBase m = MethodBase.GetCurrentMethod();
-            //try
-            //{
-            //    if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage)
-            //    {
-            //        switch (ViewModelPage.GroupedBy)
-            //        {
-            //            case ContactGroupVM.GroupBy.None:
-            //                ContactCollectionGdViewPage.GroupItemsByNone();
-            //                break;
-            //            case ContactGroupVM.GroupBy.Letter:
-            //                ContactCollectionGdViewPage.GroupItemsByAlphabetic();
-            //                break;
-            //            case ContactGroupVM.GroupBy.CreationYear:
-            //                ContactCollectionGdViewPage.GroupByCreationYear();
-            //                break;
-            //            default:
-            //                ContactCollectionGdViewPage.GroupItemsByNone();
-            //                break;
-            //        }
-            //    }
-            //    else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-            //    {
-            //        switch (ViewModelPage.GroupedBy)
-            //        {
-            //            case ContactGroupVM.GroupBy.None:
-            //                libraryCollectionDataGridViewPage.GroupItemsByNone();
-            //                break;
-            //            case ContactGroupVM.GroupBy.Letter:
-            //                libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
-            //                break;
-            //            case ContactGroupVM.GroupBy.CreationYear:
-            //                libraryCollectionDataGridViewPage.GroupByCreationYear();
-            //                break;
-            //            default:
-            //                libraryCollectionDataGridViewPage.GroupItemsByNone();
-            //                break;
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Logs.Log(ex, m);
-            //    return;
-            //}
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage)
+                {
+                    switch (ViewModelPage.GroupedBy)
+                    {
+                        case ContactGroupVM.GroupBy.None:
+                            ContactCollectionGdViewPage.GroupItemsByNone();
+                            break;
+                        case ContactGroupVM.GroupBy.LetterNomNaissance:
+                            ContactCollectionGdViewPage.GroupItemsByLetterNomNaissance();
+                            break;
+                        case ContactGroupVM.GroupBy.LetterPrenom:
+                            ContactCollectionGdViewPage.GroupItemsByLetterPrenom();
+                            break;
+                        case ContactGroupVM.GroupBy.CreationYear:
+                            ContactCollectionGdViewPage.GroupByCreationYear();
+                            break;
+                        default:
+                            ContactCollectionGdViewPage.GroupItemsByNone();
+                            break;
+                    }
+                }
+                //else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                //{
+                //    switch (ViewModelPage.GroupedBy)
+                //    {
+                //        case ContactGroupVM.GroupBy.None:
+                //            libraryCollectionDataGridViewPage.GroupItemsByNone();
+                //            break;
+                //        case ContactGroupVM.GroupBy.Letter:
+                //            libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
+                //            break;
+                //        case ContactGroupVM.GroupBy.CreationYear:
+                //            libraryCollectionDataGridViewPage.GroupByCreationYear();
+                //            break;
+                //        default:
+                //            libraryCollectionDataGridViewPage.GroupItemsByNone();
+                //            break;
+                //    }
+                //}
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         #endregion
@@ -519,35 +523,39 @@ namespace LibraryProjectUWP.Views.Contact
 
         private void NewItemXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            //MethodBase m = MethodBase.GetCurrentMethod();
-            //NewEditContactUC userControl = null;
-            //try
-            //{
-            //    userControl = new NewEditContactUC(new ManageLibraryDialogParametersVM()
-            //    {
-            //        EditMode = Code.EditMode.Create,
-            //        ViewModelList = ViewModelPage.ViewModelList,
-            //    });
+            MethodBase m = MethodBase.GetCurrentMethod();
+            NewEditContactUC userControl = null;
+            try
+            {
+                userControl = new NewEditContactUC(new ManageContactParametersDriverVM()
+                {
+                    EditMode = Code.EditMode.Create,
+                    ViewModelList = ViewModelPage.ViewModelList,
+                    CurrentViewModel = new ContactVM()
+                    {
+                        TitreCivilite = CivilityHelpers.MPoint,
+                    }
+                });
 
-            //    userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
-            //    userControl.CreateItemRequested += NewEditLibraryUC_CreateItemRequested;
+                userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
+                userControl.CreateItemRequested += NewEditLibraryUC_CreateItemRequested;
 
-            //    if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage)
-            //    {
-            //        ContactCollectionGdViewPage.ViewModelPage.SplitViewContent = userControl;
-            //        ContactCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = true;
-            //    }
-            //    else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-            //    {
-            //        libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-            //        libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Logs.Log(ex, m);
-            //    return;
-            //}
+                if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage)
+                {
+                    ContactCollectionGdViewPage.ViewModelPage.SplitViewContent = userControl;
+                    ContactCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = true;
+                }
+                //else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                //{
+                //    libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                //    libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                //}
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private async void ExportAllItemXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -588,90 +596,83 @@ namespace LibraryProjectUWP.Views.Contact
 
         private async void NewEditLibraryUC_CreateItemRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
         {
-            //MethodBase m = MethodBase.GetCurrentMethod();
-            //try
-            //{
-            //    if (sender._parameters != null)
-            //    {
-            //        var newValue = sender.ViewModelPage.Value?.Trim();
-            //        var newDescription = sender.ViewModelPage.Description?.Trim();
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    ContactVM newViewModel = sender.ViewModelPage.ViewModel;
 
-            //        var newViewModel = new ContactVM()
-            //        {
-            //            Name = newValue,
-            //            Description = newDescription,
-            //        };
+                    var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        ViewModelPage.ViewModelList.Add(newViewModel);
 
-            //        var creationResult = await DbServices.Library.CreateAsync(newViewModel);
-            //        if (creationResult.IsSuccess)
-            //        {
-            //            newViewModel.Id = creationResult.Id;
-            //            ViewModelPage.ViewModelList.Add(newViewModel);
+                        if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage)
+                        {
+                            ContactCollectionGdViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        }
+                        //else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                        //{
+                        //    libraryCollectionDataGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        //}
 
-            //            if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage)
-            //            {
-            //                ContactCollectionGdViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
-            //            }
-            //            else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-            //            {
-            //                libraryCollectionDataGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
-            //            }
+                        this.RefreshItemsGrouping();
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
+                        return;
+                    }
+                }
 
-            //            this.RefreshItemsGrouping();
-            //        }
-            //        else
-            //        {
-            //            //Erreur
-            //            sender.ViewModelPage.ErrorMessage = creationResult.Message;
-            //            return;
-            //        }
-            //    }
+                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
 
-            //    sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
-            //    sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
-
-            //    if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage2)
-            //    {
-            //        ContactCollectionGdViewPage2.ViewModelPage.IsSplitViewOpen = false;
-            //        ContactCollectionGdViewPage2.ViewModelPage.SplitViewContent = null;
-            //    }
-            //    else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage2)
-            //    {
-            //        libraryCollectionDataGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
-            //        libraryCollectionDataGridViewPage2.ViewModelPage.SplitViewContent = null;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Logs.Log(ex, m);
-            //    return;
-            //}
+                if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage2)
+                {
+                    ContactCollectionGdViewPage2.ViewModelPage.IsSplitViewOpen = false;
+                    ContactCollectionGdViewPage2.ViewModelPage.SplitViewContent = null;
+                }
+                //else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage2)
+                //{
+                //    libraryCollectionDataGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
+                //    libraryCollectionDataGridViewPage2.ViewModelPage.SplitViewContent = null;
+                //}
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void NewEditLibraryUC_CancelModificationRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
         {
-            //MethodBase m = MethodBase.GetCurrentMethod();
-            //try
-            //{
-            //    sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
-            //    sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
 
-            //    if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage)
-            //    {
-            //        ContactCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
-            //        ContactCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
-            //    }
-            //    else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-            //    {
-            //        libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-            //        libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Logs.Log(ex, m);
-            //    return;
-            //}
+                if (FramePartialView.Content is ContactCollectionGdViewPage ContactCollectionGdViewPage)
+                {
+                    ContactCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
+                    ContactCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
+                }
+                //else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                //{
+                //    libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
+                //    libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
+                //}
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void ImportItemXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)

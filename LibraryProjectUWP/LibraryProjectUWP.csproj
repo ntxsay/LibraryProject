@@ -138,6 +138,7 @@
     <Compile Include="Code\Converters\VisibilityConverter.cs" />
     <Compile Include="Code\DataTemplatesSelector\CategoriesDataTemplateSelector.cs" />
     <Compile Include="Code\Enums.cs" />
+    <Compile Include="Code\Helpers\CivilityHelpers.cs" />
     <Compile Include="Code\Helpers\DatesHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="ViewModels\Contact\ContactGroupVM.cs" />
     <Compile Include="ViewModels\Contact\ContactVM.cs" />
     <Compile Include="ViewModels\Contact\LibraryCollectionCommonViewVM.cs" />
+    <Compile Include="ViewModels\Contact\ManageContactParametersDriverVM.cs" />
     <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\General\ManageCategorieParametersVM.cs" />

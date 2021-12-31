@@ -71,7 +71,7 @@ namespace LibraryProjectUWP.ViewModels.Contact
             }
         }
 
-        private string _NomUsage;
+        private string _NomUsage = String.Empty;
         public string NomUsage
         {
             get => _NomUsage;
@@ -99,7 +99,7 @@ namespace LibraryProjectUWP.ViewModels.Contact
             }
         }
 
-        private string _AutresPrenoms;
+        private string _AutresPrenoms = String.Empty;
         public string AutresPrenoms
         {
             get => _AutresPrenoms;
@@ -223,6 +223,11 @@ namespace LibraryProjectUWP.ViewModels.Contact
                     this.OnPropertyChanged();
                 }
             }
+        }
+
+        public string DisplayName
+        {
+            get => $"{NomNaissance} {Prenom}";
         }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)

@@ -175,7 +175,7 @@ namespace LibraryProjectUWP.Views.Contact.Collection
                 return;
             }
         }
-        public void GroupItemsByLetterPrenom()
+        public void GroupItemsByLetterNomNaissance()
         {
             try
             {
@@ -185,6 +185,30 @@ namespace LibraryProjectUWP.Views.Contact.Collection
                 }
 
                 var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _contactParameters.ParentPage.ViewModelPage.OrderedBy, _contactParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NomNaissance.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Count() > 0)
+                {
+                    ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, ContactVM>>(GroupingItems);
+                    _contactParameters.ParentPage.ViewModelPage.GroupedBy = ContactGroupVM.GroupBy.LetterNomNaissance;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void GroupItemsByLetterPrenom()
+        {
+            try
+            {
+                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                {
+                    return;
+                }
+
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _contactParameters.ParentPage.ViewModelPage.OrderedBy, _contactParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Prenom.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, ContactVM>>(GroupingItems);

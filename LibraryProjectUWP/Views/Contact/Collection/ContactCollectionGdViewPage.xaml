@@ -48,40 +48,35 @@
         <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolConverter" TrueValue="False" FalseValue="True"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
-        <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ThumbnailSimpleDataTemplate">
-            <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
-                <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" Height="282" Width="180" Tag="{x:Bind Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" PointerPressed="ViewboxSimpleThumnailDatatemplate_PointerPressed">
+        <DataTemplate x:DataType="contactVm:ContactVM" x:Key="ThumbnailSimpleDataTemplate">
+            <Grid x:Name="simpleThumnailItemContainer" Height="250" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
+                <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" VerticalAlignment="Top" Height="150" Width="150" Margin="5 0" Tag="{x:Bind Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" PointerPressed="ViewboxSimpleThumnailDatatemplate_PointerPressed">
                     <ToolTipService.ToolTip>
                         <ToolTip>
                             <TextBlock>
-                                <Run Text="Ouvrir la bibliothèque de" />
-                                <Run Text="{x:Bind Name}" FontWeight="Medium"/>
+                                <Run Text="Afficher le contact" />
+                                <Run Text="{x:Bind TitreCivilite}" FontWeight="Medium"/>
+                                <Run Text="{x:Bind NomNaissance}" FontWeight="Medium"/>
+                                <Run Text="{x:Bind Prenom}" FontWeight="Medium"/>
                             </TextBlock>
                         </ToolTip>
                     </ToolTipService.ToolTip>
-                    <Border Height="301" Width="192" Background="WhiteSmoke" BorderThickness="0" CornerRadius="0">
-                        <Grid Height="301" Width="192">
-                            <Image Source="{x:Bind JaquettePath, Mode=OneWay}" Tag="{x:Bind JaquettePath, Mode=OneWay}" Stretch="UniformToFill" Loaded="Image_Loaded"/>
-                            <!--<Grid Height="150" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left">
-                                <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="LightBlue" Points="0,110, 0,70, 70,0, 110,0"/>
-                                <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="BlueViolet" Points="0,110, 0,71, 71,0, 110,0"/>
-                                <TextBlock Text="{x:Bind Diffusion.StatusDiffusion.Name, Mode=OneWay}" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Margin="-28,35,0,0" 
-                                                   UseLayoutRounding="False" d:LayoutRounding="Auto" Width="140" FontSize="16" FontWeight="Bold" Foreground="White">
-                                    <TextBlock.RenderTransform>
-                                        <CompositeTransform Rotation="-45.15"/>
-                                    </TextBlock.RenderTransform>
-                                </TextBlock>
-                            </Grid>-->
+                    <Border Height="300" Width="300" BorderThickness="0" CornerRadius="0">
+                        <Grid Height="300" Width="300">
+                            <PersonPicture DisplayName="{x:Bind DisplayName, Mode=OneWay}" Width="290" Height="290"/>
                         </Grid>
                     </Border>
                 </Viewbox>
-                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="4, 8" BorderThickness="0" CornerRadius="0 0 0 0">
+                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Padding="4, 8" BorderThickness="0" CornerRadius="0 0 0 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="2"/>
                         <ColumnDefinition Width="44"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{x:Bind Name, Mode=OneWay}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center">
+                        <Run Text="{x:Bind NomNaissance, Mode=OneWay}" FontWeight="Medium"/>
+                        <Run Text="{x:Bind Prenom, Mode=OneWay}" FontWeight="Medium"/>
+                    </TextBlock>
                     <Button x:Name="BtnActions" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand">
                         <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
                             <Border.BorderBrush>

@@ -138,8 +138,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                     }
 
                     LibraryDbContext context = new LibraryDbContext();
+                    if (await context.Tcontact.CountAsync() > 0)
+                    {
+                        
+                    }
+
                     var isExist = await context.Tcontact.AnyAsync(c => c.TitreCivilite.ToLower() == viewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
-                                                                  c.NomUsage.ToLower() == viewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == viewModel.AutresPrenoms.Trim().ToLower());
+                                                                      c.NomUsage.ToLower() == viewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == viewModel.AutresPrenoms.Trim().ToLower());
                     if (isExist)
                     {
                         return new OperationStateVM()
