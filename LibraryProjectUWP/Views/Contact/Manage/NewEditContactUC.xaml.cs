@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -52,8 +53,6 @@ namespace LibraryProjectUWP.Views.Contact.Manage
             _parameters = parameters;
             ViewModelPage.EditMode = parameters.EditMode;
             ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} un contact";
-            ViewModelPage.NamePlaceHolderText = "Nom du contact";
-            ViewModelPage.DescriptionPlaceHolderText = "Observation facultative du contact";
             ViewModelPage.ViewModel = parameters?.CurrentViewModel;
             InitializeActionInfos();
         }
@@ -145,7 +144,8 @@ namespace LibraryProjectUWP.Views.Contact.Manage
             {
                 if (ViewModelPage.ViewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace())
                 {
-                    ViewModelPage.ErrorMessage = $"Le nom de la bibliothèque ne peut pas être vide\nou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessage = $"Le nom de la bibliothèque ne peut pas être vide\nou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
                     return false;
                 }
 
@@ -157,11 +157,12 @@ namespace LibraryProjectUWP.Views.Contact.Manage
                     if (isError)
                     {
                         TbxErrorMessage.Text = $"Cette bibliothèque existe déjà.";
+                        ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
                         return false;
                     }
                 }
 
-                ViewModelPage.ErrorMessage = string.Empty;
+                ViewModelPage.ResultMessage = string.Empty;
                 return true;
             }
             catch (Exception ex)
@@ -223,15 +224,15 @@ namespace LibraryProjectUWP.Views.Contact.Manage
             }
         }
 
-        private string _ErrorMessage;
-        public string ErrorMessage
+        private string _ResultMessage;
+        public string ResultMessage
         {
-            get => this._ErrorMessage;
+            get => this._ResultMessage;
             set
             {
-                if (this._ErrorMessage != value)
+                if (this._ResultMessage != value)
                 {
-                    this._ErrorMessage = value;
+                    this._ResultMessage = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -267,29 +268,15 @@ namespace LibraryProjectUWP.Views.Contact.Manage
             }
         }
 
-        private string _NamePlaceHolderText;
-        public string NamePlaceHolderText
+        private Brush _ResultMessageForeGround;
+        public Brush ResultMessageForeGround
         {
-            get => this._NamePlaceHolderText;
+            get => this._ResultMessageForeGround;
             set
             {
-                if (this._NamePlaceHolderText != value)
+                if (this._ResultMessageForeGround != value)
                 {
-                    this._NamePlaceHolderText = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _DescriptionPlaceHolderText;
-        public string DescriptionPlaceHolderText
-        {
-            get => this._DescriptionPlaceHolderText;
-            set
-            {
-                if (this._DescriptionPlaceHolderText != value)
-                {
-                    this._DescriptionPlaceHolderText = value;
+                    this._ResultMessageForeGround = value;
                     this.OnPropertyChanged();
                 }
             }

@@ -4,8 +4,10 @@ using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Book.Collection;
+using LibraryProjectUWP.Views.Contact.Manage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,6 +19,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -485,7 +488,7 @@ namespace LibraryProjectUWP.Views.Book
 
         }
 
-        private void NewLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void NewBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -499,7 +502,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ExportAllLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -535,7 +538,137 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void ImportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ImportBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
+        #region Contact
+        private async void NewContactXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            NewEditContactUC userControl = null;
+            try
+            {
+                var contactsList = await DbServices.Contact.AllVMAsync();
+                ViewModelPage.ContactViewModelList = contactsList?.ToList();
+                userControl = new NewEditContactUC(new ManageContactParametersDriverVM()
+                {
+                    EditMode = Code.EditMode.Create,
+                    ViewModelList = ViewModelPage.ContactViewModelList,
+                    CurrentViewModel = new ContactVM()
+                    {
+                        TitreCivilite = CivilityHelpers.MPoint,
+                    }
+                });
+
+                userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
+                userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
+
+                if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
+                {
+                    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = userControl;
+                    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = true;
+                }
+                else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
+                {
+                    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = userControl;
+                    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditContactUC_CreateItemRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    ContactVM newViewModel = sender.ViewModelPage.ViewModel;
+
+                    var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        ViewModelPage.ContactViewModelList.Add(newViewModel);
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        return;
+                    }
+                }
+
+                //sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
+                //sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
+
+                //if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
+                //{
+                //    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
+                //    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
+                //}
+                //else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
+                //{
+                //    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = false;
+                //    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = null;
+                //}
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditContactUC_CancelModificationRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
+
+                if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
+                {
+                    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
+                    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
+                }
+                else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
+                {
+                    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = false;
+                    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #endregion
+
+        private void NewAuthorXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
+        private void DisplayAuthorListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
+        private void DisplayContactListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
         }
@@ -667,6 +800,20 @@ namespace LibraryProjectUWP.Views.Book
                 if (_ViewModelList != value)
                 {
                     this._ViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<ContactVM> _ContactViewModelList;
+        public List<ContactVM> ContactViewModelList
+        {
+            get => this._ContactViewModelList;
+            set
+            {
+                if (_ContactViewModelList != value)
+                {
+                    this._ContactViewModelList = value;
                     this.OnPropertyChanged();
                 }
             }

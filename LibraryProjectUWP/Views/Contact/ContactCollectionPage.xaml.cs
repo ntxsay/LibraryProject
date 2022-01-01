@@ -623,7 +623,7 @@ namespace LibraryProjectUWP.Views.Contact
                     else
                     {
                         //Erreur
-                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
                         return;
                     }
                 }

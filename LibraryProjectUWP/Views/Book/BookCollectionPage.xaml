@@ -33,12 +33,12 @@
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
         <XamlUICommand x:Name="GridViewCollectionXamlUICommand" 
                        ExecuteRequested="GridViewCollectionXamlUICommand_ExecuteRequested"
-                       Description="Affiche la vue grille des bibliothèques" 
+                       Description="Affiche la vue grille des livres" 
                        Label="Affichage grille">
         </XamlUICommand>
         <XamlUICommand x:Name="DataGridViewCollectionXamlUICommand" 
                        ExecuteRequested="DataGridViewCollectionXamlUICommand_ExecuteRequested"
-                       Description="Affiche la vue de liste des bibliothèques" 
+                       Description="Affiche la vue de liste des livres" 
                        Label="Affichage liste">
         </XamlUICommand>
         <XamlUICommand x:Name="ReloadDataXamlUICommand" 
@@ -46,19 +46,39 @@
                        Description="Actualise les données depuis la base de données" 
                        Label="Actualiser les données">
         </XamlUICommand>
-        <XamlUICommand x:Name="NewLibraryXamlUICommand" 
-                       ExecuteRequested="NewLibraryXamlUICommand_ExecuteRequested"
-                       Description="Ajoute une nouvelle bibliothèque" 
-                       Label="Ajouter une bibliothèque">
+        <XamlUICommand x:Name="NewBookXamlUICommand" 
+                       ExecuteRequested="NewBookXamlUICommand_ExecuteRequested"
+                       Description="Ajoute un nouveau livre" 
+                       Label="Ajouter un livre">
         </XamlUICommand>
-        <XamlUICommand x:Name="ImportLibraryXamlUICommand" 
-                       ExecuteRequested="ImportLibraryXamlUICommand_ExecuteRequested"
-                       Description="Importe une bibliothèque existante" 
-                       Label="Importer une bibliothèque">
+        <XamlUICommand x:Name="NewContactXamlUICommand" 
+                       ExecuteRequested="NewContactXamlUICommand_ExecuteRequested"
+                       Description="Ajoute un nouveau contact" 
+                       Label="Ajouter un contact">
         </XamlUICommand>
-        <XamlUICommand x:Name="ExportAllLibraryXamlUICommand" 
-                       ExecuteRequested="ExportAllLibraryXamlUICommand_ExecuteRequested"
-                       Description="Exporte toutes les bibliothèques existantes">
+        <XamlUICommand x:Name="DisplayContactListXamlUICommand" 
+                       ExecuteRequested="DisplayContactListXamlUICommand_ExecuteRequested"
+                       Description="Affiche la liste des contacts existants" 
+                       Label="Afficher les contacts">
+        </XamlUICommand>
+        <XamlUICommand x:Name="NewAuthorXamlUICommand" 
+                       ExecuteRequested="NewAuthorXamlUICommand_ExecuteRequested"
+                       Description="Ajoute un nouvel auteur" 
+                       Label="Ajouter un auteur">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DisplayAuthorListXamlUICommand" 
+                       ExecuteRequested="DisplayAuthorListXamlUICommand_ExecuteRequested"
+                       Description="Affiche la liste des auteurs existants" 
+                       Label="Afficher les auteurs">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ImportBookXamlUICommand" 
+                       ExecuteRequested="ImportBookXamlUICommand_ExecuteRequested"
+                       Description="Importe un livre existant" 
+                       Label="Importer un livre">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ExportAllBookXamlUICommand" 
+                       ExecuteRequested="ExportAllBookXamlUICommand_ExecuteRequested"
+                       Description="Exporte tous les livres existants">
         </XamlUICommand>
         <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
                        ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">
@@ -151,7 +171,7 @@
         </Grid>
         <!--CommandBar-->
         <CommandBar x:Name="MyCommand" VerticalAlignment="Top" IsSticky="True" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" DefaultLabelPosition="Right">
-            <AppBarButton x:Name="ABBtn_SelectedItems" ToolTipService.ToolTip="Bibliothèque(s) sélectionnée(s)" Label="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToStringPhraseConverter}, ConverterParameter='counter bibliothèque(s) sélectionnée(s)', Mode=OneWay}"
+            <AppBarButton x:Name="ABBtn_SelectedItems" ToolTipService.ToolTip="Livre(s) sélectionné(s)" Label="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToStringPhraseConverter}, ConverterParameter='counter livre(s) sélectionné(s)', Mode=OneWay}"
                           IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToEnablingConverter}, Mode=OneWay}">
                 <AppBarButton.Icon>
                     <FontIcon Glyph="&#xe762;"/>
@@ -191,7 +211,7 @@
                                                     <RowDefinition Height="*" />
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Grid.Row="0" MaxWidth="400" FontSize="13" FontWeight="Medium" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" TextWrapping="Wrap" Padding="4">
-                                                        <Run Text="Êtes-vous sûr de vouloir supprimer toutes les bibliothèques sélectionnées ? Cette action est irréversible." />
+                                                        <Run Text="Êtes-vous sûr de vouloir supprimer toutes les livres sélectionnés ? Cette action est irréversible." />
                                                 </TextBlock>
                                                 <TextBlock Grid.Row="1" MaxWidth="400" FontSize="12" TextWrapping="WrapWholeWords" Padding="4">
                                                         <Run Text='Cliquez sur "' />
@@ -254,14 +274,48 @@
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
             <AppBarSeparator/>
-            <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter une société">
+            <AppBarButton ToolTipService.ToolTip="Affiche les auteurs ou les contacts emprunteurs">
+                <AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="Ajouter une bibliothèque" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Add" Command="{StaticResource NewLibraryXamlUICommand}">
+                        <MenuFlyoutItem Text="Afficher les auteurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayAuthorListXamlUICommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Afficher les emprunteurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayContactListXamlUICommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter un élément">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Ajouter un livre" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewBookXamlUICommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Importer un livre" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Import" Command="{StaticResource ImportBookXamlUICommand}">
 
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Importer une bibliothèque" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Import" Command="{StaticResource ImportLibraryXamlUICommand}">
-
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Ajouter un auteur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewAuthorXamlUICommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Ajouter un emprunteur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewContactXamlUICommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                            </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
@@ -270,7 +324,7 @@
             <AppBarButton Icon="RepeatAll" LabelPosition="Collapsed" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ReloadDataXamlUICommand}"/>
             <AppBarSeparator/>
             <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Exporter toutes les bibliothèques" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportAllLibraryXamlUICommand}">
+                <AppBarButton Label="Exporter tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportAllBookXamlUICommand}">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xEDE1;"/>
                     </AppBarButton.Icon>

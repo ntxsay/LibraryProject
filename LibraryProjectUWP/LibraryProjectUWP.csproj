@@ -143,6 +143,7 @@
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
     <Compile Include="Code\Helpers\VisualViewHelpers.cs" />
+    <Compile Include="Code\Services\Db\Author_db.cs" />
     <Compile Include="Code\Services\Db\Contact_db.cs" />
     <Compile Include="Code\Services\Db\SubCategorie_db.cs" />
     <Compile Include="Code\Services\Db\DbServices.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Code\Services\Db\Categorie_db.cs" />
     <Compile Include="Code\Services\Db\Library_db.cs" />
     <Compile Include="Code\Services\ES\EsBook.cs" />
+    <Compile Include="Code\Services\ES\EsAuthor.cs" />
     <Compile Include="Code\Services\ES\EsContact.cs" />
     <Compile Include="Code\Services\ES\EsGeneral.cs" />
     <Compile Include="Code\Services\ES\EsLibrary.cs" />
@@ -182,6 +184,7 @@
     <Compile Include="Models\Local\TlibraryCategorie.cs" />
     <Compile Include="Models\Local\TlibrarySubCategorie.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\Author\AuthorVM.cs" />
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
@@ -224,6 +227,9 @@
     </Compile>
     <Compile Include="Views\Contact\ContactCollectionPage.xaml.cs">
       <DependentUpon>ContactCollectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Contact\ContactListUC.xaml.cs">
+      <DependentUpon>ContactListUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Contact\Manage\NewEditContactUC.xaml.cs">
       <DependentUpon>NewEditContactUC.xaml</DependentUpon>
@@ -320,6 +326,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Contact\ContactCollectionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Contact\ContactListUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

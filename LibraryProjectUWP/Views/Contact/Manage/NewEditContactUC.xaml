@@ -79,7 +79,7 @@
                     <TextBox Grid.Row="10" Text="{x:Bind ViewModelPage.ViewModel.NoMobile, Mode=TwoWay}" PlaceholderText="N° Mobile"/>
                     <TextBox Grid.Row="11" Text="{x:Bind ViewModelPage.ViewModel.AdresseMail, Mode=TwoWay}" PlaceholderText="Adresse Mail"/>
 
-                    <TextBlock x:Name="TbxErrorMessage" Grid.Row="12" Foreground="OrangeRed" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ErrorMessage, Mode=OneWay}"/>
+                    <TextBlock x:Name="TbxErrorMessage" Grid.Row="12" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
                 </Grid>
                 <StackPanel Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
                     <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">

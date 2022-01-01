@@ -35,6 +35,7 @@ namespace LibraryProjectUWP.Code.Services.ES
             public const string Libraries = "Libraries";
             public const string Books = "Books";
             public const string Contacts = "Contacts";
+            public const string Authors = "Authors";
         }
 
         public enum MainPathEnum
@@ -161,6 +162,7 @@ namespace LibraryProjectUWP.Code.Services.ES
                         folderName = DefaultPathName.Contacts;
                         break;
                     case MainPathEnum.Authors:
+                        folderName = DefaultPathName.Authors;
                         break;
                     case MainPathEnum.Editors:
                         break;
