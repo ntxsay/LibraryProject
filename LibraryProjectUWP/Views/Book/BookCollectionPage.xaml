@@ -140,9 +140,16 @@
             <Grid Grid.Row="0">
 
             </Grid>
-            <Frame x:Name="FramePartialView" Grid.Row="1" Padding="0 50 0 0">
+            <Grid Grid.Row="1" Padding="0 50 0 0">
+                <SplitView PaneBackground="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Pane="{x:Bind ViewModelPage.SplitViewContent, Mode=OneWay}"
+                IsPaneOpen="{x:Bind ViewModelPage.IsSplitViewOpen, Mode=OneWay}" PanePlacement="Right" OpenPaneLength="400" CompactPaneLength="88" DisplayMode="Inline">
+                    <!--Items-->
+                    <Frame x:Name="FramePartialView">
 
-            </Frame>
+                    </Frame>
+                </SplitView>
+            </Grid>
+            
         </Grid>
         <!--Statusbar-->
         <Grid x:Name="GridStatusBar" Grid.Row="1" VerticalAlignment="Bottom" Height="28" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">

@@ -7,6 +7,7 @@ using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Book.Collection;
+using LibraryProjectUWP.Views.Contact;
 using LibraryProjectUWP.Views.Contact.Manage;
 using System;
 using System.Collections.Generic;
@@ -565,16 +566,8 @@ namespace LibraryProjectUWP.Views.Book
                 userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
                 userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
 
-                if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
-                {
-                    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = userControl;
-                    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
-                {
-                    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = userControl;
-                    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                this.ViewModelPage.SplitViewContent = userControl;
+                this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -638,16 +631,42 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
 
-                if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
+                this.ViewModelPage.IsSplitViewOpen = false;
+                this.ViewModelPage.SplitViewContent = null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void DisplayContactListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            ContactListUC userControl = null;
+            try
+            {
+                IList<ContactVM> contactsList = await DbServices.Contact.AllVMAsync();
+                if (ViewModelPage.ContactViewModelList == null || !ViewModelPage.ContactViewModelList.Any())
                 {
-                    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
+                    ViewModelPage.ContactViewModelList = contactsList?.ToList();
                 }
-                else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
+
+                userControl = new ContactListUC(new ContactListParametersDriverVM()
                 {
-                    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = null;
-                }
+                    ViewModelList = ViewModelPage.ContactViewModelList,
+                    CurrentViewModel = new ContactVM()
+                    {
+                        TitreCivilite = CivilityHelpers.MPoint,
+                    }
+                });
+
+                //userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
+                //userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
+
+                this.ViewModelPage.SplitViewContent = userControl;
+                this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -668,10 +687,7 @@ namespace LibraryProjectUWP.Views.Book
 
         }
 
-        private void DisplayContactListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
-        }
+        
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
@@ -744,6 +760,34 @@ namespace LibraryProjectUWP.Views.Book
                 if (_IsGridView != value)
                 {
                     this._IsGridView = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsSplitViewOpen;
+        public bool IsSplitViewOpen
+        {
+            get => this._IsSplitViewOpen;
+            set
+            {
+                if (_IsSplitViewOpen != value)
+                {
+                    this._IsSplitViewOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private UserControl _SplitViewContent;
+        public UserControl SplitViewContent
+        {
+            get => this._SplitViewContent;
+            set
+            {
+                if (_SplitViewContent != value)
+                {
+                    this._SplitViewContent = value;
                     this.OnPropertyChanged();
                 }
             }

@@ -570,34 +570,6 @@ namespace LibraryProjectUWP.Views.Book.Collection
             }
         }
 
-        private bool _IsSplitViewOpen;
-        public bool IsSplitViewOpen
-        {
-            get => this._IsSplitViewOpen;
-            set
-            {
-                if (_IsSplitViewOpen != value)
-                {
-                    this._IsSplitViewOpen = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private UserControl _SplitViewContent;
-        public UserControl SplitViewContent
-        {
-            get => this._SplitViewContent;
-            set
-            {
-                if (_SplitViewContent != value)
-                {
-                    this._SplitViewContent = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
         private BookGroupVM.GroupBy _GroupedBy = BookGroupVM.GroupBy.None;
         public BookGroupVM.GroupBy GroupedBy
         {

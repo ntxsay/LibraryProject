@@ -147,4 +147,9 @@ namespace LibraryProjectUWP.ViewModels.Contact
         }
     }
 
+    public class ContactGroupCastVM
+    {
+        public string GroupName { get; set; }
+        public ObservableCollection<ContactVM> Items { get; set; }
+    }
 }

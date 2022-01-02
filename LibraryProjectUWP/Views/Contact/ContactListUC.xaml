@@ -5,15 +5,43 @@
     xmlns:local="using:LibraryProjectUWP.Views.Contact"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"    xmlns:contactVm="using:LibraryProjectUWP.ViewModels.Contact"
+    mc:Ignorable="d"    
+    xmlns:contactVm="using:LibraryProjectUWP.ViewModels.Contact"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    xmlns:wuxdata="using:Windows.UI.Xaml.Data"
     d:DesignHeight="800"
-    d:DesignWidth="510" Unloaded="UserControl_Unloaded">
+    d:DesignWidth="510" 
+    Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
+    <UserControl.Resources>
+        <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModelPage.ViewModelListGroup}" IsSourceGrouped="True" ItemsPath="Items"/>
+        
+        <DataTemplate x:Key="ZoomedInTemplate" x:DataType="contactVm:ContactVM">
+            <StackPanel Orientation="Horizontal" MinWidth="200" Margin="12,6,12,6">
+                <PersonPicture DisplayName="{x:Bind DisplayName}" Width="36" Height="36" />
+                <TextBlock TextWrapping="NoWrap" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center">
+                        <Run Text="{x:Bind NomNaissance, Mode=OneWay}" FontWeight="Medium"/>
+                        <Run Text="{x:Bind Prenom, Mode=OneWay}" FontWeight="Medium"/>
+                </TextBlock>
+                <!--<StackPanel Margin="20,0,0,0">
+                    <TextBlock Text="{x:Bind Title}" Style="{StaticResource BaseTextBlockStyle}"/>
+                    <TextBlock Text="{x:Bind Subtitle}" TextWrapping="Wrap" HorizontalAlignment="Left" Width="300" Style="{StaticResource BodyTextBlockStyle}"/>
+                </StackPanel>-->
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="contactVm:ContactGroupCastVM">
+            <TextBlock Text="{Binding GroupName}" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" Style="{StaticResource SubtitleTextBlockStyle}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ZoomedOutTemplate" x:DataType="wuxdata:ICollectionViewGroup">
+            <TextBlock Text="{x:Bind ((contactVm:ContactGroupCastVM)Group).GroupName}" TextWrapping="Wrap"/>
+        </DataTemplate>
+    </UserControl.Resources>
     <Pivot x:Name="PivotItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Pivot.OpacityTransition>
             <ScalarTransition />
@@ -22,10 +50,21 @@
             <PivotItem.Header>
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;" FontSize="20"/>
-                    <TextBlock  FontSize="16" />
+                    <TextBlock Text="{x:Bind ViewModelPage.Header, Mode=OneWay}" FontSize="16" />
                 </StackPanel>
             </PivotItem.Header>
-
+            <SemanticZoom>
+                <SemanticZoom.ZoomedInView>
+                    <ListView ItemsSource="{x:Bind cvsGroups.View}" HorizontalAlignment="Stretch" SelectionMode="None" ItemTemplate="{StaticResource ZoomedInTemplate}">
+                        <ListView.GroupStyle>
+                            <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
+                        </ListView.GroupStyle>
+                    </ListView>
+                </SemanticZoom.ZoomedInView>
+                <SemanticZoom.ZoomedOutView>
+                    <GridView ItemsSource="{x:Bind cvsGroups.View.CollectionGroups}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
+                </SemanticZoom.ZoomedOutView>
+            </SemanticZoom>
         </PivotItem>
     </Pivot>
 </UserControl>

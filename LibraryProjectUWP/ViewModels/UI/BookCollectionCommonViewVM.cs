@@ -84,16 +84,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
                 userControl.UpdateItemRequested += NewEditLibraryUC_UpdateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                _parentPage.ViewModelPage.SplitViewContent = userControl;
+                _parentPage.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -137,17 +129,9 @@ namespace LibraryProjectUWP.ViewModels.UI
 
                 sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
                 sender.UpdateItemRequested -= NewEditLibraryUC_UpdateItemRequested;
-                
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
+
+                _parentPage.ViewModelPage.IsSplitViewOpen = false;
+                _parentPage.ViewModelPage.SplitViewContent = null;
             }
             catch (Exception ex)
             {
@@ -164,16 +148,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
                 sender.UpdateItemRequested -= NewEditLibraryUC_UpdateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
+                _parentPage.ViewModelPage.IsSplitViewOpen = false;
+                _parentPage.ViewModelPage.SplitViewContent = null;
             }
             catch (Exception ex)
             {
@@ -193,16 +169,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.DeleteLibraryWithOutSaveRequested += DeleteLibraryUC_DeleteLibraryWithOutSaveRequested;
                 userControl.DeleteLibraryWithSaveRequested += DeleteLibraryUC_DeleteLibraryWithSaveRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                _parentPage.ViewModelPage.SplitViewContent = userControl;
+                _parentPage.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -245,16 +213,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 sender.DeleteLibraryWithOutSaveRequested -= DeleteLibraryUC_DeleteLibraryWithOutSaveRequested;
                 sender.DeleteLibraryWithSaveRequested -= DeleteLibraryUC_DeleteLibraryWithSaveRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
+                _parentPage.ViewModelPage.IsSplitViewOpen = false;
+                _parentPage.ViewModelPage.SplitViewContent = null;
             }
             catch (Exception ex)
             {
@@ -368,16 +328,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
                 userControl.CreateItemRequested += NewEditCategoryUC_CreateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                _parentPage.ViewModelPage.SplitViewContent = userControl;
+                _parentPage.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -402,16 +354,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
                 userControl.UpdateItemRequested += NewEditCategoryUC_UpdateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                _parentPage.ViewModelPage.SplitViewContent = userControl;
+                _parentPage.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -420,7 +364,6 @@ namespace LibraryProjectUWP.ViewModels.UI
                 return;
             }
         }
-
 
         private async void NewEditCategoryUC_CreateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
         {
@@ -455,16 +398,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 sender.CancelModificationRequested -= NewEditCategoryUC_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditCategoryUC_CreateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
+                _parentPage.ViewModelPage.IsSplitViewOpen = false;
+                _parentPage.ViewModelPage.SplitViewContent = null;
             }
             catch (Exception)
             {
@@ -507,16 +442,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 sender.CancelModificationRequested -= NewEditCategoryUC_CancelModificationRequested;
                 sender.UpdateItemRequested -= NewEditCategoryUC_UpdateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
+                _parentPage.ViewModelPage.IsSplitViewOpen = false;
+                _parentPage.ViewModelPage.SplitViewContent = null;
             }
             catch (Exception)
             {
@@ -533,16 +460,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 sender.CreateItemRequested -= NewEditCategoryUC_CreateItemRequested;
                 sender.UpdateItemRequested -= NewEditCategoryUC_UpdateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
+                _parentPage.ViewModelPage.IsSplitViewOpen = false;
+                _parentPage.ViewModelPage.SplitViewContent = null;
             }
             catch (Exception)
             {
@@ -567,16 +486,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
                 userControl.CreateItemRequested += NewEditSubCategoryUC_CreateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                _parentPage.ViewModelPage.SplitViewContent = userControl;
+                _parentPage.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -601,16 +512,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
                 userControl.UpdateItemRequested += NewEditSubCategoryUC_UpdateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                _parentPage.ViewModelPage.SplitViewContent = userControl;
+                _parentPage.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -653,16 +556,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 sender.CancelModificationRequested -= NewEditSubCategoryUC_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditSubCategoryUC_CreateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
+                _parentPage.ViewModelPage.IsSplitViewOpen = false;
+                _parentPage.ViewModelPage.SplitViewContent = null;
             }
             catch (Exception)
             {
@@ -704,16 +599,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 sender.CancelModificationRequested -= NewEditSubCategoryUC_CancelModificationRequested;
                 sender.UpdateItemRequested -= NewEditSubCategoryUC_UpdateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
+                _parentPage.ViewModelPage.IsSplitViewOpen = false;
+                _parentPage.ViewModelPage.SplitViewContent = null;
             }
             catch (Exception)
             {
@@ -730,16 +617,8 @@ namespace LibraryProjectUWP.ViewModels.UI
                 sender.CreateItemRequested -= NewEditSubCategoryUC_CreateItemRequested;
                 sender.UpdateItemRequested -= NewEditSubCategoryUC_UpdateItemRequested;
 
-                if (_bookCollectionDataGridViewPage != null)
-                {
-                    _bookCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
-                else if (_bookCollectionGridViewPage != null)
-                {
-                    _bookCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    _bookCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
-                }
+                _parentPage.ViewModelPage.IsSplitViewOpen = false;
+                _parentPage.ViewModelPage.SplitViewContent = null;
             }
             catch (Exception)
             {
