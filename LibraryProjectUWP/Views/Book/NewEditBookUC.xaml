@@ -84,103 +84,117 @@
                 </Grid.RowDefinitions>
                 <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
-                    <Grid Margin="5">
+                    <Grid Margin="0 0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <!--Titles-->
-                        <MUIXC:Expander x:Name="ExpanderTitle" Grid.Row="0" IsExpanded="True" ExpandDirection="Down" VerticalAlignment="Top" HorizontalAlignment="Stretch" 
-                                HorizontalContentAlignment="Stretch">
-                            <MUIXC:Expander.Header>
-                                <Grid ColumnSpacing="8" Margin="0 5">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon Grid.Column="0" FontFamily="Segoe MDL2 Assets" Glyph="&#xEA98;" FontSize="24"/>
-                                    <StackPanel Grid.Column="1" Orientation="Vertical">
-                                        <TextBlock Text="Général" FontSize="16" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Gère les informations générales du livre, etc..." TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                </Grid>
-                            </MUIXC:Expander.Header>
-                            <MUIXC:Expander.Content>
-                                <Grid>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" RowSpacing="18" Margin="0 8 0 0" VerticalAlignment="Top">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <DatePicker Grid.Row="0" x:Name="DP_DateDebutDiffusion" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateAjoutUser, Mode=TwoWay}" ToolTipService.ToolTip="Date d'ajout"
+                                                    HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
+                                    <DatePicker.Header>
+                                        <TextBlock Text="Date d'ajout" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    </DatePicker.Header>
+                                </DatePicker>
+                                <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.MainTitle, Mode=TwoWay}" PlaceholderText="Titre principal du livre">
+                                    <TextBox.Header>
+                                        <TextBlock Text="Titre du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    </TextBox.Header>
+                                </TextBox>
+                                
+                                <Grid Grid.Row="2" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
                                         <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0" RowSpacing="8" Margin="0 8 0 0" VerticalAlignment="Top">
+                                    <TextBlock Grid.Row="0" Text="Autre(s) titre(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    <Grid Grid.Row="1" RowSpacing="4">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
-                                        <DatePicker Grid.Row="0" x:Name="DP_DateDebutDiffusion" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateAjoutUser, Mode=TwoWay}" 
-                                                    HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" FontSize="16" RequestedTheme="Default"/>
-                                        <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.MainTitle, Mode=TwoWay}" PlaceholderText="Titre du livre"/>
-                                        <Grid Grid.Row="2" Style="{StaticResource WrapGridChildStyle}">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
-                                            <Grid Grid.Row="0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBox x:Name="TBX_TitlesOeuvre" PlaceholderText="Autre(s) titre(s) du livre" Margin="0,0,5,0"/>
-                                                <Button Grid.Column="1"  VerticalAlignment="Bottom" Margin="5,0" Command="{StaticResource AddTitleToBookXamlUICommand}">
-                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC8;"/>
-                                                </Button>
-                                                <Button Grid.Column="2" VerticalAlignment="Bottom" Margin="5,0" Command="{StaticResource RemoveTitleToBookXamlUICommand}">
-                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
-                                                </Button>
-                                            </Grid>
-                                            <ListView x:Name="LBX_TitresOeuvre" Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.ViewModel.TitresOeuvre}" Height="120" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True" Background="{ThemeResource SystemControlAcrylicElementBrush}"/>
-                                        </Grid>
-                                        <Grid Grid.Row="3" ColumnSpacing="8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <DatePicker Grid.Column="0" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateAjoutUser, Mode=TwoWay}" 
-                                                    HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" FontSize="16" RequestedTheme="Default"/>
-                                            <CheckBox x:Name="CBX_UnknowDateParution" Grid.Column="1" Content="Date inconnue" />
-                                        </Grid>
-                                        <Grid Grid.Row="4" ColumnSpacing="8">
+                                        <Grid Grid.Row="0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <MUIXC:NumberBox Grid.Column="0" HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.AnneeParution, Mode=TwoWay}" PlaceholderText="Année de parution" FontSize="16" 
-                                            SpinButtonPlacementMode="Inline" Minimum="0" Maximum="2100" IsEnabled="{Binding ElementName=CBX_UnknowYearParution, Path=IsChecked, Converter={StaticResource NullableBoolToInvertBooleanConverter}}"/>
-                                            <CheckBox x:Name="CBX_UnknowYearParution" Grid.Column="1" Content="Année inconnue" />
+                                            <TextBox x:Name="TBX_TitlesOeuvre" PlaceholderText="Autre(s) titre(s) du livre" Margin="0,0,5,0"/>
+                                            <Button Grid.Column="1"  VerticalAlignment="Bottom" Margin="5,0" Command="{StaticResource AddTitleToBookXamlUICommand}">
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC8;"/>
+                                            </Button>
+                                            <Button Grid.Column="2" VerticalAlignment="Bottom" Margin="5,0" Command="{StaticResource RemoveTitleToBookXamlUICommand}">
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
+                                            </Button>
                                         </Grid>
-                                        <TextBox Grid.Row="6" Text="{x:Bind ViewModelPage.ViewModel.Resume, Mode=TwoWay}" MinHeight="100" PlaceholderText="Résumé" TextWrapping="Wrap" AcceptsReturn="True"/>
-                                        <TextBox Grid.Row="7" Text="{x:Bind ViewModelPage.ViewModel.Notes, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes" TextWrapping="Wrap" AcceptsReturn="True"/>
-                                        <MUIXC:NumberBox Grid.Row="8" HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.NbExactExemplaire, Mode=TwoWay}" PlaceholderText="Année de parution" FontSize="16" 
-                                            SpinButtonPlacementMode="Inline" Minimum="0" Maximum="2100" />
-
+                                        <ListView x:Name="LBX_TitresOeuvre" Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.ViewModel.TitresOeuvre}" Height="80" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True" 
+                                              Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"/>
                                     </Grid>
                                 </Grid>
+                                <Grid Grid.Row="3" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    <Grid Grid.Row="1" ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <MUIXC:NumberBox Grid.Column="0" HorizontalAlignment="Center" PlaceholderText="JJ"
+                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="31" FontSize="14"/>
+                                        <TextBlock Grid.Column="1" Text="/" VerticalAlignment="Center" />
+                                        <MUIXC:NumberBox Grid.Column="2" HorizontalAlignment="Center" PlaceholderText="MM"
+                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="12" FontSize="14"/>
+                                        <TextBlock Grid.Column="3" Text="/" VerticalAlignment="Center"/>
+                                        <MUIXC:NumberBox Grid.Column="4" HorizontalAlignment="Center" PlaceholderText="AAAA"
+                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="2100" FontSize="14" Value="{x:Bind ViewModelPage.ViewModel.AnneeParution, Mode=TwoWay}"/>
+                                    </Grid>
+                                </Grid>
+                                <TextBox Grid.Row="4" Text="{x:Bind ViewModelPage.ViewModel.Resume, Mode=TwoWay}" MinHeight="100" PlaceholderText="Résumé du livre" TextWrapping="Wrap" AcceptsReturn="True">
+                                    <TextBox.Header>
+                                        <TextBlock Text="Résumé" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    </TextBox.Header>
+                                </TextBox>
+                                <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Notes, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes personnelles concernant le livre" TextWrapping="Wrap" AcceptsReturn="True">
+                                    <TextBox.Header>
+                                        <TextBlock Text="Notes" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    </TextBox.Header>
+                                </TextBox>
+                                <MUIXC:NumberBox Grid.Row="6" HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.NbExactExemplaire, Mode=TwoWay}" PlaceholderText="Année de parution"
+                                            SpinButtonPlacementMode="Inline" Minimum="0" Maximum="2100" FontSize="14">
+                                    <MUIXC:NumberBox.Header>
+                                        <TextBlock Text="Nombre d'exemplaires" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    </MUIXC:NumberBox.Header>
+                                </MUIXC:NumberBox>
 
-                            </MUIXC:Expander.Content>
-                        </MUIXC:Expander>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </ScrollViewer>
                 <TextBlock x:Name="TbxErrorMessage" Grid.Row="2" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>

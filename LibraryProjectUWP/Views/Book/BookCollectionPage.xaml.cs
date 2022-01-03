@@ -494,13 +494,37 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                
+                NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
+                {
+                    EditMode = Code.EditMode.Create,
+                    ViewModelList = ViewModelPage.ViewModelList,
+                    CurrentViewModel = new LivreVM()
+                    {
+                        
+                    }
+                });
+
+                userControl.CancelModificationRequested += NewEditBookUC_CancelModificationRequested;
+                userControl.CreateItemRequested += NewEditBookUC_CreateItemRequested;
+
+                this.ViewModelPage.SplitViewContent = userControl;
+                this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
                 Logs.Log(ex, m);
                 return;
             }
+        }
+
+        private void NewEditBookUC_CreateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void NewEditBookUC_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private async void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -788,6 +812,22 @@ namespace LibraryProjectUWP.Views.Book
                 if (_SplitViewContent != value)
                 {
                     this._SplitViewContent = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        public const double MinSplitViewWidth = 400;
+
+        private double _SplitViewWidth = MinSplitViewWidth;
+        public double SplitViewWidth
+        {
+            get => this._SplitViewWidth;
+            set
+            {
+                if (_SplitViewWidth != value)
+                {
+                    this._SplitViewWidth = value;
                     this.OnPropertyChanged();
                 }
             }
