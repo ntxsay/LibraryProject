@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LibraryProjectUWP.Code;
 using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.Views;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Library;

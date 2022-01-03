@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryProjectUWP.ViewModels
+namespace LibraryProjectUWP.ViewModels.Book
 {
     public  class LivreVM : INotifyPropertyChanged
     {
@@ -18,7 +18,34 @@ namespace LibraryProjectUWP.ViewModels
 
         public long Id { get; set; }
         public Guid Guid { get; set; } = Guid.NewGuid();
+        public long CountOpening { get; set; }
+        private short _NbExactExemplaire;
+        public short NbExactExemplaire
+        {
+            get => _NbExactExemplaire;
+            set
+            {
+                if (_NbExactExemplaire != value)
+                {
+                    _NbExactExemplaire = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
+        private string _MainTitle;
+        public string MainTitle
+        {
+            get => _MainTitle;
+            set
+            {
+                if (_MainTitle != value)
+                {
+                    _MainTitle = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         private string _Cotation;
         public string Cotation
@@ -93,15 +120,29 @@ namespace LibraryProjectUWP.ViewModels
             }
         }
 
-        private string _Description;
-        public string Description
+        private string _Resume;
+        public string Resume
         {
-            get => _Description;
+            get => _Resume;
             set
             {
-                if (_Description != value)
+                if (_Resume != value)
                 {
-                    _Description = value;
+                    _Resume = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _Notes;
+        public string Notes
+        {
+            get => _Notes;
+            set
+            {
+                if (_Notes != value)
+                {
+                    _Notes = value;
                     OnPropertyChanged();
                 }
             }

@@ -4,7 +4,6 @@ using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
-using LibraryProjectUWP.Views.Contact.Collection;
 using LibraryProjectUWP.Views.Contact.Manage;
 using System;
 using System.Collections.Generic;

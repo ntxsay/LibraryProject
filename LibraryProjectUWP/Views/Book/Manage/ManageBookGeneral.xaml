@@ -5,6 +5,7 @@
     xmlns:local="using:LibraryProjectUWP.Views.Book.Manage"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:generalVM="using:LibraryProjectUWP.ViewModels.General"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"

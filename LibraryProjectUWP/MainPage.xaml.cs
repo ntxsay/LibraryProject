@@ -4,6 +4,7 @@ using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views;
 using System;

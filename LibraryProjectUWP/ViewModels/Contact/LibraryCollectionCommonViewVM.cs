@@ -3,7 +3,6 @@ using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Contact;
-using LibraryProjectUWP.Views.Contact.Collection;
 using LibraryProjectUWP.Views.Library;
 using LibraryProjectUWP.Views.Library.Collection;
 using LibraryProjectUWP.Views.Library.Manage;

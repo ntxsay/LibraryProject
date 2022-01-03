@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;

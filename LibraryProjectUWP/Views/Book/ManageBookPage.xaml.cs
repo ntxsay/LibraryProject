@@ -1,6 +1,7 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Book.Manage;
 using System;

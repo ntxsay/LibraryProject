@@ -133,6 +133,7 @@
     <Compile Include="Code\Converters\CountToStringPhraseConverter.cs" />
     <Compile Include="Code\Converters\DateTimeConverter.cs" />
     <Compile Include="Code\Converters\GroupConverters.cs" />
+    <Compile Include="Code\Converters\NameToColorConverter.cs" />
     <Compile Include="Code\Converters\NullableBooleanConverters.cs" />
     <Compile Include="Code\Converters\SizeDiviserConverter.cs" />
     <Compile Include="Code\Converters\VisibilityConverter.cs" />
@@ -187,17 +188,16 @@
     <Compile Include="ViewModels\Author\AuthorVM.cs" />
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
+    <Compile Include="ViewModels\Book\ManageBookParametersDriverVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
     <Compile Include="ViewModels\Contact\ContactGroupVM.cs" />
     <Compile Include="ViewModels\Contact\ContactVM.cs" />
-    <Compile Include="ViewModels\Contact\LibraryCollectionCommonViewVM.cs" />
     <Compile Include="ViewModels\Contact\ManageContactParametersDriverVM.cs" />
     <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\General\ManageCategorieParametersVM.cs" />
-    <Compile Include="ViewModels\General\ManageContactParametersVM.cs" />
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
-    <Compile Include="ViewModels\LivreVM.cs" />
+    <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
     <Compile Include="ViewModels\UI\BookCollectionCommonViewVM.cs" />
     <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
@@ -222,11 +222,8 @@
     <Compile Include="Views\Book\Manage\NewCategorieCD.xaml.cs">
       <DependentUpon>NewCategorieCD.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Contact\Collection\ContactCollectionGdViewPage.xaml.cs">
-      <DependentUpon>ContactCollectionGdViewPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Contact\ContactCollectionPage.xaml.cs">
-      <DependentUpon>ContactCollectionPage.xaml</DependentUpon>
+    <Compile Include="Views\Book\NewEditBookUC.xaml.cs">
+      <DependentUpon>NewEditBookUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Contact\ContactListUC.xaml.cs">
       <DependentUpon>ContactListUC.xaml</DependentUpon>
@@ -321,11 +318,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Contact\Collection\ContactCollectionGdViewPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Contact\ContactCollectionPage.xaml">
+    <Page Include="Views\Book\NewEditBookUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.ViewModels.Book;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
