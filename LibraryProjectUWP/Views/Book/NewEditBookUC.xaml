@@ -16,24 +16,28 @@
     d:DesignHeight="800"
     d:DesignWidth="510" Unloaded="UserControl_Unloaded">
     <UserControl.Resources>
-        <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
-        <customConverters:SizeDiviserConverter x:Key="sizeDiviverConverter"/>
-        <customConverters:NullableBooleanToVisibility x:Key="NullableBoolToVisibilityConverterVOD" />
-        <customConverters:NullableBooleanToInvertBoolean x:Key="NullableBoolToInvertBooleanConverter" />
-        <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
-        <MTUUConverters:BoolToObjectConverter x:Key="invertBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries >
+                <ResourceDictionary Source="/Styles/FlipviewWoBtnStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
+            <customConverters:SizeDiviserConverter x:Key="sizeDiviverConverter"/>
+            <customConverters:NullableBooleanToVisibility x:Key="NullableBoolToVisibilityConverterVOD" />
+            <customConverters:NullableBooleanToInvertBoolean x:Key="NullableBoolToInvertBooleanConverter" />
+            <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+            <MTUUConverters:BoolToObjectConverter x:Key="invertBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
 
-        <XamlUICommand x:Name="AddTitleToBookXamlUICommand" 
+            <XamlUICommand x:Name="AddTitleToBookXamlUICommand" 
                        ExecuteRequested="AddTitleToBookXamlUICommand_ExecuteRequested"
                        Description="Custom XamlUICommand" 
                        Label="Ajouter ce titre">
-        </XamlUICommand>
-        <XamlUICommand x:Name="RemoveTitleToBookXamlUICommand" 
+            </XamlUICommand>
+            <XamlUICommand x:Name="RemoveTitleToBookXamlUICommand" 
                        ExecuteRequested="RemoveTitleToBookXamlUICommand_ExecuteRequested"
                        Description="Custom XamlUICommand" 
                        Label="Retirer ce titre">
-        </XamlUICommand>
-        <!--<XamlUICommand x:Name="AddAuthorToBookXamlUICommand" 
+            </XamlUICommand>
+            <!--<XamlUICommand x:Name="AddAuthorToBookXamlUICommand" 
                        ExecuteRequested="AddAuthorToBookXamlUICommand_ExecuteRequested"
                        Description="Custom XamlUICommand" 
                        Label="Ajouter cet auteur">
@@ -43,26 +47,35 @@
                        Description="Custom XamlUICommand" 
                        Label="Retirer cet auteur">
         </XamlUICommand>-->
-        <XamlUICommand x:Name="CancelModificationXUiCommand" 
+            <XamlUICommand x:Name="CancelModificationXUiCommand" 
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
-        </XamlUICommand>
-        <XamlUICommand x:Name="CreateItemXUiCommand" 
+            </XamlUICommand>
+            <XamlUICommand x:Name="CreateItemXUiCommand" 
                        ExecuteRequested="CreateItemXUiCommand_ExecuteRequested"
                        Description="Crée un nouvel item">
-        </XamlUICommand>
-        <XamlUICommand x:Name="UpdateItemXUiCommand" 
+            </XamlUICommand>
+            <XamlUICommand x:Name="UpdateItemXUiCommand" 
                        ExecuteRequested="UpdateItemXUiCommand_ExecuteRequested"
                        Description="Met à jour l'item">
-        </XamlUICommand>
-        <XamlUICommand x:Name="DeleteItemXUiCommand" 
+            </XamlUICommand>
+            <XamlUICommand x:Name="DeleteItemXUiCommand" 
                        ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
                        Description="Supprime l'item">
-        </XamlUICommand>
-        <Style TargetType="Grid" x:Key="WrapGridChildStyle">
-            <Setter Property="Margin" Value="4 0" />
-            <Setter Property="VerticalAlignment" Value="Top" />
-        </Style>
+            </XamlUICommand>
+            <XamlUICommand x:Name="PreviousStepXUiCommand" 
+                       ExecuteRequested="PreviousStepXUiCommand_ExecuteRequested"
+                       Description="Etape précédente">
+            </XamlUICommand>
+            <XamlUICommand x:Name="NextStepXUiCommand" 
+                       ExecuteRequested="NextStepXUiCommand_ExecuteRequested"
+                       Description="Etape suivante">
+            </XamlUICommand>
+            <Style TargetType="Grid" x:Key="WrapGridChildStyle">
+                <Setter Property="Margin" Value="4 0" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Pivot x:Name="PivotItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Pivot.OpacityTransition>
@@ -83,142 +96,230 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
-                    <Grid Margin="0 0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid>
+                <FlipView x:Name="FlipViewStep" Grid.Row="1" Style="{StaticResource FlipviewWoBtnStyle}" Background="Transparent">
+                    <!--<FlipView.ItemsPanel >
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </FlipView.ItemsPanel>-->
+                    <ScrollViewer  VerticalScrollBarVisibility="Hidden">
+                        <Grid Margin="0 0">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <Grid Grid.Row="0" RowSpacing="18" Margin="0 8 0 0" VerticalAlignment="Top">
+                            <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <DatePicker Grid.Row="0" x:Name="DP_DateDebutDiffusion" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateAjoutUser, Mode=TwoWay}" ToolTipService.ToolTip="Date d'ajout"
-                                                    HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
-                                    <DatePicker.Header>
-                                        <TextBlock Text="Date d'ajout" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                    </DatePicker.Header>
-                                </DatePicker>
-                                <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.MainTitle, Mode=TwoWay}" PlaceholderText="Titre principal du livre">
-                                    <TextBox.Header>
-                                        <TextBlock Text="Titre du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                    </TextBox.Header>
-                                </TextBox>
-                                
-                                <Grid Grid.Row="2" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
+                                <Grid Grid.Row="0" RowSpacing="18" Margin="0 8 0 0" VerticalAlignment="Top">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Text="Autre(s) titre(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                    <Grid Grid.Row="1" RowSpacing="4">
+                                    <DatePicker Grid.Row="0" x:Name="DP_DateDebutDiffusion" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateAjoutUser, Mode=TwoWay}" ToolTipService.ToolTip="Date d'ajout"
+                                                    HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
+                                        <DatePicker.Header>
+                                            <TextBlock Text="Date d'ajout" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </DatePicker.Header>
+                                    </DatePicker>
+                                    <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.MainTitle, Mode=TwoWay}" PlaceholderText="Titre principal du livre">
+                                        <TextBox.Header>
+                                            <TextBlock Text="Titre du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+
+                                    <Grid Grid.Row="2" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
-                                        <Grid Grid.Row="0">
+                                        <TextBlock Grid.Row="0" Text="Autre(s) titre(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        <Grid Grid.Row="1" RowSpacing="4">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox x:Name="TBX_TitlesOeuvre" PlaceholderText="Autre(s) titre(s) du livre" Margin="0,0,5,0"/>
+                                                <Button Grid.Column="1"  VerticalAlignment="Bottom" Margin="5,0" Command="{StaticResource AddTitleToBookXamlUICommand}">
+                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC8;"/>
+                                                </Button>
+                                                <Button Grid.Column="2" VerticalAlignment="Bottom" Margin="5,0" Command="{StaticResource RemoveTitleToBookXamlUICommand}">
+                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
+                                                </Button>
+                                            </Grid>
+                                            <ListView x:Name="LBX_TitresOeuvre" Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.ViewModel.TitresOeuvre}" Height="80" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True" 
+                                              Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"/>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid Grid.Row="3" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        <Grid Grid.Row="1" ColumnSpacing="8">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBox x:Name="TBX_TitlesOeuvre" PlaceholderText="Autre(s) titre(s) du livre" Margin="0,0,5,0"/>
-                                            <Button Grid.Column="1"  VerticalAlignment="Bottom" Margin="5,0" Command="{StaticResource AddTitleToBookXamlUICommand}">
-                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC8;"/>
-                                            </Button>
-                                            <Button Grid.Column="2" VerticalAlignment="Bottom" Margin="5,0" Command="{StaticResource RemoveTitleToBookXamlUICommand}">
-                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
-                                            </Button>
-                                        </Grid>
-                                        <ListView x:Name="LBX_TitresOeuvre" Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.ViewModel.TitresOeuvre}" Height="80" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True" 
-                                              Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"/>
-                                    </Grid>
-                                </Grid>
-                                <Grid Grid.Row="3" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                    <Grid Grid.Row="1" ColumnSpacing="8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <MUIXC:NumberBox Grid.Column="0" HorizontalAlignment="Center" PlaceholderText="JJ"
+                                            <MUIXC:NumberBox Grid.Column="0" HorizontalAlignment="Center" PlaceholderText="JJ"
                                             SpinButtonPlacementMode="Compact" Minimum="0" Maximum="31" FontSize="14"/>
-                                        <TextBlock Grid.Column="1" Text="/" VerticalAlignment="Center" />
-                                        <MUIXC:NumberBox Grid.Column="2" HorizontalAlignment="Center" PlaceholderText="MM"
+                                            <TextBlock Grid.Column="1" Text="/" VerticalAlignment="Center" />
+                                            <MUIXC:NumberBox Grid.Column="2" HorizontalAlignment="Center" PlaceholderText="MM"
                                             SpinButtonPlacementMode="Compact" Minimum="0" Maximum="12" FontSize="14"/>
-                                        <TextBlock Grid.Column="3" Text="/" VerticalAlignment="Center"/>
-                                        <MUIXC:NumberBox Grid.Column="4" HorizontalAlignment="Center" PlaceholderText="AAAA"
+                                            <TextBlock Grid.Column="3" Text="/" VerticalAlignment="Center"/>
+                                            <MUIXC:NumberBox Grid.Column="4" HorizontalAlignment="Center" PlaceholderText="AAAA"
                                             SpinButtonPlacementMode="Compact" Minimum="0" Maximum="2100" FontSize="14" Value="{x:Bind ViewModelPage.ViewModel.AnneeParution, Mode=TwoWay}"/>
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                                <TextBox Grid.Row="4" Text="{x:Bind ViewModelPage.ViewModel.Resume, Mode=TwoWay}" MinHeight="100" PlaceholderText="Résumé du livre" TextWrapping="Wrap" AcceptsReturn="True">
-                                    <TextBox.Header>
-                                        <TextBlock Text="Résumé" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                    </TextBox.Header>
-                                </TextBox>
-                                <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Notes, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes personnelles concernant le livre" TextWrapping="Wrap" AcceptsReturn="True">
-                                    <TextBox.Header>
-                                        <TextBlock Text="Notes" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                    </TextBox.Header>
-                                </TextBox>
-                                <MUIXC:NumberBox Grid.Row="6" HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.NbExactExemplaire, Mode=TwoWay}" PlaceholderText="Année de parution"
+                                    <TextBox Grid.Row="4" Text="{x:Bind ViewModelPage.ViewModel.Resume, Mode=TwoWay}" MinHeight="100" PlaceholderText="Résumé du livre" TextWrapping="Wrap" AcceptsReturn="True">
+                                        <TextBox.Header>
+                                            <TextBlock Text="Résumé" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+                                    <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Notes, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes personnelles concernant le livre" TextWrapping="Wrap" AcceptsReturn="True">
+                                        <TextBox.Header>
+                                            <TextBlock Text="Notes" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+                                    <MUIXC:NumberBox Grid.Row="6" HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.NbExactExemplaire, Mode=TwoWay}" PlaceholderText="Année de parution"
                                             SpinButtonPlacementMode="Inline" Minimum="0" Maximum="2100" FontSize="14">
-                                    <MUIXC:NumberBox.Header>
-                                        <TextBlock Text="Nombre d'exemplaires" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                    </MUIXC:NumberBox.Header>
-                                </MUIXC:NumberBox>
+                                        <MUIXC:NumberBox.Header>
+                                            <TextBlock Text="Nombre d'exemplaires" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </MUIXC:NumberBox.Header>
+                                    </MUIXC:NumberBox>
 
+                                </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
-                </ScrollViewer>
-                <TextBlock x:Name="TbxErrorMessage" Grid.Row="2" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
-                <StackPanel Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
-                    <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
-                            <TextBlock Text="Créer" />
-                        </StackPanel>
-                    </Button>
-                    <Button Command="{StaticResource UpdateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEB7E;"/>
-                            <TextBlock Text="Mettre à jour" />
-                        </StackPanel>
-                    </Button>
-                    <Button Command="{StaticResource CancelModificationXUiCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;"/>
-                            <TextBlock Text="Annuler" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
+                    </ScrollViewer>
+                    <ScrollViewer  VerticalScrollBarVisibility="Hidden">
+                        <Grid Margin="0 0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" RowSpacing="18" Margin="0 8 0 0" VerticalAlignment="Top">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.ViewModel.Identification.Cotation, Mode=TwoWay}" PlaceholderText="Cotation du livre">
+                                        <TextBox.Header>
+                                            <TextBlock Text="Cotation du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+                                    <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN, Mode=TwoWay}" PlaceholderText="ISBN du livre">
+                                        <TextBox.Header>
+                                            <TextBlock Text="ISBN" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+                                    <TextBox Grid.Row="2" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN10, Mode=TwoWay}" PlaceholderText="ISBN-10 du livre">
+                                        <TextBox.Header>
+                                            <TextBlock Text="ISBN-10" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+                                    <TextBox Grid.Row="3" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN13, Mode=TwoWay}" PlaceholderText="ISBN-13 du livre">
+                                        <TextBox.Header>
+                                            <TextBlock Text="ISBN-13" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+                                    <TextBox Grid.Row="4" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISSN, Mode=TwoWay}" PlaceholderText="ISSN du livre">
+                                        <TextBox.Header>
+                                            <TextBlock Text="ISSN" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+                                    <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Identification.ASIN, Mode=TwoWay}" PlaceholderText="ASIN du livre">
+                                        <TextBox.Header>
+                                            <TextBlock Text="ASIN (Amazon)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+                                    <TextBox Grid.Row="6" Text="{x:Bind ViewModelPage.ViewModel.Identification.CodeBarre, Mode=TwoWay}" PlaceholderText="Code barre du livre">
+                                        <TextBox.Header>
+                                            <TextBlock Text="Code barre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                        </TextBox.Header>
+                                    </TextBox>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </ScrollViewer>
 
+                </FlipView>
+                <TextBlock x:Name="TbxErrorMessage" Grid.Row="2" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+                        <Button Command="{StaticResource PreviousStepXUiCommand}" >
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76B;" FontSize="14"/>
+                        </Button>
+                        <Button Command="{StaticResource NextStepXUiCommand}">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76C;" FontSize="14"/>
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+                        <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;" FontSize="14"/>
+                                <TextBlock Text="Créer" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{StaticResource UpdateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEB7E;" FontSize="14"/>
+                                <TextBlock Text="Mettre à jour"  FontSize="14"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{StaticResource CancelModificationXUiCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="14"/>
+                                <TextBlock Text="Annuler" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
             </Grid>
         </PivotItem>
     </Pivot>

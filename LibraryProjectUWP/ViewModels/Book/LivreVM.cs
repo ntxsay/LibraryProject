@@ -46,20 +46,6 @@ namespace LibraryProjectUWP.ViewModels.Book
                 }
             }
         }
-
-        private string _Cotation;
-        public string Cotation
-        {
-            get => _Cotation;
-            set
-            {
-                if (_Cotation != value)
-                {
-                    _Cotation = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
         
         private string _ISBN;
         /// <summary>
@@ -247,7 +233,7 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
         public PretLivreVM Pret { get; set; }
-
+        public LivreIdentificationVM Identification { get; set; } = new LivreIdentificationVM();
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

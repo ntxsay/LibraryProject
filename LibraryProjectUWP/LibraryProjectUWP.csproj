@@ -188,6 +188,7 @@
     <Compile Include="ViewModels\Author\AuthorVM.cs" />
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
+    <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
     <Compile Include="ViewModels\Book\ManageBookParametersDriverVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
     <Compile Include="ViewModels\Contact\ContactGroupVM.cs" />
@@ -287,6 +288,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\FlipviewWoBtnStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -140,6 +140,40 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        private void PreviousStepXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (FlipViewStep.SelectedIndex > 0)
+                {
+                    FlipViewStep.SelectedIndex--;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NextStepXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (FlipViewStep.SelectedIndex < FlipViewStep.Items.Count)
+                {
+                    FlipViewStep.SelectedIndex++;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             CancelModificationRequested?.Invoke(this, args);
@@ -251,6 +285,8 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
+
+        
     }
 
     public class NewEditBookUCVM : INotifyPropertyChanged

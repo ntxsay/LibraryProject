@@ -131,7 +131,7 @@
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" Text="Cotation"/>
-                                    <TextBox Grid.Row="1" Text="{x:Bind ViewModel.Cotation, Mode=TwoWay}" PlaceholderText="Système de cotation" VerticalAlignment="Top" FontSize="16"></TextBox>
+                                    <TextBox Grid.Row="1" Text="{x:Bind ViewModel.Identification.Cotation, Mode=TwoWay}" PlaceholderText="Système de cotation" VerticalAlignment="Top" FontSize="16"></TextBox>
                                 </Grid>
                                 <!--Année Parution-->
                                 <Grid Style="{StaticResource WrapGridChildStyle}">
