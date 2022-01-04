@@ -27,7 +27,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace LibraryProjectUWP.Views.Contact.Manage
 {
-    public sealed partial class NewEditContactUC : UserControl
+    public sealed partial class NewEditContactUC : PivotItem
     {
         public readonly ManageContactParametersDriverVM _parameters;
 

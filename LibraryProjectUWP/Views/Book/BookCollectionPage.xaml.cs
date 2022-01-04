@@ -494,20 +494,29 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(NewEditBookUC));
+                if (checkedItem != null)
                 {
-                    EditMode = Code.EditMode.Create,
-                    ViewModelList = ViewModelPage.ViewModelList,
-                    CurrentViewModel = new LivreVM()
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
                     {
-                        
-                    }
-                });
+                        EditMode = Code.EditMode.Create,
+                        ViewModelList = ViewModelPage.ViewModelList,
+                        CurrentViewModel = new LivreVM()
+                        {
 
-                userControl.CancelModificationRequested += NewEditBookUC_CancelModificationRequested;
-                userControl.CreateItemRequested += NewEditBookUC_CreateItemRequested;
+                        }
+                    });
 
-                this.ViewModelPage.SplitViewContent = userControl;
+                    userControl.CancelModificationRequested += NewEditBookUC_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditBookUC_CreateItemRequested;
+
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
@@ -524,7 +533,23 @@ namespace LibraryProjectUWP.Views.Book
 
         private void NewEditBookUC_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
         {
-            throw new NotImplementedException();
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditBookUC_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditBookUC_CreateItemRequested;
+
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+                this.PivotRightSideBar.Items.Remove(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private async void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -572,25 +597,33 @@ namespace LibraryProjectUWP.Views.Book
         private async void NewContactXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
-            NewEditContactUC userControl = null;
             try
             {
-                var contactsList = await DbServices.Contact.AllVMAsync();
-                ViewModelPage.ContactViewModelList = contactsList?.ToList();
-                userControl = new NewEditContactUC(new ManageContactParametersDriverVM()
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(NewEditContactUC));
+                if (checkedItem != null)
                 {
-                    EditMode = Code.EditMode.Create,
-                    ViewModelList = ViewModelPage.ContactViewModelList,
-                    CurrentViewModel = new ContactVM()
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    var contactsList = await DbServices.Contact.AllVMAsync();
+                    ViewModelPage.ContactViewModelList = contactsList?.ToList();
+                    NewEditContactUC userControl = new NewEditContactUC(new ManageContactParametersDriverVM()
                     {
-                        TitreCivilite = CivilityHelpers.MPoint,
-                    }
-                });
+                        EditMode = Code.EditMode.Create,
+                        ViewModelList = ViewModelPage.ContactViewModelList,
+                        CurrentViewModel = new ContactVM()
+                        {
+                            TitreCivilite = CivilityHelpers.MPoint,
+                        }
+                    });
 
-                userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
-                userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
+                    userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
 
-                this.ViewModelPage.SplitViewContent = userControl;
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
@@ -655,8 +688,11 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
 
-                this.ViewModelPage.IsSplitViewOpen = false;
-                this.ViewModelPage.SplitViewContent = null;
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+                this.PivotRightSideBar.Items.Remove(sender);
             }
             catch (Exception ex)
             {

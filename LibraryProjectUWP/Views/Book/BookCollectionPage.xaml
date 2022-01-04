@@ -141,15 +141,21 @@
 
             </Grid>
             <Grid Grid.Row="1" Padding="0 50 0 0">
-                <SplitView PaneBackground="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Pane="{x:Bind ViewModelPage.SplitViewContent, Mode=OneWay}"
+                <SplitView PaneBackground="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" 
                 IsPaneOpen="{x:Bind ViewModelPage.IsSplitViewOpen, Mode=OneWay}" PanePlacement="Right" OpenPaneLength="{x:Bind ViewModelPage.SplitViewWidth, Mode=OneWay}" CompactPaneLength="88" DisplayMode="Inline">
                     <!--Items-->
                     <Frame x:Name="FramePartialView">
 
                     </Frame>
+                    <SplitView.Pane>
+                        <Pivot x:Name="PivotRightSideBar" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <Pivot.OpacityTransition>
+                                <ScalarTransition />
+                            </Pivot.OpacityTransition>
+                        </Pivot>
+                    </SplitView.Pane>
                 </SplitView>
             </Grid>
-            
         </Grid>
         <!--Statusbar-->
         <Grid x:Name="GridStatusBar" Grid.Row="1" VerticalAlignment="Bottom" Height="28" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">

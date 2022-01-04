@@ -26,7 +26,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace LibraryProjectUWP.Views.Book
 {
-    public sealed partial class NewEditBookUC : UserControl
+    public sealed partial class NewEditBookUC : PivotItem
     {
         public readonly ManageBookParametersDriverVM _parameters;
 
