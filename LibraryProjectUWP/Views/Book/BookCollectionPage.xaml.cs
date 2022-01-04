@@ -5,6 +5,7 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Book.Collection;
 using LibraryProjectUWP.Views.Contact;
@@ -29,6 +30,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using LibraryProjectUWP.Views.Author;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -737,17 +739,105 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
-        private void NewAuthorXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        #region Author
+        private async void NewAuthorXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(NewEditAuthorUC));
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    var authorsList = await DbServices.Author.AllVMAsync();
+                    ViewModelPage.AuthorViewModelList = authorsList?.ToList();
+                    NewEditAuthorUC userControl = new NewEditAuthorUC(new ManageAuthorParametersDriverVM()
+                    {
+                        EditMode = Code.EditMode.Create,
+                        ViewModelList = ViewModelPage.AuthorViewModelList,
+                        CurrentViewModel = new AuthorVM()
+                        {
+                            TitreCivilite = CivilityHelpers.MPoint,
+                        }
+                    });
 
+                    userControl.CancelModificationRequested += NewEditAuthorUC_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditAuthorUC_CreateItemRequested;
+
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditAuthorUC_CreateItemRequested(NewEditAuthorUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    AuthorVM newViewModel = sender.ViewModelPage.ViewModel;
+
+                    var creationResult = await DbServices.Author.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        //ViewModelPage.AuthorViewModelList.Add(newViewModel);
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        return;
+                    }
+                }
+
+                //sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
+                //sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
+
+                //if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
+                //{
+                //    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
+                //    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
+                //}
+                //else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
+                //{
+                //    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = false;
+                //    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = null;
+                //}
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditAuthorUC_CancelModificationRequested(NewEditAuthorUC sender, ExecuteRequestedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void DisplayAuthorListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
-        }
+        } 
+        #endregion
 
-        
+
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
@@ -934,6 +1024,20 @@ namespace LibraryProjectUWP.Views.Book
                 if (_ContactViewModelList != value)
                 {
                     this._ContactViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<AuthorVM> _AuthorViewModelList;
+        public List<AuthorVM> AuthorViewModelList
+        {
+            get => this._AuthorViewModelList;
+            set
+            {
+                if (_AuthorViewModelList != value)
+                {
+                    this._AuthorViewModelList = value;
                     this.OnPropertyChanged();
                 }
             }

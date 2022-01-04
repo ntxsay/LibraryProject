@@ -79,7 +79,7 @@
     </PivotItem.Resources>
     <PivotItem.Header>
         <StackPanel Orientation="Horizontal" Spacing="8">
-            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;" FontSize="20"/>
+            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;" FontSize="20"/>
             <TextBlock Text="{x:Bind ViewModelPage.Header, Mode=OneWay}" FontSize="16" />
         </StackPanel>
     </PivotItem.Header>
@@ -126,7 +126,7 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <DatePicker Grid.Row="0" x:Name="DP_DateDebutDiffusion" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateAjoutUser, Mode=TwoWay}" ToolTipService.ToolTip="Date d'ajout"
-                                                    HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
+                                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
                                 <DatePicker.Header>
                                     <TextBlock Text="Date d'ajout" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </DatePicker.Header>

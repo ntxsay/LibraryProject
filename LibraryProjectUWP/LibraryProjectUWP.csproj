@@ -186,6 +186,7 @@
     <Compile Include="Models\Local\TlibrarySubCategorie.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\Author\AuthorVM.cs" />
+    <Compile Include="ViewModels\Author\ManageAuthorParametersDriverVM.cs" />
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
@@ -202,6 +203,9 @@
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
     <Compile Include="ViewModels\UI\BookCollectionCommonViewVM.cs" />
     <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
+    <Compile Include="Views\Author\NewEditAuthorUC.xaml.cs">
+      <DependentUpon>NewEditAuthorUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\BookCollectionPage.xaml.cs">
       <DependentUpon>BookCollectionPage.xaml</DependentUpon>
     </Compile>
@@ -294,6 +298,10 @@
     <Page Include="Styles\FlipviewWoBtnStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Author\NewEditAuthorUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Book\BookCollectionPage.xaml">
       <SubType>Designer</SubType>

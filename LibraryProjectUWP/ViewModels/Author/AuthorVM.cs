@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.ViewModels.Author
 {
-    internal class AuthorVM : ContactVM
+    public class AuthorVM : ContactVM
     {
-        private DateTime? _DateNaissance = DateTime.UtcNow.AddYears(-20);
-        public DateTime? DateNaissance
+        private DateTimeOffset? _DateNaissance = DateTime.UtcNow.AddYears(-20);
+        public DateTimeOffset? DateNaissance
         {
             get => _DateNaissance;
             set
@@ -23,8 +23,8 @@ namespace LibraryProjectUWP.ViewModels.Author
             }
         }
 
-        private DateTime? _DateDeces = DateTime.UtcNow;
-        public DateTime? DateDeces
+        private DateTimeOffset? _DateDeces = DateTime.UtcNow;
+        public DateTimeOffset? DateDeces
         {
             get => _DateDeces;
             set
