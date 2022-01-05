@@ -140,6 +140,96 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        #region Date Parution
+        private void MfiClearParutionDate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (ViewModelPage.ViewModel.DateParution != null)
+                {
+                    ViewModelPage.ViewModel.DateParution = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void TmfiDayKnow_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is ToggleMenuFlyoutItem toggle && toggle.IsChecked)
+                {
+                    if (ViewModelPage.ViewModel.IsMoisParutionKnow == false || ViewModelPage.ViewModel.IsAnneeParutionKnow == false)
+                    {
+                        ViewModelPage.ViewModel.IsJourParutionKnow = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void TmfiMonthKnow_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is ToggleMenuFlyoutItem toggle)
+                {
+                    if (toggle.IsChecked)
+                    {
+                        if (ViewModelPage.ViewModel.IsAnneeParutionKnow == false)
+                        {
+                            ViewModelPage.ViewModel.IsMoisParutionKnow = false;
+                            ViewModelPage.ViewModel.IsJourParutionKnow = false;
+                        }
+                    }
+                    else
+                    {
+                        ViewModelPage.ViewModel.IsJourParutionKnow = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void TmfiYearKnow_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is ToggleMenuFlyoutItem toggle)
+                {
+                    if (!toggle.IsChecked)
+                    {
+                        ViewModelPage.ViewModel.DateParution = null;
+                        ViewModelPage.ViewModel.IsJourParutionKnow = true;
+                        ViewModelPage.ViewModel.IsMoisParutionKnow = true;
+                        ViewModelPage.ViewModel.IsAnneeParutionKnow = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
         private void PreviousStepXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
@@ -285,8 +375,6 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
-
-        
     }
 
     public class NewEditBookUCVM : INotifyPropertyChanged

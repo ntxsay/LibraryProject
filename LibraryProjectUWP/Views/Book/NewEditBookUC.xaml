@@ -163,10 +163,26 @@
                                         </Button>
                                     </Grid>
                                     <ListView x:Name="LBX_TitresOeuvre" Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.ViewModel.TitresOeuvre}" Height="80" HorizontalAlignment="Stretch" AllowDrop="True" CanDragItems="True" CanReorderItems="True" 
-                                              Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"/>
+                                              Background="{ThemeResource ButtonBackgroundThemeBrush}" BorderThickness="0 0 0 1" CornerRadius="0 0 4 4"  BorderBrush="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </Grid>
                             </Grid>
-                            <Grid Grid.Row="3" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
+                            <DatePicker Grid.Row="3" x:Name="DP_DateParution" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateParution, Mode=TwoWay}" ToolTipService.ToolTip="Date d'ajout"
+                                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default" DayVisible="{x:Bind ViewModelPage.ViewModel.IsJourParutionKnow, Mode=OneWay}" MonthVisible="{x:Bind ViewModelPage.ViewModel.IsMoisParutionKnow, Mode=OneWay}"
+                                        YearVisible="{x:Bind ViewModelPage.ViewModel.IsAnneeParutionKnow, Mode=OneWay}">
+                                <DatePicker.Header>
+                                    <TextBlock Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                </DatePicker.Header>
+                                <DatePicker.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem x:Name="MfiClearParutionDate" Text="Effacer la date" Click="MfiClearParutionDate_Click"/>
+                                        <MenuFlyoutSeparator />
+                                        <ToggleMenuFlyoutItem x:Name="TmfiYearKnow" Text="L'année est visible" Click="TmfiYearKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.IsAnneeParutionKnow, Mode=TwoWay}"/>
+                                        <ToggleMenuFlyoutItem x:Name="TmfiMonthKnow" Text="Le mois est visible" Click="TmfiMonthKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.IsMoisParutionKnow, Mode=TwoWay}"/>
+                                        <ToggleMenuFlyoutItem x:Name="TmfiDayKnow" Text="Le jour est visible" Click="TmfiDayKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.IsJourParutionKnow, Mode=TwoWay}"/>
+                                    </MenuFlyout>
+                                </DatePicker.ContextFlyout>
+                            </DatePicker>
+                            <!--<Grid Grid.Row="3" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
@@ -189,7 +205,7 @@
                                     <MUIXC:NumberBox Grid.Column="4" HorizontalAlignment="Center" PlaceholderText="AAAA"
                                             SpinButtonPlacementMode="Compact" Minimum="0" Maximum="2100" FontSize="14" Value="{x:Bind ViewModelPage.ViewModel.AnneeParution, Mode=TwoWay}"/>
                                 </Grid>
-                            </Grid>
+                            </Grid>-->
                             <TextBox Grid.Row="4" Text="{x:Bind ViewModelPage.ViewModel.Resume, Mode=TwoWay}" MinHeight="100" PlaceholderText="Résumé du livre" TextWrapping="Wrap" AcceptsReturn="True">
                                 <TextBox.Header>
                                     <TextBlock Text="Résumé" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>

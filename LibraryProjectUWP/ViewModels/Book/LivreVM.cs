@@ -148,16 +148,67 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private bool _IsAnneeParutionUnknow;
-        public bool IsAnneeParutionUnknow
+        private DateTimeOffset? _DateParution;
+        public DateTimeOffset? DateParution
         {
-            get => _IsAnneeParutionUnknow;
+            get => _DateParution;
             set
             {
-                if (_IsAnneeParutionUnknow != value)
+                if (_DateParution != value)
                 {
-                    _IsAnneeParutionUnknow = value;
+                    _DateParution = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsJourParutionKnow;
+        public bool IsJourParutionKnow
+        {
+            get => _IsJourParutionKnow;
+            set
+            {
+                if (_IsJourParutionKnow != value)
+                {
+                    _IsJourParutionKnow = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsMoisParutionKnow;
+        public bool IsMoisParutionKnow
+        {
+            get => _IsMoisParutionKnow;
+            set
+            {
+                if (_IsMoisParutionKnow != value)
+                {
+                    _IsMoisParutionKnow = value;
+                    OnPropertyChanged();
+                    //if (value == false)
+                    //{
+                    //    IsJourParutionKnow = false;
+                    //}
+                }
+            }
+        }
+
+        private bool _IsAnneeParutionKnow = true;
+        public bool IsAnneeParutionKnow
+        {
+            get => _IsAnneeParutionKnow;
+            set
+            {
+                if (_IsAnneeParutionKnow != value)
+                {
+                    _IsAnneeParutionKnow = value;
+                    OnPropertyChanged();
+                    //if (value == false)
+                    //{
+                    //    IsMoisParutionKnow = false;
+                    //    IsJourParutionKnow = false;
+                    //}
                 }
             }
         }
