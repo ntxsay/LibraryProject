@@ -144,7 +144,7 @@
                                     <MUIXC:NumberBox Grid.Row="1" HorizontalAlignment="Stretch" Value="{x:Bind ViewModel.AnneeParution, Mode=TwoWay}" PlaceholderText="Année de parution" FontSize="16" 
                                             SpinButtonPlacementMode="Inline" Minimum="0" Maximum="2100" IsEnabled="{Binding ElementName=CBX_UnknowYearParution, Path=IsChecked, Converter={StaticResource NullableBoolToInvertBooleanConverter}}">
                                     </MUIXC:NumberBox>
-                                    <CheckBox Grid.Row="2" x:Name="CBX_UnknowYearParution" IsChecked="{x:Bind ViewModel.IsAnneeParutionKnow, Mode=TwoWay}">
+                                    <CheckBox Grid.Row="2" x:Name="CBX_UnknowYearParution" >
                                         <StackPanel Orientation="Vertical">
                                             <TextBlock  HorizontalAlignment="Stretch" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" TextWrapping="Wrap" Visibility="{x:Bind CBX_UnknowYearParution.IsChecked, Converter={StaticResource boolToVisibilityConverter}, Mode=OneWay}">
                                         <Run Text="Le " /><Run Text="nombre" FontWeight="Medium" /><Run Text=" total d'épisode n'est pas connue" />

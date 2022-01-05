@@ -186,29 +186,34 @@ namespace LibraryProjectUWP.ViewModels.Book
                 {
                     _IsMoisParutionKnow = value;
                     OnPropertyChanged();
-                    //if (value == false)
-                    //{
-                    //    IsJourParutionKnow = false;
-                    //}
                 }
             }
         }
 
-        private bool _IsAnneeParutionKnow = true;
-        public bool IsAnneeParutionKnow
+        private bool _IsJourParutionVisible = true;
+        public bool IsJourParutionVisible
         {
-            get => _IsAnneeParutionKnow;
+            get => _IsJourParutionVisible;
             set
             {
-                if (_IsAnneeParutionKnow != value)
+                if (_IsJourParutionVisible != value)
                 {
-                    _IsAnneeParutionKnow = value;
+                    _IsJourParutionVisible = value;
                     OnPropertyChanged();
-                    //if (value == false)
-                    //{
-                    //    IsMoisParutionKnow = false;
-                    //    IsJourParutionKnow = false;
-                    //}
+                }
+            }
+        }
+
+        private bool _IsMoisParutionVisible = true;
+        public bool IsMoisParutionVisible
+        {
+            get => _IsMoisParutionVisible;
+            set
+            {
+                if (_IsMoisParutionVisible != value)
+                {
+                    _IsMoisParutionVisible = value;
+                    OnPropertyChanged();
                 }
             }
         }

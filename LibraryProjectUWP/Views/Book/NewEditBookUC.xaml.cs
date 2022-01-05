@@ -162,11 +162,26 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (sender is ToggleMenuFlyoutItem toggle && toggle.IsChecked)
+                if (sender is ToggleMenuFlyoutItem toggle)
                 {
-                    if (ViewModelPage.ViewModel.IsMoisParutionKnow == false || ViewModelPage.ViewModel.IsAnneeParutionKnow == false)
+                    if (toggle.IsChecked)
+                    {
+                        if (ViewModelPage.ViewModel.IsMoisParutionKnow == false || ViewModelPage.ViewModel.DateParution  == null)
+                        {
+                            ViewModelPage.ViewModel.IsJourParutionKnow = false;
+                            ViewModelPage.ViewModel.IsJourParutionVisible = false;
+                            toggle.IsChecked = false;
+                        }
+                        else
+                        {
+                            ViewModelPage.ViewModel.IsJourParutionKnow = true;
+                            ViewModelPage.ViewModel.IsJourParutionVisible = true;
+                        }
+                    }
+                    else
                     {
                         ViewModelPage.ViewModel.IsJourParutionKnow = false;
+                        ViewModelPage.ViewModel.IsJourParutionVisible = false;
                     }
                 }
             }
@@ -186,15 +201,25 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (toggle.IsChecked)
                     {
-                        if (ViewModelPage.ViewModel.IsAnneeParutionKnow == false)
+                        if (ViewModelPage.ViewModel.DateParution == null)
                         {
+                            ViewModelPage.ViewModel.IsJourParutionVisible = true;
+                            ViewModelPage.ViewModel.IsMoisParutionVisible = true;
                             ViewModelPage.ViewModel.IsMoisParutionKnow = false;
                             ViewModelPage.ViewModel.IsJourParutionKnow = false;
+                        }
+                        else
+                        {
+                            ViewModelPage.ViewModel.IsMoisParutionVisible = true;
+                            ViewModelPage.ViewModel.IsMoisParutionKnow = true;
                         }
                     }
                     else
                     {
                         ViewModelPage.ViewModel.IsJourParutionKnow = false;
+                        ViewModelPage.ViewModel.IsJourParutionVisible = false;
+                        ViewModelPage.ViewModel.IsMoisParutionKnow = false;
+                        ViewModelPage.ViewModel.IsMoisParutionVisible = false;
                     }
                 }
             }
@@ -206,19 +231,45 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void TmfiYearKnow_Click(object sender, RoutedEventArgs e)
+        private void DP_DateParution_SelectedDateChanged(DatePicker sender, DatePickerSelectedValueChangedEventArgs args)
         {
             try
             {
-                if (sender is ToggleMenuFlyoutItem toggle)
+                if (args.NewDate != null)
                 {
-                    if (!toggle.IsChecked)
-                    {
-                        ViewModelPage.ViewModel.DateParution = null;
-                        ViewModelPage.ViewModel.IsJourParutionKnow = true;
-                        ViewModelPage.ViewModel.IsMoisParutionKnow = true;
-                        ViewModelPage.ViewModel.IsAnneeParutionKnow = true;
-                    }
+                    ViewModelPage.ViewModel.IsJourParutionVisible = true;
+                    ViewModelPage.ViewModel.IsMoisParutionVisible = true;
+                    ViewModelPage.ViewModel.IsJourParutionKnow = true;
+                    ViewModelPage.ViewModel.IsMoisParutionKnow = true;
+                }
+                else
+                {
+                    ViewModelPage.ViewModel.IsJourParutionVisible = true;
+                    ViewModelPage.ViewModel.IsMoisParutionVisible = true;
+                    ViewModelPage.ViewModel.IsJourParutionKnow = false;
+                    ViewModelPage.ViewModel.IsMoisParutionKnow = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DateParution_MenuFlyout_Opening(object sender, object e)
+        {
+            try
+            {
+                if (ViewModelPage.ViewModel.DateParution == null)
+                {
+                    BtnDateParution.Flyout.Hide();
+                    MyTeachingTip.Target = BtnDateParution;
+                    MyTeachingTip.Title = "Date de parution";
+                    MyTeachingTip.Subtitle = "Sélectionnez tout d'abord une date puis cliquez de nouveau sur ce bouton.";
+                    MyTeachingTip.IsOpen = true;
+                    
                 }
             }
             catch (Exception ex)
@@ -345,10 +396,7 @@ namespace LibraryProjectUWP.Views.Book
         }
 
 
-        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
-        }
+       
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -374,6 +422,16 @@ namespace LibraryProjectUWP.Views.Book
 
                 throw;
             }
+        }
+
+        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
+        private void MenuFlyout_Opened(object sender, object e)
+        {
+
         }
     }
 

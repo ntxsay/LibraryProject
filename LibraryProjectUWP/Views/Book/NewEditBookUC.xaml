@@ -136,7 +136,6 @@
                                     <TextBlock Text="Titre du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </TextBox.Header>
                             </TextBox>
-
                             <Grid Grid.Row="2" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -166,46 +165,45 @@
                                               Background="{ThemeResource ButtonBackgroundThemeBrush}" BorderThickness="0 0 0 1" CornerRadius="0 0 4 4"  BorderBrush="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </Grid>
                             </Grid>
-                            <DatePicker Grid.Row="3" x:Name="DP_DateParution" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateParution, Mode=TwoWay}" ToolTipService.ToolTip="Date d'ajout"
-                                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default" DayVisible="{x:Bind ViewModelPage.ViewModel.IsJourParutionKnow, Mode=OneWay}" MonthVisible="{x:Bind ViewModelPage.ViewModel.IsMoisParutionKnow, Mode=OneWay}"
-                                        YearVisible="{x:Bind ViewModelPage.ViewModel.IsAnneeParutionKnow, Mode=OneWay}">
-                                <DatePicker.Header>
-                                    <TextBlock Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                </DatePicker.Header>
-                                <DatePicker.ContextFlyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem x:Name="MfiClearParutionDate" Text="Effacer la date" Click="MfiClearParutionDate_Click"/>
-                                        <MenuFlyoutSeparator />
-                                        <ToggleMenuFlyoutItem x:Name="TmfiYearKnow" Text="L'année est visible" Click="TmfiYearKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.IsAnneeParutionKnow, Mode=TwoWay}"/>
-                                        <ToggleMenuFlyoutItem x:Name="TmfiMonthKnow" Text="Le mois est visible" Click="TmfiMonthKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.IsMoisParutionKnow, Mode=TwoWay}"/>
-                                        <ToggleMenuFlyoutItem x:Name="TmfiDayKnow" Text="Le jour est visible" Click="TmfiDayKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.IsJourParutionKnow, Mode=TwoWay}"/>
-                                    </MenuFlyout>
-                                </DatePicker.ContextFlyout>
-                            </DatePicker>
-                            <!--<Grid Grid.Row="3" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                <Grid Grid.Row="1" ColumnSpacing="8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <MUIXC:NumberBox Grid.Column="0" HorizontalAlignment="Center" PlaceholderText="JJ"
-                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="31" FontSize="14"/>
-                                    <TextBlock Grid.Column="1" Text="/" VerticalAlignment="Center" />
-                                    <MUIXC:NumberBox Grid.Column="2" HorizontalAlignment="Center" PlaceholderText="MM"
-                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="12" FontSize="14"/>
-                                    <TextBlock Grid.Column="3" Text="/" VerticalAlignment="Center"/>
-                                    <MUIXC:NumberBox Grid.Column="4" HorizontalAlignment="Center" PlaceholderText="AAAA"
-                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="2100" FontSize="14" Value="{x:Bind ViewModelPage.ViewModel.AnneeParution, Mode=TwoWay}"/>
-                                </Grid>
-                            </Grid>-->
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <DatePicker Grid.Column="0" x:Name="DP_DateParution" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateParution, Mode=TwoWay}" ToolTipService.ToolTip="Date de parution"
+                                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default" DayVisible="{x:Bind ViewModelPage.ViewModel.IsJourParutionVisible, Mode=OneWay}" MonthVisible="{x:Bind ViewModelPage.ViewModel.IsMoisParutionVisible, Mode=OneWay}"
+                                         SelectedDateChanged="DP_DateParution_SelectedDateChanged">
+                                    <DatePicker.Header>
+                                        <TextBlock Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    </DatePicker.Header>
+                                    <DatePicker.ContextFlyout>
+                                        <MenuFlyout>
+                                        </MenuFlyout>
+                                    </DatePicker.ContextFlyout>
+                                </DatePicker>
+                                <Button x:Name="BtnDateParution" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="1" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
+                                        VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0 25 0 0">
+                                    <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
+                                        <Border.BorderBrush>
+                                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                                <GradientStop Color="Yellow" Offset="0.0" />
+                                                <GradientStop Color="Red" Offset="0.25" />
+                                                <GradientStop Color="Blue" Offset="0.75" />
+                                                <GradientStop Color="LimeGreen" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Border.BorderBrush>
+                                        <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
+                                    </Border>
+                                    <Button.Flyout>
+                                        <MenuFlyout Placement="BottomEdgeAlignedLeft" Opening="DateParution_MenuFlyout_Opening" Opened="MenuFlyout_Opened">
+                                            <MenuFlyoutItem x:Name="MfiClearParutionDate" Text="Effacer la date" Click="MfiClearParutionDate_Click"/>
+                                            <MenuFlyoutSeparator />
+                                            <ToggleMenuFlyoutItem x:Name="TmfiDayKnow" Text="Le jour est connu" Click="TmfiDayKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.IsJourParutionKnow, Mode=OneWay}"/>
+                                            <ToggleMenuFlyoutItem x:Name="TmfiMonthKnow" Text="Le mois est connu" Click="TmfiMonthKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.IsMoisParutionKnow, Mode=OneWay}"/>
+                                        </MenuFlyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </Grid>
                             <TextBox Grid.Row="4" Text="{x:Bind ViewModelPage.ViewModel.Resume, Mode=TwoWay}" MinHeight="100" PlaceholderText="Résumé du livre" TextWrapping="Wrap" AcceptsReturn="True">
                                 <TextBox.Header>
                                     <TextBlock Text="Résumé" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
@@ -294,7 +292,6 @@
                     </Grid>
                 </Grid>
             </ScrollViewer>
-
         </FlipView>
         <TextBlock x:Name="TbxErrorMessage" Grid.Row="2" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
         <Grid Grid.Row="3">
@@ -331,5 +328,16 @@
                 </Button>
             </StackPanel>
         </Grid>
+        <MUIXC:TeachingTip x:Name="MyTeachingTip"
+                                    Title="Change themes without hassle"
+                                    Subtitle="It's easier than ever to see control samples in both light and dark theme!"
+                                    PreferredPlacement="Bottom">
+            <MUIXC:TeachingTip.HeroContent>
+                <Image Source="ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg" AutomationProperties.Name="Sunset" />
+            </MUIXC:TeachingTip.HeroContent>
+            <!--<MUIXC:TeachingTip.Content>
+                                        <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">To change your desktop theme visit the <Hyperlink NavigateUri="ms-settings:colors">Settings app</Hyperlink>.</TextBlock>
+                                    </MUIXC:TeachingTip.Content>-->
+        </MUIXC:TeachingTip>
     </Grid>
 </PivotItem>
