@@ -251,7 +251,7 @@ namespace LibraryProjectUWP.Views.Author
             }
         }
 
-        public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
+        public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteList();
 
         private AuthorVM _ViewModel;
         public AuthorVM ViewModel

@@ -168,7 +168,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.AuthorViewModelList == null || !ViewModelPage.AuthorViewModelList.Any())
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.AuthorViewModelList == null)
                 {
                     return;
                 }
@@ -252,8 +252,10 @@ namespace LibraryProjectUWP.Views.Book
                     if (value.Id != -1)
                     {
                         sender.Text = value.NomNaissance + " " + value.Prenom;
+                        return;
                     }
                 }
+                sender.Text = string.Empty;
             }
             catch (Exception ex)
             {
@@ -303,6 +305,28 @@ namespace LibraryProjectUWP.Views.Book
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void UpdateAuthorToBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            await UpdateAuthorListAsync();
+        }
+
+        private void RemoveAuthorToBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.LBX_Author.SelectedIndex > -1)
+                {
+                    ViewModelPage.ViewModel.Auteurs.RemoveAt(this.LBX_Author.SelectedIndex);
+                }
+            }
+            catch (Exception ex)
+            {
                 Logs.Log(ex, m);
                 return;
             }
@@ -602,8 +626,6 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
-
-        
     }
 
     public class NewEditBookUCVM : INotifyPropertyChanged
@@ -696,8 +718,8 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private List<AuthorVM> _AuthorViewModelList;
-        public List<AuthorVM> AuthorViewModelList
+        private IEnumerable<AuthorVM> _AuthorViewModelList = Enumerable.Empty<AuthorVM>();
+        public IEnumerable<AuthorVM> AuthorViewModelList
         {
             get => this._AuthorViewModelList;
             set
