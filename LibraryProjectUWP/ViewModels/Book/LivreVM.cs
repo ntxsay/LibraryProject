@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Services.ES;
+using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Contact;
 using System;
 using System.Collections.Generic;
@@ -78,8 +79,8 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private ObservableCollection<string> _Auteurs = new ObservableCollection<string>();
-        public ObservableCollection<string> Auteurs
+        private ObservableCollection<AuthorVM> _Auteurs = new ObservableCollection<AuthorVM>();
+        public ObservableCollection<AuthorVM> Auteurs
         {
             get => _Auteurs;
             set

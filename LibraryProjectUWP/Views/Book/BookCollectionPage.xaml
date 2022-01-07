@@ -289,7 +289,7 @@
             <AppBarSeparator/>
             <AppBarButton ToolTipService.ToolTip="Affiche les auteurs ou les contacts emprunteurs">
                 <AppBarButton.Icon>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;" FontSize="18"/>
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <MenuFlyout>

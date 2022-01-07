@@ -32,7 +32,7 @@ namespace LibraryProjectUWP.ViewModels.General
     public class ManageBookParentChildVM
     {
         public LivreVM ViewModel { get; set; }
-        public ManageBookPage ParentPage { get; set; }
+        //public ManageBookPage ParentPage { get; set; }
         public ManageBookParametersVM Parameters { get; set; }
     }
 
@@ -40,7 +40,7 @@ namespace LibraryProjectUWP.ViewModels.General
     {
         public BibliothequeVM ViewModel { get; set; }
         public IEnumerable<BibliothequeVM> ViewModelList { get; set; }
-        public ManageLibraryPage ParentPage { get; set; }
+        //public ManageLibraryPage ParentPage { get; set; }
         public ManageLibraryParametersVM Parameters { get; set; }
     }
 

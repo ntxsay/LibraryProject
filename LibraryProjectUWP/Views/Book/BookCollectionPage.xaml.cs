@@ -505,6 +505,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
                     {
+                        ParentPage = this,
                         EditMode = Code.EditMode.Create,
                         ViewModelList = ViewModelPage.ViewModelList,
                         CurrentViewModel = new LivreVM()
@@ -742,6 +743,11 @@ namespace LibraryProjectUWP.Views.Book
         #region Author
         private async void NewAuthorXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
+            await this.NewAuthorAsync();
+        }
+
+        internal async Task NewAuthorAsync()
+        {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
@@ -756,6 +762,7 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.AuthorViewModelList = authorsList?.ToList();
                     NewEditAuthorUC userControl = new NewEditAuthorUC(new ManageAuthorParametersDriverVM()
                     {
+                        BookParentPage = this,
                         EditMode = Code.EditMode.Create,
                         ViewModelList = ViewModelPage.AuthorViewModelList,
                         CurrentViewModel = new AuthorVM()

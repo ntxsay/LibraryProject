@@ -3,7 +3,6 @@ using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
-using LibraryProjectUWP.Views.Book.Manage;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

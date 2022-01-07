@@ -215,18 +215,6 @@
     <Compile Include="Views\Book\Collection\BookCollectionGdViewPage.xaml.cs">
       <DependentUpon>BookCollectionGdViewPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\ManageBookPage.xaml.cs">
-      <DependentUpon>ManageBookPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Book\Manage\ManageBookCategorie.xaml.cs">
-      <DependentUpon>ManageBookCategorie.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Book\Manage\ManageBookGeneral.xaml.cs">
-      <DependentUpon>ManageBookGeneral.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Book\Manage\NewCategorieCD.xaml.cs">
-      <DependentUpon>NewCategorieCD.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Book\NewEditBookUC.xaml.cs">
       <DependentUpon>NewEditBookUC.xaml</DependentUpon>
     </Compile>
@@ -244,12 +232,6 @@
     </Compile>
     <Compile Include="Views\Library\LibraryCollectionPage.xaml.cs">
       <DependentUpon>LibraryCollectionPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Library\ManageLibraryPage.xaml.cs">
-      <DependentUpon>ManageLibraryPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Library\Manage\ManageLibraryGeneralPage.xaml.cs">
-      <DependentUpon>ManageLibraryGeneralPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Library\Manage\DeleteLibraryUC.xaml.cs">
       <DependentUpon>DeleteLibraryUC.xaml</DependentUpon>
@@ -315,22 +297,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Book\ManageBookPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Book\Manage\ManageBookCategorie.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Book\Manage\ManageBookGeneral.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Book\Manage\NewCategorieCD.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\Book\NewEditBookUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -352,14 +318,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Library\LibraryCollectionPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Library\ManageLibraryPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Library\Manage\ManageLibraryGeneralPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

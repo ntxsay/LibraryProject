@@ -44,12 +44,12 @@ namespace LibraryProjectUWP.Views
             if (e.Parameter is ManageLibraryParametersVM libraryParameters)
             {
                 LibraryParameters = libraryParameters;
-                NavigateToView(typeof(ManageLibraryPage), new ManageLibraryParametersVM() { ParentPage = this, ViewModelList = libraryParameters.ViewModelList, EditMode = libraryParameters.EditMode });
+                //NavigateToView(typeof(ManageLibraryPage), new ManageLibraryParametersVM() { ParentPage = this, ViewModelList = libraryParameters.ViewModelList, EditMode = libraryParameters.EditMode });
             }
             else if (e.Parameter is ManageBookParametersVM bookParameters)
             {
                 BookParameters = bookParameters;
-                NavigateToView(typeof(ManageBookPage), new ManageBookParametersVM() { ParentPage = this, ViewModel = bookParameters.ViewModel, EditMode = bookParameters.EditMode });
+                //NavigateToView(typeof(ManageBookPage), new ManageBookParametersVM() { ParentPage = this, ViewModel = bookParameters.ViewModel, EditMode = bookParameters.EditMode });
             }
         }
 

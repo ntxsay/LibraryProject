@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Views.Book;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace LibraryProjectUWP.ViewModels.Author
         public IEnumerable<AuthorVM> ViewModelList { get; set; }
         public AuthorVM CurrentViewModel { get; set; }
         public EditMode EditMode { get; set; }
+        public BookCollectionPage BookParentPage { get; set; }
+
     }
 
     public class AuthorListParametersDriverVM

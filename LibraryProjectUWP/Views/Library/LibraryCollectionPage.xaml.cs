@@ -5,7 +5,6 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Library;
-using LibraryProjectUWP.Views.Book.Manage;
 using LibraryProjectUWP.Views.Library.Collection;
 using LibraryProjectUWP.Views.Library.Manage;
 using System;

@@ -1,6 +1,8 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Text;
@@ -56,6 +59,26 @@ namespace LibraryProjectUWP.Views.Book
             ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} un livre";
             ViewModelPage.ViewModel = parameters?.CurrentViewModel;
             InitializeActionInfos();
+        }
+
+        private async void PivotItem_Loaded(object sender, RoutedEventArgs e)
+        {
+            await UpdateAuthorListAsync();
+        }
+
+        private async Task UpdateAuthorListAsync()
+        {
+            try
+            {
+                var authorsList = await DbServices.Author.AllVMAsync();
+                ViewModelPage.AuthorViewModelList = authorsList?.ToList();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void InitializeActionInfos()
@@ -134,6 +157,152 @@ namespace LibraryProjectUWP.Views.Book
             }
             catch (Exception ex)
             {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+        #region Authors
+        private void ASB_SearchAuthor_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            try
+            {
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.AuthorViewModelList == null || !ViewModelPage.AuthorViewModelList.Any())
+                {
+                    return;
+                }
+
+                var FilteredItems = new List<AuthorVM>();
+                var splitSearchTerm = sender.Text.ToLower().Split(" ");
+
+                foreach (var value in ViewModelPage.AuthorViewModelList)
+                {
+                    if (!value.NomNaissance.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        var found = splitSearchTerm.All((key) => {
+                            return value.NomNaissance.ToLower().Contains(key.ToLower());
+                        });
+
+                        if (found)
+                        {
+                            FilteredItems.Add(value);
+                        }
+                    }
+                    else if (!value.NomUsage.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        var found = splitSearchTerm.All((key) => {
+                            return value.NomUsage.ToLower().Contains(key.ToLower());
+                        });
+
+                        if (found)
+                        {
+                            FilteredItems.Add(value);
+                        }
+                    }
+                    else if (!value.Prenom.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        var found = splitSearchTerm.All((key) => {
+                            return value.Prenom.ToLower().Contains(key.ToLower());
+                        });
+
+                        if (found)
+                        {
+                            FilteredItems.Add(value);
+                        }
+                    }
+                    else if (!value.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        var found = splitSearchTerm.All((key) => {
+                            return value.AutresPrenoms.ToLower().Contains(key.ToLower());
+                        });
+
+                        if (found)
+                        {
+                            FilteredItems.Add(value);
+                        }
+                    }
+                }
+
+                if (!FilteredItems.Any())
+                {
+                    FilteredItems.Add(new AuthorVM()
+                    {
+                        Id = -1,
+                        NomNaissance = "Ajouter un auteur",
+                    });
+                }
+
+                sender.ItemsSource = FilteredItems;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ASB_SearchAuthor_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            try
+            {
+                if (args.SelectedItem != null && args.SelectedItem is AuthorVM value)
+                {
+                    if (value.Id != -1)
+                    {
+                        sender.Text = value.NomNaissance + " " + value.Prenom;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void ASB_SearchAuthor_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            try
+            {
+                if (args.ChosenSuggestion != null && args.ChosenSuggestion is AuthorVM viewModel)
+                {
+                    if (viewModel.Id != -1)
+                    {
+                        if (ViewModelPage.ViewModel.Auteurs.Any())
+                        {
+                            bool IsAlreadyExist = ViewModelPage.ViewModel.Auteurs.Any(c => c.Id == viewModel.Id);
+                            if (!IsAlreadyExist)
+                            {
+                                ViewModelPage.ViewModel.Auteurs.Add(viewModel);
+                                sender.Text = String.Empty;
+                            }
+                        }
+                        else
+                        {
+                            ViewModelPage.ViewModel.Auteurs.Add(viewModel);
+                            sender.Text = String.Empty;
+                        }
+                    }
+                    else
+                    {
+                        //Ajoute un nouvel auteur
+                        if (_parameters.ParentPage != null)
+                        {
+                            await _parameters.ParentPage.NewAuthorAsync();
+                        }
+                    }
+                }
+                else
+                {
+                    //
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
             }
@@ -433,6 +602,8 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
+
+        
     }
 
     public class NewEditBookUCVM : INotifyPropertyChanged
@@ -520,6 +691,20 @@ namespace LibraryProjectUWP.Views.Book
                 if (this._EditMode != value)
                 {
                     this._EditMode = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<AuthorVM> _AuthorViewModelList;
+        public List<AuthorVM> AuthorViewModelList
+        {
+            get => this._AuthorViewModelList;
+            set
+            {
+                if (_AuthorViewModelList != value)
+                {
+                    this._AuthorViewModelList = value;
                     this.OnPropertyChanged();
                 }
             }

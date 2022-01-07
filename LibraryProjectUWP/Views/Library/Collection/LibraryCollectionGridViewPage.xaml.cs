@@ -6,7 +6,6 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.ViewModels.UI;
-using LibraryProjectUWP.Views.Book.Manage;
 using LibraryProjectUWP.Views.Library.Manage;
 using System;
 using System.Collections.Generic;
