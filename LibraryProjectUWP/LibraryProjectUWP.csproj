@@ -146,6 +146,8 @@
     <Compile Include="Code\Helpers\VisualViewHelpers.cs" />
     <Compile Include="Code\Services\Db\Author_db.cs" />
     <Compile Include="Code\Services\Db\Contact_db.cs" />
+    <Compile Include="Code\Services\Db\Book_db.cs" />
+    <Compile Include="Code\Services\Db\Editeurs_db.cs" />
     <Compile Include="Code\Services\Db\SubCategorie_db.cs" />
     <Compile Include="Code\Services\Db\DbServices.cs" />
     <Compile Include="Code\Services\Db\General_db..cs" />
@@ -201,6 +203,7 @@
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
+    <Compile Include="ViewModels\Publishers\PublisherVM.cs" />
     <Compile Include="ViewModels\UI\BookCollectionCommonViewVM.cs" />
     <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
     <Compile Include="Views\Author\NewEditAuthorUC.xaml.cs">

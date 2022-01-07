@@ -136,7 +136,7 @@ namespace LibraryProjectUWP.Views.Book.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _bookParameters.ParentPage.ViewModelPage.OrderedBy, _bookParameters.ParentPage.ViewModelPage.SortedBy).Where(w => w.TitresOeuvre != null && w.TitresOeuvre.Any())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _bookParameters.ParentPage.ViewModelPage.OrderedBy, _bookParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
@@ -159,7 +159,7 @@ namespace LibraryProjectUWP.Views.Book.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _bookParameters.ParentPage.ViewModelPage.OrderedBy, _bookParameters.ParentPage.ViewModelPage.SortedBy).Where(w => w.TitresOeuvre != null && w.TitresOeuvre.Any())?.GroupBy(s => s.TitresOeuvre.FirstOrDefault()?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _bookParameters.ParentPage.ViewModelPage.OrderedBy, _bookParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.TitresOeuvre.FirstOrDefault()?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
@@ -183,7 +183,7 @@ namespace LibraryProjectUWP.Views.Book.Collection
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _bookParameters.ParentPage.ViewModelPage.OrderedBy, _bookParameters.ParentPage.ViewModelPage.SortedBy).Where(w => w.TitresOeuvre != null && w.TitresOeuvre.Any())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _bookParameters.ParentPage.ViewModelPage.OrderedBy, _bookParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
@@ -204,7 +204,7 @@ namespace LibraryProjectUWP.Views.Book.Collection
         {
             try
             {
-                if (Collection == null || Collection.Count() == 0)
+                if (Collection == null || !Collection.Any())
                 {
                     return null;
                 }
@@ -213,11 +213,11 @@ namespace LibraryProjectUWP.Views.Book.Collection
                 {
                     if (OrderBy == BookGroupVM.OrderBy.Croissant)
                     {
-                        return Collection.Where(w => w != null && w.TitresOeuvre != null && w.TitresOeuvre.Any()).OrderBy(o => o.TitresOeuvre);
+                        return Collection.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.MainTitle);
                     }
                     else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
                     {
-                        return Collection.Where(w => w != null && w.TitresOeuvre != null && w.TitresOeuvre.Any()).OrderByDescending(o => o.TitresOeuvre);
+                        return Collection.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.MainTitle);
                     }
                 }
                 else if (SortBy == BookGroupVM.SortBy.DateCreation)

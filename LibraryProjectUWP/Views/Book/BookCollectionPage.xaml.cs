@@ -85,9 +85,8 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-#warning Mettre à jour la base données
-                //var libraryList = await DbServices.Library.AllVMAsync();
-                //ViewModelPage.ViewModelList = libraryList?.ToList();
+                var bookList = await DbServices.Book.AllVMAsync();
+                ViewModelPage.ViewModelList = bookList?.ToList() ?? new List<LivreVM>(); ;
                 await InitializeDataAsync();
             }
             catch (Exception ex)
@@ -529,9 +528,51 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void NewEditBookUC_CreateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        private async void NewEditBookUC_CreateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
         {
-            throw new NotImplementedException();
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    LivreVM newViewModel = sender.ViewModelPage.ViewModel;
+
+                    var creationResult = await DbServices.Book.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        ViewModelPage.ViewModelList.Add(newViewModel);
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        return;
+                    }
+                }
+
+                //sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
+                //sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
+
+                //if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
+                //{
+                //    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
+                //    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
+                //}
+                //else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
+                //{
+                //    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = false;
+                //    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = null;
+                //}
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void NewEditBookUC_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)

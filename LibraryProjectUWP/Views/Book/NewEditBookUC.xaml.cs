@@ -523,10 +523,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                if (CreateItemRequested != null)
-                {
-                    CreateItemRequested(this, args);
-                }
+                CreateItemRequested?.Invoke(this, args);
             }
             catch (Exception ex)
             {
@@ -623,6 +620,36 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         private void MenuFlyout_Opened(object sender, object e)
+        {
+
+        }
+
+        private void ASB_SearchEditor_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+
+        }
+
+        private void ASB_SearchEditor_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+
+        }
+
+        private void ASB_SearchEditor_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+
+        }
+
+        private void ASB_SearchCollection_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+
+        }
+
+        private void ASB_SearchCollection_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+
+        }
+
+        private void ASB_SearchCollection_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
 
         }

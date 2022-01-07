@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    xmlns:bookVm="using:LibraryProjectUWP.ViewModels.Book"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
@@ -47,14 +48,14 @@
         <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolConverter" TrueValue="False" FalseValue="True"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
-        <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ThumbnailSimpleDataTemplate">
+        <DataTemplate x:DataType="bookVm:LivreVM" x:Key="ThumbnailSimpleDataTemplate">
             <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
                 <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" Height="282" Width="180" Tag="{x:Bind}" MTUUi:FrameworkElementExtensions.Cursor="Hand" PointerPressed="ViewboxSimpleThumnailDatatemplate_PointerPressed">
                     <ToolTipService.ToolTip>
                         <ToolTip>
                             <TextBlock>
-                                <Run Text="Ouvrir la bibliothèque de" />
-                                <Run Text="{x:Bind Name}" FontWeight="Medium"/>
+                                <Run Text="Ouvrir le livre" />
+                                <Run Text="{x:Bind MainTitle}" FontWeight="Medium"/>
                             </TextBlock>
                         </ToolTip>
                     </ToolTipService.ToolTip>
@@ -80,7 +81,7 @@
                         <ColumnDefinition Width="2"/>
                         <ColumnDefinition Width="44"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{x:Bind Name, Mode=OneWay}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="{x:Bind MainTitle, Mode=OneWay}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
                     <Button x:Name="BtnActions" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand">
                         <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
                             <Border.BorderBrush>
@@ -107,23 +108,23 @@
                                     </MenuFlyoutSubItem.Icon>
                                 </MenuFlyoutSubItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Ouvrir la bibliothèque">
+                                <MenuFlyoutItem Text="Ouvrir ce livre">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE8A7;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Exporter la bibliothèque" Command="{StaticResource ExportLibraryXamlUICommand}" CommandParameter="{x:Bind }">
+                                <MenuFlyoutItem Text="Exporter ce livre" Command="{StaticResource ExportLibraryXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xEDE1;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Editer la bibliothèque" Command="{StaticResource EditLibraryInfosXamlUICommand}" CommandParameter="{x:Bind }">
+                                <MenuFlyoutItem Text="Editer ce livre" Command="{StaticResource EditLibraryInfosXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE70F;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Supprimer la bibliothèque" Command="{StaticResource DeleteLibraryXamlUICommand}" CommandParameter="{x:Bind }" Foreground="OrangeRed">
+                                <MenuFlyoutItem Text="Supprimer ce livre" Command="{StaticResource DeleteLibraryXamlUICommand}" CommandParameter="{x:Bind }" Foreground="OrangeRed">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE74D;" Foreground="OrangeRed"/>
                                     </MenuFlyoutItem.Icon>
@@ -147,7 +148,7 @@
                 </DataTemplate>
             </Pivot.HeaderTemplate>
             <Pivot.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:BibliothequeVM">
+                <DataTemplate x:DataType="bookVm:LivreVM">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
