@@ -42,6 +42,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
         public BookCollectionPageVM ViewModelPage { get; set; } = new BookCollectionPageVM();
+        private LibraryToBookNavigationDriverVM _parameters;
         public BookCollectionPage()
         {
             this.InitializeComponent();
@@ -50,6 +51,11 @@ namespace LibraryProjectUWP.Views.Book
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            if (e.Parameter is LibraryToBookNavigationDriverVM parameters)
+            {
+                _parameters = parameters;
+                ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
+            }
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -379,16 +385,17 @@ namespace LibraryProjectUWP.Views.Book
 
                 foreach (var value in ViewModelPage.ViewModelList)
                 {
-                    //if (value.Name.IsStringNullOrEmptyOrWhiteSpace()) continue;
+                    if (value.MainTitle.IsStringNullOrEmptyOrWhiteSpace()) continue;
 
-                    //var found = splitSearchTerm.All((key) => {
-                    //    return value.Name.ToLower().Contains(key.ToLower());
-                    //});
+                    var found = splitSearchTerm.All((key) =>
+                    {
+                        return value.MainTitle.ToLower().Contains(key.ToLower());
+                    });
 
-                    //if (found)
-                    //{
-                    //    FilteredItems.Add(value);
-                    //}
+                    if (found)
+                    {
+                        FilteredItems.Add(value);
+                    }
                 }
                 sender.ItemsSource = FilteredItems;
             }
@@ -406,7 +413,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (args.SelectedItem != null && args.SelectedItem is LivreVM value)
                 {
-                    //sender.Text = value.Name;
+                    sender.Text = value.MainTitle;
                 }
             }
             catch (Exception ex)
@@ -490,12 +497,44 @@ namespace LibraryProjectUWP.Views.Book
 
         }
 
+        private void DisplayCategorieListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(BookCategorieUC));
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    BookCategorieUC userControl = new BookCategorieUC(new BookCategorieParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        ParentLibrary = ViewModelPage.ParentLibrary,
+                    });
+
+
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #region New Book
         private void NewBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(NewEditBookUC));
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
                 if (checkedItem != null)
                 {
                     this.PivotRightSideBar.SelectedItem = checkedItem;
@@ -595,6 +634,103 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+        #endregion
+
+        #region Edit Book
+        public void EditBook(LivreVM viewModel)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == Code.EditMode.Edit);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        EditMode = Code.EditMode.Edit,
+                        ViewModelList = ViewModelPage.ViewModelList,
+                        CurrentViewModel = viewModel,
+                    });
+
+                    userControl.CancelModificationRequested += NewEditBookUC_Edit_CancelModificationRequested;
+                    userControl.UpdateItemRequested += NewEditBookUC_Edit_UpdateItemRequested;
+
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditBookUC_Edit_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
+                sender.UpdateItemRequested -= NewEditBookUC_Edit_UpdateItemRequested;
+
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+                this.PivotRightSideBar.Items.Remove(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditBookUC_Edit_UpdateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    var updatedViewModel = sender.ViewModelPage.ViewModel;
+
+                    var updateResult = await DbServices.Book.UpdateAsync(updatedViewModel);
+                    if (updateResult.IsSuccess)
+                    {
+                        sender._parameters.CurrentViewModel.MainTitle = updatedViewModel.MainTitle;
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessage = updateResult.Message;
+                        return;
+                    }
+                }
+
+                sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
+                sender.UpdateItemRequested -= NewEditBookUC_Edit_UpdateItemRequested;
+
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+                this.PivotRightSideBar.Items.Remove(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
 
         private async void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -748,28 +884,34 @@ namespace LibraryProjectUWP.Views.Book
         private async void DisplayContactListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
-            ContactListUC userControl = null;
             try
             {
-                IList<ContactVM> contactsList = await DbServices.Contact.AllVMAsync();
-                if (ViewModelPage.ContactViewModelList == null || !ViewModelPage.ContactViewModelList.Any())
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(ContactListUC));
+                if (checkedItem != null)
                 {
-                    ViewModelPage.ContactViewModelList = contactsList?.ToList();
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
                 }
-
-                userControl = new ContactListUC(new ContactListParametersDriverVM()
+                else
                 {
-                    ViewModelList = ViewModelPage.ContactViewModelList,
-                    CurrentViewModel = new ContactVM()
+                    IList<ContactVM> contactsList = await DbServices.Contact.AllVMAsync();
+                    //if (ViewModelPage.ContactViewModelList == null || !ViewModelPage.ContactViewModelList.Any())
+                    //{
+                    //    ViewModelPage.ContactViewModelList = contactsList?.ToList();
+                    //}
+
+                    ContactListUC userControl = new ContactListUC(new ContactListParametersDriverVM()
                     {
-                        TitreCivilite = CivilityHelpers.MPoint,
-                    }
-                });
+                        ViewModelList = contactsList?.ToList(), //ViewModelPage.ContactViewModelList,
+                        CurrentViewModel = new ContactVM()
+                        {
+                            TitreCivilite = CivilityHelpers.MPoint,
+                        }
+                    });
 
-                //userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
-                //userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
 
-                this.ViewModelPage.SplitViewContent = userControl;
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
@@ -882,10 +1024,11 @@ namespace LibraryProjectUWP.Views.Book
         private void DisplayAuthorListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
-        } 
+        }
+
+
         #endregion
-
-
+        
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
@@ -1086,6 +1229,20 @@ namespace LibraryProjectUWP.Views.Book
                 if (_AuthorViewModelList != value)
                 {
                     this._AuthorViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BibliothequeVM _ParentLibrary;
+        public BibliothequeVM ParentLibrary
+        {
+            get => this._ParentLibrary;
+            set
+            {
+                if (_ParentLibrary != value)
+                {
+                    this._ParentLibrary = value;
                     this.OnPropertyChanged();
                 }
             }

@@ -307,13 +307,13 @@ namespace LibraryProjectUWP.Views.Book.Collection
                 return;
             }
         }
-        private void EditLibraryInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void EditBookInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    //_commonView.EditLibrary(viewModel);
+                    _commonView.EditBook(viewModel);
                 }
             }
             catch (Exception ex)

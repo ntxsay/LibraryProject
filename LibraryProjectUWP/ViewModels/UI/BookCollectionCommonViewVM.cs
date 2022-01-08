@@ -1,6 +1,7 @@
 ﻿using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Book.Collection;
@@ -70,92 +71,9 @@ namespace LibraryProjectUWP.ViewModels.UI
             }
         }
 
-        internal void EditLibrary(BibliothequeVM viewModel)
+        internal void EditBook(LivreVM viewModel)
         {
-            try
-            {
-                NewEditLibraryUC userControl = new NewEditLibraryUC(new ManageLibraryDialogParametersVM()
-                {
-                    CurrentLibrary = viewModel,
-                    EditMode = Code.EditMode.Edit,
-                    //ViewModelList = _parentPage.ViewModelPage.ViewModelList,
-                });
-
-                userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
-                userControl.UpdateItemRequested += NewEditLibraryUC_UpdateItemRequested;
-
-                _parentPage.ViewModelPage.SplitViewContent = userControl;
-                _parentPage.ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void NewEditLibraryUC_UpdateItemRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender._parameters != null)
-                {
-                    var newValue = sender.ViewModelPage.Value?.Trim();
-                    var newDescription = sender.ViewModelPage.Description?.Trim();
-
-                    var updatedViewModel = new BibliothequeVM()
-                    {
-                        Id = sender._parameters.CurrentLibrary.Id,
-                        Name = newValue,
-                        Description = newDescription,
-                        DateEdition = DateTime.UtcNow,
-                    };
-
-                    var updateResult = await DbServices.Library.UpdateAsync(updatedViewModel);
-                    if (updateResult.IsSuccess)
-                    {
-                        sender._parameters.CurrentLibrary.Name = newValue;
-                        sender._parameters.CurrentLibrary.Description = newDescription;
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ErrorMessage = updateResult.Message;
-                        return;
-                    }
-                }
-
-                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
-                sender.UpdateItemRequested -= NewEditLibraryUC_UpdateItemRequested;
-
-                _parentPage.ViewModelPage.IsSplitViewOpen = false;
-                _parentPage.ViewModelPage.SplitViewContent = null;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void NewEditLibraryUC_CancelModificationRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
-                sender.UpdateItemRequested -= NewEditLibraryUC_UpdateItemRequested;
-
-                _parentPage.ViewModelPage.IsSplitViewOpen = false;
-                _parentPage.ViewModelPage.SplitViewContent = null;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            _parentPage?.EditBook(viewModel);
         }
 
         #region Delete Library

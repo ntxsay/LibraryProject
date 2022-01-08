@@ -98,7 +98,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Run runCategorie = new Run()
                         {
-                            //Text = " " + _parameters?.CurrentViewModel?. + " " + _parameters?.CurrentViewModel?.NomNaissance + " " + _parameters?.CurrentViewModel?.Prenom,
+                            Text = " " + _parameters?.CurrentViewModel?.MainTitle,
                             FontWeight = FontWeights.Medium,
                         };
                         TbcInfos.Inlines.Add(runCategorie);

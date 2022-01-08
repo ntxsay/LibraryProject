@@ -127,7 +127,7 @@ namespace LibraryProjectUWP.Views.Library.Collection
                     var mainPage = mainControlsUI.GetMainPage;
                     if (mainPage != null)
                     {
-                        mainPage.BookCollectionNavigationAsync();
+                        mainPage.BookCollectionNavigationAsync(viewModel);
                     }
                 }
             }

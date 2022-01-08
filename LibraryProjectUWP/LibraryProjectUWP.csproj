@@ -191,6 +191,7 @@
     <Compile Include="ViewModels\Author\ManageAuthorParametersDriverVM.cs" />
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
+    <Compile Include="ViewModels\Book\LibraryToBookNavigationDriverVM.cs" />
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
     <Compile Include="ViewModels\Book\ManageBookParametersDriverVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
@@ -217,6 +218,9 @@
     </Compile>
     <Compile Include="Views\Book\Collection\BookCollectionGdViewPage.xaml.cs">
       <DependentUpon>BookCollectionGdViewPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Book\BookCategorieUC.xaml.cs">
+      <DependentUpon>BookCategorieUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\NewEditBookUC.xaml.cs">
       <DependentUpon>NewEditBookUC.xaml</DependentUpon>
@@ -299,6 +303,10 @@
     <Page Include="Views\Book\Collection\BookCollectionGdViewPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\BookCategorieUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Book\NewEditBookUC.xaml">
       <SubType>Designer</SubType>

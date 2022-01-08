@@ -8,6 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
+    xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
@@ -80,6 +81,10 @@
                        ExecuteRequested="ExportAllBookXamlUICommand_ExecuteRequested"
                        Description="Exporte tous les livres existants">
         </XamlUICommand>
+        <XamlUICommand x:Name="DisplayCategorieListXUiCmd" 
+                       ExecuteRequested="DisplayCategorieListXUiCmd_ExecuteRequested"
+                       Description="Affiche les catégories">
+        </XamlUICommand>
         <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
                        ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">
         </XamlUICommand>
@@ -101,7 +106,7 @@
         <XamlUICommand x:Name="SortByDateCreationXamlUICommand" 
                        ExecuteRequested="SortByDateCreationXamlUICommand_ExecuteRequested">
         </XamlUICommand>
-        <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ItemAutoSuggestDataTemplate">
+        <DataTemplate x:DataType="booktVm:LivreVM" x:Key="ItemAutoSuggestDataTemplate">
             <Grid Margin="0,4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50" />
@@ -114,7 +119,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Bind Name}" FontWeight="Medium" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Column="0" Text="{x:Bind MainTitle}" FontWeight="Medium" HorizontalAlignment="Left"/>
                     </Grid>
                     <TextBlock HorizontalAlignment="Stretch" TextAlignment="Left" Foreground="#616161" FontSize="12">
                         <Run Text="{x:Bind DateAjout, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='ddd dd MMM yyyy'}" />
@@ -287,6 +292,11 @@
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
             <AppBarSeparator/>
+            <AppBarButton Command="{StaticResource DisplayCategorieListXUiCmd}">
+                <AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;" FontSize="18"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
             <AppBarButton ToolTipService.ToolTip="Affiche les auteurs ou les contacts emprunteurs">
                 <AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;" FontSize="18"/>

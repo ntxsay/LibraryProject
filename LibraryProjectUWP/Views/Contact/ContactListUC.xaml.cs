@@ -24,7 +24,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace LibraryProjectUWP.Views.Contact
 {
-    public sealed partial class ContactListUC : UserControl
+    public sealed partial class ContactListUC : PivotItem
     {
         readonly ContactListParametersDriverVM _parameters;
         public ContactListUCVM ViewModelPage { get; set; } = new ContactListUCVM();

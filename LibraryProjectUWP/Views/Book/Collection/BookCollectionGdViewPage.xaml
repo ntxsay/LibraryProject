@@ -30,8 +30,8 @@
                        Description="Modifie l'image qui sert à présenter la bibliothèque" 
                        Label="Modifier la jaquette">
         </XamlUICommand>
-        <XamlUICommand x:Name="EditLibraryInfosXamlUICommand" 
-                       ExecuteRequested="EditLibraryInfosXamlUICommand_ExecuteRequested"
+        <XamlUICommand x:Name="EditBookInfosXamlUICommand" 
+                       ExecuteRequested="EditBookInfosXamlUICommand_ExecuteRequested"
                        Description="Edite les informations de base de la bibliothèque" 
                        Label="Editer les informations">
         </XamlUICommand>
@@ -118,7 +118,7 @@
                                         <FontIcon Glyph="&#xEDE1;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Editer ce livre" Command="{StaticResource EditLibraryInfosXamlUICommand}" CommandParameter="{x:Bind }">
+                                <MenuFlyoutItem Text="Editer ce livre" Command="{StaticResource EditBookInfosXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE70F;"/>
                                     </MenuFlyoutItem.Icon>

@@ -111,7 +111,7 @@
                 <TextBlock Text="{x:Bind ViewModelPage.Header, Mode=OneWay}" FontSize="16" VerticalAlignment="Center" Margin="0 0 0 5" />
             </StackPanel>
             <Button Grid.Column="1" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fermer cet onglet">
-                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="18"/>
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="16"/>
             </Button>
         </Grid>
     </PivotItem.Header>

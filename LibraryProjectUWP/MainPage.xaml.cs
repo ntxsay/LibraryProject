@@ -325,12 +325,12 @@ namespace LibraryProjectUWP
             }
         }
 
-        internal bool BookCollectionNavigationAsync()
+        internal bool BookCollectionNavigationAsync(BibliothequeVM parentLibrary)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                return NavigateToView("Book.BookCollectionPage", null);
+                return NavigateToView("Book.BookCollectionPage", new LibraryToBookNavigationDriverVM() { ParentLibrary = parentLibrary });
             }
             catch (Exception ex)
             {
