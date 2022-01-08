@@ -25,7 +25,7 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour en savoir plus sur le modèle d'élément Contrôle utilisateur, consultez la page https://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace LibraryProjectUWP.Views.Contact.Manage
+namespace LibraryProjectUWP.Views.Contact
 {
     public sealed partial class NewEditContactUC : PivotItem
     {

@@ -9,7 +9,6 @@ using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Book.Collection;
 using LibraryProjectUWP.Views.Contact;
-using LibraryProjectUWP.Views.Contact.Manage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -228,7 +228,7 @@
     <Compile Include="Views\Contact\ContactListUC.xaml.cs">
       <DependentUpon>ContactListUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Contact\Manage\NewEditContactUC.xaml.cs">
+    <Compile Include="Views\Contact\NewEditContactUC.xaml.cs">
       <DependentUpon>NewEditContactUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml.cs">
@@ -316,7 +316,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Contact\Manage\NewEditContactUC.xaml">
+    <Page Include="Views\Contact\NewEditContactUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
