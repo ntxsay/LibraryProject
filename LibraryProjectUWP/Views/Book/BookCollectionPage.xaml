@@ -292,10 +292,25 @@
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
             <AppBarSeparator/>
-            <AppBarButton Command="{StaticResource DisplayCategorieListXUiCmd}">
+            <AppBarButton>
                 <AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;" FontSize="18"/>
                 </AppBarButton.Icon>
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Afficher les catégories" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayCategorieListXUiCmd}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Afficher les collections" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarButton ToolTipService.ToolTip="Affiche les auteurs ou les contacts emprunteurs">
                 <AppBarButton.Icon>

@@ -1,7 +1,9 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.ViewModels.Author;
+using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.Publishers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -72,6 +74,34 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_Auteurs != value)
                 {
                     _Auteurs = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<CollectionVM> _Collections = new ObservableCollection<CollectionVM>();
+        public ObservableCollection<CollectionVM> Collections
+        {
+            get => _Collections;
+            set
+            {
+                if (_Collections != value)
+                {
+                    _Collections = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<PublisherVM> _Editeurs = new ObservableCollection<PublisherVM>();
+        public ObservableCollection<PublisherVM> Editeurs
+        {
+            get => _Editeurs;
+            set
+            {
+                if (_Editeurs != value)
+                {
+                    _Editeurs = value;
                     OnPropertyChanged();
                 }
             }

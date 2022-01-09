@@ -195,6 +195,7 @@
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
     <Compile Include="ViewModels\Book\ManageBookParametersDriverVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
+    <Compile Include="ViewModels\Collection\CollectionVM.cs" />
     <Compile Include="ViewModels\Contact\ContactGroupVM.cs" />
     <Compile Include="ViewModels\Contact\ContactVM.cs" />
     <Compile Include="ViewModels\Contact\ManageContactParametersDriverVM.cs" />
