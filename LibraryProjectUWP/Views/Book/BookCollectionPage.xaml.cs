@@ -210,6 +210,11 @@ namespace LibraryProjectUWP.Views.Book
             this.GroupByCreationYear();
         }
 
+        private void GroupByParutionYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            this.GroupByParutionYear();
+        }
+
         private void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             this.GroupItemsByNone();
@@ -316,7 +321,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s =>  s.DateParution?.Year.ToString() ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
@@ -1413,17 +1418,7 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
-        #endregion
-
-        private void GroupByCreationParutionXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
-        }
-
-        private void GroupByParutionYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
-        }
+        #endregion     
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
