@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.ViewModels.Library;
+﻿using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,25 @@ namespace LibraryProjectUWP.Code.Converters
                         return true;
                     }
                     else if (groupby == "year" && libraryGroupBy == LibraryGroupVM.GroupBy.CreationYear)
+                    {
+                        return true;
+                    }
+                }
+                else if (value is BookGroupVM.GroupBy bookGroupBy && parameter is string bookGroupby)
+                {
+                    if (bookGroupby == "letter" && bookGroupBy == BookGroupVM.GroupBy.Letter)
+                    {
+                        return true;
+                    }
+                    else if (bookGroupby == "none" && bookGroupBy == BookGroupVM.GroupBy.None)
+                    {
+                        return true;
+                    }
+                    else if (bookGroupby == "creation-year" && bookGroupBy == BookGroupVM.GroupBy.CreationYear)
+                    {
+                        return true;
+                    }
+                    else if (bookGroupby == "parution-year" && bookGroupBy == BookGroupVM.GroupBy.ParutionYear)
                     {
                         return true;
                     }

@@ -34,6 +34,7 @@ using LibraryProjectUWP.Views.Collection;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.Views.Editor;
 using LibraryProjectUWP.ViewModels.Publishers;
+using System.Collections.ObjectModel;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -201,66 +202,184 @@ namespace LibraryProjectUWP.Views.Book
         #region Sort - Group - Order
         private void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
-                {
-                    BookCollectionGdViewPage.GroupItemsByAlphabetic();
-                }
-                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
-                {
-                    //BookCollectionDgViewPage.GroupItemsByAlphabetic();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            this.GroupItemsByAlphabetic();
         }
 
         private void GroupByCreationYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
+            this.GroupByCreationYear();
+        }
+
+        private void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            this.GroupItemsByNone();
+        }
+
+        public void GroupItemsByNone()
+        {
             try
             {
-                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
                 {
-                    BookCollectionGdViewPage.GroupByCreationYear();
+                    return;
                 }
-                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Any())
                 {
-                    //BookCollectionDgViewPage.GroupByCreationYear();
+                    if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                    {
+                        BookCollectionGdViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+                    {
+                        BookCollectionDgViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
                 }
             }
             catch (Exception ex)
             {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        public void GroupItemsByAlphabetic()
+        {
+            try
+            {
+                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                {
+                    return;
+                }
+
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Count() > 0)
+                {
+                    if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                    {
+                        BookCollectionGdViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+                    {
+                        BookCollectionDgViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
             }
         }
 
-        private void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        public void GroupByCreationYear()
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
                 {
-                    BookCollectionGdViewPage.GroupItemsByNone();
+                    return;
                 }
-                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
-                    //BookCollectionDgViewPage.GroupItemsByNone();
+                    if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                    {
+                        BookCollectionGdViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+                    {
+                        BookCollectionDgViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
                 }
             }
             catch (Exception ex)
             {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
             }
         }
+
+        public void GroupByParutionYear()
+        {
+            try
+            {
+                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                {
+                    return;
+                }
+
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Count() > 0)
+                {
+                    if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                    {
+                        BookCollectionGdViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+                    {
+                        BookCollectionDgViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.ParutionYear;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private IEnumerable<LivreVM> OrderItems(IEnumerable<LivreVM> Collection, BookGroupVM.OrderBy OrderBy = BookGroupVM.OrderBy.Croissant, BookGroupVM.SortBy SortBy = BookGroupVM.SortBy.Name)
+        {
+            try
+            {
+                if (Collection == null || !Collection.Any())
+                {
+                    return null;
+                }
+
+                if (SortBy == BookGroupVM.SortBy.Name)
+                {
+                    if (OrderBy == BookGroupVM.OrderBy.Croissant)
+                    {
+                        return Collection.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.MainTitle);
+                    }
+                    else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
+                    {
+                        return Collection.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.MainTitle);
+                    }
+                }
+                else if (SortBy == BookGroupVM.SortBy.DateCreation)
+                {
+                    if (OrderBy == BookGroupVM.OrderBy.Croissant)
+                    {
+                        return Collection.OrderBy(o => o.DateAjout);
+                    }
+                    else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
+                    {
+                        return Collection.OrderByDescending(o => o.DateAjout);
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return Enumerable.Empty<LivreVM>();
+            }
+        }
+
 
         private void OrderByCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -327,41 +446,23 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                switch (ViewModelPage.GroupedBy)
                 {
-                    switch (ViewModelPage.GroupedBy)
-                    {
-                        case BookGroupVM.GroupBy.None:
-                            BookCollectionGdViewPage.GroupItemsByNone();
-                            break;
-                        case BookGroupVM.GroupBy.Letter:
-                            BookCollectionGdViewPage.GroupItemsByAlphabetic();
-                            break;
-                        case BookGroupVM.GroupBy.CreationYear:
-                            BookCollectionGdViewPage.GroupByCreationYear();
-                            break;
-                        default:
-                            BookCollectionGdViewPage.GroupItemsByNone();
-                            break;
-                    }
-                }
-                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
-                {
-                    switch (ViewModelPage.GroupedBy)
-                    {
-                        case BookGroupVM.GroupBy.None:
-                            //BookCollectionDgViewPage.GroupItemsByNone();
-                            break;
-                        case BookGroupVM.GroupBy.Letter:
-                            //BookCollectionDgViewPage.GroupItemsByAlphabetic();
-                            break;
-                        case BookGroupVM.GroupBy.CreationYear:
-                            //BookCollectionDgViewPage.GroupByCreationYear();
-                            break;
-                        default:
-                            //BookCollectionDgViewPage.GroupItemsByNone();
-                            break;
-                    }
+                    case BookGroupVM.GroupBy.None:
+                        this.GroupItemsByNone();
+                        break;
+                    case BookGroupVM.GroupBy.Letter:
+                        this.GroupItemsByAlphabetic();
+                        break;
+                    case BookGroupVM.GroupBy.CreationYear:
+                        this.GroupByCreationYear();
+                        break;
+                    case BookGroupVM.GroupBy.ParutionYear:
+                        this.GroupByParutionYear();
+                        break;
+                    default:
+                        this.GroupItemsByNone();
+                        break;
                 }
             }
             catch (Exception ex)
@@ -1159,9 +1260,56 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void DisplayCollectionListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void DisplayCollectionListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(CollectionListUC));
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    IList<CollectionVM> itemList = await DbServices.Collection.AllVMAsync();
+                    CollectionListUC userControl = new CollectionListUC(new CollectionListParametersDriverVM()
+                    {
+                        ViewModelList = itemList?.ToList(), //ViewModelPage.ContactViewModelList,
+                    });
 
+                    userControl.CancelModificationRequested += CollectionListUC_CancelModificationRequested;
+
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void CollectionListUC_CancelModificationRequested(CollectionListUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= CollectionListUC_CancelModificationRequested;
+
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+                this.PivotRightSideBar.Items.Remove(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
         #endregion
 
@@ -1264,14 +1412,23 @@ namespace LibraryProjectUWP.Views.Book
         private void DisplayEditorListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
-        } 
+        }
         #endregion
+
+        private void GroupByCreationParutionXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
+        private void GroupByParutionYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-
 
         private BookGroupVM.GroupBy _GroupedBy = BookGroupVM.GroupBy.None;
         public BookGroupVM.GroupBy GroupedBy

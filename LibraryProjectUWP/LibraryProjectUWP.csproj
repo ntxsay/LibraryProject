@@ -229,6 +229,9 @@
     <Compile Include="Views\Book\NewEditBookUC.xaml.cs">
       <DependentUpon>NewEditBookUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Collection\CollectionListUC.xaml.cs">
+      <DependentUpon>CollectionListUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Collection\NewEditCollectionUC.xaml.cs">
       <DependentUpon>NewEditCollectionUC.xaml</DependentUpon>
     </Compile>
@@ -321,6 +324,10 @@
     <Page Include="Views\Book\NewEditBookUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Collection\CollectionListUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Collection\NewEditCollectionUC.xaml">
       <Generator>MSBuild:Compile</Generator>

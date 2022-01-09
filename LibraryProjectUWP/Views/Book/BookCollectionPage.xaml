@@ -81,11 +81,6 @@
                        Description="Ajoute une nouvelle collection" 
                        Label="Ajouter une collection">
         </XamlUICommand>
-        <XamlUICommand x:Name="DisplayCollectionListXUiCmd" 
-                       ExecuteRequested="DisplayCollectionListXUiCmd_ExecuteRequested"
-                       Description="Afficher la liste des collections" 
-                       Label="Afficher les collections">
-        </XamlUICommand>
         <XamlUICommand x:Name="NewEditorXUiCmd" 
                        ExecuteRequested="NewEditorXUiCmd_ExecuteRequested"
                        Description="Ajoute un nouvel éditeur" 
@@ -100,11 +95,18 @@
                        ExecuteRequested="DisplayCategorieListXUiCmd_ExecuteRequested"
                        Description="Affiche les catégories">
         </XamlUICommand>
+        <XamlUICommand x:Name="DisplayCollectionListXUiCmd" 
+                       ExecuteRequested="DisplayCollectionListXUiCmd_ExecuteRequested"
+                       Description="Affiche les collections">
+        </XamlUICommand>
         <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
                        ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">
         </XamlUICommand>
         <XamlUICommand x:Name="GroupByCreationYearXamlUICommand" 
                        ExecuteRequested="GroupByCreationYearXamlUICommand_ExecuteRequested">
+        </XamlUICommand>
+        <XamlUICommand x:Name="GroupByParutionYearXamlUICommand" 
+                       ExecuteRequested="GroupByParutionYearXamlUICommand_ExecuteRequested">
         </XamlUICommand>
         <XamlUICommand x:Name="GroupByNoneXamlUICommand" 
                        ExecuteRequested="GroupByNoneXamlUICommand_ExecuteRequested">
@@ -277,7 +279,8 @@
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='year', Mode=OneWay}" Text="Année de création" Command="{StaticResource GroupByCreationYearXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='parution-year', Mode=OneWay}" Text="Année de parution" Command="{StaticResource GroupByParutionYearXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='creation-year', Mode=OneWay}" Text="Année de création" Command="{StaticResource GroupByCreationYearXamlUICommand}"/>
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='letter', Mode=OneWay}" Text="Lettre" Command="{StaticResource GroupByLetterXamlUICommand}"/>
                         <MenuFlyoutSeparator/>
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='none', Mode=OneWay}" Text="Aucun" Command="{StaticResource GroupByNoneXamlUICommand}"/>
@@ -307,9 +310,9 @@
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
             <AppBarSeparator/>
-            <AppBarButton>
+            <AppBarButton ToolTipService.ToolTip="Affiche les auteurs ou les contacts emprunteurs">
                 <AppBarButton.Icon>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;" FontSize="18"/>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7BC;" FontSize="18"/>
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <MenuFlyout>
@@ -318,27 +321,17 @@
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Afficher les collections" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                        <MenuFlyoutItem Text="Afficher les collections" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayCollectionListXUiCmd}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                    </MenuFlyout>
-                </AppBarButton.Flyout>
-            </AppBarButton>
-            <AppBarButton ToolTipService.ToolTip="Affiche les auteurs ou les contacts emprunteurs">
-                <AppBarButton.Icon>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;" FontSize="18"/>
-                </AppBarButton.Icon>
-                <AppBarButton.Flyout>
-                    <MenuFlyout>
+                        <MenuFlyoutSeparator />
                         <MenuFlyoutItem Text="Afficher les auteurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayAuthorListXamlUICommand}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutSeparator />
                         <MenuFlyoutItem Text="Afficher les emprunteurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayContactListXamlUICommand}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
@@ -347,6 +340,7 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
+            <AppBarSeparator/>
             <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter un élément">
                 <AppBarButton.Flyout>
                     <MenuFlyout>

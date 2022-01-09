@@ -18,6 +18,7 @@ namespace LibraryProjectUWP.ViewModels.Book
             None,
             Letter,
             CreationYear,
+            ParutionYear,
         }
 
         public enum SortBy
@@ -95,6 +96,11 @@ namespace LibraryProjectUWP.ViewModels.Book
             get => this.GroupedBy == GroupBy.CreationYear;
         }
 
+        public bool IsGroupedByDateParutionYear
+        {
+            get => this.GroupedBy == GroupBy.ParutionYear;
+        }
+
         private GroupBy _GroupedBy;
         public GroupBy GroupedBy
         {
@@ -119,9 +125,10 @@ namespace LibraryProjectUWP.ViewModels.Book
                 {
                     this._Collection = value;
                     this.OnPropertyChanged();
-                    this.OnPropertyChanged(nameof(IsGroupedByNone));
-                    this.OnPropertyChanged(nameof(IsGroupedByLetter));
-                    this.OnPropertyChanged(nameof(IsGroupedByDateCreationYear));
+                    //this.OnPropertyChanged(nameof(IsGroupedByNone));
+                    //this.OnPropertyChanged(nameof(IsGroupedByLetter));
+                    //this.OnPropertyChanged(nameof(IsGroupedByDateCreationYear));
+                    //this.OnPropertyChanged(nameof(IsGroupedByDateParutionYear));
                 }
             }
         }

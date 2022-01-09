@@ -18,5 +18,6 @@ namespace LibraryProjectUWP.ViewModels.Collection
     {
         public IEnumerable<CollectionVM> ViewModelList { get; set; }
         public CollectionVM CurrentViewModel { get; set; }
+        public BibliothequeVM ParentLibrary { get; set; }
     }
 }

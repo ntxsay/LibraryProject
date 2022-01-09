@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Collection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -95,6 +96,20 @@ namespace LibraryProjectUWP.ViewModels
                 {
                     _Categories = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<CollectionVM> _CollectionViewModelList = new ObservableCollection<CollectionVM>();
+        public ObservableCollection<CollectionVM> CollectionViewModelList
+        {
+            get => this._CollectionViewModelList;
+            set
+            {
+                if (_CollectionViewModelList != value)
+                {
+                    this._CollectionViewModelList = value;
+                    this.OnPropertyChanged();
                 }
             }
         }

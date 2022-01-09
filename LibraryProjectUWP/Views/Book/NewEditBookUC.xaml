@@ -135,7 +135,6 @@
             <DataTemplate x:DataType="collectionVm:CollectionVM" x:Key="ItemAutoSuggestCollectionDataTemplate">
                 <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}"/>
             </DataTemplate>
-
         </ResourceDictionary>
     </PivotItem.Resources>
     <PivotItem.Header>
