@@ -7,6 +7,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -68,6 +69,8 @@ namespace LibraryProjectUWP
                     // paramètre
                     rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
+                ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(640, 300));
+
                 // Vérifiez que la fenêtre actuelle est active
                 Window.Current.Activate();
             }

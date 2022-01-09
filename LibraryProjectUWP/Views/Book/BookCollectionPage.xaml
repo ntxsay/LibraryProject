@@ -125,7 +125,7 @@
                         <Run Text="{x:Bind DateAjout, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='ddd dd MMM yyyy'}" />
                         <Run Text="&#x000B7;" FontSize="16" FontWeight="Bold"/>
                         <Run Text="0" />
-                        <Run Text="Livres" />
+                        <Run Text="prêt(s)" />
                     </TextBlock>
                 </StackPanel>
             </Grid>
@@ -352,6 +352,8 @@
                         <FontIcon Glyph="&#xEDE1;"/>
                     </AppBarButton.Icon>
                 </AppBarButton>
+                <AppBarSeparator/>
+                <AppBarButton Icon="Help" Label="Aide" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
             </CommandBar.SecondaryCommands>
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal" Spacing="4">

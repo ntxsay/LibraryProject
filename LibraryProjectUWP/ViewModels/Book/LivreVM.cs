@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Contact;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,23 +44,6 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_MainTitle != value)
                 {
                     _MainTitle = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        
-        private string _ISBN;
-        /// <summary>
-        /// L'ISBN est un numéro international normalisé permettant l'identification d'un livre dans une édition donnée.
-        /// </summary>
-        public string ISBN
-        {
-            get => _ISBN;
-            set
-            {
-                if (_ISBN != value)
-                {
-                    _ISBN = value;
                     OnPropertyChanged();
                 }
             }
@@ -262,6 +246,8 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private string _JaquettePath = EsLibrary.LibraryDefaultJaquette;
+
+        [JsonIgnore]
         public string JaquettePath
         {
             get => this._JaquettePath;

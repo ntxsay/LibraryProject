@@ -27,22 +27,22 @@
         <customConverters:IGroupingToValueConverter x:Key="groupingConverter" />-->
         <XamlUICommand x:Name="ChangeJaquetteXamlUICommand" 
                        ExecuteRequested="ChangeJaquetteXamlUICommand_ExecuteRequested"
-                       Description="Modifie l'image qui sert à présenter la bibliothèque" 
+                       Description="Modifie l'image qui sert à présenter le livre" 
                        Label="Modifier la jaquette">
         </XamlUICommand>
         <XamlUICommand x:Name="EditBookInfosXamlUICommand" 
                        ExecuteRequested="EditBookInfosXamlUICommand_ExecuteRequested"
-                       Description="Edite les informations de base de la bibliothèque" 
+                       Description="Edite les informations de base du livre" 
                        Label="Editer les informations">
         </XamlUICommand>
         <XamlUICommand x:Name="DeleteLibraryXamlUICommand" 
                        ExecuteRequested="DeleteLibraryXamlUICommand_ExecuteRequested"
-                       Description="Supprime définitivement la bibliothèque actuelle" 
-                       Label="Supprimer la bibliothèque">
+                       Description="Supprime définitivement le livre actuel" 
+                       Label="Supprimer le livre">
         </XamlUICommand>
-        <XamlUICommand x:Name="ExportLibraryXamlUICommand"
-                       ExecuteRequested="ExportLibraryXamlUICommand_ExecuteRequested"
-                       Description="Exporte la bibliothèque et son contenu dans un dossier">
+        <XamlUICommand x:Name="ExportThisBookXamlUICommand"
+                       ExecuteRequested="ExportThisBookXamlUICommand_ExecuteRequested"
+                       Description="Exporte le livre et son contenu dans un dossier">
         </XamlUICommand>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToInvertVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolConverter" TrueValue="False" FalseValue="True"/>
@@ -113,7 +113,7 @@
                                         <FontIcon Glyph="&#xE8A7;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Exporter ce livre" Command="{StaticResource ExportLibraryXamlUICommand}" CommandParameter="{x:Bind }">
+                                <MenuFlyoutItem Text="Exporter ce livre" Command="{StaticResource ExportThisBookXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xEDE1;"/>
                                     </MenuFlyoutItem.Icon>

@@ -47,7 +47,7 @@ namespace LibraryProjectUWP
             this.TitleBarCustomization();
         }
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -79,6 +79,7 @@ namespace LibraryProjectUWP
                 titlebar.IsVisibleChanged += Titlebar_IsVisibleChanged;
                 // Set XAML element as a draggable region.
                 Window.Current.SetTitleBar(CustomDragRegion);
+                ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(840, 600));
                 ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
                 titleBar.ButtonBackgroundColor = Colors.Transparent;
                 titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;

@@ -274,13 +274,13 @@ namespace LibraryProjectUWP.Views.Book.Collection
             }
         }
 
-        private async void ExportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void ExportThisBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    //await _commonView.ExportLibraryAsync(viewModel);
+                    await _bookParameters.ParentPage?.ExportThisBookAsync(viewModel);
                 }
             }
             catch (Exception ex)
@@ -313,7 +313,7 @@ namespace LibraryProjectUWP.Views.Book.Collection
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    _commonView.EditBook(viewModel);
+                    _bookParameters.ParentPage?.EditBook(viewModel);
                 }
             }
             catch (Exception ex)
