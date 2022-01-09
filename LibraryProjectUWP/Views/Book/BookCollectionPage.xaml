@@ -72,14 +72,29 @@
                        Description="Affiche la liste des auteurs existants" 
                        Label="Afficher les auteurs">
         </XamlUICommand>
-        <XamlUICommand x:Name="ImportBookXamlUICommand" 
-                       ExecuteRequested="ImportBookXamlUICommand_ExecuteRequested"
-                       Description="Importe un livre existant" 
-                       Label="Importer un livre">
-        </XamlUICommand>
         <XamlUICommand x:Name="ExportAllBookXamlUICommand" 
                        ExecuteRequested="ExportAllBookXamlUICommand_ExecuteRequested"
                        Description="Exporte tous les livres existants">
+        </XamlUICommand>
+        <XamlUICommand x:Name="NewCollectionXUiCmd" 
+                       ExecuteRequested="NewCollectionXUiCmd_ExecuteRequested"
+                       Description="Ajoute une nouvelle collection" 
+                       Label="Ajouter une collection">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DisplayCollectionListXUiCmd" 
+                       ExecuteRequested="DisplayCollectionListXUiCmd_ExecuteRequested"
+                       Description="Afficher la liste des collections" 
+                       Label="Afficher les collections">
+        </XamlUICommand>
+        <XamlUICommand x:Name="NewEditorXUiCmd" 
+                       ExecuteRequested="NewEditorXUiCmd_ExecuteRequested"
+                       Description="Ajoute un nouvel éditeur" 
+                       Label="Ajouter un éditeur">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DisplayEditorListXUiCmd" 
+                       ExecuteRequested="DisplayEditorListXUiCmd_ExecuteRequested"
+                       Description="Afficher la liste des éditeurs" 
+                       Label="Afficher les éditeurs">
         </XamlUICommand>
         <XamlUICommand x:Name="DisplayCategorieListXUiCmd" 
                        ExecuteRequested="DisplayCategorieListXUiCmd_ExecuteRequested"
@@ -340,9 +355,6 @@
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Importer un livre" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="Import" Command="{StaticResource ImportBookXamlUICommand}">
-
-                        </MenuFlyoutItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Text="Ajouter un auteur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewAuthorXamlUICommand}">
                             <MenuFlyoutItem.Icon>
@@ -353,6 +365,18 @@
                         <MenuFlyoutItem Text="Ajouter un emprunteur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewContactXamlUICommand}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Ajouter une collection" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewCollectionXUiCmd}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Ajouter un éditeur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewEditorXUiCmd}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE731;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                     </MenuFlyout>

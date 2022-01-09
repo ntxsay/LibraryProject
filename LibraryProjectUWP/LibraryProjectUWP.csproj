@@ -147,6 +147,7 @@
     <Compile Include="Code\Services\Db\Author_db.cs" />
     <Compile Include="Code\Services\Db\Contact_db.cs" />
     <Compile Include="Code\Services\Db\Book_db.cs" />
+    <Compile Include="Code\Services\Db\Collections_db.cs" />
     <Compile Include="Code\Services\Db\Editeurs_db.cs" />
     <Compile Include="Code\Services\Db\SubCategorie_db.cs" />
     <Compile Include="Code\Services\Db\DbServices.cs" />
@@ -196,6 +197,7 @@
     <Compile Include="ViewModels\Book\ManageBookParametersDriverVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
     <Compile Include="ViewModels\Collection\CollectionVM.cs" />
+    <Compile Include="ViewModels\Collection\ManageCollectionParametersDriverVM.cs" />
     <Compile Include="ViewModels\Contact\ContactGroupVM.cs" />
     <Compile Include="ViewModels\Contact\ContactVM.cs" />
     <Compile Include="ViewModels\Contact\ManageContactParametersDriverVM.cs" />
@@ -205,6 +207,7 @@
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
+    <Compile Include="ViewModels\Publishers\ManageEditorParametersDriverVM.cs" />
     <Compile Include="ViewModels\Publishers\PublisherVM.cs" />
     <Compile Include="ViewModels\UI\BookCollectionCommonViewVM.cs" />
     <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
@@ -226,11 +229,17 @@
     <Compile Include="Views\Book\NewEditBookUC.xaml.cs">
       <DependentUpon>NewEditBookUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Collection\NewEditCollectionUC.xaml.cs">
+      <DependentUpon>NewEditCollectionUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Contact\ContactListUC.xaml.cs">
       <DependentUpon>ContactListUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Contact\NewEditContactUC.xaml.cs">
       <DependentUpon>NewEditContactUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Editor\NewEditEditorUC.xaml.cs">
+      <DependentUpon>NewEditEditorUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml.cs">
       <DependentUpon>LibraryCollectionDataGridViewPage.xaml</DependentUpon>
@@ -313,6 +322,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Collection\NewEditCollectionUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Contact\ContactListUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -320,6 +333,10 @@
     <Page Include="Views\Contact\NewEditContactUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Editor\NewEditEditorUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml">
       <SubType>Designer</SubType>

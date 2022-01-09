@@ -30,6 +30,10 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using LibraryProjectUWP.Views.Author;
+using LibraryProjectUWP.Views.Collection;
+using LibraryProjectUWP.ViewModels.Collection;
+using LibraryProjectUWP.Views.Editor;
+using LibraryProjectUWP.ViewModels.Publishers;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -803,11 +807,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void ImportBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
-        }
-
         #region Contact
         private async void NewContactXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -1063,7 +1062,210 @@ namespace LibraryProjectUWP.Views.Book
 
 
         #endregion
-        
+
+        #region Collection
+        private async void NewCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            await NewCollectionAsync();
+        }
+
+        internal async Task NewCollectionAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditCollectionUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    var itemList = await DbServices.Collection.AllVMAsync();
+                    NewEditCollectionUC userControl = new NewEditCollectionUC(new ManageCollectionParametersDriverVM()
+                    {
+                        EditMode = Code.EditMode.Create,
+                        ViewModelList = itemList,
+                        CurrentViewModel = new CollectionVM()
+                    });
+
+                    userControl.CancelModificationRequested += NewEditCollectionUC_Create_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditCollectionUC_Create_CreateItemRequested;
+
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditCollectionUC_Create_CreateItemRequested(NewEditCollectionUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    CollectionVM newViewModel = sender.ViewModelPage.ViewModel;
+
+                    var creationResult = await DbServices.Collection.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        return;
+                    }
+                }
+
+                sender.ViewModelPage.ViewModel = new CollectionVM();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditCollectionUC_Create_CancelModificationRequested(NewEditCollectionUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditCollectionUC_Create_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditCollectionUC_Create_CreateItemRequested;
+
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+                this.PivotRightSideBar.Items.Remove(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DisplayCollectionListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+        #endregion
+
+        #region Editeurs
+        private async void NewEditorXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            await NewEditorAsync();
+        }
+
+        internal async Task NewEditorAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditEditorUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    var itemList = await DbServices.Editors.AllVMAsync();
+                    NewEditEditorUC userControl = new NewEditEditorUC(new ManageEditorParametersDriverVM()
+                    {
+                        EditMode = Code.EditMode.Create,
+                        ViewModelList = itemList,
+                        CurrentViewModel = new PublisherVM()
+                    });
+
+                    userControl.CancelModificationRequested += NewEditEditorUC_Create_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditEditorUC_Create_CreateItemRequested;
+
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditEditorUC_Create_CreateItemRequested(NewEditEditorUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    PublisherVM newViewModel = sender.ViewModelPage.ViewModel;
+
+                    var creationResult = await DbServices.Editors.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        return;
+                    }
+                }
+
+                sender.ViewModelPage.ViewModel = new PublisherVM();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditEditorUC_Create_CancelModificationRequested(NewEditEditorUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditEditorUC_Create_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditEditorUC_Create_CreateItemRequested;
+
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+                this.PivotRightSideBar.Items.Remove(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DisplayEditorListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        } 
+        #endregion
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged

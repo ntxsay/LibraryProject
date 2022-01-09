@@ -12,6 +12,7 @@ namespace LibraryProjectUWP.ViewModels.Collection
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public long Id { get; set; }
+        public long IdBook { get; set; } = -1;
 
         private string _Name;
         public string Name

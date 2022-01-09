@@ -4,6 +4,8 @@ using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Collection;
+using LibraryProjectUWP.ViewModels.Publishers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -64,21 +66,8 @@ namespace LibraryProjectUWP.Views.Book
         private async void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
             await UpdateAuthorListAsync();
-        }
-
-        private async Task UpdateAuthorListAsync()
-        {
-            try
-            {
-                var authorsList = await DbServices.Author.AllVMAsync();
-                ViewModelPage.AuthorViewModelList = authorsList?.ToList();
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
+            await UpdateCollectionListAsync();
+            await UpdateEditeurListAsync();
         }
 
         private void InitializeActionInfos()
@@ -164,6 +153,21 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Authors
+        private async Task UpdateAuthorListAsync()
+        {
+            try
+            {
+                var authorsList = await DbServices.Author.AllVMAsync();
+                ViewModelPage.AuthorViewModelList = authorsList?.ToList();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void ASB_SearchAuthor_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             try
@@ -327,6 +331,311 @@ namespace LibraryProjectUWP.Views.Book
             }
             catch (Exception ex)
             {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+        #region Collection
+        private async Task UpdateCollectionListAsync()
+        {
+            try
+            {
+                var itemList = await DbServices.Collection.AllVMAsync();
+                ViewModelPage.CollectionViewModelList = itemList?.ToList();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void UpdateCollectionToBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            await UpdateCollectionListAsync();
+        }
+
+        private void RemoveCollectionToBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.ListViewCollection.SelectedIndex > -1)
+                {
+                    ViewModelPage.ViewModel.Collections.RemoveAt(this.ListViewCollection.SelectedIndex);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ASB_SearchCollection_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            try
+            {
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.CollectionViewModelList == null)
+                {
+                    return;
+                }
+
+                var FilteredItems = new List<CollectionVM>();
+                var splitSearchTerm = sender.Text.ToLower().Split(" ");
+
+                foreach (var value in ViewModelPage.CollectionViewModelList)
+                {
+                    if (!value.Name.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        var found = splitSearchTerm.All((key) => {
+                            return value.Name.ToLower().Contains(key.ToLower());
+                        });
+
+                        if (found)
+                        {
+                            FilteredItems.Add(value);
+                        }
+                    }
+                }
+
+                if (!FilteredItems.Any())
+                {
+                    FilteredItems.Add(new CollectionVM()
+                    {
+                        Id = -1,
+                        Name = "Ajouter une collection",
+                    });
+                }
+
+                sender.ItemsSource = FilteredItems;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ASB_SearchCollection_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            try
+            {
+                if (args.SelectedItem != null && args.SelectedItem is CollectionVM value)
+                {
+                    if (value.Id != -1)
+                    {
+                        sender.Text = value.Name;
+                        return;
+                    }
+                }
+                sender.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void ASB_SearchCollection_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            try
+            {
+                if (args.ChosenSuggestion != null && args.ChosenSuggestion is CollectionVM viewModel)
+                {
+                    if (viewModel.Id != -1)
+                    {
+                        if (ViewModelPage.ViewModel.Collections.Any())
+                        {
+                            bool IsAlreadyExist = ViewModelPage.ViewModel.Collections.Any(c => c.Id == viewModel.Id);
+                            if (!IsAlreadyExist)
+                            {
+                                ViewModelPage.ViewModel.Collections.Add(viewModel);
+                                sender.Text = String.Empty;
+                            }
+                        }
+                        else
+                        {
+                            ViewModelPage.ViewModel.Collections.Add(viewModel);
+                            sender.Text = String.Empty;
+                        }
+                    }
+                    else
+                    {
+                        //Ajoute un nouvel auteur
+                        if (_parameters.ParentPage != null)
+                        {
+                            await _parameters.ParentPage.NewCollectionAsync();
+                        }
+                    }
+                }
+                else
+                {
+                    //
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+        #region Editeurs
+        private async Task UpdateEditeurListAsync()
+        {
+            try
+            {
+                var itemList = await DbServices.Editors.AllVMAsync();
+                ViewModelPage.EditorsViewModelList = itemList?.ToList();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void UpdateEditorToBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            await UpdateEditeurListAsync();
+        }
+
+        private void RemoveEditorToBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.ListViewEditeur.SelectedIndex > -1)
+                {
+                    ViewModelPage.ViewModel.Editeurs.RemoveAt(this.ListViewEditeur.SelectedIndex);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ASB_SearchEditor_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            try
+            {
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.EditorsViewModelList == null)
+                {
+                    return;
+                }
+
+                var FilteredItems = new List<PublisherVM>();
+                var splitSearchTerm = sender.Text.ToLower().Split(" ");
+
+                foreach (var value in ViewModelPage.EditorsViewModelList)
+                {
+                    if (!value.Name.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        var found = splitSearchTerm.All((key) => {
+                            return value.Name.ToLower().Contains(key.ToLower());
+                        });
+
+                        if (found)
+                        {
+                            FilteredItems.Add(value);
+                        }
+                    }
+                }
+
+                if (!FilteredItems.Any())
+                {
+                    FilteredItems.Add(new PublisherVM()
+                    {
+                        Id = -1,
+                        Name = "Ajouter un éditeur",
+                    });
+                }
+
+                sender.ItemsSource = FilteredItems;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+
+        }
+
+        private void ASB_SearchEditor_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            try
+            {
+                if (args.SelectedItem != null && args.SelectedItem is PublisherVM value)
+                {
+                    if (value.Id != -1)
+                    {
+                        sender.Text = value.Name;
+                        return;
+                    }
+                }
+                sender.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void ASB_SearchEditor_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            try
+            {
+                if (args.ChosenSuggestion != null && args.ChosenSuggestion is PublisherVM viewModel)
+                {
+                    if (viewModel.Id != -1)
+                    {
+                        if (ViewModelPage.ViewModel.Editeurs.Any())
+                        {
+                            bool IsAlreadyExist = ViewModelPage.ViewModel.Editeurs.Any(c => c.Id == viewModel.Id);
+                            if (!IsAlreadyExist)
+                            {
+                                ViewModelPage.ViewModel.Editeurs.Add(viewModel);
+                                sender.Text = String.Empty;
+                            }
+                        }
+                        else
+                        {
+                            ViewModelPage.ViewModel.Editeurs.Add(viewModel);
+                            sender.Text = String.Empty;
+                        }
+                    }
+                    else
+                    {
+                        //Ajoute un nouvel auteur
+                        if (_parameters.ParentPage != null)
+                        {
+                            await _parameters.ParentPage.NewEditorAsync();
+                        }
+                    }
+                }
+                else
+                {
+                    //
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
             }
@@ -513,6 +822,11 @@ namespace LibraryProjectUWP.Views.Book
             CancelModificationRequested?.Invoke(this, args);
         }
 
+        private void ImportBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
         private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
@@ -585,9 +899,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-
-       
-
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             try
@@ -624,35 +935,7 @@ namespace LibraryProjectUWP.Views.Book
 
         }
 
-        private void ASB_SearchEditor_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchEditor_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchEditor_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchCollection_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchCollection_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchCollection_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-
-        }
+        
     }
 
     public class NewEditBookUCVM : INotifyPropertyChanged
@@ -754,6 +1037,34 @@ namespace LibraryProjectUWP.Views.Book
                 if (_AuthorViewModelList != value)
                 {
                     this._AuthorViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private IEnumerable<CollectionVM> _CollectionViewModelList = Enumerable.Empty<CollectionVM>();
+        public IEnumerable<CollectionVM> CollectionViewModelList
+        {
+            get => this._CollectionViewModelList;
+            set
+            {
+                if (_CollectionViewModelList != value)
+                {
+                    this._CollectionViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private IEnumerable<PublisherVM> _EditorsViewModelList = Enumerable.Empty<PublisherVM>();
+        public IEnumerable<PublisherVM> EditorsViewModelList
+        {
+            get => this._EditorsViewModelList;
+            set
+            {
+                if (_EditorsViewModelList != value)
+                {
+                    this._EditorsViewModelList = value;
                     this.OnPropertyChanged();
                 }
             }

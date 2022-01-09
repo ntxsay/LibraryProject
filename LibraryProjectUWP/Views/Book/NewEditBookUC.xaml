@@ -53,14 +53,37 @@
                        ExecuteRequested="UpdateAuthorToBookXUiCmd_ExecuteRequested"
                        Description="Met à jour la liste des auteurs" 
                        Label="Mettre à jour la liste des auteurs">
-        </XamlUICommand>
-        <XamlUICommand x:Name="RemoveAuthorToBookXamlUICommand" 
-                       ExecuteRequested="RemoveAuthorToBookXamlUICommand_ExecuteRequested"
-                       Description="Effacer cet auteur de la liste">
-        </XamlUICommand>
+            </XamlUICommand>
+            <XamlUICommand x:Name="RemoveAuthorToBookXamlUICommand" 
+                           ExecuteRequested="RemoveAuthorToBookXamlUICommand_ExecuteRequested"
+                           Description="Effacer cet auteur de la liste">
+            </XamlUICommand>
+            <XamlUICommand x:Name="UpdateCollectionToBookXUiCmd" 
+                       ExecuteRequested="UpdateCollectionToBookXUiCmd_ExecuteRequested"
+                       Description="Met à jour la liste des collections" 
+                       Label="Mettre à jour la liste des collections">
+            </XamlUICommand>
+            <XamlUICommand x:Name="RemoveCollectionToBookXamlUICommand" 
+                       ExecuteRequested="RemoveCollectionToBookXamlUICommand_ExecuteRequested"
+                       Description="Efface cette collection de la liste">
+            </XamlUICommand>
+            <XamlUICommand x:Name="UpdateEditorToBookXUiCmd" 
+                       ExecuteRequested="UpdateEditorToBookXUiCmd_ExecuteRequested"
+                       Description="Met à jour la liste des éditeurs" 
+                       Label="Mettre à jour la liste des éditeurs">
+            </XamlUICommand>
+            <XamlUICommand x:Name="RemoveEditorToBookXamlUICommand" 
+                       ExecuteRequested="RemoveEditorToBookXamlUICommand_ExecuteRequested"
+                       Description="Efface cet éditeur de la liste">
+            </XamlUICommand>
             <XamlUICommand x:Name="CancelModificationXUiCommand" 
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
+            </XamlUICommand>
+            <XamlUICommand x:Name="ImportBookXamlUICommand" 
+                       ExecuteRequested="ImportBookXamlUICommand_ExecuteRequested"
+                       Description="Importe un livre existant" 
+                       Label="Importer un livre">
             </XamlUICommand>
             <XamlUICommand x:Name="CreateItemXUiCommand" 
                        ExecuteRequested="CreateItemXUiCommand_ExecuteRequested"
@@ -303,16 +326,16 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <AutoSuggestBox x:Name="ASB_SearchEditor" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    PlaceholderText="Rechercher un éditeur" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}"
+                    PlaceholderText="Rechercher un éditeur" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestEditorDataTemplate}"
                                     TextChanged="ASB_SearchEditor_TextChanged" SuggestionChosen="ASB_SearchEditor_SuggestionChosen" QuerySubmitted="ASB_SearchEditor_QuerySubmitted">
                                             <AutoSuggestBox.QueryIcon>
                                                 <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
                                             </AutoSuggestBox.QueryIcon>
                                         </AutoSuggestBox>
-                                        <Button Grid.Column="1" VerticalAlignment="Bottom" Command="{StaticResource UpdateAuthorToBookXUiCmd}">
+                                        <Button Grid.Column="1" VerticalAlignment="Bottom" Command="{StaticResource UpdateEditorToBookXUiCmd}">
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE777;"/>
                                         </Button>
-                                        <Button Grid.Column="2" VerticalAlignment="Bottom" Command="{StaticResource RemoveAuthorToBookXamlUICommand}">
+                                        <Button Grid.Column="2" VerticalAlignment="Bottom" Command="{StaticResource RemoveEditorToBookXamlUICommand}">
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;"/>
                                         </Button>
                                     </Grid>
@@ -341,16 +364,16 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <AutoSuggestBox x:Name="ASB_SearchCollection" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    PlaceholderText="Rechercher une collection" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}"
+                    PlaceholderText="Rechercher une collection" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}"
                                     TextChanged="ASB_SearchCollection_TextChanged" SuggestionChosen="ASB_SearchCollection_SuggestionChosen" QuerySubmitted="ASB_SearchCollection_QuerySubmitted">
                                             <AutoSuggestBox.QueryIcon>
                                                 <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
                                             </AutoSuggestBox.QueryIcon>
                                         </AutoSuggestBox>
-                                        <Button Grid.Column="1" VerticalAlignment="Bottom" Command="{StaticResource UpdateAuthorToBookXUiCmd}">
+                                        <Button Grid.Column="1" VerticalAlignment="Bottom" Command="{StaticResource UpdateCollectionToBookXUiCmd}">
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE777;"/>
                                         </Button>
-                                        <Button Grid.Column="2" VerticalAlignment="Bottom" Command="{StaticResource RemoveAuthorToBookXamlUICommand}">
+                                        <Button Grid.Column="2" VerticalAlignment="Bottom" Command="{StaticResource RemoveCollectionToBookXamlUICommand}">
                                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;"/>
                                         </Button>
                                     </Grid>
@@ -465,6 +488,12 @@
                 </Button>
             </StackPanel>
             <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+                <Button Command="{StaticResource ImportBookXamlUICommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8B5;" FontSize="14"/>
+                        <TextBlock Text="Importer" FontSize="14" />
+                    </StackPanel>
+                </Button>
                 <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;" FontSize="14"/>
