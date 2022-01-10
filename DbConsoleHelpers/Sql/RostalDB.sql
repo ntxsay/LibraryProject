@@ -60,9 +60,12 @@ DROP TABLE IF EXISTS "TCollection";
 --Cree la Table si n'existe pas
 CREATE TABLE IF NOT EXISTS "TCollection" (
 	"Id" INTEGER NOT NULL UNIQUE,
+    "IdLibrary" INTEGER NOT NULL,
+    "CollectionType" INTEGER NOT NULL DEFAULT 0, -- Collection, liste de lecture
     "Name" TEXT NOT NULL UNIQUE,
     "Description" TEXT NULL,
 	PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("IdLibrary") REFERENCES "TLibrary"("Id") ON DELETE CASCADE
 );
 
 ----------------------------------------------------------------------------------------------------
@@ -80,6 +83,7 @@ CREATE TABLE IF NOT EXISTS "TContact" (
     "NomUsage" TEXT NULL,
     "Prenom" TEXT NOT NULL,
     "AutresPrenoms" TEXT NULL,
+    "DateNaissance" TEXT NULL,
     "AdressPostal" TEXT NULL,
     "Ville" TEXT NULL,
     "CodePostal" TEXT NULL,
@@ -128,11 +132,17 @@ CREATE TABLE IF NOT EXISTS "TBook" (
     "DateAjout" TEXT NOT NULL,
     "DateAjoutUser" TEXT NOT NULL,
     "DateEdition" TEXT NULL,
+    "DateAchat" TEXT NULL,
     "MainTitle" TEXT NOT NULL,
     "CountOpening" INTEGER NOT NULL DEFAULT 0,
-    "Cotation" TEXT NULL,
     "NbExactExemplaire" INTEGER NOT NULL DEFAULT 0,
-    "AnneeParution" INTEGER NULL,
+    "MinAge" INTEGER NULL DEFAULT 0,
+    "MaxAge" INTEGER NULL DEFAULT 0,
+    "IsJourParutionKnow" INTEGER NOT NULL DEFAULT 0,
+    "IsMoisParutionKnow" INTEGER NOT NULL DEFAULT 0,
+    "IsJourParutionVisible" INTEGER NOT NULL DEFAULT 1,
+    "IsMoisParutionVisible" INTEGER NOT NULL DEFAULT 1,
+    "IsFavori" INTEGER NOT NULL DEFAULT 0,
     "DateParution" TEXT NULL,
     "Resume" TEXT NULL,
     "Notes" TEXT NULL,
@@ -214,6 +224,7 @@ CREATE TABLE IF NOT EXISTS "TBookIdentification" (
     "ISBN13" TEXT NULL,
     "ISSN" TEXT NULL,
     "ASIN" TEXT NULL, --Id Amazon
+    "Cotation" TEXT NULL,
     "CodeBarre" TEXT NULL, -- voir le scan avec syncfusion si possible
 	PRIMARY KEY("Id" AUTOINCREMENT)
     FOREIGN KEY("Id") REFERENCES "TBook"("Id") ON DELETE CASCADE
@@ -283,6 +294,7 @@ DROP TABLE IF EXISTS "TBookEtat";
 CREATE TABLE IF NOT EXISTS "TBookEtat" (
 	"Id" INTEGER NOT NULL UNIQUE,
 	"IdBook" INTEGER NOT NULL,
+    "DateAjout" TEXT NOT NULL,
     "DateVerification" TEXT NOT NULL,
 	"Etat" TEXT NOT NULL,
 	"Observation" TEXT NULL,

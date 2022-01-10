@@ -79,47 +79,6 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private ObservableCollection<CollectionVM> _Collections = new ObservableCollection<CollectionVM>();
-        public ObservableCollection<CollectionVM> Collections
-        {
-            get => _Collections;
-            set
-            {
-                if (_Collections != value)
-                {
-                    _Collections = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private ObservableCollection<PublisherVM> _Editeurs = new ObservableCollection<PublisherVM>();
-        public ObservableCollection<PublisherVM> Editeurs
-        {
-            get => _Editeurs;
-            set
-            {
-                if (_Editeurs != value)
-                {
-                    _Editeurs = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private ObservableCollection<string> _Langues = new ObservableCollection<string>();
-        public ObservableCollection<string> Langues
-        {
-            get => _Langues;
-            set
-            {
-                if (_Langues != value)
-                {
-                    _Langues = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
         private string _Resume;
         public string Resume
@@ -144,90 +103,6 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_Notes != value)
                 {
                     _Notes = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private int _AnneeParution = DateTime.Now.Year;
-        public int AnneeParution
-        {
-            get => _AnneeParution;
-            set
-            {
-                if (_AnneeParution != value)
-                {
-                    _AnneeParution = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private DateTimeOffset? _DateParution;
-        public DateTimeOffset? DateParution
-        {
-            get => _DateParution;
-            set
-            {
-                if (_DateParution != value)
-                {
-                    _DateParution = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsJourParutionKnow;
-        public bool IsJourParutionKnow
-        {
-            get => _IsJourParutionKnow;
-            set
-            {
-                if (_IsJourParutionKnow != value)
-                {
-                    _IsJourParutionKnow = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsMoisParutionKnow;
-        public bool IsMoisParutionKnow
-        {
-            get => _IsMoisParutionKnow;
-            set
-            {
-                if (_IsMoisParutionKnow != value)
-                {
-                    _IsMoisParutionKnow = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsJourParutionVisible = true;
-        public bool IsJourParutionVisible
-        {
-            get => _IsJourParutionVisible;
-            set
-            {
-                if (_IsJourParutionVisible != value)
-                {
-                    _IsJourParutionVisible = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsMoisParutionVisible = true;
-        public bool IsMoisParutionVisible
-        {
-            get => _IsMoisParutionVisible;
-            set
-            {
-                if (_IsMoisParutionVisible != value)
-                {
-                    _IsMoisParutionVisible = value;
                     OnPropertyChanged();
                 }
             }
@@ -307,6 +182,8 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
         public PretLivreVM Pret { get; set; }
         public LivreIdentificationVM Identification { get; set; } = new LivreIdentificationVM();
+        public LivreFormatVM Format { get; set; } = new LivreFormatVM();
+        public LivrePublicationVM Publication { get; set; } = new LivrePublicationVM();
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

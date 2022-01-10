@@ -98,6 +98,21 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return Enumerable.Empty<long>().ToList();
                 }
             }
+
+            public static async Task<IList<long>> AllIdInLibraryAsync(long idLibrary)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+                    return await context.Tcollection.Where(w => w.IdLibrary == idLibrary).Select(s => s.Id).ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<long>().ToList();
+                }
+            }
             #endregion
 
             #region Multiple
@@ -138,6 +153,49 @@ namespace LibraryProjectUWP.Code.Services.Db
                 try
                 {
                     var collection = await MultipleWithIdBookAsync(idBook);
+                    if (!collection.Any()) return Enumerable.Empty<CollectionVM>().ToList();
+
+                    var values = collection.Select(s => ViewModelConverterAsync(s)).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<CollectionVM>().ToList();
+                }
+            }
+
+            public static async Task<IList<Tcollection>> MultipleInLibraryAsync(long idLibrary, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+                    List<Tcollection> collection = null;
+                    if (collectionType == CollectionTypeEnum.All)
+                    {
+                        collection = await context.Tcollection.Where(w => w.IdLibrary == idLibrary).ToListAsync();
+                    }
+                    else
+                    {
+                        collection = await context.Tcollection.Where(w => w.IdLibrary == idLibrary && w.CollectionType == (long)collectionType).ToListAsync();
+                    }
+                    
+                    return collection ?? Enumerable.Empty<Tcollection>().ToList();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<Tcollection>().ToList();
+                }
+            }
+
+            public static async Task<IList<CollectionVM>> MultipleVmInLibraryAsync(long idLibrary, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
+            {
+                try
+                {
+                    var collection = await MultipleInLibraryAsync(idLibrary, collectionType);
                     if (!collection.Any()) return Enumerable.Empty<CollectionVM>().ToList();
 
                     var values = collection.Select(s => ViewModelConverterAsync(s)).ToList();
@@ -227,6 +285,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     var record = new Tcollection()
                     {
+                        IdLibrary = viewModel.IdLibrary,
                         Name = viewModel.Name,
                         Description = viewModel.Description,
                     };

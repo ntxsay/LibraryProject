@@ -193,6 +193,8 @@
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
     <Compile Include="ViewModels\Book\LibraryToBookNavigationDriverVM.cs" />
+    <Compile Include="ViewModels\Book\LivrePublicationVM.cs" />
+    <Compile Include="ViewModels\Book\LivreFormatVM.cs" />
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
     <Compile Include="ViewModels\Book\ManageBookParametersDriverVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
@@ -204,6 +206,7 @@
     <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\General\ManageCategorieParametersVM.cs" />
+    <Compile Include="ViewModels\General\PriceVM.cs" />
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />

@@ -17,6 +17,7 @@ namespace DbConsoleHelpers.Models.Local
 
         public long Id { get; set; }
         public long IdBook { get; set; }
+        public string DateAjout { get; set; }
         public string DateVerification { get; set; }
         public string Etat { get; set; }
         public string Observation { get; set; }

@@ -233,13 +233,12 @@ namespace LibraryProjectUWP.Code.Services.Db
                         DateAjout = viewModel.DateAjout.ToString(),
                         DateAjoutUser = viewModel.DateAjoutUser.ToString(),
                         DateEdition = viewModel.DateEdition?.ToString(),
-                        DateParution = viewModel.DateParution?.ToString(),
+                        DateParution = viewModel.Publication.DateParution?.ToString(),
                         MainTitle = viewModel.MainTitle,
                         CountOpening = viewModel.CountOpening,
                         NbExactExemplaire = viewModel.NbExactExemplaire,
                         Resume = viewModel.Resume,
                         Notes = viewModel.Notes,
-                        Cotation = viewModel.Identification?.Cotation, //A deplacer dans identification
                     };
 
                     await context.Tbook.AddAsync(record);
@@ -256,6 +255,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             Issn = viewModel.Identification.ISSN,
                             Asin = viewModel.Identification.ASIN,
                             CodeBarre = viewModel.Identification.CodeBarre,
+                            Cotation = viewModel.Identification.Cotation,
                         };
 
                         await context.TbookIdentification.AddAsync(recordConnector);
@@ -292,9 +292,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                         }
                     }
 
-                    if (viewModel.Collections != null && viewModel.Collections.Any())
+                    if (viewModel.Publication.Collections != null && viewModel.Publication.Collections.Any())
                     {
-                        foreach (CollectionVM collection in viewModel.Collections)
+                        foreach (CollectionVM collection in viewModel.Publication.Collections)
                         {
                             var itemConnector = new TbookCollectionConnector()
                             {
@@ -307,9 +307,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                         }
                     }
 
-                    if (viewModel.Editeurs != null && viewModel.Editeurs.Any())
+                    if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
                     {
-                        foreach (PublisherVM editeur in viewModel.Editeurs)
+                        foreach (PublisherVM editeur in viewModel.Publication.Editeurs)
                         {
                             var itemConnector = new TbookEditeurConnector()
                             {
@@ -393,13 +393,12 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     record.DateAjoutUser = viewModel.DateAjoutUser.ToString();
                     record.DateEdition = DateTime.UtcNow.ToString();
-                    record.DateParution = viewModel.DateParution?.ToString();
+                    record.DateParution = viewModel.Publication.DateParution?.ToString();
                     record.MainTitle = viewModel.MainTitle;
                     record.CountOpening = viewModel.CountOpening;
                     record.NbExactExemplaire = viewModel.NbExactExemplaire;
                     record.Resume = viewModel.Resume;
                     record.Notes = viewModel.Notes;
-                    record.Cotation = viewModel.Identification?.Cotation; //A deplacer dans identification
 
                     context.Tbook.Update(record);
 
@@ -449,7 +448,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         }
                     }
 
-                    if (viewModel.Collections != null)
+                    if (viewModel.Publication.Collections != null)
                     {
                         var recorditemList = await context.TbookCollectionConnector.Where(a => a.IdBook == record.Id).ToListAsync();
                         if (recorditemList.Any())
@@ -457,9 +456,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                             context.TbookCollectionConnector.RemoveRange(recorditemList);
                         }
                         
-                        if (viewModel.Collections.Any())
+                        if (viewModel.Publication.Collections.Any())
                         {
-                            foreach (CollectionVM collection in viewModel.Collections)
+                            foreach (CollectionVM collection in viewModel.Publication.Collections)
                             {
                                 var itemConnector = new TbookCollectionConnector()
                                 {
@@ -472,7 +471,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         }
                     }
 
-                    if (viewModel.Editeurs != null)
+                    if (viewModel.Publication.Editeurs != null)
                     {
                         var recorditemList = await context.TbookEditeurConnector.Where(a => a.IdBook == record.Id).ToListAsync();
                         if (recorditemList.Any())
@@ -480,9 +479,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                             context.TbookEditeurConnector.RemoveRange(recorditemList);
                         }
 
-                        if (viewModel.Editeurs.Any())
+                        if (viewModel.Publication.Editeurs.Any())
                         {
-                            foreach (PublisherVM editeur in viewModel.Editeurs)
+                            foreach (PublisherVM editeur in viewModel.Publication.Editeurs)
                             {
                                 var itemConnector = new TbookEditeurConnector()
                                 {
@@ -513,6 +512,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         recordIdentification.Issn = viewModel.Identification.ISSN;
                         recordIdentification.Asin = viewModel.Identification.ASIN;
                         recordIdentification.CodeBarre = viewModel.Identification.CodeBarre;
+                        recordIdentification.Cotation = viewModel.Identification.Cotation;
                         _ = context.TbookIdentification.Update(recordIdentification);
                     }
 
@@ -642,12 +642,15 @@ namespace LibraryProjectUWP.Code.Services.Db
                         DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
                         DateAjoutUser = DatesHelpers.Converter.GetDateFromString(model.DateAjoutUser),
                         DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
-                        DateParution = DatesHelpers.Converter.GetNullableDateFromString(model.DateParution),
                         MainTitle = model.MainTitle,
                         CountOpening = model.CountOpening,
                         NbExactExemplaire = Convert.ToInt16(model.NbExactExemplaire),
                         Resume = model.Resume,
                         Notes = model.Notes,
+                        Publication = new LivrePublicationVM()
+                        {
+                            DateParution = DatesHelpers.Converter.GetNullableDateFromString(model.DateParution),
+                        }
                     };
 
                     if (model.TbookIdentification != null)
@@ -661,7 +664,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             ISSN = model.TbookIdentification.Issn,
                             ASIN = model.TbookIdentification.Asin,
                             CodeBarre = model.TbookIdentification.CodeBarre,
-                            Cotation = model.Cotation,
+                            Cotation = model.TbookIdentification.Cotation,
                         };
                     }
 

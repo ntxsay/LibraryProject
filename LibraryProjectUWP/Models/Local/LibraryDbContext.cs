@@ -44,8 +44,11 @@ namespace LibraryProjectUWP.Models.Local
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var dbFile = DbServices.DbFile();
-                optionsBuilder.UseSqlite($"Data Source={dbFile}");            
+                if (!optionsBuilder.IsConfigured)
+                {
+                    var dbFile = DbServices.DbFile();
+                    optionsBuilder.UseSqlite($"Data Source={dbFile}");
+                }
             }
         }
 
@@ -92,7 +95,15 @@ namespace LibraryProjectUWP.Models.Local
 
                 entity.Property(e => e.Guid).IsRequired();
 
+                entity.Property(e => e.IsJourParutionVisible).HasDefaultValueSql("1");
+
+                entity.Property(e => e.IsMoisParutionVisible).HasDefaultValueSql("1");
+
                 entity.Property(e => e.MainTitle).IsRequired();
+
+                entity.Property(e => e.MaxAge).HasDefaultValueSql("0");
+
+                entity.Property(e => e.MinAge).HasDefaultValueSql("0");
             });
 
             modelBuilder.Entity<TbookAuthorConnector>(entity =>
@@ -157,6 +168,8 @@ namespace LibraryProjectUWP.Models.Local
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.DateAjout).IsRequired();
 
                 entity.Property(e => e.DateVerification).IsRequired();
 
@@ -300,6 +313,10 @@ namespace LibraryProjectUWP.Models.Local
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Name).IsRequired();
+
+                entity.HasOne(d => d.IdLibraryNavigation)
+                    .WithMany(p => p.Tcollection)
+                    .HasForeignKey(d => d.IdLibrary);
             });
 
             modelBuilder.Entity<Tcontact>(entity =>

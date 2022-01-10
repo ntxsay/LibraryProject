@@ -365,7 +365,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (this.ListViewCollection.SelectedIndex > -1)
                 {
-                    ViewModelPage.ViewModel.Collections.RemoveAt(this.ListViewCollection.SelectedIndex);
+                    ViewModelPage.ViewModel.Publication.Collections.RemoveAt(this.ListViewCollection.SelectedIndex);
                 }
             }
             catch (Exception ex)
@@ -451,18 +451,18 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (viewModel.Id != -1)
                     {
-                        if (ViewModelPage.ViewModel.Collections.Any())
+                        if (ViewModelPage.ViewModel.Publication.Collections.Any())
                         {
-                            bool IsAlreadyExist = ViewModelPage.ViewModel.Collections.Any(c => c.Id == viewModel.Id);
+                            bool IsAlreadyExist = ViewModelPage.ViewModel.Publication.Collections.Any(c => c.Id == viewModel.Id);
                             if (!IsAlreadyExist)
                             {
-                                ViewModelPage.ViewModel.Collections.Add(viewModel);
+                                ViewModelPage.ViewModel.Publication.Collections.Add(viewModel);
                                 sender.Text = String.Empty;
                             }
                         }
                         else
                         {
-                            ViewModelPage.ViewModel.Collections.Add(viewModel);
+                            ViewModelPage.ViewModel.Publication.Collections.Add(viewModel);
                             sender.Text = String.Empty;
                         }
                     }
@@ -517,7 +517,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (this.ListViewEditeur.SelectedIndex > -1)
                 {
-                    ViewModelPage.ViewModel.Editeurs.RemoveAt(this.ListViewEditeur.SelectedIndex);
+                    ViewModelPage.ViewModel.Publication.Editeurs.RemoveAt(this.ListViewEditeur.SelectedIndex);
                 }
             }
             catch (Exception ex)
@@ -604,18 +604,18 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (viewModel.Id != -1)
                     {
-                        if (ViewModelPage.ViewModel.Editeurs.Any())
+                        if (ViewModelPage.ViewModel.Publication.Editeurs.Any())
                         {
-                            bool IsAlreadyExist = ViewModelPage.ViewModel.Editeurs.Any(c => c.Id == viewModel.Id);
+                            bool IsAlreadyExist = ViewModelPage.ViewModel.Publication.Editeurs.Any(c => c.Id == viewModel.Id);
                             if (!IsAlreadyExist)
                             {
-                                ViewModelPage.ViewModel.Editeurs.Add(viewModel);
+                                ViewModelPage.ViewModel.Publication.Editeurs.Add(viewModel);
                                 sender.Text = String.Empty;
                             }
                         }
                         else
                         {
-                            ViewModelPage.ViewModel.Editeurs.Add(viewModel);
+                            ViewModelPage.ViewModel.Publication.Editeurs.Add(viewModel);
                             sender.Text = String.Empty;
                         }
                     }
@@ -647,9 +647,9 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (ViewModelPage.ViewModel.DateParution != null)
+                if (ViewModelPage.ViewModel.Publication.DateParution != null)
                 {
-                    ViewModelPage.ViewModel.DateParution = null;
+                    ViewModelPage.ViewModel.Publication.DateParution = null;
                 }
             }
             catch (Exception ex)
@@ -668,22 +668,22 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (toggle.IsChecked)
                     {
-                        if (ViewModelPage.ViewModel.IsMoisParutionKnow == false || ViewModelPage.ViewModel.DateParution  == null)
+                        if (ViewModelPage.ViewModel.Publication.IsMoisParutionKnow == false || ViewModelPage.ViewModel.Publication.DateParution  == null)
                         {
-                            ViewModelPage.ViewModel.IsJourParutionKnow = false;
-                            ViewModelPage.ViewModel.IsJourParutionVisible = false;
+                            ViewModelPage.ViewModel.Publication.IsJourParutionKnow = false;
+                            ViewModelPage.ViewModel.Publication.IsJourParutionVisible = false;
                             toggle.IsChecked = false;
                         }
                         else
                         {
-                            ViewModelPage.ViewModel.IsJourParutionKnow = true;
-                            ViewModelPage.ViewModel.IsJourParutionVisible = true;
+                            ViewModelPage.ViewModel.Publication.IsJourParutionKnow = true;
+                            ViewModelPage.ViewModel.Publication.IsJourParutionVisible = true;
                         }
                     }
                     else
                     {
-                        ViewModelPage.ViewModel.IsJourParutionKnow = false;
-                        ViewModelPage.ViewModel.IsJourParutionVisible = false;
+                        ViewModelPage.ViewModel.Publication.IsJourParutionKnow = false;
+                        ViewModelPage.ViewModel.Publication.IsJourParutionVisible = false;
                     }
                 }
             }
@@ -703,25 +703,25 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (toggle.IsChecked)
                     {
-                        if (ViewModelPage.ViewModel.DateParution == null)
+                        if (ViewModelPage.ViewModel.Publication.DateParution == null)
                         {
-                            ViewModelPage.ViewModel.IsJourParutionVisible = true;
-                            ViewModelPage.ViewModel.IsMoisParutionVisible = true;
-                            ViewModelPage.ViewModel.IsMoisParutionKnow = false;
-                            ViewModelPage.ViewModel.IsJourParutionKnow = false;
+                            ViewModelPage.ViewModel.Publication.IsJourParutionVisible = true;
+                            ViewModelPage.ViewModel.Publication.IsMoisParutionVisible = true;
+                            ViewModelPage.ViewModel.Publication.IsMoisParutionKnow = false;
+                            ViewModelPage.ViewModel.Publication.IsJourParutionKnow = false;
                         }
                         else
                         {
-                            ViewModelPage.ViewModel.IsMoisParutionVisible = true;
-                            ViewModelPage.ViewModel.IsMoisParutionKnow = true;
+                            ViewModelPage.ViewModel.Publication.IsMoisParutionVisible = true;
+                            ViewModelPage.ViewModel.Publication.IsMoisParutionKnow = true;
                         }
                     }
                     else
                     {
-                        ViewModelPage.ViewModel.IsJourParutionKnow = false;
-                        ViewModelPage.ViewModel.IsJourParutionVisible = false;
-                        ViewModelPage.ViewModel.IsMoisParutionKnow = false;
-                        ViewModelPage.ViewModel.IsMoisParutionVisible = false;
+                        ViewModelPage.ViewModel.Publication.IsJourParutionKnow = false;
+                        ViewModelPage.ViewModel.Publication.IsJourParutionVisible = false;
+                        ViewModelPage.ViewModel.Publication.IsMoisParutionKnow = false;
+                        ViewModelPage.ViewModel.Publication.IsMoisParutionVisible = false;
                     }
                 }
             }
@@ -739,17 +739,17 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (args.NewDate != null)
                 {
-                    ViewModelPage.ViewModel.IsJourParutionVisible = true;
-                    ViewModelPage.ViewModel.IsMoisParutionVisible = true;
-                    ViewModelPage.ViewModel.IsJourParutionKnow = true;
-                    ViewModelPage.ViewModel.IsMoisParutionKnow = true;
+                    ViewModelPage.ViewModel.Publication.IsJourParutionVisible = true;
+                    ViewModelPage.ViewModel.Publication.IsMoisParutionVisible = true;
+                    ViewModelPage.ViewModel.Publication.IsJourParutionKnow = true;
+                    ViewModelPage.ViewModel.Publication.IsMoisParutionKnow = true;
                 }
                 else
                 {
-                    ViewModelPage.ViewModel.IsJourParutionVisible = true;
-                    ViewModelPage.ViewModel.IsMoisParutionVisible = true;
-                    ViewModelPage.ViewModel.IsJourParutionKnow = false;
-                    ViewModelPage.ViewModel.IsMoisParutionKnow = false;
+                    ViewModelPage.ViewModel.Publication.IsJourParutionVisible = true;
+                    ViewModelPage.ViewModel.Publication.IsMoisParutionVisible = true;
+                    ViewModelPage.ViewModel.Publication.IsJourParutionKnow = false;
+                    ViewModelPage.ViewModel.Publication.IsMoisParutionKnow = false;
                 }
             }
             catch (Exception ex)
@@ -764,7 +764,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (ViewModelPage.ViewModel.DateParution == null)
+                if (ViewModelPage.ViewModel.Publication.DateParution == null)
                 {
                     BtnDateParution.Flyout.Hide();
                     MyTeachingTip.Target = BtnDateParution;

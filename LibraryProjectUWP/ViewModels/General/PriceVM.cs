@@ -6,43 +6,54 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryProjectUWP.ViewModels.Collection
+namespace LibraryProjectUWP.ViewModels.General
 {
-    public class CollectionVM : INotifyPropertyChanged
+    public class PriceVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public long Id { get; set; }
-        public long IdBook { get; set; } = -1;
-        public long IdLibrary { get; set; } = -1;
 
-        private string _Name;
-        public string Name
+        private double _Price;
+        public double Price
         {
-            get => _Name;
+            get => _Price;
             set
             {
-                if (_Name != value)
+                if (_Price != value)
                 {
-                    _Name = value;
+                    _Price = value;
                     OnPropertyChanged();
                 }
             }
         }
 
-        private string _Description;
-        public string Description
+        private string _DeviceName;
+        public string DeviceName
         {
-            get => _Description;
+            get => _DeviceName;
             set
             {
-                if (_Description != value)
+                if (_DeviceName != value)
                 {
-                    _Description = value;
+                    _DeviceName = value;
                     OnPropertyChanged();
                 }
             }
         }
-       
+
+        private string _DeviceChar;
+        public string DeviceChar
+        {
+            get => _DeviceChar;
+            set
+            {
+                if (_DeviceChar != value)
+                {
+                    _DeviceChar = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             // Raise the PropertyChanged event, passing the name of the property whose value has changed.

@@ -34,4 +34,11 @@ namespace LibraryProjectUWP.Code
         Settings,
         None,
     }
+
+    public enum CollectionTypeEnum : short
+    {
+        All = -1,
+        Collection = 0,
+        Playlist = 1,
+    }
 }

@@ -27,11 +27,17 @@ namespace LibraryProjectUWP.Models.Local
         public string DateAjout { get; set; }
         public string DateAjoutUser { get; set; }
         public string DateEdition { get; set; }
+        public string DateAchat { get; set; }
         public string MainTitle { get; set; }
         public long CountOpening { get; set; }
-        public string Cotation { get; set; }
         public long NbExactExemplaire { get; set; }
-        public long? AnneeParution { get; set; }
+        public long? MinAge { get; set; }
+        public long? MaxAge { get; set; }
+        public long IsJourParutionKnow { get; set; }
+        public long IsMoisParutionKnow { get; set; }
+        public long IsJourParutionVisible { get; set; }
+        public long IsMoisParutionVisible { get; set; }
+        public long IsFavori { get; set; }
         public string DateParution { get; set; }
         public string Resume { get; set; }
         public string Notes { get; set; }

@@ -23,6 +23,7 @@ namespace DbConsoleHelpers.Models.Local
         public string NomUsage { get; set; }
         public string Prenom { get; set; }
         public string AutresPrenoms { get; set; }
+        public string DateNaissance { get; set; }
         public string AdressPostal { get; set; }
         public string Ville { get; set; }
         public string CodePostal { get; set; }

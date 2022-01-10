@@ -15,9 +15,12 @@ namespace LibraryProjectUWP.Models.Local
         }
 
         public long Id { get; set; }
+        public long IdLibrary { get; set; }
+        public long CollectionType { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
 
+        public virtual Tlibrary IdLibraryNavigation { get; set; }
         public virtual ICollection<TbookCollectionConnector> TbookCollectionConnector { get; set; }
     }
 }
