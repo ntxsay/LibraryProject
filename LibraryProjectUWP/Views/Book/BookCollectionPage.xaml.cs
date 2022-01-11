@@ -1191,7 +1191,11 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         EditMode = Code.EditMode.Create,
                         ViewModelList = itemList,
+                        //ParentLibrary = _parameters.ParentLibrary,
                         CurrentViewModel = new CollectionVM()
+                        {
+                            IdLibrary = _parameters.ParentLibrary.Id,
+                        }
                     });
 
                     userControl.CancelModificationRequested += NewEditCollectionUC_Create_CancelModificationRequested;
@@ -1276,9 +1280,10 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    IList<CollectionVM> itemList = await DbServices.Collection.AllVMAsync();
+                    IList<CollectionVM> itemList = await DbServices.Collection.MultipleVmInLibraryAsync(_parameters.ParentLibrary.Id, Code.CollectionTypeEnum.Collection);
                     CollectionListUC userControl = new CollectionListUC(new CollectionListParametersDriverVM()
                     {
+                        ParentLibrary = _parameters.ParentLibrary,
                         ViewModelList = itemList?.ToList(), //ViewModelPage.ContactViewModelList,
                     });
 

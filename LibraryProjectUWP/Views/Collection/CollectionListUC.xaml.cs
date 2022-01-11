@@ -59,6 +59,10 @@ namespace LibraryProjectUWP.Views.Collection
             _parameters = parameters;
             ViewModelPage.Header = $"Collections";
             ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
+            if (parameters.ViewModelList != null && parameters.ViewModelList.Any())
+            {
+                ViewModelPage.CollectionViewModelList = new ObservableCollection<CollectionVM>(parameters.ViewModelList);
+            }
             InitializeActionInfos();
         }
 

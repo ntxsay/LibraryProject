@@ -89,8 +89,9 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap">
-            <Run Text="Naviguez parmis les collections de la bibliothèque" />
+            <Run Text="Vous naviguez parmi les collections de la bibliothèque «" />
             <Run Text="{x:Bind ViewModelPage.ParentLibrary.Name, Mode=OneWay}" FontWeight="Bold" />
+            <Run Text="»" />
         </TextBlock>
         <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.CollectionViewModelList, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" SelectedItem="{x:Bind ViewModelPage.SelectedViewModel, Mode=TwoWay}" SelectionChanged="ListView_SelectionChanged">
             

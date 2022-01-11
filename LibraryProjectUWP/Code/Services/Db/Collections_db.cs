@@ -309,6 +309,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         IsSuccess = true,
                         Id = record.Id,
+                        Message = $"La collection \"{viewModel.Name}\" a été créé avec succès."
                     };
                 }
                 catch (Exception ex)

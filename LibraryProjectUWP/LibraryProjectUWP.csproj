@@ -265,7 +265,7 @@
     <Compile Include="Views\Library\Manage\NewEditLibraryUC.xaml.cs">
       <DependentUpon>NewEditLibraryUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Library\Manage\NewEditCategoryUC.xaml.cs">
+    <Compile Include="Views\Categories\NewEditCategoryUC.xaml.cs">
       <DependentUpon>NewEditCategoryUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Library\Manage\NewLibraryCD.xaml.cs">
@@ -371,7 +371,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Library\Manage\NewEditCategoryUC.xaml">
+    <Page Include="Views\Categories\NewEditCategoryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
