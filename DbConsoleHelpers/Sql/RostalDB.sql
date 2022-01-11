@@ -1,4 +1,5 @@
 ----------------------------------------------------------------------------------------------------
+-- SQLITE --
 --Bibliotheque -- 
 --Supprime la Table si existe
 DROP TABLE IF EXISTS "TLibrary";

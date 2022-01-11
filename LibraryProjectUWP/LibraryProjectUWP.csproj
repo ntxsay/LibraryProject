@@ -193,6 +193,9 @@
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
     <Compile Include="ViewModels\Book\LibraryToBookNavigationDriverVM.cs" />
+    <Compile Include="ViewModels\Book\LivreClassificationAgeVM.cs" />
+    <Compile Include="ViewModels\Book\LivreEtatVM.cs" />
+    <Compile Include="ViewModels\Book\LivreDescriptionVM.cs" />
     <Compile Include="ViewModels\Book\LivrePublicationVM.cs" />
     <Compile Include="ViewModels\Book\LivreFormatVM.cs" />
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />

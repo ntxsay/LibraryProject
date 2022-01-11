@@ -234,11 +234,15 @@ namespace LibraryProjectUWP.Code.Services.Db
                         DateAjoutUser = viewModel.DateAjoutUser.ToString(),
                         DateEdition = viewModel.DateEdition?.ToString(),
                         DateParution = viewModel.Publication.DateParution?.ToString(),
+                        IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0,
+                        IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0,
                         MainTitle = viewModel.MainTitle,
                         CountOpening = viewModel.CountOpening,
                         NbExactExemplaire = viewModel.NbExactExemplaire,
-                        Resume = viewModel.Resume,
-                        Notes = viewModel.Notes,
+                        Resume = viewModel.Description?.Resume,
+                        Notes = viewModel.Description?.Notes,
+                        MinAge = viewModel.ClassificationAge?.MinAge,
+                        MaxAge = viewModel.ClassificationAge?.MaxAge
                     };
 
                     await context.Tbook.AddAsync(record);
@@ -326,6 +330,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         IsSuccess = true,
                         Id = record.Id,
+                        Message = $"Le livre {viewModel.MainTitle} a été créé avec succès."
                     };
                 }
                 catch (Exception ex)
@@ -394,11 +399,16 @@ namespace LibraryProjectUWP.Code.Services.Db
                     record.DateAjoutUser = viewModel.DateAjoutUser.ToString();
                     record.DateEdition = DateTime.UtcNow.ToString();
                     record.DateParution = viewModel.Publication.DateParution?.ToString();
+                    record.IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0;
+                    record.IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0;
                     record.MainTitle = viewModel.MainTitle;
                     record.CountOpening = viewModel.CountOpening;
                     record.NbExactExemplaire = viewModel.NbExactExemplaire;
-                    record.Resume = viewModel.Resume;
-                    record.Notes = viewModel.Notes;
+                    record.Resume = viewModel.Description.Resume;
+                    record.Notes = viewModel.Description.Notes;
+                    record.MinAge = viewModel.ClassificationAge?.MinAge;
+                    record.MaxAge = viewModel.ClassificationAge?.MaxAge;
+
 
                     context.Tbook.Update(record);
 
@@ -645,12 +655,20 @@ namespace LibraryProjectUWP.Code.Services.Db
                         MainTitle = model.MainTitle,
                         CountOpening = model.CountOpening,
                         NbExactExemplaire = Convert.ToInt16(model.NbExactExemplaire),
-                        Resume = model.Resume,
-                        Notes = model.Notes,
+                        Description = new LivreDescriptionVM()
+                        {
+                            Resume = model.Resume,
+                            Notes = model.Notes,
+                        },
                         Publication = new LivrePublicationVM()
                         {
                             DateParution = DatesHelpers.Converter.GetNullableDateFromString(model.DateParution),
-                        }
+                        },
+                        ClassificationAge = new LivreClassificationAgeVM()
+                        {
+                            MinAge = (byte)(model.MinAge < byte.MinValue || model.MinAge > byte.MaxValue ? 0 : model.MinAge),
+                            MaxAge = (byte)(model.MaxAge < byte.MinValue || model.MaxAge > byte.MaxValue ? 0 : model.MaxAge),
+                        },
                     };
 
                     if (model.TbookIdentification != null)

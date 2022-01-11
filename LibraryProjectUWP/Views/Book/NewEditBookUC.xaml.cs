@@ -17,6 +17,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -872,11 +873,26 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                //if (ViewModelPage.Value.IsStringNullOrEmptyOrWhiteSpace())
-                //{
-                //    ViewModelPage.ResultMessage = $"Le nom de la bibliothèque ne peut pas être vide\nou ne contenir que des espaces blancs.";
-                //    return false;
-                //}
+                if (ViewModelPage.ViewModel.MainTitle.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    ViewModelPage.ResultMessage = $"Le titre principal du livre ne peut pas être vide ou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                    return false;
+                }
+
+                if (ViewModelPage.ViewModel.ClassificationAge.MinAge > ViewModelPage.ViewModel.ClassificationAge.MaxAge)
+                {
+                    ViewModelPage.ResultMessage = $"L'âge minimum ne peut pas être supérieur à l'âge maximum.";
+                    ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                    return false;
+                }
+
+                if (ViewModelPage.ViewModel.ClassificationAge.MaxAge < ViewModelPage.ViewModel.ClassificationAge.MinAge)
+                {
+                    ViewModelPage.ResultMessage = $"L'âge maximum ne peut pas être inférieur à l'âge maximum.";
+                    ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                    return false;
+                }
 
                 //if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(a => a.Name.ToLower() == ViewModelPage.Value.Trim().ToLower()))
                 //{
@@ -888,7 +904,7 @@ namespace LibraryProjectUWP.Views.Book
                 //    }
                 //}
 
-                //ViewModelPage.ResultMessage = string.Empty;
+                ViewModelPage.ResultMessage = string.Empty;
                 return true;
             }
             catch (Exception ex)

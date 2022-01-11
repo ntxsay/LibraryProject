@@ -661,8 +661,8 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     });
 
-                    userControl.CancelModificationRequested += NewEditBookUC_CancelModificationRequested;
-                    userControl.CreateItemRequested += NewEditBookUC_CreateItemRequested;
+                    userControl.CancelModificationRequested += NewEditBookUC_Create_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditBookUC_Create_CreateItemRequested;
 
                     this.PivotRightSideBar.Items.Add(userControl);
                     this.PivotRightSideBar.SelectedItem = userControl;
@@ -676,7 +676,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void NewEditBookUC_CreateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        private async void NewEditBookUC_Create_CreateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -690,6 +690,17 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         newViewModel.Id = creationResult.Id;
                         ViewModelPage.ViewModelList.Add(newViewModel);
+
+                        if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
+                        {
+                            bookCollectionGdViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        }
+                        else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
+                        {
+                            bookCollectionDgViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        }
+
+                        this.RefreshItemsGrouping();
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
                     }
@@ -702,19 +713,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
                 }
 
-                //sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
-                //sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
-
-                //if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
-                //{
-                //    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
-                //    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
-                //}
-                //else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
-                //{
-                //    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = false;
-                //    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = null;
-                //}
+                sender.ViewModelPage.ViewModel = new LivreVM();
             }
             catch (Exception ex)
             {
@@ -723,13 +722,13 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void NewEditBookUC_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        private void NewEditBookUC_Create_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                sender.CancelModificationRequested -= NewEditBookUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditBookUC_CreateItemRequested;
+                sender.CancelModificationRequested -= NewEditBookUC_Create_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditBookUC_Create_CreateItemRequested;
 
                 if (this.PivotRightSideBar.Items.Count == 1)
                 {

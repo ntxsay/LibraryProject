@@ -174,8 +174,9 @@
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Text="Général" FontSize="17" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="SemiBold" Margin="0 0 0 8"/>
                 <ScrollViewer Grid.Row="1">
-                    <Grid RowSpacing="18" VerticalAlignment="Top">
+                    <Grid RowSpacing="38" VerticalAlignment="Top">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -266,6 +267,93 @@
                                 <TextBlock Text="Nombre d'exemplaires" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </MUIXC:NumberBox.Header>
                         </MUIXC:NumberBox>
+                        <Grid Grid.Row="5" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Classification âge" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            <Grid Grid.Row="1" ColumnSpacing="40">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                    <TextBlock VerticalAlignment="Center">
+                                    <Run Text="Min :" />
+                                    </TextBlock>
+                                    <MUIXC:NumberBox Grid.Column="1" HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.ClassificationAge.MinAge, Mode=TwoWay}" PlaceholderText="Min"
+                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="30" FontSize="14">
+                                    </MUIXC:NumberBox>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                    <TextBlock VerticalAlignment="Center" HorizontalTextAlignment="Right">
+                                    <Run Text="Max :" />
+                                    </TextBlock>
+                                    <MUIXC:NumberBox HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.ClassificationAge.MaxAge, Mode=TwoWay}" PlaceholderText="Max"
+                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="30" FontSize="14">
+                                    </MUIXC:NumberBox>
+                                </StackPanel>
+                                
+                            </Grid>
+                        </Grid>
+
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+            <!--Identification-->
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Identification" FontSize="17" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="SemiBold" Margin="0 0 0 8"/>
+                <ScrollViewer Grid.Row="1">
+                    <Grid RowSpacing="38" VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.ViewModel.Identification.Cotation, Mode=TwoWay}" PlaceholderText="Cotation du livre">
+                            <TextBox.Header>
+                                <TextBlock Text="Cotation du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </TextBox.Header>
+                        </TextBox>
+                        <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN, Mode=TwoWay}" PlaceholderText="ISBN du livre">
+                            <TextBox.Header>
+                                <TextBlock Text="ISBN" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </TextBox.Header>
+                        </TextBox>
+                        <TextBox Grid.Row="2" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN10, Mode=TwoWay}" PlaceholderText="ISBN-10 du livre">
+                            <TextBox.Header>
+                                <TextBlock Text="ISBN-10" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </TextBox.Header>
+                        </TextBox>
+                        <TextBox Grid.Row="3" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN13, Mode=TwoWay}" PlaceholderText="ISBN-13 du livre">
+                            <TextBox.Header>
+                                <TextBlock Text="ISBN-13" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </TextBox.Header>
+                        </TextBox>
+                        <TextBox Grid.Row="4" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISSN, Mode=TwoWay}" PlaceholderText="ISSN du livre">
+                            <TextBox.Header>
+                                <TextBlock Text="ISSN" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </TextBox.Header>
+                        </TextBox>
+                        <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Identification.ASIN, Mode=TwoWay}" PlaceholderText="ASIN du livre">
+                            <TextBox.Header>
+                                <TextBlock Text="ASIN (Amazon)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </TextBox.Header>
+                        </TextBox>
+                        <TextBox Grid.Row="6" Text="{x:Bind ViewModelPage.ViewModel.Identification.CodeBarre, Mode=TwoWay}" PlaceholderText="Code barre du livre">
+                            <TextBox.Header>
+                                <TextBlock Text="Code barre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </TextBox.Header>
+                        </TextBox>
                     </Grid>
                 </ScrollViewer>
             </Grid>
@@ -464,62 +552,6 @@
                     </Grid>
                 </ScrollViewer>
             </Grid>
-            <!--Identification-->
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="Identification" FontSize="17" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="SemiBold" Margin="0 0 0 8"/>
-                <ScrollViewer Grid.Row="1">
-                    <Grid RowSpacing="18" VerticalAlignment="Top">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.ViewModel.Identification.Cotation, Mode=TwoWay}" PlaceholderText="Cotation du livre">
-                            <TextBox.Header>
-                                <TextBlock Text="Cotation du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </TextBox.Header>
-                        </TextBox>
-                        <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN, Mode=TwoWay}" PlaceholderText="ISBN du livre">
-                            <TextBox.Header>
-                                <TextBlock Text="ISBN" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </TextBox.Header>
-                        </TextBox>
-                        <TextBox Grid.Row="2" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN10, Mode=TwoWay}" PlaceholderText="ISBN-10 du livre">
-                            <TextBox.Header>
-                                <TextBlock Text="ISBN-10" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </TextBox.Header>
-                        </TextBox>
-                        <TextBox Grid.Row="3" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN13, Mode=TwoWay}" PlaceholderText="ISBN-13 du livre">
-                            <TextBox.Header>
-                                <TextBlock Text="ISBN-13" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </TextBox.Header>
-                        </TextBox>
-                        <TextBox Grid.Row="4" Text="{x:Bind ViewModelPage.ViewModel.Identification.ISSN, Mode=TwoWay}" PlaceholderText="ISSN du livre">
-                            <TextBox.Header>
-                                <TextBlock Text="ISSN" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </TextBox.Header>
-                        </TextBox>
-                        <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Identification.ASIN, Mode=TwoWay}" PlaceholderText="ASIN du livre">
-                            <TextBox.Header>
-                                <TextBlock Text="ASIN (Amazon)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </TextBox.Header>
-                        </TextBox>
-                        <TextBox Grid.Row="6" Text="{x:Bind ViewModelPage.ViewModel.Identification.CodeBarre, Mode=TwoWay}" PlaceholderText="Code barre du livre">
-                            <TextBox.Header>
-                                <TextBlock Text="Code barre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </TextBox.Header>
-                        </TextBox>
-                    </Grid>
-                </ScrollViewer>
-            </Grid>
             <!--Format-->
             <Grid>
                 <Grid.RowDefinitions>
@@ -528,7 +560,7 @@
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Text="Format" FontSize="17" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="SemiBold" Margin="0 0 0 8"/>
                 <ScrollViewer Grid.Row="1">
-                    <Grid RowSpacing="18" VerticalAlignment="Top">
+                    <Grid RowSpacing="38" VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -549,25 +581,19 @@
                                 <TextBlock Text="Nombre de pages" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </MUIXC:NumberBox.Header>
                         </MUIXC:NumberBox>
-                        <ComboBox Grid.Row="2" Margin="0 16 0 0" ItemsSource="{x:Bind ViewModelPage.ViewModel.Format.FormatModelList, Mode=OneWay}" PlaceholderText="Unité de mesure (dimensions)" SelectedItem="{x:Bind ViewModelPage.ViewModel.Format.Format, Mode=TwoWay}"
-                                  HorizontalAlignment="Stretch">
-                            <ComboBox.Header>
-                                <TextBlock Text="Unité de mesure (dimensions)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </ComboBox.Header>
-                        </ComboBox>
-                        <MUIXC:NumberBox Grid.Row="3" Value="{x:Bind ViewModelPage.ViewModel.Format.Hauteur, Mode=TwoWay}" Minimum="-1" PlaceholderText="Hauteur du livre" SpinButtonPlacementMode="Inline">
+                        <MUIXC:NumberBox Grid.Row="2" Margin="0 16 0 0" Value="{x:Bind ViewModelPage.ViewModel.Format.Hauteur, Mode=TwoWay}" Minimum="-1" PlaceholderText="Hauteur du livre" SpinButtonPlacementMode="Inline">
                             <MUIXC:NumberBox.Header>
-                                <TextBlock Text="Hauteur du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                <TextBlock Text="Hauteur du livre (en cm)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </MUIXC:NumberBox.Header>
                         </MUIXC:NumberBox>
-                        <MUIXC:NumberBox Grid.Row="4" Value="{x:Bind ViewModelPage.ViewModel.Format.Largeur, Mode=TwoWay}" Minimum="-1" PlaceholderText="Largeur du livre" SpinButtonPlacementMode="Inline">
+                        <MUIXC:NumberBox Grid.Row="3" Value="{x:Bind ViewModelPage.ViewModel.Format.Largeur, Mode=TwoWay}" Minimum="-1" PlaceholderText="Largeur du livre" SpinButtonPlacementMode="Inline">
                             <MUIXC:NumberBox.Header>
-                                <TextBlock Text="Largeur du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                <TextBlock Text="Largeur du livre (en cm)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </MUIXC:NumberBox.Header>
                         </MUIXC:NumberBox>
-                        <MUIXC:NumberBox Grid.Row="5" Value="{x:Bind ViewModelPage.ViewModel.Format.Epaisseur, Mode=TwoWay}" Minimum="-1" PlaceholderText="Epaisseur du livre" SpinButtonPlacementMode="Inline">
+                        <MUIXC:NumberBox Grid.Row="4" Value="{x:Bind ViewModelPage.ViewModel.Format.Epaisseur, Mode=TwoWay}" Minimum="-1" PlaceholderText="Epaisseur du livre" SpinButtonPlacementMode="Inline">
                             <MUIXC:NumberBox.Header>
-                                <TextBlock Text="Epaisseur du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                <TextBlock Text="Epaisseur du livre (en cm)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </MUIXC:NumberBox.Header>
                         </MUIXC:NumberBox>
                     </Grid>
@@ -586,12 +612,12 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.ViewModel.Resume, Mode=TwoWay}" MinHeight="100" PlaceholderText="Résumé du livre" TextWrapping="Wrap" AcceptsReturn="True">
+                        <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.ViewModel.Description.Resume, Mode=TwoWay}" MinHeight="100" PlaceholderText="Résumé du livre" TextWrapping="Wrap" AcceptsReturn="True">
                             <TextBox.Header>
                                 <TextBlock Text="Résumé" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </TextBox.Header>
                         </TextBox>
-                        <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.Notes, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes personnelles concernant le livre" TextWrapping="Wrap" AcceptsReturn="True">
+                        <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.Description.Notes, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes personnelles concernant le livre" TextWrapping="Wrap" AcceptsReturn="True">
                             <TextBox.Header>
                                 <TextBlock Text="Notes" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </TextBox.Header>

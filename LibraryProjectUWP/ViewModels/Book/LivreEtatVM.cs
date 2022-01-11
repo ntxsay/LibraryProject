@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using LibraryProjectUWP.ViewModels.Collection;
+using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Publishers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.ViewModels.Book
 {
-    public class LivreFormatVM : INotifyPropertyChanged
+    public class LivreEtatVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
@@ -20,86 +24,74 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreVM Parent { get; set; }
 
         [JsonIgnore]
-        public  IEnumerable<string> FormatModelList => new List<string>()
+        public IEnumerable<string> EtatModelList => new List<string>()
         {
-            "Relié",
-            "Broché",
-            "Cartonné",
-            "Poche",
-            "Audio",
-            "Ebook",
+            "Neuf",
+            "Comme neuf",
+            "Très bon",
+            "Bon",
+            "Assez bon",
+            "Satisfaisant",
+            "Moyen",
+            "Mauvais",
         };
 
-        private string _Format;
-        public string Format
+        private string _Etat;
+        public string Etat
         {
-            get => _Format;
+            get => _Etat;
             set
             {
-                if (_Format != value)
+                if (_Etat != value)
                 {
-                    _Format = value;
+                    _Etat = value;
                     OnPropertyChanged();
                 }
             }
         }
 
-        private short _NbOfPages;
-        public short NbOfPages
+        private DateTime _DateAjout = DateTime.UtcNow;
+        public DateTime DateAjout
         {
-            get => _NbOfPages;
+            get => _DateAjout;
             set
             {
-                if (_NbOfPages != value)
+                if (_DateAjout != value)
                 {
-                    _NbOfPages = value;
+                    _DateAjout = value;
                     OnPropertyChanged();
                 }
             }
         }
 
-        private double _Hauteur;
-        public double Hauteur
+        private DateTime _DateVerification = DateTime.UtcNow;
+        public DateTime DateVerification
         {
-            get => _Hauteur;
+            get => _DateVerification;
             set
             {
-                if (_Hauteur != value)
+                if (_DateVerification != value)
                 {
-                    _Hauteur = value;
+                    _DateVerification = value;
                     OnPropertyChanged();
                 }
             }
         }
 
-        private double _Largeur;
-        public double Largeur
+
+        private string _Observations;
+        public string Observations
         {
-            get => _Largeur;
+            get => _Observations;
             set
             {
-                if (_Largeur != value)
+                if (_Observations != value)
                 {
-                    _Largeur = value;
+                    _Observations = value;
                     OnPropertyChanged();
                 }
             }
         }
-
-        private double _Epaisseur;
-        public double Epaisseur
-        {
-            get => _Epaisseur;
-            set
-            {
-                if (_Epaisseur != value)
-                {
-                    _Epaisseur = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

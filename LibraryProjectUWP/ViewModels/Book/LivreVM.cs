@@ -79,35 +79,6 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-
-        private string _Resume;
-        public string Resume
-        {
-            get => _Resume;
-            set
-            {
-                if (_Resume != value)
-                {
-                    _Resume = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _Notes;
-        public string Notes
-        {
-            get => _Notes;
-            set
-            {
-                if (_Notes != value)
-                {
-                    _Notes = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         private DateTime _DateAjout = DateTime.UtcNow;
         public DateTime DateAjout
         {
@@ -150,6 +121,20 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        private ObservableCollection<LivreEtatVM> _EtatLivre = new ObservableCollection<LivreEtatVM>();
+        public ObservableCollection<LivreEtatVM> EtatLivre
+        {
+            get => _EtatLivre;
+            set
+            {
+                if (_EtatLivre != value)
+                {
+                    _EtatLivre = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _JaquettePath = EsLibrary.LibraryDefaultJaquette;
 
         [JsonIgnore]
@@ -181,6 +166,8 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
         public PretLivreVM Pret { get; set; }
+        public LivreDescriptionVM Description { get; set; } = new LivreDescriptionVM();
+        public LivreClassificationAgeVM ClassificationAge { get; set; } = new LivreClassificationAgeVM();
         public LivreIdentificationVM Identification { get; set; } = new LivreIdentificationVM();
         public LivreFormatVM Format { get; set; } = new LivreFormatVM();
         public LivrePublicationVM Publication { get; set; } = new LivrePublicationVM();
