@@ -1068,7 +1068,7 @@ namespace LibraryProjectUWP.Views.Book
             await this.NewAuthorAsync(string.Empty, string.Empty);
         }
 
-        internal async Task NewAuthorAsync(string prenom, string nomNaissance)
+        internal async Task NewAuthorAsync(string prenom, string nomNaissance, Guid? guid = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1094,6 +1094,11 @@ namespace LibraryProjectUWP.Views.Book
                             Prenom = prenom,
                         }
                     });
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
 
                     userControl.CancelModificationRequested += NewEditAuthorUC_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditAuthorUC_CreateItemRequested;
@@ -1176,7 +1181,7 @@ namespace LibraryProjectUWP.Views.Book
             await NewCollectionAsync(string.Empty);
         }
 
-        internal async Task NewCollectionAsync(string partName)
+        internal async Task NewCollectionAsync(string partName, Guid? guid = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1200,6 +1205,11 @@ namespace LibraryProjectUWP.Views.Book
                             Name = partName,
                         }
                     });
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
 
                     userControl.CancelModificationRequested += NewEditCollectionUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditCollectionUC_Create_CreateItemRequested;
@@ -1231,6 +1241,15 @@ namespace LibraryProjectUWP.Views.Book
                         newViewModel.Id = creationResult.Id;
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            if (bookManager != null)
+                            {
+                                bookManager.ViewModelPage.ViewModel.Publication.Collections.Add(newViewModel);
+                            }
+                        }
                     }
                     else
                     {
@@ -1428,7 +1447,33 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
-        #endregion     
+        #endregion
+
+        #region Functions
+        private NewEditBookUC GetBookSideBarByGuid(Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    var itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.Guid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as NewEditBookUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+        #endregion
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged

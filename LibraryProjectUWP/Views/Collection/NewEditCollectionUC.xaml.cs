@@ -209,6 +209,8 @@ namespace LibraryProjectUWP.Views.Collection
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+        public Guid? Guid { get; set; }
+
         private string _Header;
         public string Header
         {

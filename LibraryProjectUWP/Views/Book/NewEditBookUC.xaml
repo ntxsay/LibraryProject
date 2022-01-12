@@ -160,14 +160,9 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
-        <FlipView x:Name="FlipViewStep" Grid.Row="1" Style="{StaticResource FlipviewWoBtnStyle}" Background="Transparent">
-            <!--<FlipView.ItemsPanel >
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Vertical"/>
-                        </ItemsPanelTemplate>
-                    </FlipView.ItemsPanel>-->
+        <Grid  Grid.Row="1">
             <!--Général-->
-            <Grid>
+            <Grid Visibility="{x:Bind ViewModelPage.GeneralStepVisibility, Mode=OneWay}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -294,7 +289,7 @@
                                             SpinButtonPlacementMode="Compact" Minimum="0" Maximum="30" FontSize="14">
                                     </MUIXC:NumberBox>
                                 </StackPanel>
-                                
+
                             </Grid>
                         </Grid>
 
@@ -302,7 +297,7 @@
                 </ScrollViewer>
             </Grid>
             <!--Identification-->
-            <Grid>
+            <Grid  Visibility="{x:Bind ViewModelPage.IdentificationStepVisibility, Mode=OneWay}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -358,7 +353,7 @@
                 </ScrollViewer>
             </Grid>
             <!--Publication-->
-            <Grid>
+            <Grid  Visibility="{x:Bind ViewModelPage.PublicationStepVisibility, Mode=OneWay}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -553,7 +548,7 @@
                 </ScrollViewer>
             </Grid>
             <!--Format-->
-            <Grid>
+            <Grid  Visibility="{x:Bind ViewModelPage.FormatStepVisibility, Mode=OneWay}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -600,7 +595,7 @@
                 </ScrollViewer>
             </Grid>
             <!--Description-->
-            <Grid>
+            <Grid  Visibility="{x:Bind ViewModelPage.DescriptionStepVisibility, Mode=OneWay}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -625,6 +620,14 @@
                     </Grid>
                 </ScrollViewer>
             </Grid>
+
+        </Grid>
+        <FlipView x:Name="FlipViewStep" Grid.Row="1" Style="{StaticResource FlipviewWoBtnStyle}" Background="Transparent">
+            <!--<FlipView.ItemsPanel >
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </FlipView.ItemsPanel>-->
 
         </FlipView>
         <TextBlock x:Name="TbxErrorMessage" Grid.Row="2" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>

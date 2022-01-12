@@ -478,7 +478,7 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            await _parameters.ParentPage.NewCollectionAsync(sender.Text);
+                            await _parameters.ParentPage.NewCollectionAsync(sender.Text, ViewModelPage.Guid);
                         }
                     }
                 }
@@ -578,7 +578,6 @@ namespace LibraryProjectUWP.Views.Book
                 Logs.Log(ex, m);
                 return;
             }
-
         }
 
         private void ASB_SearchEditor_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
@@ -963,6 +962,9 @@ namespace LibraryProjectUWP.Views.Book
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+        public Guid Guid => Guid.NewGuid();
+
+
         private string _Header;
         public string Header
         {
@@ -1086,6 +1088,76 @@ namespace LibraryProjectUWP.Views.Book
                 if (_EditorsViewModelList != value)
                 {
                     this._EditorsViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _GeneralStepVisibility;
+        public Visibility GeneralStepVisibility
+        {
+            get => this._GeneralStepVisibility;
+            set
+            {
+                if (this._GeneralStepVisibility != value)
+                {
+                    this._GeneralStepVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _IdentificationStepVisibility;
+        public Visibility IdentificationStepVisibility
+        {
+            get => this._IdentificationStepVisibility;
+            set
+            {
+                if (this._IdentificationStepVisibility != value)
+                {
+                    this._IdentificationStepVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _PublicationStepVisibility;
+        public Visibility PublicationStepVisibility
+        {
+            get => this._PublicationStepVisibility;
+            set
+            {
+                if (this._PublicationStepVisibility != value)
+                {
+                    this._PublicationStepVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _FormatStepVisibility;
+        public Visibility FormatStepVisibility
+        {
+            get => this._FormatStepVisibility;
+            set
+            {
+                if (this._FormatStepVisibility != value)
+                {
+                    this._FormatStepVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _DescriptionStepVisibility;
+        public Visibility DescriptionStepVisibility
+        {
+            get => this._DescriptionStepVisibility;
+            set
+            {
+                if (this._DescriptionStepVisibility != value)
+                {
+                    this._DescriptionStepVisibility = value;
                     this.OnPropertyChanged();
                 }
             }
