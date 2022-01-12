@@ -100,7 +100,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             #endregion
 
             #region Multiple
-            public static async Task<IList<Tediteur>> MultipleWithIdBookAsync(long idBook)
+            public static async Task<IList<Tediteur>> MultipleInBookAsync(long idBook)
             {
                 try
                 {
@@ -132,11 +132,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<PublisherVM>> MultipleVmWithIdBookAsync(long idBook)
+            public static async Task<IList<PublisherVM>> MultipleVmInBookAsync(long idBook)
             {
                 try
                 {
-                    var collection = await MultipleWithIdBookAsync(idBook);
+                    var collection = await MultipleInBookAsync(idBook);
                     if (!collection.Any()) return Enumerable.Empty<PublisherVM>().ToList();
 
                     var values = collection.Select(s => ViewModelConverterAsync(s)).ToList();

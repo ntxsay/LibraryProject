@@ -84,7 +84,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<long>> AllIdBookAsync(long idBook)
+            public static async Task<IList<long>> AllIdInBookAsync(long idBook)
             {
                 try
                 {
@@ -116,7 +116,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             #endregion
 
             #region Multiple
-            public static async Task<IList<Tcollection>> MultipleWithIdBookAsync(long idBook)
+            public static async Task<IList<Tcollection>> MultipleInBookAsync(long idBook, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
             {
                 try
                 {
@@ -128,10 +128,21 @@ namespace LibraryProjectUWP.Code.Services.Db
                         List<Tcollection> collection = new List<Tcollection>();
                         foreach (TbookCollectionConnector driver in preCollection)
                         {
-                            Tcollection model = await context.Tcollection.SingleOrDefaultAsync(w => w.Id == driver.IdCollection);
-                            if (model != null)
+                            if (collectionType == CollectionTypeEnum.All)
                             {
-                                collection.Add(model);
+                                Tcollection model = await context.Tcollection.SingleOrDefaultAsync(w => w.Id == driver.IdCollection);
+                                if (model != null)
+                                {
+                                    collection.Add(model);
+                                }
+                            }
+                            else
+                            {
+                                Tcollection model = await context.Tcollection.SingleOrDefaultAsync(w => w.Id == driver.IdCollection && w.CollectionType == (long)collectionType);
+                                if (model != null)
+                                {
+                                    collection.Add(model);
+                                }
                             }
                         }
 
@@ -148,11 +159,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<CollectionVM>> MultipleVmWithIdBookAsync(long idBook)
+            public static async Task<IList<CollectionVM>> MultipleVmInBookAsync(long idBook, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
             {
                 try
                 {
-                    var collection = await MultipleWithIdBookAsync(idBook);
+                    var collection = await MultipleInBookAsync(idBook, collectionType);
                     if (!collection.Any()) return Enumerable.Empty<CollectionVM>().ToList();
 
                     var values = collection.Select(s => ViewModelConverterAsync(s)).ToList();

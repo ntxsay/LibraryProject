@@ -114,6 +114,59 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
+            #region Multiple
+            public static async Task<IList<Tauthor>> MultipleInBookAsync(long idBook)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    var preCollection = await context.TbookAuthorConnector.Where(w => w.IdBook == idBook).ToListAsync();
+                    if (preCollection.Any())
+                    {
+                        List<Tauthor> collection = new List<Tauthor>();
+                        foreach (TbookAuthorConnector driver in preCollection)
+                        {
+                            Tauthor model = await context.Tauthor.SingleOrDefaultAsync(w => w.Id == driver.IdAuthor);
+                            if (model != null)
+                            {
+                                collection.Add(model);
+                            }
+                        }
+
+                        return collection;
+                    }
+
+                    return Enumerable.Empty<Tauthor>().ToList();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<Tauthor>().ToList();
+                }
+            }
+
+            public static async Task<IList<AuthorVM>> MultipleVmInBookAsync(long idBook)
+            {
+                try
+                {
+                    var collection = await MultipleInBookAsync(idBook);
+                    if (!collection.Any()) return Enumerable.Empty<AuthorVM>().ToList();
+
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<AuthorVM>().ToList();
+                }
+            }
+
+            #endregion
+
             public static async Task<OperationStateVM> CreateAsync(AuthorVM viewModel)
             {
                 try

@@ -1065,10 +1065,10 @@ namespace LibraryProjectUWP.Views.Book
         #region Author
         private async void NewAuthorXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await this.NewAuthorAsync();
+            await this.NewAuthorAsync(string.Empty, string.Empty);
         }
 
-        internal async Task NewAuthorAsync()
+        internal async Task NewAuthorAsync(string prenom, string nomNaissance)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1090,6 +1090,8 @@ namespace LibraryProjectUWP.Views.Book
                         CurrentViewModel = new AuthorVM()
                         {
                             TitreCivilite = CivilityHelpers.MPoint,
+                            NomNaissance = nomNaissance,
+                            Prenom = prenom,
                         }
                     });
 
@@ -1171,10 +1173,10 @@ namespace LibraryProjectUWP.Views.Book
         #region Collection
         private async void NewCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await NewCollectionAsync();
+            await NewCollectionAsync(string.Empty);
         }
 
-        internal async Task NewCollectionAsync()
+        internal async Task NewCollectionAsync(string partName)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1195,6 +1197,7 @@ namespace LibraryProjectUWP.Views.Book
                         CurrentViewModel = new CollectionVM()
                         {
                             IdLibrary = _parameters.ParentLibrary.Id,
+                            Name = partName,
                         }
                     });
 
@@ -1325,10 +1328,10 @@ namespace LibraryProjectUWP.Views.Book
         #region Editeurs
         private async void NewEditorXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await NewEditorAsync();
+            await NewEditorAsync(string.Empty);
         }
 
-        internal async Task NewEditorAsync()
+        internal async Task NewEditorAsync(string partName)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1346,6 +1349,9 @@ namespace LibraryProjectUWP.Views.Book
                         EditMode = Code.EditMode.Create,
                         ViewModelList = itemList,
                         CurrentViewModel = new PublisherVM()
+                        {
+                            Name = partName,
+                        },
                     });
 
                     userControl.CancelModificationRequested += NewEditEditorUC_Create_CancelModificationRequested;

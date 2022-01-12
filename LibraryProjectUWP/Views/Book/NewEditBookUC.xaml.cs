@@ -260,7 +260,6 @@ namespace LibraryProjectUWP.Views.Book
                         return;
                     }
                 }
-                sender.Text = string.Empty;
             }
             catch (Exception ex)
             {
@@ -298,7 +297,15 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            await _parameters.ParentPage.NewAuthorAsync();
+                            var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
+                            if (split.Length == 1)
+                            {
+                                await _parameters.ParentPage.NewAuthorAsync(split[0], string.Empty);
+                            }
+                            else if (split.Length >= 2)
+                            {
+                                await _parameters.ParentPage.NewAuthorAsync(split[0], split[1]);
+                            }
                         }
                     }
                 }
@@ -434,7 +441,6 @@ namespace LibraryProjectUWP.Views.Book
                         return;
                     }
                 }
-                sender.Text = string.Empty;
             }
             catch (Exception ex)
             {
@@ -472,7 +478,7 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            await _parameters.ParentPage.NewCollectionAsync();
+                            await _parameters.ParentPage.NewCollectionAsync(sender.Text);
                         }
                     }
                 }
@@ -587,7 +593,6 @@ namespace LibraryProjectUWP.Views.Book
                         return;
                     }
                 }
-                sender.Text = string.Empty;
             }
             catch (Exception ex)
             {
@@ -625,7 +630,7 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            await _parameters.ParentPage.NewEditorAsync();
+                            await _parameters.ParentPage.NewEditorAsync(sender.Text);
                         }
                     }
                 }

@@ -9,6 +9,7 @@ using LibraryProjectUWP.ViewModels.Publishers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -60,7 +61,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var collection = await AllAsync();
                     if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
 
-                    var values = collection.Select(s => ViewModelConverterAsync(s)).ToList();
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
                     return values;
                 }
                 catch (Exception ex)
@@ -142,7 +143,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var collection = await MultipleWithIdLibraryAsync(idLibrary);
                     if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
 
-                    var values = collection.Select(s => ViewModelConverterAsync(s)).ToList();
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
                     return values;
                 }
                 catch (Exception ex)
@@ -150,6 +151,23 @@ namespace LibraryProjectUWP.Code.Services.Db
                     MethodBase m = MethodBase.GetCurrentMethod();
                     Logs.Log(ex, m);
                     return Enumerable.Empty<LivreVM>().ToList();
+                }
+            }
+
+            public static async Task<IList<string>> GetOtherTitlesInBookAsync(long idBook)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    List<string> collection = await context.TbookOtherTitle.Where(w => w.IdBook == idBook).Select(s => s.Title).ToListAsync();
+                    return collection;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<string>().ToList();
                 }
             }
             #endregion
@@ -189,7 +207,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <returns></returns>
             public static async Task<LivreVM> SingleVMAsync(long id)
             {
-                return ViewModelConverterAsync(await SingleAsync(id));
+                return await ViewModelConverterAsync(await SingleAsync(id));
             }
             #endregion
 
@@ -636,7 +654,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <typeparam name="T2">Type sortie</typeparam>
             /// <param name="model">Modèle de base de données</param>
             /// <returns>Un modèle de vue</returns>
-            private static LivreVM ViewModelConverterAsync(Tbook model)
+            private static async Task<LivreVM> ViewModelConverterAsync(Tbook model)
             {
                 try
                 {
@@ -685,6 +703,36 @@ namespace LibraryProjectUWP.Code.Services.Db
                             Cotation = model.TbookIdentification.Cotation,
                         };
                     }
+
+                    return await ViewModelConverterConnectorAsync(model, viewModel);
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
+            private static async Task<LivreVM> ViewModelConverterConnectorAsync(Tbook model, LivreVM viewModel)
+            {
+                try
+                {
+                    if (model == null) return null;
+                    if (viewModel == null) return null;
+
+                    IList<string> titres = await GetOtherTitlesInBookAsync(model.Id);
+                    IList<AuthorVM> authors = await Author.MultipleVmInBookAsync(model.Id);
+                    IList<PublisherVM> editors = await Editors.MultipleVmInBookAsync(model.Id);
+                    IList<CollectionVM> collections = await Collection.MultipleVmInBookAsync(model.Id, CollectionTypeEnum.Collection);
+
+                    viewModel.TitresOeuvre = titres != null && titres.Any() ? new ObservableCollection<string>(titres) : new ObservableCollection<string>();
+                    viewModel.Auteurs = authors != null && authors.Any() ? new ObservableCollection<AuthorVM>(authors) : new ObservableCollection<AuthorVM>();
+                    viewModel.Publication = new LivrePublicationVM()
+                    {
+                        Collections = collections != null && collections.Any() ? new ObservableCollection<CollectionVM>(collections) : new ObservableCollection<CollectionVM>(),
+                        Editeurs = editors != null && editors.Any() ? new ObservableCollection<PublisherVM>(editors) : new ObservableCollection<PublisherVM>(),
+                    };
 
                     return viewModel;
                 }
