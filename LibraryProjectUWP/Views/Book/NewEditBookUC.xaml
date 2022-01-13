@@ -158,6 +158,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
         <Grid  Grid.Row="1">
@@ -622,28 +623,22 @@
             </Grid>
 
         </Grid>
-        <FlipView x:Name="FlipViewStep" Grid.Row="1" Style="{StaticResource FlipviewWoBtnStyle}" Background="Transparent">
-            <!--<FlipView.ItemsPanel >
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Vertical"/>
-                        </ItemsPanelTemplate>
-                    </FlipView.ItemsPanel>-->
-
-        </FlipView>
-        <TextBlock x:Name="TbxErrorMessage" Grid.Row="2" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
-        <Grid Grid.Row="3">
+        <MUIXC:PipsPager Grid.Row="2" Orientation="Horizontal" PreviousButtonVisibility="Visible" NextButtonVisibility="Visible" HorizontalAlignment="Center" Margin="0 10" NumberOfPages="5" FontSize="18"
+                         SelectedIndexChanged="PipsPager_SelectedIndexChanged"/>
+        <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
+        <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+            <!--<StackPanel Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
                 <Button Command="{StaticResource PreviousStepXUiCommand}" >
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76B;" FontSize="14"/>
                 </Button>
                 <Button Command="{StaticResource NextStepXUiCommand}">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76C;" FontSize="14"/>
                 </Button>
-            </StackPanel>
+            </StackPanel>-->
             <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
                 <Button Command="{StaticResource ImportBookXamlUICommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">

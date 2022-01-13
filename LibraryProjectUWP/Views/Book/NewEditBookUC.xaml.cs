@@ -788,13 +788,92 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        private void PipsPager_SelectedIndexChanged(Microsoft.UI.Xaml.Controls.PipsPager sender, Microsoft.UI.Xaml.Controls.PipsPagerSelectedIndexChangedEventArgs args)
+        {
+            try
+            {
+                if (sender.SelectedPageIndex == -1)
+                {
+                    return;
+                }
+
+                if (sender.SelectedPageIndex == 0)
+                {
+                    ViewModelPage.GeneralStepVisibility = Visibility.Visible;
+                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.IdentificationStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.FormatStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
+                }
+                else if (sender.SelectedPageIndex == 1)
+                {
+                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.PublicationStepVisibility = Visibility.Visible;
+                    ViewModelPage.IdentificationStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.FormatStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
+                }
+                else if (sender.SelectedPageIndex == 2)
+                {
+                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.IdentificationStepVisibility = Visibility.Visible;
+                    ViewModelPage.FormatStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
+                }
+                else if (sender.SelectedPageIndex == 3)
+                {
+                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.IdentificationStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.FormatStepVisibility = Visibility.Visible;
+                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
+                }
+                else if (sender.SelectedPageIndex == 4)
+                {
+                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.IdentificationStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.FormatStepVisibility = Visibility.Collapsed;
+                    ViewModelPage.DescriptionStepVisibility = Visibility.Visible;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void PreviousStepXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
-                if (FlipViewStep.SelectedIndex > 0)
+                if (ViewModelPage.GeneralStepVisibility == Visibility.Visible)
                 {
-                    FlipViewStep.SelectedIndex--;
+                    ViewModelPage.DescriptionStepVisibility = Visibility.Visible;
+                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.DescriptionStepVisibility == Visibility.Visible)
+                {
+                    ViewModelPage.FormatStepVisibility = Visibility.Visible;
+                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.FormatStepVisibility == Visibility.Visible)
+                {
+                    ViewModelPage.IdentificationStepVisibility = Visibility.Visible;
+                    ViewModelPage.FormatStepVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.IdentificationStepVisibility == Visibility.Visible)
+                {
+                    ViewModelPage.PublicationStepVisibility = Visibility.Visible;
+                    ViewModelPage.IdentificationStepVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.PublicationStepVisibility == Visibility.Visible)
+                {
+                    ViewModelPage.GeneralStepVisibility = Visibility.Visible;
+                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)
@@ -809,9 +888,30 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (FlipViewStep.SelectedIndex < FlipViewStep.Items.Count)
+                if (ViewModelPage.GeneralStepVisibility == Visibility.Visible)
                 {
-                    FlipViewStep.SelectedIndex++;
+                    ViewModelPage.PublicationStepVisibility = Visibility.Visible;
+                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.PublicationStepVisibility == Visibility.Visible)
+                {
+                    ViewModelPage.IdentificationStepVisibility = Visibility.Visible;
+                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.IdentificationStepVisibility == Visibility.Visible)
+                {
+                    ViewModelPage.FormatStepVisibility = Visibility.Visible;
+                    ViewModelPage.IdentificationStepVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.FormatStepVisibility == Visibility.Visible)
+                {
+                    ViewModelPage.DescriptionStepVisibility = Visibility.Visible;
+                    ViewModelPage.FormatStepVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.DescriptionStepVisibility == Visibility.Visible)
+                {
+                    ViewModelPage.GeneralStepVisibility = Visibility.Visible;
+                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)
@@ -1093,7 +1193,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private Visibility _GeneralStepVisibility;
+        private Visibility _GeneralStepVisibility = Visibility.Visible;
         public Visibility GeneralStepVisibility
         {
             get => this._GeneralStepVisibility;
@@ -1107,7 +1207,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private Visibility _IdentificationStepVisibility;
+        private Visibility _IdentificationStepVisibility = Visibility.Collapsed;
         public Visibility IdentificationStepVisibility
         {
             get => this._IdentificationStepVisibility;
@@ -1121,7 +1221,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private Visibility _PublicationStepVisibility;
+        private Visibility _PublicationStepVisibility = Visibility.Collapsed;
         public Visibility PublicationStepVisibility
         {
             get => this._PublicationStepVisibility;
@@ -1135,7 +1235,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private Visibility _FormatStepVisibility;
+        private Visibility _FormatStepVisibility = Visibility.Collapsed;
         public Visibility FormatStepVisibility
         {
             get => this._FormatStepVisibility;
@@ -1149,7 +1249,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private Visibility _DescriptionStepVisibility;
+        private Visibility _DescriptionStepVisibility = Visibility.Collapsed;
         public Visibility DescriptionStepVisibility
         {
             get => this._DescriptionStepVisibility;
