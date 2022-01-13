@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Contact;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -144,8 +145,10 @@ namespace LibraryProjectUWP.Views.Contact
             {
                 if (ViewModelPage.ViewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace())
                 {
-                    ViewModelPage.ResultMessage = $"Le nom de la bibliothèque ne peut pas être vide\nou ne contenir que des espaces blancs.";
-                    ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Le nom du contact ne peut pas être vide\nou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
                     return false;
                 }
 
@@ -156,13 +159,15 @@ namespace LibraryProjectUWP.Views.Contact
                                                                   _parameters.CurrentViewModel.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && _parameters.CurrentViewModel.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower());
                     if (isError)
                     {
-                        TbxErrorMessage.Text = $"Cette bibliothèque existe déjà.";
-                        ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"Ce contact existe déjà.";
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
                         return false;
                     }
                 }
 
-                ViewModelPage.ResultMessage = string.Empty;
+                ViewModelPage.IsResultMessageOpen = false;
                 return true;
             }
             catch (Exception ex)
@@ -238,15 +243,43 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private string _ArgName;
-        public string ArgName
+        private InfoBarSeverity _ResultMessageSeverity = InfoBarSeverity.Informational;
+        public InfoBarSeverity ResultMessageSeverity
         {
-            get => this._ArgName;
+            get => this._ResultMessageSeverity;
             set
             {
-                if (this._ArgName != value)
+                if (this._ResultMessageSeverity != value)
                 {
-                    this._ArgName = value;
+                    this._ResultMessageSeverity = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsResultMessageOpen;
+        public bool IsResultMessageOpen
+        {
+            get => this._IsResultMessageOpen;
+            set
+            {
+                if (this._IsResultMessageOpen != value)
+                {
+                    this._IsResultMessageOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ResultMessageTitle;
+        public string ResultMessageTitle
+        {
+            get => this._ResultMessageTitle;
+            set
+            {
+                if (this._ResultMessageTitle != value)
+                {
+                    this._ResultMessageTitle = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -263,20 +296,6 @@ namespace LibraryProjectUWP.Views.Contact
                 if (this._ViewModel != value)
                 {
                     this._ViewModel = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private Brush _ResultMessageForeGround;
-        public Brush ResultMessageForeGround
-        {
-            get => this._ResultMessageForeGround;
-            set
-            {
-                if (this._ResultMessageForeGround != value)
-                {
-                    this._ResultMessageForeGround = value;
                     this.OnPropertyChanged();
                 }
             }

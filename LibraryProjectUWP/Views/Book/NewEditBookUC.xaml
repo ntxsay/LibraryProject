@@ -187,7 +187,11 @@
                         </DatePicker>
                         <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.MainTitle, Mode=TwoWay}" PlaceholderText="Titre principal du livre">
                             <TextBox.Header>
-                                <TextBlock Text="Titre du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBlock Text="Titre du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE783;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="14" FontWeight="Medium"
+                                              MTUUi:FrameworkElementExtensions.Cursor="Hand" ToolTipService.ToolTip="Cette information est obligatoire"/>
+                                </StackPanel>
                             </TextBox.Header>
                         </TextBox>
                         <Grid Grid.Row="2" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
@@ -623,22 +627,16 @@
             </Grid>
 
         </Grid>
-        <MUIXC:PipsPager Grid.Row="2" Orientation="Horizontal" PreviousButtonVisibility="Visible" NextButtonVisibility="Visible" HorizontalAlignment="Center" Margin="0 10" NumberOfPages="5" FontSize="18"
-                         SelectedIndexChanged="PipsPager_SelectedIndexChanged"/>
-        <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
+        <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="2" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+                       IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}" Margin="0 10 0 5">
+        </MUIXC:InfoBar>
+        <MUIXC:PipsPager Grid.Row="3" Orientation="Horizontal" PreviousButtonVisibility="Visible" NextButtonVisibility="Visible" HorizontalAlignment="Center" Margin="0 5 0 10" NumberOfPages="5" FontSize="18"
+                         SelectedIndexChanged="PipsPager_SelectedIndexChanged" SelectedPageIndex="{x:Bind ViewModelPage.CurrentPipsPagerIndex, Mode=TwoWay}"/>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <!--<StackPanel Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
-                <Button Command="{StaticResource PreviousStepXUiCommand}" >
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76B;" FontSize="14"/>
-                </Button>
-                <Button Command="{StaticResource NextStepXUiCommand}">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76C;" FontSize="14"/>
-                </Button>
-            </StackPanel>-->
             <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
                 <Button Command="{StaticResource ImportBookXamlUICommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">

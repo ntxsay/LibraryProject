@@ -54,6 +54,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
@@ -128,11 +129,14 @@
                         <TextBlock Text="Adresse mail" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </TextBox.Header>
                 </TextBox>
-
-                <TextBlock x:Name="TbxErrorMessage" Grid.Row="12" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
             </Grid>
         </ScrollViewer>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" Margin="0 10 0 10">
+            <MUIXC:InfoBar IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+                       IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}">
+            </MUIXC:InfoBar>
+        </Grid>
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />

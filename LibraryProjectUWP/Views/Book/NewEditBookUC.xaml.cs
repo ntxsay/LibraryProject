@@ -6,6 +6,7 @@ using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Publishers;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -479,6 +480,7 @@ namespace LibraryProjectUWP.Views.Book
                         if (_parameters.ParentPage != null)
                         {
                             await _parameters.ParentPage.NewCollectionAsync(sender.Text, ViewModelPage.Guid);
+                            sender.Text = String.Empty;
                         }
                     }
                 }
@@ -979,22 +981,31 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (ViewModelPage.ViewModel.MainTitle.IsStringNullOrEmptyOrWhiteSpace())
                 {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
                     ViewModelPage.ResultMessage = $"Le titre principal du livre ne peut pas être vide ou ne contenir que des espaces blancs.";
-                    ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                    ViewModelPage.CurrentPipsPagerIndex = 0;
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
                     return false;
                 }
 
                 if (ViewModelPage.ViewModel.ClassificationAge.MinAge > ViewModelPage.ViewModel.ClassificationAge.MaxAge)
                 {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
                     ViewModelPage.ResultMessage = $"L'âge minimum ne peut pas être supérieur à l'âge maximum.";
-                    ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                    ViewModelPage.CurrentPipsPagerIndex = 0;
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
                     return false;
                 }
 
                 if (ViewModelPage.ViewModel.ClassificationAge.MaxAge < ViewModelPage.ViewModel.ClassificationAge.MinAge)
                 {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
                     ViewModelPage.ResultMessage = $"L'âge maximum ne peut pas être inférieur à l'âge maximum.";
-                    ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                    ViewModelPage.CurrentPipsPagerIndex = 0;
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
                     return false;
                 }
 
@@ -1008,7 +1019,7 @@ namespace LibraryProjectUWP.Views.Book
                 //    }
                 //}
 
-                ViewModelPage.ResultMessage = string.Empty;
+                ViewModelPage.IsResultMessageOpen = false;
                 return true;
             }
             catch (Exception ex)
@@ -1062,7 +1073,7 @@ namespace LibraryProjectUWP.Views.Book
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public Guid Guid => Guid.NewGuid();
+        public Guid Guid { get; private set; } = Guid.NewGuid();
 
 
         private string _Header;
@@ -1093,20 +1104,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private string _ArgName;
-        public string ArgName
-        {
-            get => this._ArgName;
-            set
-            {
-                if (this._ArgName != value)
-                {
-                    this._ArgName = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
         public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
 
         private LivreVM _ViewModel;
@@ -1118,20 +1115,6 @@ namespace LibraryProjectUWP.Views.Book
                 if (this._ViewModel != value)
                 {
                     this._ViewModel = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private Brush _ResultMessageForeGround;
-        public Brush ResultMessageForeGround
-        {
-            get => this._ResultMessageForeGround;
-            set
-            {
-                if (this._ResultMessageForeGround != value)
-                {
-                    this._ResultMessageForeGround = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -1188,6 +1171,62 @@ namespace LibraryProjectUWP.Views.Book
                 if (_EditorsViewModelList != value)
                 {
                     this._EditorsViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private InfoBarSeverity _ResultMessageSeverity = InfoBarSeverity.Informational;
+        public InfoBarSeverity ResultMessageSeverity
+        {
+            get => this._ResultMessageSeverity;
+            set
+            {
+                if (this._ResultMessageSeverity != value)
+                {
+                    this._ResultMessageSeverity = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsResultMessageOpen;
+        public bool IsResultMessageOpen
+        {
+            get => this._IsResultMessageOpen;
+            set
+            {
+                if (this._IsResultMessageOpen != value)
+                {
+                    this._IsResultMessageOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ResultMessageTitle;
+        public string ResultMessageTitle
+        {
+            get => this._ResultMessageTitle;
+            set
+            {
+                if (this._ResultMessageTitle != value)
+                {
+                    this._ResultMessageTitle = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private int _CurrentPipsPagerIndex;
+        public int CurrentPipsPagerIndex
+        {
+            get => this._CurrentPipsPagerIndex;
+            set
+            {
+                if (this._CurrentPipsPagerIndex != value)
+                {
+                    this._CurrentPipsPagerIndex = value;
                     this.OnPropertyChanged();
                 }
             }

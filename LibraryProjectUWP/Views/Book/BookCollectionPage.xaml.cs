@@ -701,14 +701,18 @@ namespace LibraryProjectUWP.Views.Book
                         }
 
                         this.RefreshItemsGrouping();
+                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                     }
                     else
                     {
                         //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                         return;
                     }
                 }
@@ -966,14 +970,18 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         newViewModel.Id = creationResult.Id;
                         ViewModelPage.ContactViewModelList.Add(newViewModel);
+                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                     }
                     else
                     {
                         //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                         return;
                     }
                 }
@@ -1129,14 +1137,18 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         newViewModel.Id = creationResult.Id;
                         //ViewModelPage.AuthorViewModelList.Add(newViewModel);
+                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                     }
                     else
                     {
                         //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                         return;
                     }
                 }
@@ -1164,7 +1176,23 @@ namespace LibraryProjectUWP.Views.Book
 
         private void NewEditAuthorUC_CancelModificationRequested(NewEditAuthorUC sender, ExecuteRequestedEventArgs e)
         {
-            throw new NotImplementedException();
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditAuthorUC_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditAuthorUC_CreateItemRequested;
+
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+                this.PivotRightSideBar.Items.Remove(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void DisplayAuthorListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -1239,8 +1267,10 @@ namespace LibraryProjectUWP.Views.Book
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
+                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
 
                         if (sender.ViewModelPage.Guid != null)
                         {
@@ -1248,14 +1278,17 @@ namespace LibraryProjectUWP.Views.Book
                             if (bookManager != null)
                             {
                                 bookManager.ViewModelPage.ViewModel.Publication.Collections.Add(newViewModel);
+                                NewEditCollectionUC_Create_CancelModificationRequested(sender, e);
                             }
                         }
                     }
                     else
                     {
                         //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                         return;
                     }
                 }
@@ -1401,14 +1434,18 @@ namespace LibraryProjectUWP.Views.Book
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
+                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.Green);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                     }
                     else
                     {
                         //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                         return;
                     }
                 }
@@ -1458,7 +1495,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.PivotRightSideBar.Items.Count > 0)
                 {
-                    var itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.Guid == guid);
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.Guid == guid);
                     if (itemPivot != null)
                     {
                         return itemPivot as NewEditBookUC;

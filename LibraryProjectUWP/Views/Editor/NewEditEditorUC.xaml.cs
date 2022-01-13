@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Publishers;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -144,8 +145,10 @@ namespace LibraryProjectUWP.Views.Editor
             {
                 if (ViewModelPage.ViewModel.Name.IsStringNullOrEmptyOrWhiteSpace())
                 {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
                     ViewModelPage.ResultMessage = $"Le nom de l'éditeur ne peut pas être vide\nou ne contenir que des espaces blancs.";
-                    ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
                     return false;
                 }
 
@@ -154,13 +157,15 @@ namespace LibraryProjectUWP.Views.Editor
                     var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel?.Name?.Trim().ToLower() == ViewModelPage.ViewModel.Name?.Trim().ToLower());
                     if (isError)
                     {
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
                         ViewModelPage.ResultMessage = $"Cet éditeur existe déjà.";
-                        ViewModelPage.ResultMessageForeGround = new SolidColorBrush(Colors.OrangeRed);
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
                         return false;
                     }
                 }
 
-                ViewModelPage.ResultMessage = string.Empty;
+                ViewModelPage.IsResultMessageOpen = false;
                 return true;
             }
             catch (Exception ex)
@@ -236,20 +241,47 @@ namespace LibraryProjectUWP.Views.Editor
             }
         }
 
-        private string _ArgName;
-        public string ArgName
+        private InfoBarSeverity _ResultMessageSeverity = InfoBarSeverity.Informational;
+        public InfoBarSeverity ResultMessageSeverity
         {
-            get => this._ArgName;
+            get => this._ResultMessageSeverity;
             set
             {
-                if (this._ArgName != value)
+                if (this._ResultMessageSeverity != value)
                 {
-                    this._ArgName = value;
+                    this._ResultMessageSeverity = value;
                     this.OnPropertyChanged();
                 }
             }
         }
 
+        private bool _IsResultMessageOpen;
+        public bool IsResultMessageOpen
+        {
+            get => this._IsResultMessageOpen;
+            set
+            {
+                if (this._IsResultMessageOpen != value)
+                {
+                    this._IsResultMessageOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ResultMessageTitle;
+        public string ResultMessageTitle
+        {
+            get => this._ResultMessageTitle;
+            set
+            {
+                if (this._ResultMessageTitle != value)
+                {
+                    this._ResultMessageTitle = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private PublisherVM _ViewModel;
         public PublisherVM ViewModel
@@ -260,20 +292,6 @@ namespace LibraryProjectUWP.Views.Editor
                 if (this._ViewModel != value)
                 {
                     this._ViewModel = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private Brush _ResultMessageForeGround;
-        public Brush ResultMessageForeGround
-        {
-            get => this._ResultMessageForeGround;
-            set
-            {
-                if (this._ResultMessageForeGround != value)
-                {
-                    this._ResultMessageForeGround = value;
                     this.OnPropertyChanged();
                 }
             }

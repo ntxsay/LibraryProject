@@ -75,8 +75,10 @@
                 </TextBox>
             </Grid>
         </ScrollViewer>
-        <Grid Grid.Row="2">
-            <TextBlock x:Name="TbxErrorMessage" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
+        <Grid Grid.Row="2" Margin="0 10 0 10">
+            <MUIXC:InfoBar IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+                       IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}">
+            </MUIXC:InfoBar>
         </Grid>
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
