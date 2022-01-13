@@ -154,6 +154,56 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        #region LanGuages
+        private void ComboBox_Language_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is ComboBox combo && combo.SelectedItem != null && combo.SelectedItem is string lang)
+                {
+                    if (ViewModelPage.ViewModel.Publication.Langues.Any())
+                    {
+                        bool IsAlreadyExist = ViewModelPage.ViewModel.Publication.Langues.Any(c => c.ToLower() == lang.ToLower());
+                        if (!IsAlreadyExist)
+                        {
+                            ViewModelPage.ViewModel.Publication.Langues.Add(lang);
+                            this.TBX_TitlesOeuvre.Text = String.Empty;
+                        }
+                    }
+                    else
+                    {
+                        ViewModelPage.ViewModel.Publication.Langues.Add(lang);
+                        this.TBX_TitlesOeuvre.Text = String.Empty;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void RemoveLanguageXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.ListViewLanguages.SelectedIndex > -1)
+                {
+                    ViewModelPage.ViewModel.Publication.Langues.RemoveAt(this.ListViewLanguages.SelectedIndex);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+
         #region Authors
         private async Task UpdateAuthorListAsync()
         {
@@ -193,9 +243,11 @@ namespace LibraryProjectUWP.Views.Book
                         if (found)
                         {
                             FilteredItems.Add(value);
+                            continue;
                         }
                     }
-                    else if (!value.NomUsage.IsStringNullOrEmptyOrWhiteSpace())
+                    
+                    if (!value.NomUsage.IsStringNullOrEmptyOrWhiteSpace())
                     {
                         var found = splitSearchTerm.All((key) => {
                             return value.NomUsage.ToLower().Contains(key.ToLower());
@@ -206,7 +258,8 @@ namespace LibraryProjectUWP.Views.Book
                             FilteredItems.Add(value);
                         }
                     }
-                    else if (!value.Prenom.IsStringNullOrEmptyOrWhiteSpace())
+
+                    if (!value.Prenom.IsStringNullOrEmptyOrWhiteSpace())
                     {
                         var found = splitSearchTerm.All((key) => {
                             return value.Prenom.ToLower().Contains(key.ToLower());
@@ -215,9 +268,11 @@ namespace LibraryProjectUWP.Views.Book
                         if (found)
                         {
                             FilteredItems.Add(value);
+                            continue;
                         }
                     }
-                    else if (!value.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace())
+                    
+                    if (!value.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace())
                     {
                         var found = splitSearchTerm.All((key) => {
                             return value.AutresPrenoms.ToLower().Contains(key.ToLower());
@@ -226,6 +281,7 @@ namespace LibraryProjectUWP.Views.Book
                         if (found)
                         {
                             FilteredItems.Add(value);
+                            continue;
                         }
                     }
                 }
@@ -298,15 +354,23 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
-                            if (split.Length == 1)
+                            if (!sender.Text.IsStringNullOrEmptyOrWhiteSpace()) 
                             {
-                                await _parameters.ParentPage.NewAuthorAsync(split[0], string.Empty);
+                                var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
+                                if (split.Length == 1)
+                                {
+                                    await _parameters.ParentPage.NewAuthorAsync(split[0], string.Empty, ViewModelPage.Guid);
+                                }
+                                else if (split.Length >= 2)
+                                {
+                                    await _parameters.ParentPage.NewAuthorAsync(split[0], split[1], ViewModelPage.Guid);
+                                }
                             }
-                            else if (split.Length >= 2)
+                            else
                             {
-                                await _parameters.ParentPage.NewAuthorAsync(split[0], split[1]);
+                                await _parameters.ParentPage.NewAuthorAsync(string.Empty, string.Empty, ViewModelPage.Guid);
                             }
+                            sender.Text = String.Empty;
                         }
                     }
                 }
@@ -631,7 +695,8 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            await _parameters.ParentPage.NewEditorAsync(sender.Text);
+                            await _parameters.ParentPage.NewEditorAsync(sender.Text, ViewModelPage.Guid);
+                            sender.Text = String.Empty;
                         }
                     }
                 }
@@ -848,82 +913,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void PreviousStepXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (ViewModelPage.GeneralStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.DescriptionStepVisibility = Visibility.Visible;
-                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
-                }
-                else if (ViewModelPage.DescriptionStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.FormatStepVisibility = Visibility.Visible;
-                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
-                }
-                else if (ViewModelPage.FormatStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.IdentificationStepVisibility = Visibility.Visible;
-                    ViewModelPage.FormatStepVisibility = Visibility.Collapsed;
-                }
-                else if (ViewModelPage.IdentificationStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.PublicationStepVisibility = Visibility.Visible;
-                    ViewModelPage.IdentificationStepVisibility = Visibility.Collapsed;
-                }
-                else if (ViewModelPage.PublicationStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.GeneralStepVisibility = Visibility.Visible;
-                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void NextStepXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (ViewModelPage.GeneralStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.PublicationStepVisibility = Visibility.Visible;
-                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
-                }
-                else if (ViewModelPage.PublicationStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.IdentificationStepVisibility = Visibility.Visible;
-                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
-                }
-                else if (ViewModelPage.IdentificationStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.FormatStepVisibility = Visibility.Visible;
-                    ViewModelPage.IdentificationStepVisibility = Visibility.Collapsed;
-                }
-                else if (ViewModelPage.FormatStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.DescriptionStepVisibility = Visibility.Visible;
-                    ViewModelPage.FormatStepVisibility = Visibility.Collapsed;
-                }
-                else if (ViewModelPage.DescriptionStepVisibility == Visibility.Visible)
-                {
-                    ViewModelPage.GeneralStepVisibility = Visibility.Visible;
-                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             CancelModificationRequested?.Invoke(this, args);
@@ -1104,7 +1093,8 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
+        public readonly IEnumerable<string> languagesList = CountryHelpers.LanguagesList();
+        //public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
 
         private LivreVM _ViewModel;
         public LivreVM ViewModel

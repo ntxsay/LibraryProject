@@ -76,6 +76,10 @@
                        ExecuteRequested="RemoveEditorToBookXamlUICommand_ExecuteRequested"
                        Description="Efface cet éditeur de la liste">
             </XamlUICommand>
+            <XamlUICommand x:Name="RemoveLanguageXUiCommand" 
+                       ExecuteRequested="RemoveLanguageXUiCommand_ExecuteRequested"
+                       Description="Efface la langue sélectionné ci-dessous">
+            </XamlUICommand>
             <XamlUICommand x:Name="CancelModificationXUiCommand" 
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
@@ -97,14 +101,7 @@
                        ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
                        Description="Supprime l'item">
             </XamlUICommand>
-            <XamlUICommand x:Name="PreviousStepXUiCommand" 
-                       ExecuteRequested="PreviousStepXUiCommand_ExecuteRequested"
-                       Description="Etape précédente">
-            </XamlUICommand>
-            <XamlUICommand x:Name="NextStepXUiCommand" 
-                       ExecuteRequested="NextStepXUiCommand_ExecuteRequested"
-                       Description="Etape suivante">
-            </XamlUICommand>
+
             <Style TargetType="Grid" x:Key="WrapGridChildStyle">
                 <Setter Property="Margin" Value="4 0" />
                 <Setter Property="VerticalAlignment" Value="Top" />
@@ -500,9 +497,9 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="sélectionnez une langue" >
+                                    <ComboBox HorizontalAlignment="Stretch" ItemsSource="{x:Bind ViewModelPage.languagesList, Mode=OneWay}" VerticalAlignment="Center" PlaceholderText="sélectionnez une langue" SelectionChanged="ComboBox_Language_SelectionChanged">
                                     </ComboBox>
-                                    <Button Grid.Column="1" VerticalAlignment="Bottom" Command="{StaticResource RemoveCollectionToBookXamlUICommand}">
+                                    <Button Grid.Column="1" VerticalAlignment="Bottom" Command="{StaticResource RemoveLanguageXUiCommand}">
                                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;"/>
                                     </Button>
                                 </Grid>

@@ -140,6 +140,8 @@
     <Compile Include="Code\DataTemplatesSelector\CategoriesDataTemplateSelector.cs" />
     <Compile Include="Code\Enums.cs" />
     <Compile Include="Code\Helpers\CivilityHelpers.cs" />
+    <Compile Include="Code\Helpers\CountryHelpers.cs" />
+    <Compile Include="Code\Helpers\CultureHelpers.cs" />
     <Compile Include="Code\Helpers\DatesHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />

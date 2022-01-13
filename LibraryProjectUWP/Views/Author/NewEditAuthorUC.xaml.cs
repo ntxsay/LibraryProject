@@ -145,7 +145,23 @@ namespace LibraryProjectUWP.Views.Author
                 if (ViewModelPage.ViewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace())
                 {
                     ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Le nom de l'auteur ne peut pas être vide\nou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessage = $"Le titre de civilité de l'auteur doit être renseigné.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
+                else if (ViewModelPage.ViewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Le nom de naissance de l'auteur ne peut pas être vide ou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
+                else if (ViewModelPage.ViewModel.Prenom.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Le prénom de l'auteur ne peut pas être vide ou ne contenir que des espaces blancs.";
                     ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
                     ViewModelPage.IsResultMessageOpen = true;
                     return false;

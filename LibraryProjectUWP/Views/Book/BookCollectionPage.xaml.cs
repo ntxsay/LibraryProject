@@ -1141,6 +1141,16 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            if (bookManager != null)
+                            {
+                                bookManager.ViewModelPage.ViewModel.Auteurs.Add(newViewModel);
+                                NewEditAuthorUC_CancelModificationRequested(sender, e);
+                            }
+                        }
                     }
                     else
                     {
@@ -1383,7 +1393,7 @@ namespace LibraryProjectUWP.Views.Book
             await NewEditorAsync(string.Empty);
         }
 
-        internal async Task NewEditorAsync(string partName)
+        internal async Task NewEditorAsync(string partName, Guid? guid = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1405,6 +1415,11 @@ namespace LibraryProjectUWP.Views.Book
                             Name = partName,
                         },
                     });
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
 
                     userControl.CancelModificationRequested += NewEditEditorUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditEditorUC_Create_CreateItemRequested;
@@ -1438,6 +1453,16 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            if (bookManager != null)
+                            {
+                                bookManager.ViewModelPage.ViewModel.Publication.Editeurs.Add(newViewModel);
+                                NewEditEditorUC_Create_CancelModificationRequested(sender, e);
+                            }
+                        }
                     }
                     else
                     {
