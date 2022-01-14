@@ -121,10 +121,10 @@ namespace LibraryProjectUWP.Views.Book
                     }
                 }
 
-
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
-                ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
-                this.RefreshItemsGrouping();
+                NavigateToView(typeof(BookCollectionGdViewPage), new BookCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
+                ViewModelPage.IsGridView = true;
+                ViewModelPage.IsDataGridView = false;
             }
             catch (Exception ex)
             {
@@ -132,111 +132,39 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-        #region Item MenuFlyout
-        private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (args.Parameter is LivreVM viewModel)
-                {
-                    EsBook esBook = new EsBook();
-                    var result = await esBook.ChangeBookItemJaquetteAsync(viewModel);
-                    if (!result.IsSuccess)
-                    {
-                        return;
-                    }
-
-                    viewModel.JaquettePath = result.Result?.ToString() ?? "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-                    var image = GetSelectedThumbnailImage(viewModel);
-                    if (image != null)
-                    {
-                        var bitmapImage = await Files.BitmapImageFromFileAsync(viewModel.JaquettePath);
-                        image.Source = bitmapImage;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void ExportThisBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (args.Parameter is LivreVM viewModel)
-                {
-                    await this.ExportThisBookAsync(viewModel);
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void DeleteLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (args.Parameter is LivreVM viewModel)
-                {
-                    // _commonView.DeleteLibrary(viewModel);
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        private void EditBookInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (args.Parameter is LivreVM viewModel)
-                {
-                    this.EditBook(viewModel);
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        #endregion
 
         #region Navigation
-        
+        public void NavigateToView(Type page, object parameters)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                _ = FramePartialView.Navigate(page, parameters, new EntranceNavigationTransitionInfo());
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void GridViewCollectionXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
-                this.RefreshItemsGrouping();
-                //return;
-                //if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
-                //{
-                //    NavigateToView(typeof(BookCollectionGdViewPage), new BookCollectionParentChildParamsVM()
-                //    {
-                //        ParentPage = this,
-                //        ViewModelList = ViewModelPage.ViewModelList,
-                //    });
-                //}
+                if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+                {
+                    NavigateToView(typeof(BookCollectionGdViewPage), new BookCollectionParentChildParamsVM()
+                    {
+                        ParentPage = this,
+                        ViewModelList = ViewModelPage.ViewModelList,
+                    });
+                }
 
-                //this.ViewModelPage.SelectedItems = new List<LivreVM>();
-                //ViewModelPage.IsGridView = true;
-                //ViewModelPage.IsDataGridView = false;
+                this.ViewModelPage.SelectedItems = new List<LivreVM>();
+                ViewModelPage.IsGridView = true;
+                ViewModelPage.IsDataGridView = false;
             }
             catch (Exception ex)
             {
@@ -250,21 +178,18 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.DataGridView;
-                this.RefreshItemsGrouping();
-                //return;
-                //if (FramePartialView.Content is BookCollectionGdViewPage)
-                //{
-                //    NavigateToView(typeof(BookCollectionDgViewPage), new BookCollectionParentChildParamsVM()
-                //    {
-                //        ParentPage = this,
-                //        ViewModelList = ViewModelPage.ViewModelList,
-                //    });
-                //}
+                if (FramePartialView.Content is BookCollectionGdViewPage)
+                {
+                    NavigateToView(typeof(BookCollectionDgViewPage), new BookCollectionParentChildParamsVM()
+                    {
+                        ParentPage = this,
+                        ViewModelList = ViewModelPage.ViewModelList,
+                    });
+                }
 
-                //this.ViewModelPage.SelectedItems = new List<LivreVM>();
-                //ViewModelPage.IsGridView = false;
-                //ViewModelPage.IsDataGridView = true;
+                this.ViewModelPage.SelectedItems = new List<LivreVM>();
+                ViewModelPage.IsGridView = false;
+                ViewModelPage.IsDataGridView = true;
             }
             catch (Exception ex)
             {
@@ -307,7 +232,14 @@ namespace LibraryProjectUWP.Views.Book
                 var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
                 {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                    {
+                        BookCollectionGdViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+                    {
+                        BookCollectionDgViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
                     this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
                 }
             }
@@ -330,7 +262,14 @@ namespace LibraryProjectUWP.Views.Book
                 var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                    {
+                        BookCollectionGdViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+                    {
+                        BookCollectionDgViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
                     this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
                 }
             }
@@ -354,7 +293,14 @@ namespace LibraryProjectUWP.Views.Book
                 var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                    {
+                        BookCollectionGdViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+                    {
+                        BookCollectionDgViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
                     this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
                 }
             }
@@ -378,7 +324,14 @@ namespace LibraryProjectUWP.Views.Book
                 var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s =>  s.Publication.DateParution?.Year.ToString() ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
+                    {
+                        BookCollectionGdViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
+                    else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
+                    {
+                        BookCollectionDgViewPage.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    }
                     this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.ParutionYear;
                 }
             }
@@ -601,7 +554,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void SearchViewModel(LivreVM viewModel)
+        private void SearchViewModel(LivreVM viewModel)
         {
             try
             {
@@ -610,85 +563,13 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                foreach (var pivotItem in PivotItems.Items)
+                if (FramePartialView.Content is BookCollectionGdViewPage BookCollectionGdViewPage)
                 {
-                    if (pivotItem is IGrouping<string, LivreVM> group && group.Any(f => f == viewModel))
-                    {
-                        if (this.PivotItems.SelectedItem != pivotItem)
-                        {
-                            this.PivotItems.SelectedItem = pivotItem;
-                        }
-
-                        var _container = this.PivotItems.ContainerFromItem(pivotItem);
-                        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
-                        while (gridView != null && gridView.Name != "GridViewItems")
-                        {
-                            gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
-                            if (gridView == null)
-                            {
-                                return;
-                            }
-                            else
-                            {
-                                if (gridView.Name == "GridViewItems")
-                                {
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (gridView != null)
-                        {
-                            foreach (var gridViewItem in gridView.Items)
-                            {
-                                if (gridViewItem is LivreVM _viewModel && _viewModel == viewModel)
-                                {
-                                    if (gridView.SelectedItem != gridViewItem)
-                                    {
-                                        gridView.SelectedItem = gridViewItem;
-                                    }
-
-                                    var _gridViewItemContainer = gridView.ContainerFromItem(gridViewItem);
-                                    OpenFlyoutSearchedItem(_gridViewItemContainer);
-                                }
-                            }
-                        }
-                    }
+                    BookCollectionGdViewPage.SearchViewModel(viewModel);
                 }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void OpenFlyoutSearchedItem(DependencyObject _gridViewItemContainer)
-        {
-            try
-            {
-                if (_gridViewItemContainer == null)
+                else if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
                 {
-                    return;
-                }
-
-                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
-                if (grid != null)
-                {
-                    Grid gridActions = grid.Children.FirstOrDefault(f => f is Grid _gridActions && _gridActions.Name == "GridActions") as Grid;
-                    if (gridActions != null)
-                    {
-                        Button buttonActions = gridActions.Children.FirstOrDefault(f => f is Button _buttonActions && _buttonActions.Name == "BtnActions") as Button;
-                        if (buttonActions != null)
-                        {
-                            buttonActions.Flyout.ShowAt(buttonActions, new FlyoutShowOptions()
-                            {
-                                Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
-                                ShowMode = FlyoutShowMode.Auto
-                            });
-                        }
-                    }
+                    //BookCollectionDgViewPage.SearchViewModel(viewModel);
                 }
             }
             catch (Exception ex)
@@ -809,8 +690,17 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         newViewModel.Id = creationResult.Id;
                         ViewModelPage.ViewModelList.Add(newViewModel);
-                        this.RefreshItemsGrouping();
 
+                        if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
+                        {
+                            bookCollectionGdViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        }
+                        else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
+                        {
+                            bookCollectionDgViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        }
+
+                        this.RefreshItemsGrouping();
                         sender.ViewModelPage.ResultMessageTitle = "Succeès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
@@ -1645,145 +1535,12 @@ namespace LibraryProjectUWP.Views.Book
                 return null;
             }
         }
-
-        private Image GetSelectedThumbnailImage(LivreVM viewModel)
-        {
-            try
-            {
-                if (viewModel == null)
-                {
-                    return null;
-                }
-
-                if (this.PivotItems.SelectedItem != null)
-                {
-                    if (this.PivotItems.SelectedItem is IGrouping<string, LivreVM> group && group.Any(f => f == viewModel))
-                    {
-
-                        var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
-                        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
-                        while (gridView != null && gridView.Name != "GridViewItems")
-                        {
-                            gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
-                            if (gridView == null)
-                            {
-                                return null;
-                            }
-                            else
-                            {
-                                if (gridView.Name == "GridViewItems")
-                                {
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (gridView != null)
-                        {
-                            foreach (var gridViewItem in gridView.Items)
-                            {
-                                if (gridViewItem is LivreVM _viewModel && _viewModel == viewModel)
-                                {
-                                    if (gridView.SelectedItem != gridViewItem)
-                                    {
-                                        gridView.SelectedItem = gridViewItem;
-                                    }
-
-                                    var _gridViewItemContainer = gridView.ContainerFromItem(gridViewItem);
-                                    return SelectImageFromContainer(_gridViewItemContainer);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return null;
-            }
-        }
-
-        private Image SelectImageFromContainer(DependencyObject _gridViewItemContainer)
-        {
-            try
-            {
-                if (_gridViewItemContainer == null)
-                {
-                    return null;
-                }
-
-                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
-                if (grid != null)
-                {
-                    Viewbox viewboxThumbnailContainer = grid.Children.FirstOrDefault(f => f is Viewbox _viewboxThumbnailContainer && _viewboxThumbnailContainer.Name == "ViewboxSimpleThumnailDatatemplate") as Viewbox;
-                    if (viewboxThumbnailContainer != null)
-                    {
-                        Border border = viewboxThumbnailContainer.Child as Border;
-                        if (border != null)
-                        {
-                            Grid gridImageContainer = border.Child as Grid;
-                            if (gridImageContainer != null)
-                            {
-                                Image image = gridImageContainer.Children.FirstOrDefault(f => f is Image _image) as Image;
-                                return image;
-                            }
-                        }
-                    }
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return null;
-            }
-        }
         #endregion
-
-        private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-
-        }
-
-        private void Image_Loaded_1(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-        private BookGroupVM _GroupedRelatedViewModel = new BookGroupVM();
-        public BookGroupVM GroupedRelatedViewModel
-        {
-            get => this._GroupedRelatedViewModel;
-            set
-            {
-                if (this._GroupedRelatedViewModel != value)
-                {
-                    this._GroupedRelatedViewModel = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
 
         private BookGroupVM.GroupBy _GroupedBy = BookGroupVM.GroupBy.None;
         public BookGroupVM.GroupBy GroupedBy
@@ -1827,33 +1584,33 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        //private bool _IsDataGridView;
-        //public bool IsDataGridView
-        //{
-        //    get => this._IsDataGridView;
-        //    set
-        //    {
-        //        if (_IsDataGridView != value)
-        //        {
-        //            this._IsDataGridView = value;
-        //            this.OnPropertyChanged();
-        //        }
-        //    }
-        //}
+        private bool _IsDataGridView;
+        public bool IsDataGridView
+        {
+            get => this._IsDataGridView;
+            set
+            {
+                if (_IsDataGridView != value)
+                {
+                    this._IsDataGridView = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
-        //private bool _IsGridView;
-        //public bool IsGridView
-        //{
-        //    get => this._IsGridView;
-        //    set
-        //    {
-        //        if (_IsGridView != value)
-        //        {
-        //            this._IsGridView = value;
-        //            this.OnPropertyChanged();
-        //        }
-        //    }
-        //}
+        private bool _IsGridView;
+        public bool IsGridView
+        {
+            get => this._IsGridView;
+            set
+            {
+                if (_IsGridView != value)
+                {
+                    this._IsGridView = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private bool _IsSplitViewOpen;
         public bool IsSplitViewOpen

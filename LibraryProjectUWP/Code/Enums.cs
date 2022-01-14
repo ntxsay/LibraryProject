@@ -41,4 +41,10 @@ namespace LibraryProjectUWP.Code
         Collection = 0,
         Playlist = 1,
     }
+
+    public enum DataViewModeEnum
+    {
+        DataGridView,
+        GridView,
+    }
 }

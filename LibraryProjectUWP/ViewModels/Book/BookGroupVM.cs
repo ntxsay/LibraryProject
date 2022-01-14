@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibraryProjectUWP.Code;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -110,6 +111,20 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (this._GroupedBy != value)
                 {
                     this._GroupedBy = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private DataViewModeEnum _DataViewMode = DataViewModeEnum.GridView;
+        public DataViewModeEnum DataViewMode
+        {
+            get => this._DataViewMode;
+            set
+            {
+                if (this._DataViewMode != value)
+                {
+                    this._DataViewMode = value;
                     this.OnPropertyChanged();
                 }
             }

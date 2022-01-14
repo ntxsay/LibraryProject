@@ -9,7 +9,6 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
-    xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
@@ -22,7 +21,6 @@
         <customConverters:StringTimeToStringDisplay x:Key="StringTimeToStringDisplayConverter"/>
         <customConverters:ListTypeToString x:Key="ListTypeToStringConverter" />
         <customConverters:IGroupingToValueConverter x:Key="groupingConverter" />-->
-        <customConverters:ObjectToBooleanConverter x:Key="objectToBooleanConverter" />
         <customConverters:CountToEnablingConverter x:Key="CountToEnablingConverter" />
         <customConverters:CountOneToEnablingConverter x:Key="CountOneToEnablingConverter" />
         <customConverters:CountToStringPhrase x:Key="CountToStringPhraseConverter" />
@@ -34,28 +32,6 @@
         <MTUUConverters:BoolToObjectConverter x:Key="InvertBoolConverter" TrueValue="False" FalseValue="True"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
-        <MTUUConverters:StringFormatConverter x:Key="StringFormatConverter"/>
-        <!--Item Flyout-->
-        <XamlUICommand x:Name="ChangeJaquetteXamlUICommand" 
-                       ExecuteRequested="ChangeJaquetteXamlUICommand_ExecuteRequested"
-                       Description="Modifie l'image qui sert à présenter le livre" 
-                       Label="Modifier la jaquette">
-        </XamlUICommand>
-        <XamlUICommand x:Name="EditBookInfosXamlUICommand" 
-                       ExecuteRequested="EditBookInfosXamlUICommand_ExecuteRequested"
-                       Description="Edite les informations de base du livre" 
-                       Label="Editer les informations">
-        </XamlUICommand>
-        <XamlUICommand x:Name="DeleteLibraryXamlUICommand" 
-                       ExecuteRequested="DeleteLibraryXamlUICommand_ExecuteRequested"
-                       Description="Supprime définitivement le livre actuel" 
-                       Label="Supprimer le livre">
-        </XamlUICommand>
-        <XamlUICommand x:Name="ExportThisBookXamlUICommand"
-                       ExecuteRequested="ExportThisBookXamlUICommand_ExecuteRequested"
-                       Description="Exporte le livre et son contenu dans un dossier">
-        </XamlUICommand>
-        <!--CommandBar-->
         <XamlUICommand x:Name="GridViewCollectionXamlUICommand" 
                        ExecuteRequested="GridViewCollectionXamlUICommand_ExecuteRequested"
                        Description="Affiche la vue grille des livres" 
@@ -147,198 +123,6 @@
         <XamlUICommand x:Name="SortByDateCreationXamlUICommand" 
                        ExecuteRequested="SortByDateCreationXamlUICommand_ExecuteRequested">
         </XamlUICommand>
-        <ThemeShadow x:Name="BackgroundGridShadow"/>
-        <DataTemplate x:DataType="booktVm:LivreVM" x:Key="ThumbnailSimpleDataTemplate">
-            <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
-                <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" Height="282" Width="180" Tag="{x:Bind}" MTUUi:FrameworkElementExtensions.Cursor="Hand" PointerPressed="ViewboxSimpleThumnailDatatemplate_PointerPressed">
-                    <ToolTipService.ToolTip>
-                        <ToolTip>
-                            <TextBlock>
-                                <Run Text="Ouvrir le livre" />
-                                <Run Text="{x:Bind MainTitle}" FontWeight="Medium"/>
-                            </TextBlock>
-                        </ToolTip>
-                    </ToolTipService.ToolTip>
-                    <Border Height="301" Width="192" Background="WhiteSmoke" BorderThickness="0" CornerRadius="0">
-                        <Grid Height="301" Width="192">
-                            <Image Source="{x:Bind JaquettePath, Mode=OneWay}" Tag="{x:Bind JaquettePath, Mode=OneWay}" Stretch="UniformToFill" Loaded="Image_Loaded_1"/>
-                            <!--<Grid Height="150" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left">
-                                <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="LightBlue" Points="0,110, 0,70, 70,0, 110,0"/>
-                                <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="BlueViolet" Points="0,110, 0,71, 71,0, 110,0"/>
-                                <TextBlock Text="{x:Bind Diffusion.StatusDiffusion.Name, Mode=OneWay}" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Margin="-28,35,0,0" 
-                                                   UseLayoutRounding="False" d:LayoutRounding="Auto" Width="140" FontSize="16" FontWeight="Bold" Foreground="White">
-                                    <TextBlock.RenderTransform>
-                                        <CompositeTransform Rotation="-45.15"/>
-                                    </TextBlock.RenderTransform>
-                                </TextBlock>
-                            </Grid>-->
-                        </Grid>
-                    </Border>
-                </Viewbox>
-                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="4, 8" BorderThickness="0" CornerRadius="0 0 0 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="2"/>
-                        <ColumnDefinition Width="44"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{x:Bind MainTitle, Mode=OneWay}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
-                    <Button x:Name="BtnActions" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand">
-                        <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
-                            <Border.BorderBrush>
-                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                    <GradientStop Color="Yellow" Offset="0.0" />
-                                    <GradientStop Color="Red" Offset="0.25" />
-                                    <GradientStop Color="Blue" Offset="0.75" />
-                                    <GradientStop Color="LimeGreen" Offset="1.0" />
-                                </LinearGradientBrush>
-                            </Border.BorderBrush>
-                            <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
-                        </Border>
-                        <Button.Flyout>
-                            <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                <MenuFlyoutItem Text="Modifier la jaquette" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xEB9F;"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutSeparator />
-                                <MenuFlyoutSubItem Text="Catégories" Tag="{x:Bind Mode=OneWay}">
-                                    <MenuFlyoutSubItem.Icon>
-                                        <FontIcon Glyph="&#xE81E;"/>
-                                    </MenuFlyoutSubItem.Icon>
-                                </MenuFlyoutSubItem>
-                                <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Ouvrir ce livre">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE8A7;"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Exporter ce livre" Command="{StaticResource ExportThisBookXamlUICommand}" CommandParameter="{x:Bind }">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xEDE1;"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Editer ce livre" Command="{StaticResource EditBookInfosXamlUICommand}" CommandParameter="{x:Bind }">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE70F;"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Supprimer ce livre" Command="{StaticResource DeleteLibraryXamlUICommand}" CommandParameter="{x:Bind }" Foreground="OrangeRed">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE74D;" Foreground="OrangeRed"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                            </MenuFlyout>
-                        </Button.Flyout>
-                    </Button>
-                </Grid>
-            </Grid>
-        </DataTemplate>
-
-        <DataTemplate x:Key="GridViewTemplate" x:DataType="booktVm:LivreVM">
-            <ScrollViewer x:Name="scrollItems" HorizontalScrollMode="Disabled" Grid.Row="0">
-                <GridView x:Name="GridViewItems" ItemsSource="{Binding }" SelectionMode="Extended" IsItemClickEnabled="False" Padding="4,14" SelectionChanged="GridViewItems_SelectionChanged"
-                                  ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled" IsMultiSelectCheckBoxEnabled="True" SingleSelectionFollowsFocus="True">
-                    <GridView.ItemContainerStyle>
-                        <Style TargetType="GridViewItem" >
-                            <Setter Property="Margin" Value="7" />
-                        </Style>
-                    </GridView.ItemContainerStyle>
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsWrapGrid  Orientation="Horizontal" HorizontalAlignment="Left"/>
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
-                    <GridView.ItemContainerTransitions>
-                        <TransitionCollection>
-                            <EntranceThemeTransition />
-                            <AddDeleteThemeTransition/>
-                            <NavigationThemeTransition/>
-                            <ContentThemeTransition/>
-                        </TransitionCollection>
-                    </GridView.ItemContainerTransitions>
-                </GridView>
-            </ScrollViewer>
-        </DataTemplate>
-        <DataTemplate x:Key="DataGridViewTemplate" x:DataType="booktVm:LivreVM">
-            <MTUUControls:DataGrid x:Name="dataGrid" ItemsSource="{Binding }" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 14 0 0"
-                                                           HorizontalScrollBarVisibility="Visible" SelectionChanged="dataGrid_SelectionChanged"
-                                        VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
-                                        AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
-                                        AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
-                                        MaxColumnWidth="500" FrozenColumnCount="1" GridLinesVisibility="None" HeadersVisibility="Column"
-                                        IsReadOnly="True" BorderThickness="0"
-                                        RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
-                                        RowGroupHeaderPropertyNameAlternative="Range">
-                <MTUUControls:DataGrid.Columns>
-                    <MTUUControls:DataGridTextColumn Header="#" Binding="{Binding Id}" Tag="Rank"/>
-                    <MTUUControls:DataGridTextColumn Header="Titre" Binding="{Binding MainTitle}" Tag="Rank"/>
-                    <MTUUControls:DataGridTemplateColumn Header="Date d'ajout" Tag="First_ascent">
-                        <MTUUControls:DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding DateAjoutUser, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:dd/MM/yyy}'}" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                            </DataTemplate>
-                        </MTUUControls:DataGridTemplateColumn.CellTemplate>
-                        <MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <CalendarDatePicker Margin="3,4,3,3" Date="{Binding DateAjout, Mode=OneWay}"/>
-                            </DataTemplate>
-                        </MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
-                    </MTUUControls:DataGridTemplateColumn>
-                    <MTUUControls:DataGridTextColumn Header="Cotation" Binding="{Binding Identification.Cotation, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ISBN" Binding="{Binding Identification.ISBN, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ISBN-10" Binding="{Binding Identification.ISBN10, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ISBN13" Binding="{Binding Identification.ISBN13, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ISSN" Binding="{Binding Identification.ISSN, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ASIN" Binding="{Binding Identification.ASIN, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="Format" Binding="{Binding Format.Format, Mode=OneWay}" Width="Auto"/>
-                </MTUUControls:DataGrid.Columns>
-                <MTUUControls:DataGrid.RowStyle>
-                    <Style TargetType="MTUUControls:DataGridRow">
-                        <Setter Property="MTUUControls:DataGridRow.ContextFlyout">
-                            <Setter.Value>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem Text="Modifier la jaquette" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{Binding }">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xEB9F;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutSeparator />
-                                    <MenuFlyoutSubItem Text="Catégories" Tag="{x:Bind Mode=OneWay}">
-                                        <MenuFlyoutSubItem.Icon>
-                                            <FontIcon Glyph="&#xE81E;"/>
-                                        </MenuFlyoutSubItem.Icon>
-                                    </MenuFlyoutSubItem>
-                                    <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Text="Ouvrir ce livre">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE8A7;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Exporter ce livre" Command="{StaticResource ExportThisBookXamlUICommand}" CommandParameter="{Binding }">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xEDE1;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Editer ce livre" Command="{StaticResource EditBookInfosXamlUICommand}" CommandParameter="{Binding }">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE70F;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Text="Supprimer ce livre" Command="{StaticResource DeleteLibraryXamlUICommand}" CommandParameter="{Binding }" Foreground="OrangeRed">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE74D;" Foreground="OrangeRed"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                </MenuFlyout>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </MTUUControls:DataGrid.RowStyle>
-            </MTUUControls:DataGrid>
-        </DataTemplate>
         <DataTemplate x:DataType="booktVm:LivreVM" x:Key="ItemAutoSuggestDataTemplate">
             <Grid Margin="0,4">
                 <Grid.ColumnDefinitions>
@@ -363,9 +147,6 @@
                 </StackPanel>
             </Grid>
         </DataTemplate>
-        <dTemplateSelectors:DataViewModeTemplateSelector x:Key="dataViewModeTemplateSelector"
-        DataGridViewTemplate="{StaticResource DataGridViewTemplate}"
-        GridViewTemplate="{StaticResource GridViewTemplate}" />
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -385,28 +166,9 @@
                 <SplitView PaneBackground="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" 
                 IsPaneOpen="{x:Bind ViewModelPage.IsSplitViewOpen, Mode=OneWay}" PanePlacement="Right" OpenPaneLength="{x:Bind ViewModelPage.SplitViewWidth, Mode=OneWay}" CompactPaneLength="88" DisplayMode="Inline">
                     <!--Items-->
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <!--<Frame x:Name="FramePartialView" Visibility="Collapsed">
+                    <Frame x:Name="FramePartialView">
 
-                        </Frame>-->
-                        <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                               ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}">
-                            <Pivot.OpacityTransition>
-                                <ScalarTransition />
-                            </Pivot.OpacityTransition>
-                            <Pivot.HeaderTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Key}"></TextBlock>
-                                </DataTemplate>
-                            </Pivot.HeaderTemplate>
-                        </Pivot>
-
-                        <MUIXC:PipsPager Grid.Row="1" Orientation="Horizontal" PreviousButtonVisibility="Visible" NextButtonVisibility="Visible" HorizontalAlignment="Center" Margin="0 10"/>
-                    </Grid>
+                    </Frame>
                     <SplitView.Pane>
                         <Pivot x:Name="PivotRightSideBar" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <Pivot.OpacityTransition>
@@ -537,12 +299,12 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='DataGridView'}"  Command="{StaticResource DataGridViewCollectionXamlUICommand}">
+            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsDataGridView, Mode=OneWay}" Command="{StaticResource DataGridViewCollectionXamlUICommand}">
                 <AppBarToggleButton.Icon>
                     <FontIcon Glyph="&#xE8FD;"/>
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
-            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='GridView'}" Command="{StaticResource GridViewCollectionXamlUICommand}">
+            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.IsGridView, Mode=OneWay}" Command="{StaticResource GridViewCollectionXamlUICommand}">
                 <AppBarToggleButton.Icon>
                     <FontIcon Glyph="&#xF0E2;"/>
                 </AppBarToggleButton.Icon>
