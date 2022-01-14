@@ -497,8 +497,15 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <ComboBox HorizontalAlignment="Stretch" ItemsSource="{x:Bind ViewModelPage.languagesList, Mode=OneWay}" VerticalAlignment="Center" PlaceholderText="sélectionnez une langue" SelectionChanged="ComboBox_Language_SelectionChanged">
-                                    </ComboBox>
+                                    <AutoSuggestBox x:Name="ASB_SearchLanguage" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                        PlaceholderText="Rechercher une langue" IsSuggestionListOpen="False"
+                                        TextChanged="ASB_SearchLanguage_TextChanged" SuggestionChosen="ASB_SearchLanguage_SuggestionChosen" QuerySubmitted="ASB_SearchLanguage_QuerySubmitted">
+                                        <AutoSuggestBox.QueryIcon>
+                                            <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
+                                        </AutoSuggestBox.QueryIcon>
+                                    </AutoSuggestBox>
+                                    <!--<ComboBox HorizontalAlignment="Stretch" ItemsSource="{x:Bind ViewModelPage.languagesList, Mode=OneWay}" VerticalAlignment="Center" PlaceholderText="sélectionnez une langue" SelectionChanged="ComboBox_Language_SelectionChanged">
+                                    </ComboBox>-->
                                     <Button Grid.Column="1" VerticalAlignment="Bottom" Command="{StaticResource RemoveLanguageXUiCommand}">
                                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;"/>
                                     </Button>

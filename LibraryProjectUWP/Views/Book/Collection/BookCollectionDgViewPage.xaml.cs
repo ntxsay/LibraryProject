@@ -48,6 +48,10 @@ namespace LibraryProjectUWP.Views.Book.Collection
             }
         }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
     public class BookCollectionDgViewPageVM : INotifyPropertyChanged

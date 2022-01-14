@@ -155,11 +155,67 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region LanGuages
-        private void ComboBox_Language_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ASB_SearchLanguage_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             try
             {
-                if (sender is ComboBox combo && combo.SelectedItem != null && combo.SelectedItem is string lang)
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.languagesList == null)
+                {
+                    return;
+                }
+
+                var FilteredItems = new List<string>();
+                var splitSearchTerm = sender.Text.ToLower().Split(" ");
+
+                foreach (var value in ViewModelPage.languagesList)
+                {
+                    if (!value.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        var found = splitSearchTerm.All((key) => {
+                            return value.ToLower().Contains(key.ToLower());
+                        });
+
+                        if (found)
+                        {
+                            FilteredItems.Add(value);
+                            continue;
+                        }
+                    }
+                }
+
+                sender.ItemsSource = FilteredItems;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+
+        }
+
+        private void ASB_SearchLanguage_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            try
+            {
+                if (args.SelectedItem != null && args.SelectedItem is string value)
+                {
+                    sender.Text = value;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ASB_SearchLanguage_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            try
+            {
+                if (args.ChosenSuggestion != null && args.ChosenSuggestion is string lang)
                 {
                     if (ViewModelPage.ViewModel.Publication.Langues.Any())
                     {
@@ -167,14 +223,13 @@ namespace LibraryProjectUWP.Views.Book
                         if (!IsAlreadyExist)
                         {
                             ViewModelPage.ViewModel.Publication.Langues.Add(lang);
-                            this.TBX_TitlesOeuvre.Text = String.Empty;
                         }
                     }
                     else
                     {
                         ViewModelPage.ViewModel.Publication.Langues.Add(lang);
-                        this.TBX_TitlesOeuvre.Text = String.Empty;
                     }
+                    sender.Text = String.Empty;
                 }
             }
             catch (Exception ex)

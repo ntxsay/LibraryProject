@@ -766,7 +766,7 @@ namespace LibraryProjectUWP.Views.Book
                         ParentPage = this,
                         EditMode = Code.EditMode.Edit,
                         ViewModelList = ViewModelPage.ViewModelList,
-                        CurrentViewModel = viewModel,
+                        CurrentViewModel = DbServices.Book.DeepCopy(viewModel),
                     });
 
                     userControl.CancelModificationRequested += NewEditBookUC_Edit_CancelModificationRequested;

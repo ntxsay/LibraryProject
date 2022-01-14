@@ -743,6 +743,80 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return null;
                 }
             }
+
+            public static LivreVM DeepCopy(LivreVM viewModelToCopy)
+            {
+                try
+                {
+                    if (viewModelToCopy == null) return null;
+
+                    LivreVM newViewModel = new LivreVM()
+                    {
+                        Id = viewModelToCopy.Id,
+                        Guid = viewModelToCopy.Guid,
+                        DateAjout = viewModelToCopy.DateAjout,
+                        DateAjoutUser = viewModelToCopy.DateAjoutUser,
+                        DateEdition = viewModelToCopy.DateEdition,
+                        MainTitle = viewModelToCopy.MainTitle,
+                        CountOpening = viewModelToCopy.CountOpening,
+                        NbExactExemplaire = viewModelToCopy.NbExactExemplaire,
+                        TitresOeuvre = viewModelToCopy.TitresOeuvre,
+                        Auteurs = viewModelToCopy.Auteurs,
+                        JaquettePath = viewModelToCopy.JaquettePath,
+                    };
+
+                    if (viewModelToCopy.Identification != null)
+                    {
+                        newViewModel.Identification = new LivreIdentificationVM()
+                        {
+                            Id = viewModelToCopy.Identification.Id,
+                            ISBN = viewModelToCopy.Identification.ISBN,
+                            ISBN10 = viewModelToCopy.Identification.ISBN10,
+                            ISBN13 = viewModelToCopy.Identification.ISBN13,
+                            ISSN = viewModelToCopy.Identification.ISSN,
+                            ASIN = viewModelToCopy.Identification.ASIN,
+                            CodeBarre = viewModelToCopy.Identification.CodeBarre,
+                            Cotation = viewModelToCopy.Identification.Cotation,
+                        };
+                    }
+
+                    if (viewModelToCopy.ClassificationAge != null)
+                    {
+                        newViewModel.ClassificationAge = new LivreClassificationAgeVM()
+                        {
+                            MinAge = viewModelToCopy.ClassificationAge.MinAge,
+                            MaxAge = viewModelToCopy.ClassificationAge.MaxAge,
+                        };
+                    }
+
+                    if (viewModelToCopy.Publication != null)
+                    {
+                        newViewModel.Publication = new LivrePublicationVM()
+                        {
+                            DateParution = viewModelToCopy.Publication.DateParution,
+                            Collections = viewModelToCopy.Publication.Collections,
+                            Editeurs = viewModelToCopy.Publication.Editeurs,
+                        };
+                    }
+
+                    if (viewModelToCopy.Description != null)
+                    {
+                        newViewModel.Description = new LivreDescriptionVM()
+                        {
+                            Resume = viewModelToCopy.Description.Resume,
+                            Notes = viewModelToCopy.Description.Notes,
+                        };
+                    }
+
+                    return newViewModel;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
             #endregion
         }
     }
