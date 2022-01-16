@@ -775,40 +775,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        //private void OpenFlyoutSearchedItemDataGridView(DependencyObject _gridViewItemContainer)
-        //{
-        //    try
-        //    {
-        //        if (_gridViewItemContainer == null)
-        //        {
-        //            return;
-        //        }
-
-        //        var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
-        //        if (grid != null)
-        //        {
-        //            Grid gridActions = grid.Children.FirstOrDefault(f => f is Grid _gridActions && _gridActions.Name == "GridActions") as Grid;
-        //            if (gridActions != null)
-        //            {
-        //                Button buttonActions = gridActions.Children.FirstOrDefault(f => f is Button _buttonActions && _buttonActions.Name == "BtnActions") as Button;
-        //                if (buttonActions != null)
-        //                {
-        //                    buttonActions.Flyout.ShowAt(buttonActions, new FlyoutShowOptions()
-        //                    {
-        //                        Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
-        //                        ShowMode = FlyoutShowMode.Auto
-        //                    });
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MethodBase m = MethodBase.GetCurrentMethod();
-        //        Logs.Log(ex, m);
-        //        return;
-        //    }
-        //}
         #endregion
 
         private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1938,33 +1904,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        //private bool _IsDataGridView;
-        //public bool IsDataGridView
-        //{
-        //    get => this._IsDataGridView;
-        //    set
-        //    {
-        //        if (_IsDataGridView != value)
-        //        {
-        //            this._IsDataGridView = value;
-        //            this.OnPropertyChanged();
-        //        }
-        //    }
-        //}
-
-        //private bool _IsGridView;
-        //public bool IsGridView
-        //{
-        //    get => this._IsGridView;
-        //    set
-        //    {
-        //        if (_IsGridView != value)
-        //        {
-        //            this._IsGridView = value;
-        //            this.OnPropertyChanged();
-        //        }
-        //    }
-        //}
 
         private bool _IsSplitViewOpen;
         public bool IsSplitViewOpen

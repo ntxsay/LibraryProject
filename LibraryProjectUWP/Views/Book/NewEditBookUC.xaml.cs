@@ -154,6 +154,44 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        #region Price
+        private void AddPriceXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.numberBoxPrice.Value >= 0d && ComboBoxPrice.SelectedIndex > -1)
+                {
+                    string value = this.TBX_TitlesOeuvre.Text.Trim();
+                    if (ViewModelPage.ViewModel.TitresOeuvre.Any())
+                    {
+                        bool IsAlreadyExist = ViewModelPage.ViewModel.TitresOeuvre.Any(c => c == value);
+                        if (!IsAlreadyExist)
+                        {
+                            ViewModelPage.ViewModel.TitresOeuvre.Add(value);
+                            this.TBX_TitlesOeuvre.Text = String.Empty;
+                        }
+                    }
+                    else
+                    {
+                        ViewModelPage.ViewModel.TitresOeuvre.Add(value);
+                        this.TBX_TitlesOeuvre.Text = String.Empty;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void RemovePriceXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+        #endregion
+
         #region LanGuages
         private void ASB_SearchLanguage_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
@@ -257,7 +295,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
         #endregion
-
 
         #region Authors
         private async Task UpdateAuthorListAsync()
@@ -1342,6 +1379,20 @@ namespace LibraryProjectUWP.Views.Book
                 if (this._DescriptionStepVisibility != value)
                 {
                     this._DescriptionStepVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _SelectedMoneyDevise;
+        public string SelectedMoneyDevise
+        {
+            get => this._SelectedMoneyDevise;
+            set
+            {
+                if (_SelectedMoneyDevise != value)
+                {
+                    this._SelectedMoneyDevise = value;
                     this.OnPropertyChanged();
                 }
             }

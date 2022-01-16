@@ -8,6 +8,21 @@ namespace LibraryProjectUWP.Code.Helpers
 {
     public partial class CultureHelpers
     {
+        public struct Money
+        {
+            public static IEnumerable<string> MoneyList()
+            {
+                var List = new List<string>()
+                    {
+                        "$",
+                        "€",
+                        "¥",
+                        "£",
+                        "₩",
+                    };
+                return List;
+            }
+        }
         public struct YesNo
         {
             public const string ChooseYesNo = "Choisissez une réponse";

@@ -135,6 +135,9 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        [JsonIgnore]
+        public readonly IEnumerable<string> MoneyList = Code.Helpers.CultureHelpers.Money.MoneyList();
+
         private ObservableCollection<PriceVM> _Prices = new ObservableCollection<PriceVM>();
         public ObservableCollection<PriceVM> Prices
         {
