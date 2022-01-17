@@ -16,13 +16,13 @@ namespace DbConsoleHelpers.Models.Local
         }
 
         public long Id { get; set; }
-        public long IdBook { get; set; }
+        public long IdBookExemplary { get; set; }
         public string DateAjout { get; set; }
-        public string DateVerification { get; set; }
+        public long TypeVerification { get; set; }
         public string Etat { get; set; }
-        public string Observation { get; set; }
+        public string Observations { get; set; }
 
-        public virtual Tbook IdBookNavigation { get; set; }
+        public virtual TbookExemplary IdBookExemplaryNavigation { get; set; }
         public virtual ICollection<TbookPret> TbookPretIdEtatAfterNavigation { get; set; }
         public virtual ICollection<TbookPret> TbookPretIdEtatBeforeNavigation { get; set; }
     }

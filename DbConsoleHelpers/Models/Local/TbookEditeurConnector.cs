@@ -14,6 +14,6 @@ namespace DbConsoleHelpers.Models.Local
         public long IdBook { get; set; }
 
         public virtual Tbook IdBookNavigation { get; set; }
-        public virtual Tediteur IdEditeurNavigation { get; set; }
+        public virtual Tcontact IdEditeurNavigation { get; set; }
     }
 }

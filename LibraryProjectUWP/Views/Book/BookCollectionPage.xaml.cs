@@ -1592,16 +1592,22 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    var itemList = await DbServices.Editors.AllVMAsync();
-                    NewEditEditorUC userControl = new NewEditEditorUC(new ManageEditorParametersDriverVM()
+                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactType.EditorHouse);
+                    var parameters = new ManageContactParametersDriverVM()
                     {
                         EditMode = Code.EditMode.Create,
+                        ContactType = Code.ContactType.EditorHouse,
                         ViewModelList = itemList,
-                        CurrentViewModel = new PublisherVM()
-                        {
-                            Name = partName,
-                        },
-                    });
+                        CurrentViewModel = new ContactVM() { ContactType = Code.ContactType.EditorHouse },
+                    };
+
+                    if (parameters.ContactType == Code.ContactType.EditorHouse)
+                    {
+                        parameters.CurrentViewModel.SocietyName = partName;
+                    }
+
+                    NewEditContactUC userControl = new NewEditContactUC(parameters);
+                    
 
                     if (guid != null)
                     {
@@ -1623,16 +1629,16 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void NewEditEditorUC_Create_CreateItemRequested(NewEditEditorUC sender, ExecuteRequestedEventArgs e)
+        private async void NewEditEditorUC_Create_CreateItemRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (sender._parameters != null)
                 {
-                    PublisherVM newViewModel = sender.ViewModelPage.ViewModel;
+                    ContactVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                    var creationResult = await DbServices.Editors.CreateAsync(newViewModel);
+                    var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
@@ -1662,7 +1668,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
                 }
 
-                sender.ViewModelPage.ViewModel = new PublisherVM();
+                sender.ViewModelPage.ViewModel = new ContactVM();
             }
             catch (Exception ex)
             {
@@ -1671,7 +1677,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void NewEditEditorUC_Create_CancelModificationRequested(NewEditEditorUC sender, ExecuteRequestedEventArgs e)
+        private void NewEditEditorUC_Create_CancelModificationRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try

@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.ViewModels.Collection;
+using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Publishers;
 using Newtonsoft.Json;
@@ -107,8 +108,8 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private ObservableCollection<PublisherVM> _Editeurs = new ObservableCollection<PublisherVM>();
-        public ObservableCollection<PublisherVM> Editeurs
+        private ObservableCollection<ContactVM> _Editeurs = new ObservableCollection<ContactVM>();
+        public ObservableCollection<ContactVM> Editeurs
         {
             get => _Editeurs;
             set
@@ -121,15 +122,29 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private ObservableCollection<string> _Langues = new ObservableCollection<string>();
-        public ObservableCollection<string> Langues
+        private string _Pays;
+        public string Pays
         {
-            get => _Langues;
+            get => _Pays;
             set
             {
-                if (_Langues != value)
+                if (_Pays != value)
                 {
-                    _Langues = value;
+                    _Pays = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _Langue;
+        public string Langue
+        {
+            get => _Langue;
+            set
+            {
+                if (_Langue != value)
+                {
+                    _Langue = value;
                     OnPropertyChanged();
                 }
             }
@@ -138,15 +153,29 @@ namespace LibraryProjectUWP.ViewModels.Book
         [JsonIgnore]
         public readonly IEnumerable<string> MoneyList = Code.Helpers.CultureHelpers.Money.MoneyList();
 
-        private ObservableCollection<PriceVM> _Prices = new ObservableCollection<PriceVM>();
-        public ObservableCollection<PriceVM> Prices
+        private double _Price;
+        public double Price
         {
-            get => _Prices;
+            get => _Price;
             set
             {
-                if (_Prices != value)
+                if (_Price != value)
                 {
-                    _Prices = value;
+                    _Price = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _DeviceName;
+        public string DeviceName
+        {
+            get => _DeviceName;
+            set
+            {
+                if (_DeviceName != value)
+                {
+                    _DeviceName = value;
                     OnPropertyChanged();
                 }
             }

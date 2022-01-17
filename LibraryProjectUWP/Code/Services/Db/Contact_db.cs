@@ -22,7 +22,7 @@ namespace LibraryProjectUWP.Code.Services.Db
     {
         public struct Contact
         {
-            static string NameEmptyMessage = "Les informations minimales obligatoires à renseigner sont : le titre de civilité, le nom de naissance et le prénom.";
+            static string NameEmptyMessage = "Les informations minimales obligatoires à renseigner sont : le titre de civilité, le nom de naissance et le prénom si client ou auteur sinon le nom de la société.";
             static string NameAlreadyExistMessage = "Ce contact existe déjà.";
             #region All
             /// <summary>
@@ -73,6 +73,116 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
             #endregion
+
+            #region Multiple
+            public static async Task<IList<Tcontact>> MultipleAsync(ContactType contactType)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    var collection = await context.Tcontact.Where(w => w.Type == (byte)contactType).ToListAsync();
+                    if (collection == null || !collection.Any()) return Enumerable.Empty<Tcontact>().ToList();
+
+                    return collection;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<Tcontact>().ToList();
+                }
+            }
+
+            public static async Task<IList<ContactVM>> MultipleVMAsync(ContactType contactType)
+            {
+                try
+                {
+                    var collection = await MultipleAsync(contactType);
+                    if (!collection.Any()) return Enumerable.Empty<ContactVM>().ToList();
+
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<ContactVM>().ToList();
+                }
+            }
+
+            public static async Task<IList<Tcontact>> MultipleAsync(long idBook, ContactType contactType)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    List<Tcontact> collection = new List<Tcontact>();
+                    if (contactType == ContactType.Author)
+                    {
+                        var preCollection = await context.TbookAuthorConnector.Where(w => w.IdBook == idBook).ToListAsync();
+                        if (preCollection.Any())
+                        {
+                            foreach (TbookAuthorConnector driver in preCollection)
+                            {
+                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdAuthor);
+                                if (model != null)
+                                {
+                                    collection.Add(model);
+                                }
+                            }
+
+                            return collection;
+                        }
+                    }
+                    else if (contactType == ContactType.EditorHouse)
+                    {
+                        var preCollection = await context.TbookEditeurConnector.Where(w => w.IdBook == idBook).ToListAsync();
+                        if (preCollection.Any())
+                        {
+                            foreach (TbookEditeurConnector driver in preCollection)
+                            {
+                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdEditeur);
+                                if (model != null)
+                                {
+                                    collection.Add(model);
+                                }
+                            }
+
+                            return collection;
+                        }
+                    }
+
+                    return collection;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<Tcontact>().ToList();
+                }
+            }
+
+            public static async Task<IList<ContactVM>> MultipleVMAsync(long idBook, ContactType contactType)
+            {
+                try
+                {
+                    var collection = await MultipleAsync(idBook, contactType);
+                    if (!collection.Any()) return Enumerable.Empty<ContactVM>().ToList();
+
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<ContactVM>().ToList();
+                }
+            }
+            #endregion
+
 
             #region Single
             /// <summary>
@@ -126,23 +236,33 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    if (viewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() || 
-                        viewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() || 
-                        viewModel.Prenom.IsStringNullOrEmptyOrWhiteSpace())
+                    if (viewModel.ContactType == ContactType.Client || viewModel.ContactType == ContactType.Author)
                     {
-                        return new OperationStateVM()
+                        if (viewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ||
+                        viewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ||
+                        viewModel.Prenom.IsStringNullOrEmptyOrWhiteSpace())
                         {
-                            IsSuccess = false,
-                            Message = NameEmptyMessage,
-                        };
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = NameEmptyMessage,
+                            };
+                        }
                     }
+                    else if (viewModel.ContactType == ContactType.EditorHouse || viewModel.ContactType == ContactType.Enterprise)
+                    {
+                        if (viewModel.SocietyName.IsStringNullOrEmptyOrWhiteSpace())
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = NameEmptyMessage,
+                            };
+                        }
+                    }
+                    
 
                     LibraryDbContext context = new LibraryDbContext();
-                    if (await context.Tcontact.CountAsync() > 0)
-                    {
-                        
-                    }
-
                     var isExist = await context.Tcontact.AnyAsync(c => c.TitreCivilite.ToLower() == viewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
                                                                       c.NomUsage.ToLower() == viewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == viewModel.AutresPrenoms.Trim().ToLower());
                     if (isExist)
@@ -171,6 +291,14 @@ namespace LibraryProjectUWP.Code.Services.Db
                         NoMobile = viewModel.NoMobile,
                         NoTelephone = viewModel.NoTelephone,
                         MailAdress = viewModel.AdresseMail,
+                        DateDeces = viewModel.DateDeces?.ToString(),
+                        LieuDeces = viewModel.LieuDeces,
+                        DateNaissance = viewModel.DateNaissance?.ToString(),
+                        LieuNaissance = viewModel.LieuNaissance,
+                        Biographie = viewModel.Biographie,
+                        Nationality = viewModel.Nationality,
+                        SocietyName = viewModel.SocietyName,
+                        Type = (long)viewModel.ContactType,
                     };
 
                     await context.Tcontact.AddAsync(record);
@@ -243,15 +371,29 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    if (viewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ||
+                    if (viewModel.ContactType == ContactType.Client || viewModel.ContactType == ContactType.Author)
+                    {
+                        if (viewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ||
                         viewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ||
                         viewModel.Prenom.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        return new OperationStateVM()
                         {
-                            IsSuccess = false,
-                            Message = NameEmptyMessage,
-                        };
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = NameEmptyMessage,
+                            };
+                        }
+                    }
+                    else if (viewModel.ContactType == ContactType.EditorHouse || viewModel.ContactType == ContactType.Enterprise)
+                    {
+                        if (viewModel.SocietyName.IsStringNullOrEmptyOrWhiteSpace())
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = NameEmptyMessage,
+                            };
+                        }
                     }
 
                     LibraryDbContext context = new LibraryDbContext();
@@ -290,6 +432,14 @@ namespace LibraryProjectUWP.Code.Services.Db
                     record.NoTelephone = viewModel.NoTelephone;
                     record.NoMobile = viewModel.NoMobile;
                     record.MailAdress = viewModel.AdresseMail;
+                    record.Biographie = viewModel.Biographie;
+                    record.DateDeces = viewModel.DateDeces?.ToString();
+                    record.LieuDeces = viewModel.LieuDeces;
+                    record.DateNaissance = viewModel.DateNaissance?.ToString();
+                    record.LieuNaissance = viewModel.LieuNaissance;
+                    record.Type = (long)viewModel.ContactType;
+                    record.Nationality = viewModel.Nationality;
+                    record.SocietyName = viewModel.SocietyName;
 
                     context.Tcontact.Update(record);
                     await context.SaveChangesAsync();
@@ -377,6 +527,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var viewModel = new ContactVM()
                     {
                         Id = model.Id,
+                        Guid = isGuidCorrect ? guid : Guid.Empty,
+                        ContactType = (ContactType)model.Type,
                         DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
                         DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
                         Observation = model.Observation,
@@ -391,6 +543,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                         NoMobile = model.NoMobile,
                         NoTelephone = model.NoTelephone,
                         AdresseMail = model.MailAdress,
+                        DateDeces = DatesHelpers.Converter.GetNullableDateFromString(model.DateDeces),
+                        LieuDeces = model.LieuDeces,
+                        DateNaissance = DatesHelpers.Converter.GetNullableDateFromString(model.DateNaissance),
+                        LieuNaissance = model.LieuNaissance,
+                        Biographie = model.Biographie,
+                        SocietyName = model.SocietyName,
+                        Nationality = model.Nationality,
                     };
                     return viewModel;
                 }

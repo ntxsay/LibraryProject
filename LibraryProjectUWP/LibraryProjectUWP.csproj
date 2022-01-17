@@ -148,11 +148,9 @@
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
     <Compile Include="Code\Helpers\VisualViewHelpers.cs" />
-    <Compile Include="Code\Services\Db\Author_db.cs" />
     <Compile Include="Code\Services\Db\Contact_db.cs" />
     <Compile Include="Code\Services\Db\Book_db.cs" />
     <Compile Include="Code\Services\Db\Collections_db.cs" />
-    <Compile Include="Code\Services\Db\Editeurs_db.cs" />
     <Compile Include="Code\Services\Db\SubCategorie_db.cs" />
     <Compile Include="Code\Services\Db\DbServices.cs" />
     <Compile Include="Code\Services\Db\General_db..cs" />
@@ -172,21 +170,18 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\Local\LibraryDbContext.cs" />
-    <Compile Include="Models\Local\Tauthor.cs" />
     <Compile Include="Models\Local\Tbook.cs" />
     <Compile Include="Models\Local\TbookAuthorConnector.cs" />
     <Compile Include="Models\Local\TbookCollectionConnector.cs" />
     <Compile Include="Models\Local\TbookEditeurConnector.cs" />
     <Compile Include="Models\Local\TbookEtat.cs" />
+    <Compile Include="Models\Local\TbookExemplary.cs" />
     <Compile Include="Models\Local\TbookFormat.cs" />
     <Compile Include="Models\Local\TbookIdentification.cs" />
-    <Compile Include="Models\Local\TbookLangue.cs" />
     <Compile Include="Models\Local\TbookOtherTitle.cs" />
     <Compile Include="Models\Local\TbookPret.cs" />
-    <Compile Include="Models\Local\TbookPrice.cs" />
     <Compile Include="Models\Local\Tcollection.cs" />
     <Compile Include="Models\Local\Tcontact.cs" />
-    <Compile Include="Models\Local\Tediteur.cs" />
     <Compile Include="Models\Local\Tlibrary.cs" />
     <Compile Include="Models\Local\TlibraryBookConnector.cs" />
     <Compile Include="Models\Local\TlibraryCategorie.cs" />

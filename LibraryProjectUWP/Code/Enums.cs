@@ -47,4 +47,12 @@ namespace LibraryProjectUWP.Code
         DataGridView,
         GridView,
     }
+
+    public enum ContactType
+    {
+        Client,
+        Author,
+        EditorHouse,
+        Enterprise,
+    }
 }

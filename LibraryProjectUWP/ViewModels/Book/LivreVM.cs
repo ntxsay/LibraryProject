@@ -24,6 +24,8 @@ namespace LibraryProjectUWP.ViewModels.Book
         public Guid Guid { get; set; } = Guid.NewGuid();
         public long CountOpening { get; set; }
         private short _NbExactExemplaire;
+
+        [Obsolete]
         public short NbExactExemplaire
         {
             get => _NbExactExemplaire;
@@ -65,8 +67,8 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private ObservableCollection<AuthorVM> _Auteurs = new ObservableCollection<AuthorVM>();
-        public ObservableCollection<AuthorVM> Auteurs
+        private ObservableCollection<ContactVM> _Auteurs = new ObservableCollection<ContactVM>();
+        public ObservableCollection<ContactVM> Auteurs
         {
             get => _Auteurs;
             set
@@ -94,6 +96,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private DateTimeOffset? _DateAjoutUser = DateTime.UtcNow;
+        [Obsolete]
         public DateTimeOffset? DateAjoutUser
         {
             get => _DateAjoutUser;

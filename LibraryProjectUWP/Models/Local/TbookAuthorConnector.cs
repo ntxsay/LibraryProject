@@ -13,7 +13,7 @@ namespace LibraryProjectUWP.Models.Local
         public long IdBook { get; set; }
         public long IdAuthor { get; set; }
 
-        public virtual Tauthor IdAuthorNavigation { get; set; }
+        public virtual Tcontact IdAuthorNavigation { get; set; }
         public virtual Tbook IdBookNavigation { get; set; }
     }
 }

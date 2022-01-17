@@ -4,6 +4,7 @@ using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
+using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Publishers;
 using Microsoft.EntityFrameworkCore;
@@ -235,32 +236,38 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     LibraryDbContext context = new LibraryDbContext();
 
-                    var isExist = await context.Tbook.AnyAsync(c => c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower());
+                    var isExist = await context.Tbook.AnyAsync(c => c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower() && c.Langue.ToLower() == viewModel.Publication.Langue.ToLower());
                     if (isExist)
                     {
-                        return new OperationStateVM()
+                        var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
+                        if (isFormatExist)
                         {
-                            IsSuccess = true,
-                            Message = DbServices.RecordAlreadyExistMessage
-                        };
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordAlreadyExistMessage
+                            };
+                        }
                     }
 
                     var record = new Tbook()
                     {
                         Guid = viewModel.Guid.ToString(),
                         DateAjout = viewModel.DateAjout.ToString(),
-                        DateAjoutUser = viewModel.DateAjoutUser.ToString(),
                         DateEdition = viewModel.DateEdition?.ToString(),
                         DateParution = viewModel.Publication.DateParution?.ToString(),
                         IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0,
                         IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0,
                         MainTitle = viewModel.MainTitle,
                         CountOpening = viewModel.CountOpening,
-                        NbExactExemplaire = viewModel.NbExactExemplaire,
                         Resume = viewModel.Description?.Resume,
                         Notes = viewModel.Description?.Notes,
                         MinAge = viewModel.ClassificationAge?.MinAge,
-                        MaxAge = viewModel.ClassificationAge?.MaxAge
+                        MaxAge = viewModel.ClassificationAge?.MaxAge,
+                        Pays = viewModel.Publication?.Pays,
+                        Langue = viewModel.Publication?.Langue,
+                        Price = viewModel.Publication?.Price ?? 0,
+                        DeviceName = viewModel.Publication?.DeviceName
                     };
 
                     await context.Tbook.AddAsync(record);
@@ -284,6 +291,22 @@ namespace LibraryProjectUWP.Code.Services.Db
                         await context.SaveChangesAsync();
                     }
 
+                    if (viewModel.Format != null)
+                    {
+                        var recordConnector = new TbookFormat()
+                        {
+                            Id = record.Id,
+                            Format = viewModel.Format.Format,
+                            NbOfPages = viewModel.Format.NbOfPages,
+                            Epaisseur = viewModel.Format.Epaisseur,
+                            Hauteur = viewModel.Format.Hauteur,
+                            Largeur = viewModel.Format.Largeur,
+                        };
+
+                        await context.TbookFormat.AddAsync(recordConnector);
+                        await context.SaveChangesAsync();
+                    }
+
                     if (viewModel.TitresOeuvre != null && viewModel.TitresOeuvre.Any())
                     {
                         foreach (string title in viewModel.TitresOeuvre)
@@ -301,7 +324,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     if (viewModel.Auteurs != null && viewModel.Auteurs.Any())
                     {
-                        foreach (AuthorVM author in viewModel.Auteurs)
+                        foreach (ContactVM author in viewModel.Auteurs)
                         {
                             var authorConnector = new TbookAuthorConnector()
                             {
@@ -331,7 +354,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
                     {
-                        foreach (PublisherVM editeur in viewModel.Publication.Editeurs)
+                        foreach (ContactVM editeur in viewModel.Publication.Editeurs)
                         {
                             var itemConnector = new TbookEditeurConnector()
                             {
@@ -404,30 +427,35 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    var isExist = await context.Tbook.AnyAsync(c => c.Id != record.Id && c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower());
+                    var isExist = await context.Tbook.AnyAsync(c => c.Id != record.Id && c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower() && c.Langue.ToLower() == viewModel.Publication.Langue.ToLower());
                     if (isExist)
                     {
-                        return new OperationStateVM()
+                        var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
+                        if (isFormatExist)
                         {
-                            IsSuccess = true,
-                            Message = NameAlreadyExistMessage
-                        };
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordAlreadyExistMessage
+                            };
+                        }
                     }
 
-                    record.DateAjoutUser = viewModel.DateAjoutUser.ToString();
                     record.DateEdition = DateTime.UtcNow.ToString();
                     record.DateParution = viewModel.Publication.DateParution?.ToString();
                     record.IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0;
                     record.IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0;
                     record.MainTitle = viewModel.MainTitle;
                     record.CountOpening = viewModel.CountOpening;
-                    record.NbExactExemplaire = viewModel.NbExactExemplaire;
                     record.Resume = viewModel.Description.Resume;
                     record.Notes = viewModel.Description.Notes;
                     record.MinAge = viewModel.ClassificationAge?.MinAge;
                     record.MaxAge = viewModel.ClassificationAge?.MaxAge;
-
-
+                    record.Langue = viewModel.Publication?.Langue;
+                    record.Pays = viewModel.Publication?.Pays;
+                    record.Price = viewModel.Publication?.Price ?? 0;
+                    record.DeviceName = viewModel.Publication?.DeviceName;
+                    
                     context.Tbook.Update(record);
 
                     if (viewModel.TitresOeuvre != null)
@@ -463,7 +491,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (viewModel.Auteurs.Any())
                         {
-                            foreach (AuthorVM author in viewModel.Auteurs)
+                            foreach (ContactVM author in viewModel.Auteurs)
                             {
                                 var authorConnector = new TbookAuthorConnector()
                                 {
@@ -509,7 +537,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (viewModel.Publication.Editeurs.Any())
                         {
-                            foreach (PublisherVM editeur in viewModel.Publication.Editeurs)
+                            foreach (ContactVM editeur in viewModel.Publication.Editeurs)
                             {
                                 var itemConnector = new TbookEditeurConnector()
                                 {
@@ -542,6 +570,26 @@ namespace LibraryProjectUWP.Code.Services.Db
                         recordIdentification.CodeBarre = viewModel.Identification.CodeBarre;
                         recordIdentification.Cotation = viewModel.Identification.Cotation;
                         _ = context.TbookIdentification.Update(recordIdentification);
+                    }
+
+                    if (viewModel.Format != null)
+                    {
+                        var recordFormat = await context.TbookFormat.SingleOrDefaultAsync(a => a.Id == record.Id);
+                        if (recordFormat == null)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage,
+                            };
+                        }
+
+                        recordFormat.Format = viewModel.Format.Format;
+                        recordFormat.NbOfPages = viewModel.Format.NbOfPages;
+                        recordFormat.Largeur = viewModel.Format.Largeur;
+                        recordFormat.Epaisseur = viewModel.Format.Epaisseur;
+                        recordFormat.Hauteur = viewModel.Format.Hauteur;
+                        _ = context.TbookFormat.Update(recordFormat);
                     }
 
                     await context.SaveChangesAsync();
@@ -668,19 +716,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Id = model.Id,
                         Guid = isGuidCorrect ? guid : Guid.Empty,
                         DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
-                        DateAjoutUser = DatesHelpers.Converter.GetDateFromString(model.DateAjoutUser),
                         DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
                         MainTitle = model.MainTitle,
                         CountOpening = model.CountOpening,
-                        NbExactExemplaire = Convert.ToInt16(model.NbExactExemplaire),
                         Description = new LivreDescriptionVM()
                         {
                             Resume = model.Resume,
                             Notes = model.Notes,
-                        },
-                        Publication = new LivrePublicationVM()
-                        {
-                            DateParution = DatesHelpers.Converter.GetNullableDateFromString(model.DateParution),
                         },
                         ClassificationAge = new LivreClassificationAgeVM()
                         {
@@ -704,6 +746,19 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
+                    if (model.TbookFormat != null)
+                    {
+                        viewModel.Format = new LivreFormatVM()
+                        {
+                            Id = model.TbookFormat.Id,
+                            Format = model.TbookFormat.Format,
+                            NbOfPages = (short)model.TbookFormat.NbOfPages,
+                            Hauteur = model.TbookFormat.Hauteur ?? 0,
+                            Epaisseur = model.TbookFormat?.Epaisseur ?? 0,
+                            Largeur = model.TbookFormat?.Largeur ?? 0,
+                        };
+                    }
+
                     return await ViewModelConverterConnectorAsync(model, viewModel);
                 }
                 catch (Exception ex)
@@ -722,16 +777,25 @@ namespace LibraryProjectUWP.Code.Services.Db
                     if (viewModel == null) return null;
 
                     IList<string> titres = await GetOtherTitlesInBookAsync(model.Id);
-                    IList<AuthorVM> authors = await Author.MultipleVmInBookAsync(model.Id);
-                    IList<PublisherVM> editors = await Editors.MultipleVmInBookAsync(model.Id);
+                    IList<ContactVM> authors = await Contact.MultipleVMAsync(model.Id, ContactType.Author);
+                    IList<ContactVM> editors = await Contact.MultipleVMAsync(model.Id, ContactType.EditorHouse);
                     IList<CollectionVM> collections = await Collection.MultipleVmInBookAsync(model.Id, CollectionTypeEnum.Collection);
 
                     viewModel.TitresOeuvre = titres != null && titres.Any() ? new ObservableCollection<string>(titres) : new ObservableCollection<string>();
-                    viewModel.Auteurs = authors != null && authors.Any() ? new ObservableCollection<AuthorVM>(authors) : new ObservableCollection<AuthorVM>();
+                    viewModel.Auteurs = authors != null && authors.Any() ? new ObservableCollection<ContactVM>(authors) : new ObservableCollection<ContactVM>();
                     viewModel.Publication = new LivrePublicationVM()
                     {
+                        Pays = model.Pays,
+                        Langue = model.Langue,
+                        Price = model.Price,
+                        DeviceName = model.DeviceName,
+                        DateParution = DatesHelpers.Converter.GetNullableDateFromString(model.DateParution),
+                        IsJourParutionKnow = model.IsJourParutionKnow >= 1 ? true : false,
+                        IsMoisParutionKnow = model.IsMoisParutionKnow >= 1 ? true : false,
+                        IsJourParutionVisible = model.IsJourParutionKnow >= 1 ? true : false,
+                        IsMoisParutionVisible = model.IsMoisParutionKnow >= 1 ? true : false,
                         Collections = collections != null && collections.Any() ? new ObservableCollection<CollectionVM>(collections) : new ObservableCollection<CollectionVM>(),
-                        Editeurs = editors != null && editors.Any() ? new ObservableCollection<PublisherVM>(editors) : new ObservableCollection<PublisherVM>(),
+                        Editeurs = editors != null && editors.Any() ? new ObservableCollection<ContactVM>(editors) : new ObservableCollection<ContactVM>(),
                     };
 
                     return viewModel;
@@ -755,11 +819,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Id = viewModelToCopy.Id,
                         Guid = viewModelToCopy.Guid,
                         DateAjout = viewModelToCopy.DateAjout,
-                        DateAjoutUser = viewModelToCopy.DateAjoutUser,
                         DateEdition = viewModelToCopy.DateEdition,
                         MainTitle = viewModelToCopy.MainTitle,
                         CountOpening = viewModelToCopy.CountOpening,
-                        NbExactExemplaire = viewModelToCopy.NbExactExemplaire,
                         TitresOeuvre = viewModelToCopy.TitresOeuvre,
                         Auteurs = viewModelToCopy.Auteurs,
                         JaquettePath = viewModelToCopy.JaquettePath,
@@ -793,9 +855,27 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         newViewModel.Publication = new LivrePublicationVM()
                         {
+                            Pays = viewModelToCopy.Publication.Pays,
+                            Langue = viewModelToCopy.Publication.Langue,
+                            Price = viewModelToCopy.Publication.Price,
+                            DeviceName = viewModelToCopy.Publication.DeviceName,
                             DateParution = viewModelToCopy.Publication.DateParution,
                             Collections = viewModelToCopy.Publication.Collections,
                             Editeurs = viewModelToCopy.Publication.Editeurs,
+
+                        };
+                    }
+
+                    if (viewModelToCopy.Format != null)
+                    {
+                        newViewModel.Format = new LivreFormatVM()
+                        {
+                            Format = viewModelToCopy.Format.Format,
+                            NbOfPages = viewModelToCopy.Format.NbOfPages,
+                            Epaisseur = viewModelToCopy.Format.Epaisseur,
+                            Hauteur = viewModelToCopy.Format.Hauteur,
+                            Largeur = viewModelToCopy.Format.Largeur,
+                            Id = viewModelToCopy.Format.Id,
                         };
                     }
 

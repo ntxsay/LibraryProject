@@ -19,21 +19,18 @@ namespace DbConsoleHelpers.Models.Local
         {
         }
 
-        public virtual DbSet<Tauthor> Tauthor { get; set; }
         public virtual DbSet<Tbook> Tbook { get; set; }
         public virtual DbSet<TbookAuthorConnector> TbookAuthorConnector { get; set; }
         public virtual DbSet<TbookCollectionConnector> TbookCollectionConnector { get; set; }
         public virtual DbSet<TbookEditeurConnector> TbookEditeurConnector { get; set; }
         public virtual DbSet<TbookEtat> TbookEtat { get; set; }
+        public virtual DbSet<TbookExemplary> TbookExemplary { get; set; }
         public virtual DbSet<TbookFormat> TbookFormat { get; set; }
         public virtual DbSet<TbookIdentification> TbookIdentification { get; set; }
-        public virtual DbSet<TbookLangue> TbookLangue { get; set; }
         public virtual DbSet<TbookOtherTitle> TbookOtherTitle { get; set; }
         public virtual DbSet<TbookPret> TbookPret { get; set; }
-        public virtual DbSet<TbookPrice> TbookPrice { get; set; }
         public virtual DbSet<Tcollection> Tcollection { get; set; }
         public virtual DbSet<Tcontact> Tcontact { get; set; }
-        public virtual DbSet<Tediteur> Tediteur { get; set; }
         public virtual DbSet<Tlibrary> Tlibrary { get; set; }
         public virtual DbSet<TlibraryBookConnector> TlibraryBookConnector { get; set; }
         public virtual DbSet<TlibraryCategorie> TlibraryCategorie { get; set; }
@@ -50,29 +47,6 @@ namespace DbConsoleHelpers.Models.Local
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Tauthor>(entity =>
-            {
-                entity.ToTable("TAuthor");
-
-                entity.HasIndex(e => e.Guid)
-                    .IsUnique();
-
-                entity.HasIndex(e => e.Id)
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.DateAjout).IsRequired();
-
-                entity.Property(e => e.Guid).IsRequired();
-
-                entity.Property(e => e.NomNaissance).IsRequired();
-
-                entity.Property(e => e.Prenom).IsRequired();
-
-                entity.Property(e => e.TitreCivilite).IsRequired();
-            });
-
             modelBuilder.Entity<Tbook>(entity =>
             {
                 entity.ToTable("TBook");
@@ -87,13 +61,9 @@ namespace DbConsoleHelpers.Models.Local
 
                 entity.Property(e => e.DateAjout).IsRequired();
 
-                entity.Property(e => e.DateAjoutUser).IsRequired();
+                entity.Property(e => e.DeviceName).IsRequired();
 
                 entity.Property(e => e.Guid).IsRequired();
-
-                entity.Property(e => e.IsJourParutionVisible).HasDefaultValueSql("1");
-
-                entity.Property(e => e.IsMoisParutionVisible).HasDefaultValueSql("1");
 
                 entity.Property(e => e.MainTitle).IsRequired();
 
@@ -167,13 +137,38 @@ namespace DbConsoleHelpers.Models.Local
 
                 entity.Property(e => e.DateAjout).IsRequired();
 
-                entity.Property(e => e.DateVerification).IsRequired();
-
                 entity.Property(e => e.Etat).IsRequired();
 
-                entity.HasOne(d => d.IdBookNavigation)
+                entity.HasOne(d => d.IdBookExemplaryNavigation)
                     .WithMany(p => p.TbookEtat)
+                    .HasForeignKey(d => d.IdBookExemplary);
+            });
+
+            modelBuilder.Entity<TbookExemplary>(entity =>
+            {
+                entity.ToTable("TBookExemplary");
+
+                entity.HasIndex(e => e.Id)
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.DateAjout).IsRequired();
+
+                entity.Property(e => e.IsVisible).HasDefaultValueSql("1");
+
+                entity.Property(e => e.NoExemplary).IsRequired();
+
+                entity.Property(e => e.Source).IsRequired();
+
+                entity.HasOne(d => d.IdBookNavigation)
+                    .WithMany(p => p.TbookExemplary)
                     .HasForeignKey(d => d.IdBook);
+
+                entity.HasOne(d => d.IdContactSourceNavigation)
+                    .WithMany(p => p.TbookExemplary)
+                    .HasForeignKey(d => d.IdContactSource)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<TbookFormat>(entity =>
@@ -214,22 +209,6 @@ namespace DbConsoleHelpers.Models.Local
                     .HasForeignKey<TbookIdentification>(d => d.Id);
             });
 
-            modelBuilder.Entity<TbookLangue>(entity =>
-            {
-                entity.ToTable("TBookLangue");
-
-                entity.HasIndex(e => e.Id)
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.Langue).IsRequired();
-
-                entity.HasOne(d => d.IdBookNavigation)
-                    .WithMany(p => p.TbookLangue)
-                    .HasForeignKey(d => d.IdBook);
-            });
-
             modelBuilder.Entity<TbookOtherTitle>(entity =>
             {
                 entity.ToTable("TBookOtherTitle");
@@ -260,9 +239,9 @@ namespace DbConsoleHelpers.Models.Local
 
                 entity.Property(e => e.DatePret).IsRequired();
 
-                entity.HasOne(d => d.IdBookNavigation)
+                entity.HasOne(d => d.IdBookExemplaryNavigation)
                     .WithMany(p => p.TbookPret)
-                    .HasForeignKey(d => d.IdBook);
+                    .HasForeignKey(d => d.IdBookExemplary);
 
                 entity.HasOne(d => d.IdContactNavigation)
                     .WithMany(p => p.TbookPret)
@@ -276,24 +255,6 @@ namespace DbConsoleHelpers.Models.Local
                 entity.HasOne(d => d.IdEtatBeforeNavigation)
                     .WithMany(p => p.TbookPretIdEtatBeforeNavigation)
                     .HasForeignKey(d => d.IdEtatBefore);
-            });
-
-            modelBuilder.Entity<TbookPrice>(entity =>
-            {
-                entity.ToTable("TBookPrice");
-
-                entity.HasIndex(e => e.Id)
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.DeviceChar).IsRequired();
-
-                entity.Property(e => e.DeviceName).IsRequired();
-
-                entity.HasOne(d => d.IdBookNavigation)
-                    .WithMany(p => p.TbookPrice)
-                    .HasForeignKey(d => d.IdBook);
             });
 
             modelBuilder.Entity<Tcollection>(entity =>
@@ -331,26 +292,21 @@ namespace DbConsoleHelpers.Models.Local
 
                 entity.Property(e => e.Guid).IsRequired();
 
-                entity.Property(e => e.NomNaissance).IsRequired();
+                entity.Property(e => e.Nationality).IsRequired();
+
+                entity.Property(e => e.NomNaissance)
+                    .IsRequired()
+                    .HasDefaultValueSql("\"\"");
 
                 entity.Property(e => e.Prenom).IsRequired();
 
-                entity.Property(e => e.TitreCivilite).IsRequired();
-            });
+                entity.Property(e => e.SocietyName)
+                    .IsRequired()
+                    .HasDefaultValueSql("\"\"");
 
-            modelBuilder.Entity<Tediteur>(entity =>
-            {
-                entity.ToTable("TEditeur");
-
-                entity.HasIndex(e => e.Id)
-                    .IsUnique();
-
-                entity.HasIndex(e => e.Name)
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.TitreCivilite)
+                    .IsRequired()
+                    .HasDefaultValueSql("\"\"");
             });
 
             modelBuilder.Entity<Tlibrary>(entity =>

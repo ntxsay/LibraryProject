@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS "TContact" (
     "Guid" TEXT NOT NULL UNIQUE,--Si le dossier ce cree
     "DateAjout" TEXT NOT NULL,
     "DateEdition" TEXT NULL,
-    "SocietyName" TEXT NOT NULL DFEAULT "",
+    "SocietyName" TEXT NOT NULL DEFAULT "",
     "TitreCivilite" TEXT NOT NULL DEFAULT "",
     "NomNaissance" TEXT NOT NULL DEFAULT "",
     "NomUsage" TEXT NULL,
@@ -111,7 +111,8 @@ CREATE TABLE IF NOT EXISTS "TBook" (
     "Notes" TEXT NULL,
     "Price" REAL NOT NULL DEFAULT 0,
 	"DeviceName" TEXT NOT NULL,
-	"Langue" TEXT NOT NULL,
+	"Langue" TEXT NULL,
+	"Pays" TEXT NULL,
     PRIMARY KEY("Id" AUTOINCREMENT)
 );
 
@@ -170,10 +171,10 @@ CREATE TABLE IF NOT EXISTS "TBookExemplary" (
 	"Id" INTEGER NOT NULL UNIQUE,
 	"IdBook" INTEGER NOT NULL,
 	"IdContactSource" INTEGER NULL,
+    "NoExemplary" TEXT NOT NULL,
     "DateAjout" TEXT NOT NULL,
     "DateEdition" TEXT NULL,
     "Source" TEXT NOT NULL, --Donné, Acheté, preté, 
-    "Etat" TEXT NOT NULL, 
     "DateAcquisition" TEXT NULL, --Date emprunt, Achat, Donation
     "DateRemise" TEXT NULL, --Si emprunt
     "IsJourAcquisitionKnow" INTEGER NOT NULL DEFAULT 0,
@@ -253,13 +254,13 @@ DROP TABLE IF EXISTS "TBookEtat";
 --Cree la Table si n'existe pas
 CREATE TABLE IF NOT EXISTS "TBookEtat" (
 	"Id" INTEGER NOT NULL UNIQUE,
-	"IdBook" INTEGER NOT NULL,
+	"IdBookExemplary" INTEGER NOT NULL,
     "DateAjout" TEXT NOT NULL,
-    "DateVerification" TEXT NOT NULL,
+    "TypeVerification" INTEGER NOT NULL, -- Entrée, avant pret, apres pret, sortie
 	"Etat" TEXT NOT NULL,
-	"Observation" TEXT NULL,
+	"Observations" TEXT NULL,
     PRIMARY KEY("Id" AUTOINCREMENT)
-    FOREIGN KEY("IdBook") REFERENCES "TBook"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdBookExemplary") REFERENCES "TBookExemplary"("Id") ON DELETE CASCADE
 );
 
 ----------------------------------------------------------------------------------------------------

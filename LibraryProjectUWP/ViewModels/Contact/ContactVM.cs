@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.Code.Services.ES;
+﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Services.ES;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,6 +15,20 @@ namespace LibraryProjectUWP.ViewModels.Contact
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public long Id { get; set; }
         public Guid Guid { get; set; } = Guid.NewGuid();
+        
+        private ContactType _ContactType;
+        public ContactType ContactType
+        {
+            get => _ContactType;
+            set
+            {
+                if (_ContactType != value)
+                {
+                    _ContactType = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         private DateTime _DateAjout = DateTime.UtcNow;
         public DateTime DateAjout
@@ -211,6 +226,34 @@ namespace LibraryProjectUWP.ViewModels.Contact
             }
         }
 
+        private string _SocietyName;
+        public string SocietyName
+        {
+            get => _SocietyName;
+            set
+            {
+                if (_SocietyName != value)
+                {
+                    _SocietyName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _Nationality;
+        public string Nationality
+        {
+            get => _Nationality;
+            set
+            {
+                if (_Nationality != value)
+                {
+                    _Nationality = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _JaquettePath = EsLibrary.LibraryDefaultJaquette;
         public string JaquettePath
         {
@@ -221,6 +264,76 @@ namespace LibraryProjectUWP.ViewModels.Contact
                 {
                     this._JaquettePath = value;
                     this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private DateTimeOffset? _DateNaissance = DateTime.UtcNow.AddYears(-20);
+        public DateTimeOffset? DateNaissance
+        {
+            get => _DateNaissance;
+            set
+            {
+                if (_DateNaissance != value)
+                {
+                    _DateNaissance = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private DateTimeOffset? _DateDeces = DateTime.UtcNow;
+        public DateTimeOffset? DateDeces
+        {
+            get => _DateDeces;
+            set
+            {
+                if (_DateDeces != value)
+                {
+                    _DateDeces = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _LieuNaissance;
+        public string LieuNaissance
+        {
+            get => _LieuNaissance;
+            set
+            {
+                if (_LieuNaissance != value)
+                {
+                    _LieuNaissance = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _LieuDeces;
+        public string LieuDeces
+        {
+            get => _LieuDeces;
+            set
+            {
+                if (_LieuDeces != value)
+                {
+                    _LieuDeces = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _Biographie;
+        public string Biographie
+        {
+            get => _Biographie;
+            set
+            {
+                if (_Biographie != value)
+                {
+                    _Biographie = value;
+                    OnPropertyChanged();
                 }
             }
         }

@@ -74,59 +74,112 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ComboBox Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.civilityList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.TitreCivilite, Mode=TwoWay}" PlaceholderText="Titre de civilité">
-                    <ComboBox.Header>
-                        <TextBlock Text="Titre de civilité" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </ComboBox.Header>
-                </ComboBox>
-                <TextBox Grid.Row="2" Text="{x:Bind ViewModelPage.ViewModel.NomNaissance, Mode=TwoWay}" PlaceholderText="Nom de naissance">
+                <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.ViewModel.AdressePostal, Mode=TwoWay}" MinHeight="100" PlaceholderText="Adresse Postal" TextWrapping="Wrap" AcceptsReturn="True">
                     <TextBox.Header>
-                        <TextBlock Text="Nom de naissnce" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        <TextBlock Text="Nom de la société" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </TextBox.Header>
                 </TextBox>
-                <TextBox Grid.Row="3" Text="{x:Bind ViewModelPage.ViewModel.NomUsage, Mode=TwoWay}" PlaceholderText="Nom d'usage">
+                <StackPanel Grid.Row="1" Orientation="Vertical" Spacing="8">
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.civilityList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.TitreCivilite, Mode=TwoWay}" PlaceholderText="Titre de civilité">
+                        <ComboBox.Header>
+                            <TextBlock Text="Titre de civilité" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.NomNaissance, Mode=TwoWay}" PlaceholderText="Nom de naissance">
+                        <TextBox.Header>
+                            <TextBlock Text="Nom de naissnce" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.NomUsage, Mode=TwoWay}" PlaceholderText="Nom d'usage">
+                        <TextBox.Header>
+                            <TextBlock Text="Nom d'usage" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.Prenom, Mode=TwoWay}" PlaceholderText="Prénom">
+                        <TextBox.Header>
+                            <TextBlock Text="Prénom" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.AutresPrenoms, Mode=TwoWay}" PlaceholderText="Autre(s) prénom(s)">
+                        <TextBox.Header>
+                            <TextBlock Text="Autre(s) prénom(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                </StackPanel>
+                <DatePicker Grid.Row="2" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateNaissance, Mode=TwoWay}" ToolTipService.ToolTip="Date de naissance"
+                                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
+                    <DatePicker.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Effacer la date" />
+                        </MenuFlyout>
+                    </DatePicker.ContextFlyout>
+                    <DatePicker.Header>
+                        <TextBlock Text="Date de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    </DatePicker.Header>
+                </DatePicker>
+                <StackPanel Grid.Row="3" Orientation="Vertical" Spacing="8">
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.LieuNaissance, Mode=TwoWay}" PlaceholderText="Lieu de naissance">
+                        <TextBox.Header>
+                            <TextBlock Text="Lieu de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.civilityList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Nationality, Mode=TwoWay}" PlaceholderText="Nationalité">
+                        <ComboBox.Header>
+                            <TextBlock Text="Nationalité" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                    <DatePicker DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateDeces, Mode=TwoWay}" ToolTipService.ToolTip="Date de décès"
+                                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
+                        <DatePicker.Header>
+                            <TextBlock Text="Date de décès" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </DatePicker.Header>
+                    </DatePicker>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.LieuDeces, Mode=TwoWay}" PlaceholderText="Lieu de décès">
+                        <TextBox.Header>
+                            <TextBlock Text="Lieu de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.Biographie, Mode=TwoWay}" MinHeight="100" PlaceholderText="Biographie courte de l'auteur" TextWrapping="Wrap" AcceptsReturn="True">
+                        <TextBox.Header>
+                            <TextBlock Text="Biographie" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                </StackPanel>
+                <StackPanel Grid.Row="4" Orientation="Vertical" Spacing="8">
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.AdressePostal, Mode=TwoWay}" MinHeight="100" PlaceholderText="Adresse Postal" TextWrapping="Wrap" AcceptsReturn="True">
+                        <TextBox.Header>
+                            <TextBlock Text="Adresse" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.CodePostal, Mode=TwoWay}" PlaceholderText="Code postal">
+                        <TextBox.Header>
+                            <TextBlock Text="Code postal" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.Ville, Mode=TwoWay}" PlaceholderText="Ville">
+                        <TextBox.Header>
+                            <TextBlock Text="Ville" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.NoTelephone, Mode=TwoWay}" PlaceholderText="N° Téléphone">
+                        <TextBox.Header>
+                            <TextBlock Text="N° Téléphone" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.NoMobile, Mode=TwoWay}" PlaceholderText="N° Mobile">
+                        <TextBox.Header>
+                            <TextBlock Text="N° mobile" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.AdresseMail, Mode=TwoWay}" PlaceholderText="Adresse Mail">
+                        <TextBox.Header>
+                            <TextBlock Text="Adresse mail" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </TextBox.Header>
+                    </TextBox>
+                </StackPanel>
+                <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Observation, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes sur l'auteur" TextWrapping="Wrap" AcceptsReturn="True">
                     <TextBox.Header>
-                        <TextBlock Text="Nom d'usage" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </TextBox.Header>
-                </TextBox>
-                <TextBox Grid.Row="4" Text="{x:Bind ViewModelPage.ViewModel.Prenom, Mode=TwoWay}" PlaceholderText="Prénom">
-                    <TextBox.Header>
-                        <TextBlock Text="Prénom" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </TextBox.Header>
-                </TextBox>
-                <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.AutresPrenoms, Mode=TwoWay}" PlaceholderText="Autre(s) prénom(s)">
-                    <TextBox.Header>
-                        <TextBlock Text="Autre(s) prénom(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </TextBox.Header>
-                </TextBox>
-                <TextBox Grid.Row="6" Text="{x:Bind ViewModelPage.ViewModel.AdressePostal, Mode=TwoWay}" MinHeight="100" PlaceholderText="Adresse Postal" TextWrapping="Wrap" AcceptsReturn="True">
-                    <TextBox.Header>
-                        <TextBlock Text="Adresse" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </TextBox.Header>
-                </TextBox>
-                <TextBox Grid.Row="7" Text="{x:Bind ViewModelPage.ViewModel.CodePostal, Mode=TwoWay}" PlaceholderText="Code postal">
-                    <TextBox.Header>
-                        <TextBlock Text="Code postal" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </TextBox.Header>
-                </TextBox>
-                <TextBox Grid.Row="8" Text="{x:Bind ViewModelPage.ViewModel.Ville, Mode=TwoWay}" PlaceholderText="Ville">
-                    <TextBox.Header>
-                        <TextBlock Text="Ville" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </TextBox.Header>
-                </TextBox>
-                <TextBox Grid.Row="9" Text="{x:Bind ViewModelPage.ViewModel.NoTelephone, Mode=TwoWay}" PlaceholderText="N° Téléphone">
-                    <TextBox.Header>
-                        <TextBlock Text="N° Téléphone" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </TextBox.Header>
-                </TextBox>
-                <TextBox Grid.Row="10" Text="{x:Bind ViewModelPage.ViewModel.NoMobile, Mode=TwoWay}" PlaceholderText="N° Mobile">
-                    <TextBox.Header>
-                        <TextBlock Text="N° mobile" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </TextBox.Header>
-                </TextBox>
-                <TextBox Grid.Row="11" Text="{x:Bind ViewModelPage.ViewModel.AdresseMail, Mode=TwoWay}" PlaceholderText="Adresse Mail">
-                    <TextBox.Header>
-                        <TextBlock Text="Adresse mail" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        <TextBlock Text="Notes" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </TextBox.Header>
                 </TextBox>
             </Grid>

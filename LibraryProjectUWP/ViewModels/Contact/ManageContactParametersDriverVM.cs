@@ -12,11 +12,13 @@ namespace LibraryProjectUWP.ViewModels.Contact
         public IEnumerable<ContactVM> ViewModelList { get; set; }
         public ContactVM CurrentViewModel { get; set; }
         public EditMode EditMode { get; set; }
+        public ContactType ContactType { get; set; }
     }
 
     public class ContactListParametersDriverVM
     {
         public IEnumerable<ContactVM> ViewModelList { get; set; }
         public ContactVM CurrentViewModel { get; set; }
+        public ContactType ContactType { get; set; }
     }
 }

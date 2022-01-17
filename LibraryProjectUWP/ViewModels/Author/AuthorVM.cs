@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.ViewModels.Author
 {
+    [Obsolete]
     public class AuthorVM : ContactVM
     {
         private DateTimeOffset? _DateNaissance = DateTime.UtcNow.AddYears(-20);

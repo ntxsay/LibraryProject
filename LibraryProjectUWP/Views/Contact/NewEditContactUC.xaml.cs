@@ -53,7 +53,7 @@ namespace LibraryProjectUWP.Views.Contact
             this.InitializeComponent();
             _parameters = parameters;
             ViewModelPage.EditMode = parameters.EditMode;
-            ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} un contact";
+            ViewModelPage.Header = $"{(parameters.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un type de contact";
             ViewModelPage.ViewModel = parameters?.CurrentViewModel;
             InitializeActionInfos();
         }
@@ -62,9 +62,34 @@ namespace LibraryProjectUWP.Views.Contact
         {
             try
             {
+                string title = string.Empty;
+                string name = string.Empty;
+
+                if (_parameters.ContactType == ContactType.Client)
+                {
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un" : "d'éditer le")} contact";
+                    name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
+                }
+                else if (_parameters.ContactType == ContactType.EditorHouse)
+                {
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une" : "d'éditer la")} maison d'édition";
+                    name = $"{_parameters?.CurrentViewModel?.SocietyName}";
+                }
+                else if (_parameters.ContactType == ContactType.Author)
+                {
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un auteur" : "d'éditer l'auteur")}";
+                    name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
+                }
+                else if (_parameters.ContactType == ContactType.Enterprise)
+                {
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une socité" : "d'éditer une société")}";
+                    name = $"{_parameters?.CurrentViewModel?.SocietyName}";
+                }
+
+
                 Run runTitle = new Run()
                 {
-                    Text = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un " : "d'éditer le")} contact",
+                    Text = title,
                     //FontWeight = FontWeights.Medium,
                 };
                 TbcInfos.Inlines.Add(runTitle);
@@ -73,12 +98,12 @@ namespace LibraryProjectUWP.Views.Contact
                 {
                     if (ViewModelPage.EditMode == EditMode.Edit)
                     {
-                        Run runCategorie = new Run()
+                        Run runName = new Run()
                         {
-                            Text = " " + _parameters?.CurrentViewModel?.TitreCivilite + " " + _parameters?.CurrentViewModel?.NomNaissance + " " + _parameters?.CurrentViewModel?.Prenom,
+                            Text = name,
                             FontWeight = FontWeights.Medium,
                         };
-                        TbcInfos.Inlines.Add(runCategorie);
+                        TbcInfos.Inlines.Add(runName);
                     }
                 }
 
@@ -214,6 +239,9 @@ namespace LibraryProjectUWP.Views.Contact
     public class NewEditContactUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public Guid? Guid { get; set; }
+
 
         private string _Header;
         public string Header
