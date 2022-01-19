@@ -76,10 +76,15 @@
                        Description="Ajoute un nouveau livre" 
                        Label="Ajouter un livre">
         </XamlUICommand>
+        <XamlUICommand x:Name="AddBookExemplaryXUiCmd" 
+                       ExecuteRequested="AddBookExemplaryXUiCmd_ExecuteRequested"
+                       Description="Ajoute un nouvel exemplaire de ce livre" 
+                       Label="Ajouter un exemplaire">
+        </XamlUICommand>
         <XamlUICommand x:Name="NewContactXamlUICommand" 
                        ExecuteRequested="NewContactXamlUICommand_ExecuteRequested"
-                       Description="Ajoute un nouveau contact" 
-                       Label="Ajouter un contact">
+                       Description="Ajoute un nouvel adhérant" 
+                       Label="Ajouter un adhérant">
         </XamlUICommand>
         <XamlUICommand x:Name="DisplayContactListXamlUICommand" 
                        ExecuteRequested="DisplayContactListXamlUICommand_ExecuteRequested"
@@ -202,11 +207,22 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutSubItem Text="Catégories" Tag="{x:Bind Mode=OneWay}">
+                                <MenuFlyoutSubItem Text="Exemplaires">
                                     <MenuFlyoutSubItem.Icon>
-                                        <FontIcon Glyph="&#xE81E;"/>
+                                        <FontIcon Glyph="&#xE71B;"/>
                                     </MenuFlyoutSubItem.Icon>
+                                    <MenuFlyoutItem Text="Ajouter un exemplaire" Command="{StaticResource AddBookExemplaryXUiCmd}" CommandParameter="{x:Bind }">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE710;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
                                 </MenuFlyoutSubItem>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem Text="Catégories" Tag="{x:Bind Mode=OneWay}">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE81E;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Text="Ouvrir ce livre">
                                     <MenuFlyoutItem.Icon>
@@ -390,9 +406,6 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <!--<Frame x:Name="FramePartialView" Visibility="Collapsed">
-
-                        </Frame>-->
                         <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}">
                             <Pivot.OpacityTransition>
@@ -408,11 +421,20 @@
                         <MUIXC:PipsPager Grid.Row="1" Orientation="Horizontal" PreviousButtonVisibility="Visible" NextButtonVisibility="Visible" HorizontalAlignment="Center" Margin="0 10"/>
                     </Grid>
                     <SplitView.Pane>
-                        <Pivot x:Name="PivotRightSideBar" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                            <Pivot.OpacityTransition>
-                                <ScalarTransition />
-                            </Pivot.OpacityTransition>
-                        </Pivot>
+                        <Grid RowSpacing="4">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" Background="Transparent" Visibility="Collapsed">
+
+                            </ComboBox>
+                            <Pivot Grid.Row="1" x:Name="PivotRightSideBar" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                <Pivot.OpacityTransition>
+                                    <ScalarTransition />
+                                </Pivot.OpacityTransition>
+                            </Pivot>
+                        </Grid>
                     </SplitView.Pane>
                 </SplitView>
             </Grid>
@@ -594,7 +616,7 @@
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Ajouter un emprunteur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewContactXamlUICommand}">
+                        <MenuFlyoutItem Text="Ajouter un adhérant" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewContactXamlUICommand}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
                             </MenuFlyoutItem.Icon>

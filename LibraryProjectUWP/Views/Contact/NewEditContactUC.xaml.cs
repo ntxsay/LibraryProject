@@ -53,9 +53,9 @@ namespace LibraryProjectUWP.Views.Contact
             this.InitializeComponent();
             _parameters = parameters;
             ViewModelPage.EditMode = parameters.EditMode;
-            ViewModelPage.Header = $"{(parameters.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un type de contact";
             ViewModelPage.ViewModel = parameters?.CurrentViewModel;
             InitializeActionInfos();
+            InitializeFieldVisibility();
         }
 
         private void InitializeActionInfos()
@@ -65,26 +65,31 @@ namespace LibraryProjectUWP.Views.Contact
                 string title = string.Empty;
                 string name = string.Empty;
 
-                if (_parameters.ContactType == ContactType.Client)
+                if (_parameters.ContactType == ContactType.Adherant)
                 {
-                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un" : "d'éditer le")} contact";
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un " : "d'éditer l'")}adhérant";
                     name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
+                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un adhérant";
                 }
                 else if (_parameters.ContactType == ContactType.EditorHouse)
                 {
                     title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une" : "d'éditer la")} maison d'édition";
                     name = $"{_parameters?.CurrentViewModel?.SocietyName}";
+                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une maison d'édition";
                 }
                 else if (_parameters.ContactType == ContactType.Author)
                 {
                     title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un auteur" : "d'éditer l'auteur")}";
                     name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
+                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un auteur";
                 }
                 else if (_parameters.ContactType == ContactType.Enterprise)
                 {
-                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une socité" : "d'éditer une société")}";
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une société" : "d'éditer une société")}";
                     name = $"{_parameters?.CurrentViewModel?.SocietyName}";
+                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une société";
                 }
+
 
 
                 Run runTitle = new Run()
@@ -113,6 +118,44 @@ namespace LibraryProjectUWP.Views.Contact
 
                 throw;
             }
+        }
+
+        private void InitializeFieldVisibility()
+        {
+            try
+            {
+                if (_parameters.ContactType == ContactType.Adherant)
+                {
+                    ViewModelPage.AdressVisibility = Visibility.Visible;
+                    ViewModelPage.CivilityVisibility = Visibility.Visible;
+                }
+                else if (_parameters.ContactType == ContactType.EditorHouse)
+                {
+                    ViewModelPage.SocietyNameVisibility = Visibility.Visible;
+                    ViewModelPage.AdressVisibility = Visibility.Visible;
+                }
+                else if (_parameters.ContactType == ContactType.Author)
+                {
+                    ViewModelPage.AdressVisibility = Visibility.Visible;
+                    ViewModelPage.CivilityVisibility = Visibility.Visible;
+                    ViewModelPage.AuthorVisibility = Visibility.Visible;
+                }
+                else if (_parameters.ContactType == ContactType.Enterprise)
+                {
+                    ViewModelPage.SocietyNameVisibility = Visibility.Visible;
+                    ViewModelPage.AdressVisibility = Visibility.Visible;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void CmbxContactType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -234,6 +277,13 @@ namespace LibraryProjectUWP.Views.Contact
                 throw;
             }
         }
+
+        private void ToggleMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        
     }
 
     public class NewEditContactUCVM : INotifyPropertyChanged
@@ -242,6 +292,7 @@ namespace LibraryProjectUWP.Views.Contact
 
         public Guid? Guid { get; set; }
 
+        public readonly IEnumerable<string> contactType = LibraryHelpers.Contact.ContactList;
 
         private string _Header;
         public string Header
@@ -252,6 +303,62 @@ namespace LibraryProjectUWP.Views.Contact
                 if (this._Header != value)
                 {
                     this._Header = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _SocietyNameVisibility = Visibility.Collapsed;
+        public Visibility SocietyNameVisibility
+        {
+            get => this._SocietyNameVisibility;
+            set
+            {
+                if (this._SocietyNameVisibility != value)
+                {
+                    this._SocietyNameVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _AdressVisibility = Visibility.Collapsed;
+        public Visibility AdressVisibility
+        {
+            get => this._AdressVisibility;
+            set
+            {
+                if (this._AdressVisibility != value)
+                {
+                    this._AdressVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _AuthorVisibility = Visibility.Collapsed;
+        public Visibility AuthorVisibility
+        {
+            get => this._AuthorVisibility;
+            set
+            {
+                if (this._AuthorVisibility != value)
+                {
+                    this._AuthorVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _CivilityVisibility = Visibility.Collapsed;
+        public Visibility CivilityVisibility
+        {
+            get => this._CivilityVisibility;
+            set
+            {
+                if (this._CivilityVisibility != value)
+                {
+                    this._CivilityVisibility = value;
                     this.OnPropertyChanged();
                 }
             }

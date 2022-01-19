@@ -145,6 +145,7 @@
     <Compile Include="Code\Helpers\CountryHelpers.cs" />
     <Compile Include="Code\Helpers\CultureHelpers.cs" />
     <Compile Include="Code\Helpers\DatesHelpers.cs" />
+    <Compile Include="Code\Helpers\LibraryHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
     <Compile Include="Code\Helpers\VisualViewHelpers.cs" />
@@ -195,6 +196,7 @@
     <Compile Include="ViewModels\Book\LivreClassificationAgeVM.cs" />
     <Compile Include="ViewModels\Book\LivreEtatVM.cs" />
     <Compile Include="ViewModels\Book\LivreDescriptionVM.cs" />
+    <Compile Include="ViewModels\Book\LivreExemplaryVM.cs" />
     <Compile Include="ViewModels\Book\LivrePublicationVM.cs" />
     <Compile Include="ViewModels\Book\LivreFormatVM.cs" />
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
@@ -216,8 +218,8 @@
     <Compile Include="ViewModels\Publishers\PublisherVM.cs" />
     <Compile Include="ViewModels\UI\BookCollectionCommonViewVM.cs" />
     <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
-    <Compile Include="Views\Author\NewEditAuthorUC.xaml.cs">
-      <DependentUpon>NewEditAuthorUC.xaml</DependentUpon>
+    <Compile Include="Views\Book\NewEditBookExemplaryUC.xaml.cs">
+      <DependentUpon>NewEditBookExemplaryUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\BookCollectionPage.xaml.cs">
       <DependentUpon>BookCollectionPage.xaml</DependentUpon>
@@ -306,7 +308,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Author\NewEditAuthorUC.xaml">
+    <Page Include="Views\Book\NewEditBookExemplaryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -421,7 +423,9 @@
     </None>
     <None Include="LibraryProjectUWP_TemporaryKey.pfx" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\Author\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

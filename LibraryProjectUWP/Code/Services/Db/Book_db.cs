@@ -235,11 +235,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                     }
 
                     LibraryDbContext context = new LibraryDbContext();
-
-                    var isExist = await context.Tbook.AnyAsync(c => c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower() && c.Langue.ToLower() == viewModel.Publication.Langue.ToLower());
-                    if (isExist)
+                    string lang = viewModel.Publication?.Langue?.ToLower() ?? null;
+                    var existingItem = await context.Tbook.FirstOrDefaultAsync(c => c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower() && c.Langue.ToLower() == lang);
+                    if (existingItem != null)
                     {
-                        var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
+                        var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Id == existingItem.Id && c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
                         if (isFormatExist)
                         {
                             return new OperationStateVM()
@@ -267,7 +267,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Pays = viewModel.Publication?.Pays,
                         Langue = viewModel.Publication?.Langue,
                         Price = viewModel.Publication?.Price ?? 0,
-                        DeviceName = viewModel.Publication?.DeviceName
+                        DeviceName = viewModel.Publication?.DeviceName ?? "€"
                     };
 
                     await context.Tbook.AddAsync(record);

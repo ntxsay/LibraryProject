@@ -56,7 +56,33 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
+        <Grid Grid.Row="0" Margin="0 10 0 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="TbcInfos" Grid.Column="0" TextWrapping="Wrap"/>
+            <Button x:Name="BtnDateParution" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="1" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
+                                        VerticalAlignment="Center" VerticalContentAlignment="Center">
+                <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
+                    <Border.BorderBrush>
+                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                            <GradientStop Color="Yellow" Offset="0.0" />
+                            <GradientStop Color="Red" Offset="0.25" />
+                            <GradientStop Color="Blue" Offset="0.75" />
+                            <GradientStop Color="LimeGreen" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.BorderBrush>
+                    <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
+                </Border>
+                <Button.Flyout>
+                    <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                        <ToggleMenuFlyoutItem Text="Ajouter le champs civilité" Click="ToggleMenuFlyoutItem_Click"/>
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+
+        </Grid>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
             <Grid RowSpacing="16" Margin="0 8 0 0" VerticalAlignment="Top">
                 <Grid.RowDefinitions>
@@ -74,20 +100,28 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.ViewModel.AdressePostal, Mode=TwoWay}" MinHeight="100" PlaceholderText="Adresse Postal" TextWrapping="Wrap" AcceptsReturn="True">
+                <ComboBox Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.contactType}" PlaceholderText="Type de contact" SelectionChanged="CmbxContactType_SelectionChanged"
+                              HorizontalAlignment="Stretch">
+                    <ComboBox.Header>
+                        <TextBlock Text="Type de contact" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    </ComboBox.Header>
+                </ComboBox>
+                <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.SocietyName, Mode=TwoWay}" PlaceholderText="Nom de la société" TextWrapping="Wrap" AcceptsReturn="True"
+                         Visibility="{x:Bind ViewModelPage.SocietyNameVisibility, Mode=OneWay}">
                     <TextBox.Header>
                         <TextBlock Text="Nom de la société" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </TextBox.Header>
                 </TextBox>
-                <StackPanel Grid.Row="1" Orientation="Vertical" Spacing="8">
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.civilityList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.TitreCivilite, Mode=TwoWay}" PlaceholderText="Titre de civilité">
+                <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="8" Visibility="{x:Bind ViewModelPage.CivilityVisibility, Mode=OneWay}">
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.civilityList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.TitreCivilite, Mode=TwoWay}" PlaceholderText="Titre de civilité"
+                              HorizontalAlignment="Stretch">
                         <ComboBox.Header>
                             <TextBlock Text="Titre de civilité" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </ComboBox.Header>
                     </ComboBox>
                     <TextBox Text="{x:Bind ViewModelPage.ViewModel.NomNaissance, Mode=TwoWay}" PlaceholderText="Nom de naissance">
                         <TextBox.Header>
-                            <TextBlock Text="Nom de naissnce" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            <TextBlock Text="Nom de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
                     </TextBox>
                     <TextBox Text="{x:Bind ViewModelPage.ViewModel.NomUsage, Mode=TwoWay}" PlaceholderText="Nom d'usage">
@@ -105,29 +139,30 @@
                             <TextBlock Text="Autre(s) prénom(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
                     </TextBox>
-                </StackPanel>
-                <DatePicker Grid.Row="2" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateNaissance, Mode=TwoWay}" ToolTipService.ToolTip="Date de naissance"
+                    <DatePicker DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateNaissance, Mode=TwoWay}" ToolTipService.ToolTip="Date de naissance"
                                                     HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
-                    <DatePicker.ContextFlyout>
-                        <MenuFlyout>
-                            <MenuFlyoutItem Text="Effacer la date" />
-                        </MenuFlyout>
-                    </DatePicker.ContextFlyout>
-                    <DatePicker.Header>
-                        <TextBlock Text="Date de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </DatePicker.Header>
-                </DatePicker>
-                <StackPanel Grid.Row="3" Orientation="Vertical" Spacing="8">
+                        <DatePicker.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Effacer la date" />
+                            </MenuFlyout>
+                        </DatePicker.ContextFlyout>
+                        <DatePicker.Header>
+                            <TextBlock Text="Date de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </DatePicker.Header>
+                    </DatePicker>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.civilityList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Nationality, Mode=TwoWay}" PlaceholderText="Nationalité"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.Header>
+                            <TextBlock Text="Nationalité" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Grid.Row="3" Orientation="Vertical" Spacing="8" Visibility="{x:Bind ViewModelPage.AuthorVisibility, Mode=OneWay}">
                     <TextBox Text="{x:Bind ViewModelPage.ViewModel.LieuNaissance, Mode=TwoWay}" PlaceholderText="Lieu de naissance">
                         <TextBox.Header>
                             <TextBlock Text="Lieu de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
                     </TextBox>
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.civilityList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Nationality, Mode=TwoWay}" PlaceholderText="Nationalité">
-                        <ComboBox.Header>
-                            <TextBlock Text="Nationalité" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
                     <DatePicker DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateDeces, Mode=TwoWay}" ToolTipService.ToolTip="Date de décès"
                                                     HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
                         <DatePicker.Header>
@@ -136,7 +171,7 @@
                     </DatePicker>
                     <TextBox Text="{x:Bind ViewModelPage.ViewModel.LieuDeces, Mode=TwoWay}" PlaceholderText="Lieu de décès">
                         <TextBox.Header>
-                            <TextBlock Text="Lieu de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            <TextBlock Text="Lieu de décès" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
                     </TextBox>
                     <TextBox Text="{x:Bind ViewModelPage.ViewModel.Biographie, Mode=TwoWay}" MinHeight="100" PlaceholderText="Biographie courte de l'auteur" TextWrapping="Wrap" AcceptsReturn="True">
@@ -145,7 +180,7 @@
                         </TextBox.Header>
                     </TextBox>
                 </StackPanel>
-                <StackPanel Grid.Row="4" Orientation="Vertical" Spacing="8">
+                <StackPanel Grid.Row="4" Orientation="Vertical" Spacing="8" Visibility="{x:Bind ViewModelPage.AdressVisibility, Mode=OneWay}">
                     <TextBox Text="{x:Bind ViewModelPage.ViewModel.AdressePostal, Mode=TwoWay}" MinHeight="100" PlaceholderText="Adresse Postal" TextWrapping="Wrap" AcceptsReturn="True">
                         <TextBox.Header>
                             <TextBlock Text="Adresse" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>

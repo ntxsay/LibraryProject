@@ -48,9 +48,9 @@ namespace LibraryProjectUWP.Code
         GridView,
     }
 
-    public enum ContactType
+    public enum ContactType : byte
     {
-        Client,
+        Adherant,
         Author,
         EditorHouse,
         Enterprise,

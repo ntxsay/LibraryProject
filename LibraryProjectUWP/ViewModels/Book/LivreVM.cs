@@ -168,6 +168,21 @@ namespace LibraryProjectUWP.ViewModels.Book
                 }
             }
         }
+
+        private ObservableCollection<LivreExemplaryVM> _Exemplaires = new ObservableCollection<LivreExemplaryVM>();
+        public ObservableCollection<LivreExemplaryVM> Exemplaires
+        {
+            get => _Exemplaires;
+            set
+            {
+                if (_Exemplaires != value)
+                {
+                    _Exemplaires = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public PretLivreVM Pret { get; set; }
         public LivreDescriptionVM Description { get; set; } = new LivreDescriptionVM();
         public LivreClassificationAgeVM ClassificationAge { get; set; } = new LivreClassificationAgeVM();

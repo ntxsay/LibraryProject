@@ -22,7 +22,7 @@ namespace LibraryProjectUWP.Code.Services.Db
     {
         public struct Contact
         {
-            static string NameEmptyMessage = "Les informations minimales obligatoires à renseigner sont : le titre de civilité, le nom de naissance et le prénom si client ou auteur sinon le nom de la société.";
+            static string NameEmptyMessage = "Les informations minimales obligatoires à renseigner sont : le titre de civilité, le nom de naissance et le prénom si Adherant ou auteur sinon le nom de la société.";
             static string NameAlreadyExistMessage = "Ce contact existe déjà.";
             #region All
             /// <summary>
@@ -236,7 +236,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    if (viewModel.ContactType == ContactType.Client || viewModel.ContactType == ContactType.Author)
+                    if (viewModel.ContactType == ContactType.Adherant || viewModel.ContactType == ContactType.Author)
                     {
                         if (viewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ||
                         viewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ||
@@ -371,7 +371,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    if (viewModel.ContactType == ContactType.Client || viewModel.ContactType == ContactType.Author)
+                    if (viewModel.ContactType == ContactType.Adherant || viewModel.ContactType == ContactType.Author)
                     {
                         if (viewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ||
                         viewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ||

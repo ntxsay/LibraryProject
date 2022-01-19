@@ -173,7 +173,13 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.ViewModel.MainTitle, Mode=TwoWay}" PlaceholderText="Titre principal du livre">
+                        <DatePicker Grid.Row="0" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateAjoutUser, Mode=TwoWay}" ToolTipService.ToolTip="Date d'ajout"
+                                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
+                            <DatePicker.Header>
+                                <TextBlock Text="Date d'ajout" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </DatePicker.Header>
+                        </DatePicker>
+                        <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.MainTitle, Mode=TwoWay}" PlaceholderText="Titre principal du livre">
                             <TextBox.Header>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <TextBlock Text="Titre du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
@@ -182,7 +188,7 @@
                                 </StackPanel>
                             </TextBox.Header>
                         </TextBox>
-                        <Grid Grid.Row="1" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
+                        <Grid Grid.Row="2" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -211,7 +217,7 @@
                                               Background="{ThemeResource ListViewBg}" BorderThickness="0 0 0 1" CornerRadius="0 0 4 4"  BorderBrush="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </Grid>
                         </Grid>
-                        <Grid Grid.Row="2" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
+                        <Grid Grid.Row="3" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -249,7 +255,13 @@
                                 </ListView>
                             </Grid>
                         </Grid>
-                        <Grid Grid.Row="3" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
+                        <MUIXC:NumberBox Grid.Row="4" HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.NbExactExemplaire, Mode=TwoWay}" PlaceholderText="Année de parution"
+                                            SpinButtonPlacementMode="Inline" Minimum="0" Maximum="2100" FontSize="14">
+                            <MUIXC:NumberBox.Header>
+                                <TextBlock Text="Nombre d'exemplaires" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </MUIXC:NumberBox.Header>
+                        </MUIXC:NumberBox>
+                        <Grid Grid.Row="5" Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -281,6 +293,7 @@
 
                             </Grid>
                         </Grid>
+
                     </Grid>
                 </ScrollViewer>
             </Grid>
@@ -350,7 +363,6 @@
                 <ScrollViewer Grid.Row="1">
                     <Grid RowSpacing="18" VerticalAlignment="Top">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -468,7 +480,7 @@
                                 </ListView>
                             </Grid>
                         </Grid>
-                        <ComboBox Grid.Row="3" ItemsSource="{x:Bind ViewModelPage.languagesList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.Langue, Mode=TwoWay}" PlaceholderText="Langue" HorizontalAlignment="Stretch">
+                        <ComboBox Grid.Row="3" ItemsSource="{x:Bind ViewModelPage.languagesList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.Langue, Mode=TwoWay}" PlaceholderText="Langue">
                             <ComboBox.Header>
                                 <TextBlock Text="Langue" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </ComboBox.Header>
@@ -486,17 +498,12 @@
                                 </Grid.ColumnDefinitions>
                                 <MUIXC:NumberBox x:Name="numberBoxPrice" HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Entrez le prix du livre" SpinButtonPlacementMode="Compact" Minimum="0" Value="{x:Bind ViewModelPage.ViewModel.Publication.Price, Mode=TwoWay}">
                                 </MUIXC:NumberBox>
-                                <ComboBox x:Name="ComboBoxPrice" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModelPage.ViewModel.Publication.MoneyList}"
+                                <ComboBox x:Name="ComboBoxPrice" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="€" ItemsSource="{x:Bind ViewModelPage.ViewModel.Publication.MoneyList}"
                                           SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.DeviceName, Mode=TwoWay}">
                                 </ComboBox>
                             </Grid>
 
                         </Grid>
-                        <ComboBox Grid.Row="5" ItemsSource="{x:Bind ViewModelPage.languagesList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.Langue, Mode=TwoWay}" PlaceholderText="Sélectionnez un pays" HorizontalAlignment="Stretch">
-                            <ComboBox.Header>
-                                <TextBlock Text="Pays" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </ComboBox.Header>
-                        </ComboBox>
                     </Grid>
                 </ScrollViewer>
             </Grid>

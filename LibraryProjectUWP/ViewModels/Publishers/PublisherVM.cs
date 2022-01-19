@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.ViewModels.Publishers
 {
+    [Obsolete]
     public class PublisherVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };

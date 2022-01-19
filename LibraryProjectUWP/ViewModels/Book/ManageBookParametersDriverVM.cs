@@ -16,6 +16,15 @@ namespace LibraryProjectUWP.ViewModels.Book
         public BookCollectionPage ParentPage { get; set; }
     }
 
+    public class ManageBookExemplaryParametersDriverVM
+    {
+        public IEnumerable<LivreExemplaryVM> ExemplaryViewModelList { get; set; }
+        public LivreExemplaryVM CurrentViewModel { get; set; }
+        public LivreVM Parent { get; set; }
+        public EditMode EditMode { get; set; }
+        public BookCollectionPage ParentPage { get; set; }
+    }
+
     public class BookListParametersDriverVM
     {
         public IEnumerable<LivreVM> ViewModelList { get; set; }

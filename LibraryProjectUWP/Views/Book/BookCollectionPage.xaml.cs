@@ -29,7 +29,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using LibraryProjectUWP.Views.Author;
 using LibraryProjectUWP.Views.Collection;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.Views.Editor;
@@ -1031,6 +1030,73 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        #region Book Exemplary
+        private void AddBookExemplaryXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookExemplaryUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    NewEditBookExemplaryUC userControl = new NewEditBookExemplaryUC(new ManageBookExemplaryParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        EditMode = Code.EditMode.Create,
+                        //ViewModelList = ViewModelPage.ViewModelList,
+                        Parent = args.Parameter as LivreVM,
+                        CurrentViewModel = new LivreExemplaryVM()
+                        {
+
+                        }
+                    });
+
+                    userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
+
+                    this.PivotRightSideBar.Items.Add(userControl);
+                    this.PivotRightSideBar.SelectedItem = userControl;
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditBookExemplaryUC_Create_CreateItemRequested(NewEditBookExemplaryUC sender, ExecuteRequestedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void NewEditBookExemplaryUC_Create_CancelModificationRequested(NewEditBookExemplaryUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditBookExemplaryUC_Create_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditBookExemplaryUC_Create_CreateItemRequested;
+
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+                this.PivotRightSideBar.Items.Remove(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
         private async void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1109,7 +1175,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(NewEditContactUC));
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == Code.EditMode.Create && item._parameters.ContactType == Code.ContactType.Adherant);
                 if (checkedItem != null)
                 {
                     this.PivotRightSideBar.SelectedItem = checkedItem;
@@ -1117,16 +1183,19 @@ namespace LibraryProjectUWP.Views.Book
                 else
                 {
                     var contactsList = await DbServices.Contact.AllVMAsync();
-                    ViewModelPage.ContactViewModelList = contactsList?.ToList();
-                    NewEditContactUC userControl = new NewEditContactUC(new ManageContactParametersDriverVM()
+                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactType.Adherant);
+                    var parameters = new ManageContactParametersDriverVM()
                     {
                         EditMode = Code.EditMode.Create,
-                        ViewModelList = ViewModelPage.ContactViewModelList,
-                        CurrentViewModel = new ContactVM()
-                        {
-                            TitreCivilite = CivilityHelpers.MPoint,
-                        }
-                    });
+                        ContactType = Code.ContactType.Adherant,
+                        ViewModelList = itemList,
+                        CurrentViewModel = new ContactVM() { TitreCivilite = CivilityHelpers.MPoint },
+                    };
+
+                    parameters.CurrentViewModel.ContactType = parameters.CurrentViewModel.ContactType;
+
+                    NewEditContactUC userControl = new NewEditContactUC(parameters);
+                    
 
                     userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
@@ -1268,27 +1337,31 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(NewEditAuthorUC));
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == Code.EditMode.Create && item._parameters.ContactType == Code.ContactType.Author);
                 if (checkedItem != null)
                 {
                     this.PivotRightSideBar.SelectedItem = checkedItem;
                 }
                 else
                 {
-                    var authorsList = await DbServices.Author.AllVMAsync();
-                    ViewModelPage.AuthorViewModelList = authorsList?.ToList();
-                    NewEditAuthorUC userControl = new NewEditAuthorUC(new ManageAuthorParametersDriverVM()
+                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactType.Author);
+                    ViewModelPage.AuthorViewModelList = itemList?.ToList();
+                    var parameters = new ManageContactParametersDriverVM()
                     {
-                        BookParentPage = this,
                         EditMode = Code.EditMode.Create,
-                        ViewModelList = ViewModelPage.AuthorViewModelList,
-                        CurrentViewModel = new AuthorVM()
+                        ContactType = Code.ContactType.Author,
+                        ViewModelList = itemList,
+                        CurrentViewModel = new ContactVM()
                         {
                             TitreCivilite = CivilityHelpers.MPoint,
                             NomNaissance = nomNaissance,
                             Prenom = prenom,
-                        }
-                    });
+                        },
+                    };
+
+                    parameters.CurrentViewModel.ContactType = parameters.ContactType;
+
+                    NewEditContactUC userControl = new NewEditContactUC(parameters);
 
                     if (guid != null)
                     {
@@ -1310,21 +1383,21 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void NewEditAuthorUC_CreateItemRequested(NewEditAuthorUC sender, ExecuteRequestedEventArgs e)
+        private async void NewEditAuthorUC_CreateItemRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (sender._parameters != null)
                 {
-                    AuthorVM newViewModel = sender.ViewModelPage.ViewModel;
+                    ContactVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                    var creationResult = await DbServices.Author.CreateAsync(newViewModel);
+                    var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
                         //ViewModelPage.AuthorViewModelList.Add(newViewModel);
-                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
@@ -1371,7 +1444,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void NewEditAuthorUC_CancelModificationRequested(NewEditAuthorUC sender, ExecuteRequestedEventArgs e)
+        private void NewEditAuthorUC_CancelModificationRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1585,7 +1658,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditEditorUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == Code.EditMode.Create && item._parameters.ContactType == Code.ContactType.EditorHouse);
                 if (checkedItem != null)
                 {
                     this.PivotRightSideBar.SelectedItem = checkedItem;
@@ -1848,6 +1921,8 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
+
+        
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
@@ -2025,8 +2100,8 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private List<AuthorVM> _AuthorViewModelList;
-        public List<AuthorVM> AuthorViewModelList
+        private List<ContactVM> _AuthorViewModelList;
+        public List<ContactVM> AuthorViewModelList
         {
             get => this._AuthorViewModelList;
             set
