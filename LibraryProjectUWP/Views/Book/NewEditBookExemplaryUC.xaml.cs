@@ -56,7 +56,7 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
             _parameters = parameters;
             ViewModelPage.EditMode = parameters.EditMode;
-            ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} un auteur";
+            ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} un exemplaire";
             ViewModelPage.ViewModel = parameters?.CurrentViewModel;
             InitializeActionInfos();
         }
@@ -72,22 +72,19 @@ namespace LibraryProjectUWP.Views.Book
             {
                 Run runTitle = new Run()
                 {
-                    Text = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un " : "d'éditer le")} contact",
+                    Text = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un " : "d'éditer le")} exemplaire au livre",
                     //FontWeight = FontWeights.Medium,
                 };
                 TbcInfos.Inlines.Add(runTitle);
 
                 if (_parameters != null)
                 {
-                    if (ViewModelPage.EditMode == EditMode.Edit)
+                    Run runName = new Run()
                     {
-                        //Run runCategorie = new Run()
-                        //{
-                        //    Text = " " + _parameters?.CurrentViewModel?.TitreCivilite + " " + _parameters?.CurrentViewModel?.NomNaissance + " " + _parameters?.CurrentViewModel?.Prenom,
-                        //    FontWeight = FontWeights.Medium,
-                        //};
-                        //TbcInfos.Inlines.Add(runCategorie);
-                    }
+                        Text = " " + _parameters?.Parent?.MainTitle,
+                        FontWeight = FontWeights.Medium,
+                    };
+                    TbcInfos.Inlines.Add(runName);
                 }
 
             }
@@ -655,12 +652,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public readonly IEnumerable<string> SourceList = new List<string>()
-        {
-            "Achat",
-            "Prêt",
-            "Don",
-        };
+        public readonly IEnumerable<string> SourceList = LibraryHelpers.EntrySourceList;
 
         private LivreExemplaryVM _ViewModel;
         public LivreExemplaryVM ViewModel

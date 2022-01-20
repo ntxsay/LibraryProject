@@ -35,6 +35,7 @@ using LibraryProjectUWP.Views.Editor;
 using LibraryProjectUWP.ViewModels.Publishers;
 using System.Collections.ObjectModel;
 using Microsoft.Toolkit.Uwp.UI.Controls;
+using LibraryProjectUWP.Views.UserControls;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -820,8 +821,7 @@ namespace LibraryProjectUWP.Views.Book
                     });
 
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -859,8 +859,7 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditBookUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditBookUC_Create_CreateItemRequested;
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -920,11 +919,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditBookUC_Create_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditBookUC_Create_CreateItemRequested;
 
-                if (this.PivotRightSideBar.Items.Count == 1)
-                {
-                    this.ViewModelPage.IsSplitViewOpen = false;
-                }
-                this.PivotRightSideBar.Items.Remove(sender);
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -958,8 +953,7 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditBookUC_Edit_CancelModificationRequested;
                     userControl.UpdateItemRequested += NewEditBookUC_Edit_UpdateItemRequested;
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -978,11 +972,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
                 sender.UpdateItemRequested -= NewEditBookUC_Edit_UpdateItemRequested;
 
-                if (this.PivotRightSideBar.Items.Count == 1)
-                {
-                    this.ViewModelPage.IsSplitViewOpen = false;
-                }
-                this.PivotRightSideBar.Items.Remove(sender);
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -1016,11 +1006,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
                 sender.UpdateItemRequested -= NewEditBookUC_Edit_UpdateItemRequested;
 
-                if (this.PivotRightSideBar.Items.Count == 1)
-                {
-                    this.ViewModelPage.IsSplitViewOpen = false;
-                }
-                this.PivotRightSideBar.Items.Remove(sender);
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -1058,8 +1044,7 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1083,11 +1068,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditBookExemplaryUC_Create_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditBookExemplaryUC_Create_CreateItemRequested;
 
-                if (this.PivotRightSideBar.Items.Count == 1)
-                {
-                    this.ViewModelPage.IsSplitViewOpen = false;
-                }
-                this.PivotRightSideBar.Items.Remove(sender);
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -1200,8 +1181,7 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1242,19 +1222,6 @@ namespace LibraryProjectUWP.Views.Book
                     }
                 }
 
-                //sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
-                //sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
-
-                //if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
-                //{
-                //    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
-                //    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
-                //}
-                //else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
-                //{
-                //    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = false;
-                //    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = null;
-                //}
             }
             catch (Exception ex)
             {
@@ -1271,11 +1238,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
 
-                if (this.PivotRightSideBar.Items.Count == 1)
-                {
-                    this.ViewModelPage.IsSplitViewOpen = false;
-                }
-                this.PivotRightSideBar.Items.Remove(sender);
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -1312,8 +1275,7 @@ namespace LibraryProjectUWP.Views.Book
                     });
 
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1371,8 +1333,7 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditAuthorUC_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditAuthorUC_CreateItemRequested;
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1423,19 +1384,6 @@ namespace LibraryProjectUWP.Views.Book
                     }
                 }
 
-                //sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
-                //sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
-
-                //if (FramePartialView.Content is BookCollectionGdViewPage bookCollectionGdViewPage)
-                //{
-                //    bookCollectionGdViewPage.ViewModelPage.IsSplitViewOpen = false;
-                //    bookCollectionGdViewPage.ViewModelPage.SplitViewContent = null;
-                //}
-                //else if (FramePartialView.Content is BookCollectionDgViewPage bookCollectionDgViewPage)
-                //{
-                //    bookCollectionDgViewPage.ViewModelPage.IsSplitViewOpen = false;
-                //    bookCollectionDgViewPage.ViewModelPage.SplitViewContent = null;
-                //}
             }
             catch (Exception ex)
             {
@@ -1452,11 +1400,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditAuthorUC_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditAuthorUC_CreateItemRequested;
 
-                if (this.PivotRightSideBar.Items.Count == 1)
-                {
-                    this.ViewModelPage.IsSplitViewOpen = false;
-                }
-                this.PivotRightSideBar.Items.Remove(sender);
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -1512,8 +1456,7 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditCollectionUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditCollectionUC_Create_CreateItemRequested;
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1580,11 +1523,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditCollectionUC_Create_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditCollectionUC_Create_CreateItemRequested;
 
-                if (this.PivotRightSideBar.Items.Count == 1)
-                {
-                    this.ViewModelPage.IsSplitViewOpen = false;
-                }
-                this.PivotRightSideBar.Items.Remove(sender);
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -1614,8 +1553,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     userControl.CancelModificationRequested += CollectionListUC_CancelModificationRequested;
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1633,11 +1571,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 sender.CancelModificationRequested -= CollectionListUC_CancelModificationRequested;
 
-                if (this.PivotRightSideBar.Items.Count == 1)
-                {
-                    this.ViewModelPage.IsSplitViewOpen = false;
-                }
-                this.PivotRightSideBar.Items.Remove(sender);
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -1690,8 +1624,7 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditEditorUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditEditorUC_Create_CreateItemRequested;
 
-                    this.PivotRightSideBar.Items.Add(userControl);
-                    this.PivotRightSideBar.SelectedItem = userControl;
+                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1758,11 +1691,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CancelModificationRequested -= NewEditEditorUC_Create_CancelModificationRequested;
                 sender.CreateItemRequested -= NewEditEditorUC_Create_CreateItemRequested;
 
-                if (this.PivotRightSideBar.Items.Count == 1)
-                {
-                    this.ViewModelPage.IsSplitViewOpen = false;
-                }
-                this.PivotRightSideBar.Items.Remove(sender);
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -1778,6 +1707,58 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Functions
+        private void AddItemToSideBar(PivotItem item, string header)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.PivotRightSideBar.Items.Add(item);
+                this.PivotRightSideBar.SelectedItem = item;
+                if (item.Header is Grid grid && grid.Children[0] is SideBarItemHeader pivotHeader)
+                {
+                    ViewModelPage.ItemsSideBarHeader.Add(new SideBarItemHeaderVM()
+                    {
+                        Glyph = pivotHeader.Glyph,
+                        Title = header,
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void RemoveItemToSideBar(PivotItem item)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.PivotRightSideBar.Items.Count == 1)
+                {
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
+
+                if (item.Header is SideBarItemHeader header && ViewModelPage.ItemsSideBarHeader.Count > 0)
+                {
+                    var head = new SideBarItemHeaderVM()
+                    {
+                        Glyph = header.Glyph,
+                        Title = header.Title,
+                    };
+                    ViewModelPage.ItemsSideBarHeader.Remove(head);
+                }
+
+                this.PivotRightSideBar.Items.Remove(item);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private NewEditBookUC GetBookSideBarByGuid(Guid guid)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1928,6 +1909,20 @@ namespace LibraryProjectUWP.Views.Book
     public class BookCollectionPageVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        private ObservableCollection<SideBarItemHeaderVM> _ItemsSideBarHeader = new ObservableCollection<SideBarItemHeaderVM>();
+        public ObservableCollection<SideBarItemHeaderVM> ItemsSideBarHeader
+        {
+            get => this._ItemsSideBarHeader;
+            set
+            {
+                if (_ItemsSideBarHeader != value)
+                {
+                    this._ItemsSideBarHeader = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private BookGroupVM _GroupedRelatedViewModel = new BookGroupVM();
         public BookGroupVM GroupedRelatedViewModel

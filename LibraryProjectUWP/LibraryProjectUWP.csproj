@@ -211,6 +211,7 @@
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\General\ManageCategorieParametersVM.cs" />
     <Compile Include="ViewModels\General\PriceVM.cs" />
+    <Compile Include="ViewModels\General\SideBarItemHeaderVM.cs" />
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
@@ -277,6 +278,9 @@
     </Compile>
     <Compile Include="Views\NewElementCD.xaml.cs">
       <DependentUpon>NewElementCD.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserControls\SideBarItemHeader.xaml.cs">
+      <DependentUpon>SideBarItemHeader.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -385,6 +389,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\NewElementCD.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\SideBarItemHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

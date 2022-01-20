@@ -8,6 +8,14 @@ namespace LibraryProjectUWP.Code.Helpers
 {
     public class LibraryHelpers
     {
+        public static IEnumerable<string> EntrySourceList => new List<string>()
+        {
+            "Achat",
+            "Prêt",
+            "Don",
+            "Autre",
+        };
+
         public static IEnumerable<string> EtatModelList => new List<string>()
         {
             "Neuf",

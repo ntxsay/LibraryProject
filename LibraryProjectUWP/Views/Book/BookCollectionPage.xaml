@@ -8,6 +8,8 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
+    xmlns:generalVm="using:LibraryProjectUWP.ViewModels.General"
+    xmlns:userControls="using:LibraryProjectUWP.Views.UserControls"
     xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
     xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
@@ -426,8 +428,15 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" Background="Transparent" Visibility="Collapsed">
-
+                            <ComboBox Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.ItemsSideBarHeader, Mode=OneWay}" HorizontalAlignment="Stretch" Background="Transparent" Visibility="Visible">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="generalVm:SideBarItemHeaderVM">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind Glyph, Mode=OneWay}" FontSize="20"/>
+                                            <TextBlock Text="{x:Bind Title, Mode=OneWay}" FontSize="16" VerticalAlignment="Center" Margin="0 0 0 5" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                             </ComboBox>
                             <Pivot Grid.Row="1" x:Name="PivotRightSideBar" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                                 <Pivot.OpacityTransition>
