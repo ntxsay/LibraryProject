@@ -28,7 +28,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace LibraryProjectUWP.Views.UserControls
 {
-    public sealed partial class SideBarPivotItem : PivotItem
+    public partial class SideBarPivotItem : PivotItem
     {
         public SideBarPivotItem()
         {

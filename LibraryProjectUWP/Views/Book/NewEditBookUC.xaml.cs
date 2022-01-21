@@ -7,6 +7,7 @@ using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.Publishers;
+using LibraryProjectUWP.Views.UserControls;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace LibraryProjectUWP.Views.Book
 {
-    public sealed partial class NewEditBookUC : PivotItem
+    public sealed partial class NewEditBookUC : SideBarPivotItem
     {
         public readonly ManageBookParametersDriverVM _parameters;
 
