@@ -865,8 +865,8 @@ namespace LibraryProjectUWP.Views.Book
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
+                        Glyph = userControl.ViewModelPage.Glyph.ToString(),
+                        Title = userControl.ViewModelPage.Header.ToString(),
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
