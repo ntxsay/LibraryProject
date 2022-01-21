@@ -450,6 +450,20 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
+        private string _Glyph = "&#xe736;";
+        public string Glyph
+        {
+            get => _Glyph;
+            set
+            {
+                if (_Glyph != value)
+                {
+                    _Glyph = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             // Raise the PropertyChanged event, passing the name of the property whose value has changed.

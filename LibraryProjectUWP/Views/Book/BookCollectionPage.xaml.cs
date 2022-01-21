@@ -821,7 +821,11 @@ namespace LibraryProjectUWP.Views.Book
                     });
 
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -859,7 +863,11 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditBookUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditBookUC_Create_CreateItemRequested;
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -953,7 +961,11 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditBookUC_Edit_CancelModificationRequested;
                     userControl.UpdateItemRequested += NewEditBookUC_Edit_UpdateItemRequested;
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1044,7 +1056,11 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1181,7 +1197,11 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1275,7 +1295,11 @@ namespace LibraryProjectUWP.Views.Book
                     });
 
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1333,7 +1357,11 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditAuthorUC_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditAuthorUC_CreateItemRequested;
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1456,7 +1484,11 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditCollectionUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditCollectionUC_Create_CreateItemRequested;
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1553,7 +1585,11 @@ namespace LibraryProjectUWP.Views.Book
 
                     userControl.CancelModificationRequested += CollectionListUC_CancelModificationRequested;
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1624,7 +1660,11 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.CancelModificationRequested += NewEditEditorUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditEditorUC_Create_CreateItemRequested;
 
-                    this.AddItemToSideBar(userControl, userControl.ViewModelPage.Header);
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                    });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
             }
@@ -1707,7 +1747,7 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Functions
-        private void AddItemToSideBar(PivotItem item, string header)
+        private void AddItemToSideBar(PivotItem item, SideBarItemHeaderVM sideBarItem)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1716,11 +1756,7 @@ namespace LibraryProjectUWP.Views.Book
                 this.PivotRightSideBar.SelectedItem = item;
                 if (item.Header is Grid grid && grid.Children[0] is SideBarItemHeader pivotHeader)
                 {
-                    ViewModelPage.ItemsSideBarHeader.Add(new SideBarItemHeaderVM()
-                    {
-                        Glyph = pivotHeader.Glyph,
-                        Title = header,
-                    });
+                    ViewModelPage.ItemsSideBarHeader.Add(sideBarItem);
                 }
             }
             catch (Exception ex)

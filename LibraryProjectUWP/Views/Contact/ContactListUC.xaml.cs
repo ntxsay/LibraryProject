@@ -238,6 +238,20 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
+        private string _Glyph = "&#xe77b;";
+        public string Glyph
+        {
+            get => _Glyph;
+            set
+            {
+                if (_Glyph != value)
+                {
+                    _Glyph = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _ResultMessage;
         public string ResultMessage
         {

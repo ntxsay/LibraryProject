@@ -230,6 +230,20 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
+        private string _Glyph = "&#xE81E;";
+        public string Glyph
+        {
+            get => _Glyph;
+            set
+            {
+                if (_Glyph != value)
+                {
+                    _Glyph = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _ResultMessage;
         public string ResultMessage
         {

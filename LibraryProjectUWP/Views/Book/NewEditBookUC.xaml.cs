@@ -1030,6 +1030,20 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private string _Glyph = "\ue736";
+        public string Glyph
+        {
+            get => _Glyph;
+            set
+            {
+                if (_Glyph != value)
+                {
+                    _Glyph = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _ResultMessage;
         public string ResultMessage
         {
