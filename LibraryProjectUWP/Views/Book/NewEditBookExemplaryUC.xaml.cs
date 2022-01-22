@@ -35,6 +35,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class NewEditBookExemplaryUC : PivotItem
     {
         public readonly ManageBookExemplaryParametersDriverVM _parameters;
+        public readonly Guid IdItem = Guid.NewGuid();
 
         public NewEditBookExemplaryUCVM ViewModelPage { get; set; } = new NewEditBookExemplaryUCVM();
 

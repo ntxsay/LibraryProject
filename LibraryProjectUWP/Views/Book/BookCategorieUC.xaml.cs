@@ -33,6 +33,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCategorieUC : PivotItem
     {
         public readonly BookCategorieParametersDriverVM _parameters;
+        public readonly Guid IdItem = Guid.NewGuid();
 
         public BookCategorieUCVM ViewModelPage { get; set; } = new BookCategorieUCVM();
 

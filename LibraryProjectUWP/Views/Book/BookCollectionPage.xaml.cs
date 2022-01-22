@@ -777,6 +777,67 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
+        private void CmbxSideBarItemTitle_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is ComboBox cmbx && cmbx.SelectedItem is SideBarItemHeaderVM headerVM)
+                {
+                    foreach(var item in this.PivotRightSideBar.Items)
+                    {
+                        if (item is NewEditBookExemplaryUC bookExemplaryUC)
+                        {
+                            if (bookExemplaryUC.IdItem == headerVM.IdItem)
+                            {
+                                this.PivotRightSideBar.SelectedItem = item;
+                            }
+                        }
+                        else if (item is NewEditBookUC newEditBookUC)
+                        {
+                            if (newEditBookUC.IdItem == headerVM.IdItem)
+                            {
+                                this.PivotRightSideBar.SelectedItem = item;
+                            }
+                        }
+                        else if (item is NewEditCollectionUC newEditCollectionUC)
+                        {
+                            if (newEditCollectionUC.IdItem == headerVM.IdItem)
+                            {
+                                this.PivotRightSideBar.SelectedItem = item;
+                            }
+                        }
+                        else if (item is NewEditContactUC newEditContactUC)
+                        {
+                            if (newEditContactUC.IdItem == headerVM.IdItem)
+                            {
+                                this.PivotRightSideBar.SelectedItem = item;
+                            }
+                        }
+                        else if (item is ContactListUC contactListUC)
+                        {
+                            if (contactListUC.IdItem == headerVM.IdItem)
+                            {
+                                this.PivotRightSideBar.SelectedItem = item;
+                            }
+                        }
+                        else if (item is CollectionListUC collectionListUC)
+                        {
+                            if (collectionListUC.IdItem == headerVM.IdItem)
+                            {
+                                this.PivotRightSideBar.SelectedItem = item;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
@@ -825,6 +886,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -865,8 +927,9 @@ namespace LibraryProjectUWP.Views.Book
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
-                        Glyph = userControl.ViewModelPage.Glyph.ToString(),
-                        Title = userControl.ViewModelPage.Header.ToString(),
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -965,6 +1028,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1060,6 +1124,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1201,6 +1266,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1299,6 +1365,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1361,6 +1428,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1488,6 +1556,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1589,6 +1658,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1664,6 +1734,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1754,9 +1825,15 @@ namespace LibraryProjectUWP.Views.Book
             {
                 this.PivotRightSideBar.Items.Add(item);
                 this.PivotRightSideBar.SelectedItem = item;
-                if (item.Header is Grid grid && grid.Children[0] is SideBarItemHeader pivotHeader)
+                ViewModelPage.ItemsSideBarHeader.Add(sideBarItem);
+                this.CmbxSideBarItemTitle.SelectedItem = sideBarItem;
+                if (PivotRightSideBar.Items.Count >= 2)
                 {
-                    ViewModelPage.ItemsSideBarHeader.Add(sideBarItem);
+                    this.CmbxSideBarItemTitle.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    this.CmbxSideBarItemTitle.Visibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)
@@ -1787,6 +1864,14 @@ namespace LibraryProjectUWP.Views.Book
                 }
 
                 this.PivotRightSideBar.Items.Remove(item);
+                if (PivotRightSideBar.Items.Count > 2)
+                {
+                    this.CmbxSideBarItemTitle.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    this.CmbxSideBarItemTitle.Visibility = Visibility.Visible;
+                }
             }
             catch (Exception ex)
             {

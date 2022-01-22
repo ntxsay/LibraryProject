@@ -34,6 +34,7 @@ namespace LibraryProjectUWP.Views.Collection
     public sealed partial class CollectionListUC : PivotItem
     {
         public readonly CollectionListParametersDriverVM _parameters;
+        public readonly Guid IdItem = Guid.NewGuid();
 
         public CollectionListUCVM ViewModelPage { get; set; } = new CollectionListUCVM();
 

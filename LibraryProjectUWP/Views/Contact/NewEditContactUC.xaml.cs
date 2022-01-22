@@ -31,6 +31,7 @@ namespace LibraryProjectUWP.Views.Contact
     public sealed partial class NewEditContactUC : PivotItem
     {
         public readonly ManageContactParametersDriverVM _parameters;
+        public readonly Guid IdItem = Guid.NewGuid();
 
         public NewEditContactUCVM ViewModelPage { get; set; } = new NewEditContactUCVM();
 
