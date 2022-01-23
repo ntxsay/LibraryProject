@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:LibraryProjectUWP.Views.Book"
+    xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
     xmlns:userControls="using:LibraryProjectUWP.Views.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -39,7 +40,7 @@
             <Setter Property="Margin" Value="4 0" />
             <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
-        <DataTemplate x:DataType="contactVm:ContactVM" x:Key="ItemAutoSuggestDataTemplate">
+        <DataTemplate x:DataType="contactVm:ContactVM" x:Key="PersonTemplate">
             <Grid Margin="0,4" ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="24" />
@@ -52,7 +53,7 @@
                 <TextBlock Grid.Column="1" Text="{x:Bind DisplayName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:DataType="contactVm:ContactVM" x:Key="ItemAutoSuggestEditorDataTemplate">
+        <DataTemplate x:DataType="contactVm:ContactVM" x:Key="EnterpriseTemplate">
             <Grid Margin="0,4" ColumnSpacing="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -62,6 +63,9 @@
                 <TextBlock Grid.Column="1" Text="{x:Bind AdressePostal, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
             </Grid>
         </DataTemplate>
+        <dTemplateSelectors:ContactTypeDataTemplateSelector x:Key="contactTypeTemplateSelector"
+        PersonTemplate="{StaticResource PersonTemplate}"
+        EnterpriseTemplate="{StaticResource EnterpriseTemplate}" />
     </PivotItem.Resources>
     <PivotItem.Header>
         <Grid ColumnSpacing="8">
@@ -193,7 +197,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <AutoSuggestBox x:Name="ASB_SearchContact" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    PlaceholderText="Rechercher un auteur" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}"
+                    PlaceholderText="Rechercher un auteur" IsSuggestionListOpen="False" ItemTemplateSelector="{StaticResource contactTypeTemplateSelector}"
                                     TextChanged="ASB_SearchContact_TextChanged" SuggestionChosen="ASB_SearchContact_SuggestionChosen" QuerySubmitted="ASB_SearchContact_QuerySubmitted">
                                 <AutoSuggestBox.QueryIcon>
                                     <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
@@ -214,17 +218,18 @@
                                 </Border>
                                 <Button.Flyout>
                                     <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                        <MenuFlyoutItem Text="Effacer la date" Click="MfiClearRemiseDate_Click"/>
+                                        <MenuFlyoutItem Text="Effacer le contact" Click="MfiClearRemiseDate_Click"/>
                                     </MenuFlyout>
                                 </Button.Flyout>
                             </Button>
                         </Grid>
                         <Grid Grid.Row="1">
-                            <TextBlock>
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.SocietyName, Mode=OneWay}" />
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.TitreCivilite, Mode=OneWay}" />
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.NomNaissance, Mode=OneWay}" />
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.Prenom, Mode=OneWay}" />
+                            <TextBlock TextWrapping="Wrap">
+                                <Run Text="Cet/ces exemplaire(s) ont été acquis chez" />
+                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.SocietyName, Mode=OneWay}" FontWeight="Medium"/>
+                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.TitreCivilite, Mode=OneWay}" FontWeight="Medium" />
+                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.NomNaissance, Mode=OneWay}" FontWeight="Medium" />
+                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.Prenom, Mode=OneWay}" FontWeight="Medium" />
                             </TextBlock>
                         </Grid>
                     </Grid>
@@ -234,7 +239,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Prix" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    <TextBlock Grid.Row="0" Text="Prix (si acheté)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     <Grid Grid.Row="1" ColumnSpacing="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -243,7 +248,7 @@
                         <MUIXC:NumberBox x:Name="numberBoxPrice" HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Entrez le prix du livre" SpinButtonPlacementMode="Compact" Minimum="0" Value="{x:Bind ViewModelPage.ViewModel.Price, Mode=TwoWay}">
                         </MUIXC:NumberBox>
                         <ComboBox x:Name="ComboBoxPrice" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModelPage.ViewModel.MoneyList}"
-                                          SelectedItem="{x:Bind ViewModelPage.ViewModel.DeviceName, Mode=TwoWay}">
+                                          SelectedItem="{x:Bind ViewModelPage.ViewModel.DeviceName, Mode=TwoWay}" SelectedIndex="1">
                         </ComboBox>
                     </Grid>
 

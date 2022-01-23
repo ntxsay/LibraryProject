@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibraryProjectUWP.Code.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,16 +32,34 @@ namespace LibraryProjectUWP.Views.UserControls
         }
 
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(String),
-                                                                typeof(SideBarItemHeader), new PropertyMetadata(null));
+                                                                typeof(SideBarItemHeader), new PropertyMetadata(null, new PropertyChangedCallback(OnTitleChanged)));
+
+        private static void OnTitleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is SideBarItemHeader parent && e.NewValue is string title)
+            {
+                if (!title.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    parent.TbcTitle.Text = title.Trim();
+                }
+            }
+        }
 
         public String Glyph
         {
-            get { return (String)GetValue(TitleProperty); }
-            set { SetValue(TitleProperty, value); }
+            get { return (String)GetValue(GlyphProperty); }
+            set { SetValue(GlyphProperty, value); }
         }
 
         public static readonly DependencyProperty GlyphProperty = DependencyProperty.Register(nameof(Glyph), typeof(String),
-                                                                typeof(SideBarItemHeader), new PropertyMetadata(null));
+                                                                typeof(SideBarItemHeader), new PropertyMetadata(null, new PropertyChangedCallback(OnGlyphChanged)));
+        private static void OnGlyphChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is SideBarItemHeader parent && e.NewValue is string glyph)
+            {
+                parent.MyFontIcon.Glyph = glyph;
+            }
+        }
 
     }
 }

@@ -31,8 +31,6 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using LibraryProjectUWP.Views.Collection;
 using LibraryProjectUWP.ViewModels.Collection;
-using LibraryProjectUWP.Views.Editor;
-using LibraryProjectUWP.ViewModels.Publishers;
 using System.Collections.ObjectModel;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using LibraryProjectUWP.Views.UserControls;
@@ -1232,6 +1230,125 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         #region Contact
+        internal async Task NewFreeContactAsync(string prenom, string nomNaissance, Guid? guid = null)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    var itemList = await DbServices.Contact.AllVMAsync();
+                    var parameters = new ManageContactParametersDriverVM()
+                    {
+                        EditMode = Code.EditMode.Create,
+                        ContactType = Code.ContactType.Enterprise,
+                        ContactTypeVisibility = Visibility.Visible,
+                        ViewModelList = itemList,
+                        CurrentViewModel = new ContactVM()
+                        {
+                            TitreCivilite = CivilityHelpers.MPoint,
+                            NomNaissance = nomNaissance,
+                            Prenom = prenom,
+                        },
+                    };
+
+                    parameters.CurrentViewModel.ContactType = parameters.ContactType;
+
+                    NewEditContactUC userControl = new NewEditContactUC(parameters);
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
+
+                    userControl.CancelModificationRequested += NewEditFreeContactUC_Create_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditFreeContactUC_Create_CreateItemRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditFreeContactUC_Create_CreateItemRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    ContactVM newViewModel = sender.ViewModelPage.ViewModel;
+
+                    var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            var bookManager = GetBookExemplarySideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            if (bookManager != null)
+                            {
+                                bookManager.ViewModelPage.ViewModel.ContactSource = newViewModel;
+                                NewEditFreeContactUC_Create_CancelModificationRequested(sender, e);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditFreeContactUC_Create_CancelModificationRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditFreeContactUC_Create_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditFreeContactUC_Create_CreateItemRequested;
+
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private async void NewContactXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1853,18 +1970,67 @@ namespace LibraryProjectUWP.Views.Book
                     this.ViewModelPage.IsSplitViewOpen = false;
                 }
 
-                if (item.Header is SideBarItemHeader header && ViewModelPage.ItemsSideBarHeader.Count > 0)
+                if (this.CmbxSideBarItemTitle.Items.Count > 0)
                 {
-                    var head = new SideBarItemHeaderVM()
+
+                    foreach (var cmbxItem in this.CmbxSideBarItemTitle.Items)
                     {
-                        Glyph = header.Glyph,
-                        Title = header.Title,
-                    };
-                    ViewModelPage.ItemsSideBarHeader.Remove(head);
+                        if (cmbxItem is SideBarItemHeaderVM headerVM)
+                        {
+                            if (item is NewEditBookExemplaryUC bookExemplaryUC)
+                            {
+                                if (bookExemplaryUC.IdItem == headerVM.IdItem)
+                                {
+                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
+                                    break;
+                                }
+                            }
+                            else if (item is NewEditBookUC newEditBookUC)
+                            {
+                                if (newEditBookUC.IdItem == headerVM.IdItem)
+                                {
+                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
+                                    break;
+                                }
+                            }
+                            else if (item is NewEditCollectionUC newEditCollectionUC)
+                            {
+                                if (newEditCollectionUC.IdItem == headerVM.IdItem)
+                                {
+                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
+                                    break;
+                                }
+                            }
+                            else if (item is NewEditContactUC newEditContactUC)
+                            {
+                                if (newEditContactUC.IdItem == headerVM.IdItem)
+                                {
+                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
+                                    break;
+                                }
+                            }
+                            else if (item is ContactListUC contactListUC)
+                            {
+                                if (contactListUC.IdItem == headerVM.IdItem)
+                                {
+                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
+                                    break;
+                                }
+                            }
+                            else if (item is CollectionListUC collectionListUC)
+                            {
+                                if (collectionListUC.IdItem == headerVM.IdItem)
+                                {
+                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 this.PivotRightSideBar.Items.Remove(item);
-                if (PivotRightSideBar.Items.Count > 2)
+                if (PivotRightSideBar.Items.Count < 2)
                 {
                     this.CmbxSideBarItemTitle.Visibility = Visibility.Collapsed;
                 }
@@ -1877,6 +2043,30 @@ namespace LibraryProjectUWP.Views.Book
             {
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        private NewEditBookExemplaryUC GetBookExemplarySideBarByGuid(Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookExemplaryUC item && item.ViewModelPage.Guid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as NewEditBookExemplaryUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
             }
         }
 

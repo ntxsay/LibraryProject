@@ -6,7 +6,6 @@ using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
-using LibraryProjectUWP.ViewModels.Publishers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

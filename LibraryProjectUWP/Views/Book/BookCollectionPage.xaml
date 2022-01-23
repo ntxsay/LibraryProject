@@ -430,11 +430,11 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <ComboBox x:Name="CmbxSideBarItemTitle" Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.ItemsSideBarHeader, Mode=OneWay}" HorizontalAlignment="Stretch" Background="Transparent"
-                                      SelectionChanged="CmbxSideBarItemTitle_SelectionChanged" Visibility="Collapsed">
+                                      SelectionChanged="CmbxSideBarItemTitle_SelectionChanged" Visibility="Collapsed" HorizontalContentAlignment="Center">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate x:DataType="generalVm:SideBarItemHeaderVM">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <!--<FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind Glyph, Mode=OneWay}" FontSize="20"/>-->
+                                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind Glyph, Mode=OneWay}" FontSize="20"/>
                                             <TextBlock Text="{x:Bind Title, Mode=OneWay}" FontSize="16" VerticalAlignment="Center" Margin="0 0 0 5" />
                                         </StackPanel>
                                     </DataTemplate>

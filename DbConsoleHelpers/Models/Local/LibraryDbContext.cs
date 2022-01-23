@@ -291,22 +291,6 @@ namespace DbConsoleHelpers.Models.Local
                 entity.Property(e => e.DateAjout).IsRequired();
 
                 entity.Property(e => e.Guid).IsRequired();
-
-                entity.Property(e => e.Nationality).IsRequired();
-
-                entity.Property(e => e.NomNaissance)
-                    .IsRequired()
-                    .HasDefaultValueSql("\"\"");
-
-                entity.Property(e => e.Prenom).IsRequired();
-
-                entity.Property(e => e.SocietyName)
-                    .IsRequired()
-                    .HasDefaultValueSql("\"\"");
-
-                entity.Property(e => e.TitreCivilite)
-                    .IsRequired()
-                    .HasDefaultValueSql("\"\"");
             });
 
             modelBuilder.Entity<Tlibrary>(entity =>

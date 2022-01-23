@@ -22,6 +22,8 @@ namespace DbConsoleHelpers.Models.Local
         public string DateAjout { get; set; }
         public string DateEdition { get; set; }
         public string Source { get; set; }
+        public double? Price { get; set; }
+        public string DeviceName { get; set; }
         public string DateAcquisition { get; set; }
         public string DateRemise { get; set; }
         public long IsJourAcquisitionKnow { get; set; }

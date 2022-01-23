@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    xmlns:userControls="using:LibraryProjectUWP.Views.UserControls"
     xmlns:contactVm="using:LibraryProjectUWP.ViewModels.Contact"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
@@ -40,10 +41,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;" FontSize="20"/>
-                <TextBlock Text="{x:Bind ViewModelPage.Header, Mode=OneWay}" FontSize="16" VerticalAlignment="Center" Margin="0 0 0 5" />
-            </StackPanel>
+            <userControls:SideBarItemHeader x:Name="header" Grid.Column="0" Title="{x:Bind ViewModelPage.Header, Mode=OneWay}" Glyph="{x:Bind ViewModelPage.Glyph, Mode=OneWay}" />
             <Button Grid.Column="1" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fermer cet onglet">
                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="16"/>
             </Button>
@@ -62,7 +60,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="TbcInfos" Grid.Column="0" TextWrapping="Wrap"/>
-            <Button x:Name="BtnDateParution" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="1" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
+            <!--<Button x:Name="BtnDateParution" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="1" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
                                         VerticalAlignment="Center" VerticalContentAlignment="Center">
                 <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
                     <Border.BorderBrush>
@@ -80,8 +78,7 @@
                         <ToggleMenuFlyoutItem Text="Ajouter le champs civilité" Click="ToggleMenuFlyoutItem_Click"/>
                     </MenuFlyout>
                 </Button.Flyout>
-            </Button>
-
+            </Button>-->
         </Grid>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
             <Grid RowSpacing="16" Margin="0 8 0 0" VerticalAlignment="Top">
@@ -100,7 +97,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ComboBox Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.contactType}" PlaceholderText="Type de contact" SelectionChanged="CmbxContactType_SelectionChanged"
+                <ComboBox x:Name="cmbxContactType" Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.contactType}" Visibility="{x:Bind ViewModelPage.ContactTypeVisibility, Mode=OneWay}" PlaceholderText="Type de contact" SelectionChanged="CmbxContactType_SelectionChanged"
                               HorizontalAlignment="Stretch">
                     <ComboBox.Header>
                         <TextBlock Text="Type de contact" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
@@ -139,18 +136,38 @@
                             <TextBlock Text="Autre(s) prénom(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
                     </TextBox>
-                    <DatePicker DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateNaissance, Mode=TwoWay}" ToolTipService.ToolTip="Date de naissance"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <DatePicker Grid.Column="0" x:Name="DpDateNaissance" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateNaissance, Mode=TwoWay}" ToolTipService.ToolTip="Date de naissance"
                                                     HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
-                        <DatePicker.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Text="Effacer la date" />
-                            </MenuFlyout>
-                        </DatePicker.ContextFlyout>
-                        <DatePicker.Header>
-                            <TextBlock Text="Date de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </DatePicker.Header>
-                    </DatePicker>
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.civilityList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Nationality, Mode=TwoWay}" PlaceholderText="Nationalité"
+                            <DatePicker.Header>
+                                <TextBlock Text="Date de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </DatePicker.Header>
+                        </DatePicker>
+                        <Button x:Name="BtnResetDateNaissance" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="1" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
+                                        VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0 25 0 0">
+                            <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
+                                <Border.BorderBrush>
+                                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                        <GradientStop Color="Yellow" Offset="0.0" />
+                                        <GradientStop Color="Red" Offset="0.25" />
+                                        <GradientStop Color="Blue" Offset="0.75" />
+                                        <GradientStop Color="LimeGreen" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.BorderBrush>
+                                <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
+                            </Border>
+                            <Button.Flyout>
+                                <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                    <MenuFlyoutItem x:Name="MfiClearNaissanceDate" Text="Effacer la date" Click="MfiClearNaissanceDate_Click"/>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </Grid>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.nationalityList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Nationality, Mode=TwoWay}" PlaceholderText="Nationalité"
                               HorizontalAlignment="Stretch">
                         <ComboBox.Header>
                             <TextBlock Text="Nationalité" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
@@ -163,12 +180,37 @@
                             <TextBlock Text="Lieu de naissance" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
                     </TextBox>
-                    <DatePicker DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateDeces, Mode=TwoWay}" ToolTipService.ToolTip="Date de décès"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <DatePicker Grid.Column="0" x:Name="DpDateDeces" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateDeces, Mode=TwoWay}" ToolTipService.ToolTip="Date de décès"
                                                     HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
-                        <DatePicker.Header>
-                            <TextBlock Text="Date de décès" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </DatePicker.Header>
-                    </DatePicker>
+                            <DatePicker.Header>
+                                <TextBlock Text="Date de décès" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </DatePicker.Header>
+                        </DatePicker>
+                        <Button x:Name="BtnResetDateDeces" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="1" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
+                                        VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0 25 0 0">
+                            <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
+                                <Border.BorderBrush>
+                                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                        <GradientStop Color="Yellow" Offset="0.0" />
+                                        <GradientStop Color="Red" Offset="0.25" />
+                                        <GradientStop Color="Blue" Offset="0.75" />
+                                        <GradientStop Color="LimeGreen" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.BorderBrush>
+                                <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
+                            </Border>
+                            <Button.Flyout>
+                                <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                    <MenuFlyoutItem x:Name="MfiClearDeathDate" Text="Effacer la date" Click="MfiClearDeathDate_Click"/>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </Grid>
                     <TextBox Text="{x:Bind ViewModelPage.ViewModel.LieuDeces, Mode=TwoWay}" PlaceholderText="Lieu de décès">
                         <TextBox.Header>
                             <TextBlock Text="Lieu de décès" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
@@ -181,7 +223,7 @@
                     </TextBox>
                 </StackPanel>
                 <StackPanel Grid.Row="4" Orientation="Vertical" Spacing="8" Visibility="{x:Bind ViewModelPage.AdressVisibility, Mode=OneWay}">
-                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.AdressePostal, Mode=TwoWay}" MinHeight="100" PlaceholderText="Adresse Postal" TextWrapping="Wrap" AcceptsReturn="True">
+                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.AdressePostal, Mode=TwoWay}" MinHeight="100" PlaceholderText="Adresse postale" TextWrapping="Wrap" AcceptsReturn="True">
                         <TextBox.Header>
                             <TextBlock Text="Adresse" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
@@ -212,9 +254,9 @@
                         </TextBox.Header>
                     </TextBox>
                 </StackPanel>
-                <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Observation, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes sur l'auteur" TextWrapping="Wrap" AcceptsReturn="True">
+                <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Observation, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes ou observations" TextWrapping="Wrap" AcceptsReturn="True">
                     <TextBox.Header>
-                        <TextBlock Text="Notes" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        <TextBlock Text="Observations" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </TextBox.Header>
                 </TextBox>
             </Grid>

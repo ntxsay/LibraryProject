@@ -236,6 +236,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
+                    LibraryDbContext context = new LibraryDbContext();
                     if (viewModel.ContactType == ContactType.Adherant || viewModel.ContactType == ContactType.Author)
                     {
                         if (viewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ||
@@ -246,6 +247,17 @@ namespace LibraryProjectUWP.Code.Services.Db
                             {
                                 IsSuccess = false,
                                 Message = NameEmptyMessage,
+                            };
+                        }
+
+                        var isExist = await context.Tcontact.AnyAsync(c => c.TitreCivilite.ToLower() == viewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
+                                                                          c.NomUsage.ToLower() == viewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == viewModel.AutresPrenoms.Trim().ToLower());
+                        if (isExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordAlreadyExistMessage
                             };
                         }
                     }
@@ -259,21 +271,20 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 Message = NameEmptyMessage,
                             };
                         }
+
+                        var isExist = await context.Tcontact.AnyAsync(c => c.SocietyName.ToLower() == viewModel.SocietyName.Trim().ToLower());
+                        if (isExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordAlreadyExistMessage
+                            };
+                        }
                     }
                     
 
-                    LibraryDbContext context = new LibraryDbContext();
-                    var isExist = await context.Tcontact.AnyAsync(c => c.TitreCivilite.ToLower() == viewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
-                                                                      c.NomUsage.ToLower() == viewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == viewModel.AutresPrenoms.Trim().ToLower());
-                    if (isExist)
-                    {
-                        return new OperationStateVM()
-                        {
-                            IsSuccess = true,
-                            Message = DbServices.RecordAlreadyExistMessage
-                        };
-                    }
-
+                    
                     var record = new Tcontact()
                     {
                         Guid = viewModel.Guid.ToString(),
@@ -306,12 +317,26 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     await CreateFolderAsync(viewModel.Guid);
 
-                    return new OperationStateVM()
+                    if (viewModel.ContactType == ContactType.Adherant || viewModel.ContactType == ContactType.Author)
                     {
-                        IsSuccess = true,
-                        Id = record.Id,
-                        Message = $"Le contact {record.TitreCivilite} {record.NomNaissance} {record.Prenom} a été créé avec succès."
-                    };
+                        var result = new OperationStateVM()
+                        {
+                            IsSuccess = true,
+                            Id = record.Id,
+                            Message = $"Le contact \"{record.TitreCivilite} {record.NomNaissance} {record.Prenom}\" a été créé avec succès."
+                        };
+                        return result;
+                    }
+                    else
+                    {
+                        var result = new OperationStateVM()
+                        {
+                            IsSuccess = true,
+                            Id = record.Id,
+                            Message = $"La société \"{record.SocietyName}\" a été créé avec succès."
+                        };
+                        return result;
+                    }
                 }
                 catch (Exception ex)
                 {

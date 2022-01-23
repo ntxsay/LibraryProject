@@ -3,7 +3,6 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.General;
-using LibraryProjectUWP.ViewModels.Publishers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

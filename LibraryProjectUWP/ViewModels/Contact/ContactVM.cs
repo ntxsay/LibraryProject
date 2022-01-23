@@ -268,7 +268,7 @@ namespace LibraryProjectUWP.ViewModels.Contact
             }
         }
 
-        private DateTimeOffset? _DateNaissance = DateTime.UtcNow.AddYears(-20);
+        private DateTimeOffset? _DateNaissance;
         public DateTimeOffset? DateNaissance
         {
             get => _DateNaissance;
@@ -282,7 +282,7 @@ namespace LibraryProjectUWP.ViewModels.Contact
             }
         }
 
-        private DateTimeOffset? _DateDeces = DateTime.UtcNow;
+        private DateTimeOffset? _DateDeces;
         public DateTimeOffset? DateDeces
         {
             get => _DateDeces;

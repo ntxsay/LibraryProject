@@ -55,6 +55,7 @@ namespace LibraryProjectUWP.Views.Contact
             _parameters = parameters;
             ViewModelPage.EditMode = parameters.EditMode;
             ViewModelPage.ViewModel = parameters?.CurrentViewModel;
+            ViewModelPage.ContactTypeVisibility = parameters.ContactTypeVisibility;
             InitializeActionInfos();
             InitializeFieldVisibility();
         }
@@ -66,29 +67,38 @@ namespace LibraryProjectUWP.Views.Contact
                 string title = string.Empty;
                 string name = string.Empty;
 
-                if (_parameters.ContactType == ContactType.Adherant)
+                if (_parameters.ContactTypeVisibility == Visibility.Collapsed)
                 {
-                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un " : "d'éditer l'")}adhérant";
+                    if (_parameters.ContactType == ContactType.Adherant)
+                    {
+                        title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un " : "d'éditer l'")}adhérant";
+                        name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
+                        ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un adhérant";
+                    }
+                    else if (_parameters.ContactType == ContactType.EditorHouse)
+                    {
+                        title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une" : "d'éditer la")} maison d'édition";
+                        name = $"{_parameters?.CurrentViewModel?.SocietyName}";
+                        ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une maison d'édition";
+                    }
+                    else if (_parameters.ContactType == ContactType.Author)
+                    {
+                        title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un auteur" : "d'éditer l'auteur")}";
+                        name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
+                        ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un auteur";
+                    }
+                    else if (_parameters.ContactType == ContactType.Enterprise)
+                    {
+                        title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une société" : "d'éditer une société")}";
+                        name = $"{_parameters?.CurrentViewModel?.SocietyName}";
+                        ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une société";
+                    }
+                }
+                else
+                {
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un type de contact" : "d'éditer le contact")}";
                     name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
-                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un adhérant";
-                }
-                else if (_parameters.ContactType == ContactType.EditorHouse)
-                {
-                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une" : "d'éditer la")} maison d'édition";
-                    name = $"{_parameters?.CurrentViewModel?.SocietyName}";
-                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une maison d'édition";
-                }
-                else if (_parameters.ContactType == ContactType.Author)
-                {
-                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un auteur" : "d'éditer l'auteur")}";
-                    name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
-                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un auteur";
-                }
-                else if (_parameters.ContactType == ContactType.Enterprise)
-                {
-                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une société" : "d'éditer une société")}";
-                    name = $"{_parameters?.CurrentViewModel?.SocietyName}";
-                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une société";
+                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un type de contact";
                 }
 
 
@@ -129,34 +139,99 @@ namespace LibraryProjectUWP.Views.Contact
                 {
                     ViewModelPage.AdressVisibility = Visibility.Visible;
                     ViewModelPage.CivilityVisibility = Visibility.Visible;
+                    ViewModelPage.SocietyNameVisibility = Visibility.Collapsed;
+                    ViewModelPage.AuthorVisibility = Visibility.Collapsed;
                 }
                 else if (_parameters.ContactType == ContactType.EditorHouse)
                 {
                     ViewModelPage.SocietyNameVisibility = Visibility.Visible;
                     ViewModelPage.AdressVisibility = Visibility.Visible;
+                    ViewModelPage.AuthorVisibility = Visibility.Collapsed;
+                    ViewModelPage.CivilityVisibility = Visibility.Collapsed;
                 }
                 else if (_parameters.ContactType == ContactType.Author)
                 {
                     ViewModelPage.AdressVisibility = Visibility.Visible;
                     ViewModelPage.CivilityVisibility = Visibility.Visible;
                     ViewModelPage.AuthorVisibility = Visibility.Visible;
+                    ViewModelPage.SocietyNameVisibility = Visibility.Collapsed;
                 }
                 else if (_parameters.ContactType == ContactType.Enterprise)
                 {
                     ViewModelPage.SocietyNameVisibility = Visibility.Visible;
                     ViewModelPage.AdressVisibility = Visibility.Visible;
+                    ViewModelPage.AuthorVisibility = Visibility.Collapsed;
+                    ViewModelPage.CivilityVisibility = Visibility.Collapsed;
+                }
+
+                var isExist = LibraryHelpers.Contact.ContactTypeDictionary.TryGetValue((byte)_parameters.ContactType, out string value);
+                if (isExist && (cmbxContactType.SelectedItem == null || cmbxContactType.SelectedItem is string selectedVal && selectedVal != value))
+                {
+                    cmbxContactType.SelectedItem = value;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
 
         private void CmbxContactType_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            try
+            {
+                if (sender is ComboBox comboBox && comboBox.SelectedItem is string type)
+                {
+                    var typeKeyPair = LibraryHelpers.Contact.ContactTypeDictionary.SingleOrDefault(s => s.Value == type);
+                    if (!typeKeyPair.Equals(default(KeyValuePair<byte, string>)))
+                    {
+                        _parameters.ContactType = (ContactType)typeKeyPair.Key;
+                        InitializeFieldVisibility();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
 
+        private void MfiClearNaissanceDate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (ViewModelPage.ViewModel.DateNaissance != null)
+                {
+                    ViewModelPage.ViewModel.DateNaissance = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void MfiClearDeathDate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (ViewModelPage.ViewModel.DateDeces != null)
+                {
+                    ViewModelPage.ViewModel.DateDeces = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -212,29 +287,62 @@ namespace LibraryProjectUWP.Views.Contact
         {
             try
             {
-                if (ViewModelPage.ViewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace())
+                if (_parameters.ContactType == ContactType.Adherant || _parameters.ContactType == ContactType.Author)
                 {
-                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Le nom du contact ne peut pas être vide\nou ne contenir que des espaces blancs.";
-                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                    ViewModelPage.IsResultMessageOpen = true;
-                    return false;
-                }
-
-                if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(c => c.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
-                                                                  c.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower()))
-                {
-                    var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && _parameters.CurrentViewModel.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && _parameters.CurrentViewModel.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
-                                                                  _parameters.CurrentViewModel.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && _parameters.CurrentViewModel.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower());
-                    if (isError)
+                    ViewModelPage.ViewModel.SocietyName = String.Empty;
+                    if (ViewModelPage.ViewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace())
                     {
                         ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                        ViewModelPage.ResultMessage = $"Ce contact existe déjà.";
+                        ViewModelPage.ResultMessage = $"Le nom du contact ne peut pas être vide\nou ne contenir que des espaces blancs.";
                         ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
                         ViewModelPage.IsResultMessageOpen = true;
                         return false;
                     }
+
+                    if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(c => c.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
+                                                                      c.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower()))
+                    {
+                        var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && _parameters.CurrentViewModel.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && _parameters.CurrentViewModel.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
+                                                                      _parameters.CurrentViewModel.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && _parameters.CurrentViewModel.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower());
+                        if (isError)
+                        {
+                            ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                            ViewModelPage.ResultMessage = $"Ce contact existe déjà.";
+                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                            ViewModelPage.IsResultMessageOpen = true;
+                            return false;
+                        }
+                    }
                 }
+                else if (_parameters.ContactType == ContactType.EditorHouse || _parameters.ContactType == ContactType.Enterprise)
+                {
+                    ViewModelPage.ViewModel.TitreCivilite = String.Empty;
+                    ViewModelPage.ViewModel.NomNaissance = String.Empty;
+                    ViewModelPage.ViewModel.Prenom = String.Empty;
+
+                    if (ViewModelPage.ViewModel.SocietyName.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"Le nom de la société ne peut pas être vide\nou ne contenir que des espaces blancs.";
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return false;
+                    }
+
+                    if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(c => !c.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && c.SocietyName.ToLower() == ViewModelPage.ViewModel.SocietyName.Trim().ToLower()))
+                    {
+                        var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel.SocietyName.ToLower() == ViewModelPage.ViewModel.SocietyName.Trim().ToLower());
+                        if (isError)
+                        {
+                            ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                            ViewModelPage.ResultMessage = $"Cette société existe déjà.";
+                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                            ViewModelPage.IsResultMessageOpen = true;
+                            return false;
+                        }
+                    }
+                }
+
 
                 ViewModelPage.IsResultMessageOpen = false;
                 return true;
@@ -294,6 +402,8 @@ namespace LibraryProjectUWP.Views.Contact
         public Guid? Guid { get; set; }
 
         public readonly IEnumerable<string> contactType = LibraryHelpers.Contact.ContactList;
+        public readonly IEnumerable<string> nationalityList = CountryHelpers.NationalitiesList();
+        public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
 
         private string _Header;
         public string Header
@@ -304,6 +414,34 @@ namespace LibraryProjectUWP.Views.Contact
                 if (this._Header != value)
                 {
                     this._Header = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _Glyph = "\ue77b";
+        public string Glyph
+        {
+            get => _Glyph;
+            set
+            {
+                if (_Glyph != value)
+                {
+                    _Glyph = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _ContactTypeVisibility = Visibility.Collapsed;
+        public Visibility ContactTypeVisibility
+        {
+            get => this._ContactTypeVisibility;
+            set
+            {
+                if (this._ContactTypeVisibility != value)
+                {
+                    this._ContactTypeVisibility = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -421,7 +559,6 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
 
         private ContactVM _ViewModel;
         public ContactVM ViewModel
@@ -447,20 +584,6 @@ namespace LibraryProjectUWP.Views.Contact
                 {
                     this._EditMode = value;
                     this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _Glyph = "&#xe736;";
-        public string Glyph
-        {
-            get => _Glyph;
-            set
-            {
-                if (_Glyph != value)
-                {
-                    _Glyph = value;
-                    OnPropertyChanged();
                 }
             }
         }

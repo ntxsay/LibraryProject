@@ -288,7 +288,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         var found = splitSearchTerm.All((key) =>
                         {
-                            return value.NomNaissance.ToLower().Contains(key.ToLower());
+                            return value.SocietyName.ToLower().Contains(key.ToLower());
                         });
 
                         if (found)
@@ -415,16 +415,16 @@ namespace LibraryProjectUWP.Views.Book
                                 var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                 if (split.Length == 1)
                                 {
-                                    await _parameters.ParentPage.NewAuthorAsync(split[0], string.Empty, ViewModelPage.Guid);
+                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], string.Empty, ViewModelPage.Guid);
                                 }
                                 else if (split.Length >= 2)
                                 {
-                                    await _parameters.ParentPage.NewAuthorAsync(split[0], split[1], ViewModelPage.Guid);
+                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], split[1], ViewModelPage.Guid);
                                 }
                             }
                             else
                             {
-                                await _parameters.ParentPage.NewAuthorAsync(string.Empty, string.Empty, ViewModelPage.Guid);
+                                await _parameters.ParentPage.NewFreeContactAsync(string.Empty, string.Empty, ViewModelPage.Guid);
                             }
                             sender.Text = String.Empty;
                         }
@@ -581,7 +581,7 @@ namespace LibraryProjectUWP.Views.Book
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public Guid? Guid { get; set; }
+        public Guid Guid { get; set; } = Guid.NewGuid();
 
         private string _Header;
         public string Header
@@ -597,7 +597,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private string _Glyph = "&#xE71B;";
+        private string _Glyph = "\uE71B";
         public string Glyph
         {
             get => _Glyph;

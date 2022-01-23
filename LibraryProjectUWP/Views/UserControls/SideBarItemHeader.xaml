@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <StackPanel Orientation="Horizontal" Spacing="8">
-        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind Glyph, Mode=OneWay}" FontSize="20"/>
-        <TextBlock Text="{x:Bind Title, Mode=OneWay}" FontSize="16" VerticalAlignment="Center" Margin="0 0 0 5" />
+        <FontIcon x:Name="MyFontIcon" FontFamily="Segoe MDL2 Assets" FontSize="20"/>
+        <TextBlock x:Name="TbcTitle" FontSize="16" VerticalAlignment="Center" Margin="0 0 0 5" />
     </StackPanel>
 </UserControl>

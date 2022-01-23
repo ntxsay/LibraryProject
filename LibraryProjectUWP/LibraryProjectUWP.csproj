@@ -138,6 +138,7 @@
     <Compile Include="Code\Converters\SizeDiviserConverter.cs" />
     <Compile Include="Code\Converters\ObjectToBooleanConverter.cs" />
     <Compile Include="Code\Converters\VisibilityConverter.cs" />
+    <Compile Include="Code\DataTemplatesSelector\ContactTypeDataTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\DataViewModeTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\CategoriesDataTemplateSelector.cs" />
     <Compile Include="Code\Enums.cs" />
@@ -215,8 +216,6 @@
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
-    <Compile Include="ViewModels\Publishers\ManageEditorParametersDriverVM.cs" />
-    <Compile Include="ViewModels\Publishers\PublisherVM.cs" />
     <Compile Include="ViewModels\UI\BookCollectionCommonViewVM.cs" />
     <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
     <Compile Include="Views\Book\NewEditBookExemplaryUC.xaml.cs">
@@ -248,9 +247,6 @@
     </Compile>
     <Compile Include="Views\Contact\NewEditContactUC.xaml.cs">
       <DependentUpon>NewEditContactUC.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Editor\NewEditEditorUC.xaml.cs">
-      <DependentUpon>NewEditEditorUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml.cs">
       <DependentUpon>LibraryCollectionDataGridViewPage.xaml</DependentUpon>
@@ -354,10 +350,6 @@
     <Page Include="Views\Contact\NewEditContactUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Editor\NewEditEditorUC.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml">
       <SubType>Designer</SubType>

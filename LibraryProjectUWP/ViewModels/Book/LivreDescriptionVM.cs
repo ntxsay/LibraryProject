@@ -1,6 +1,5 @@
 ﻿using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.General;
-using LibraryProjectUWP.ViewModels.Publishers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
