@@ -91,8 +91,8 @@
         </XamlUICommand>
         <XamlUICommand x:Name="DisplayContactListXamlUICommand" 
                        ExecuteRequested="DisplayContactListXamlUICommand_ExecuteRequested"
-                       Description="Affiche la liste des contacts existants" 
-                       Label="Afficher les contacts">
+                       Description="Affiche la liste des adhérants" 
+                       Label="Afficher les adhérants">
         </XamlUICommand>
         <XamlUICommand x:Name="NewAuthorXamlUICommand" 
                        ExecuteRequested="NewAuthorXamlUICommand_ExecuteRequested"
@@ -183,7 +183,7 @@
                         </Grid>
                     </Border>
                 </Viewbox>
-                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="4, 8" BorderThickness="0" CornerRadius="0 0 0 0">
+                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="4, 8" BorderThickness="0" CornerRadius="12 12 0 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="2"/>
@@ -603,7 +603,7 @@
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Afficher les emprunteurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayContactListXamlUICommand}">
+                        <MenuFlyoutItem Text="Afficher les adhérants" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayContactListXamlUICommand}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
                             </MenuFlyoutItem.Icon>

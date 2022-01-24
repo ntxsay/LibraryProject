@@ -407,7 +407,7 @@ namespace LibraryProjectUWP
 
         public ItemTagContentVM ContactCollectionMenuItem => new ItemTagContentVM()
         {
-            Text = "Contacts",
+            Text = "Adhérants",
             Tag = "contact-collection"
         };
 

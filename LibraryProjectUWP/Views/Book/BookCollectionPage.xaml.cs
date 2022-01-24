@@ -1408,7 +1408,7 @@ namespace LibraryProjectUWP.Views.Book
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
-                        ViewModelPage.ContactViewModelList.Add(newViewModel);
+                        //ViewModelPage.ContactViewModelList.Add(newViewModel);
                         sender.ViewModelPage.ResultMessageTitle = "Succeès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;

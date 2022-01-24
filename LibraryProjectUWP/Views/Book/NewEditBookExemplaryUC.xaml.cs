@@ -73,7 +73,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 Run runTitle = new Run()
                 {
-                    Text = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un " : "d'éditer le")} exemplaire au livre",
+                    Text = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un ou plusieurs" : "d'éditer le")} exemplaire(s) au livre",
                     //FontWeight = FontWeights.Medium,
                 };
                 TbcInfos.Inlines.Add(runTitle);

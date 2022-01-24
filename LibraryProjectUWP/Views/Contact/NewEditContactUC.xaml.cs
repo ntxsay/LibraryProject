@@ -299,19 +299,30 @@ namespace LibraryProjectUWP.Views.Contact
                         return false;
                     }
 
-                    if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(c => c.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
-                                                                      c.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower()))
+                    if (_parameters.ViewModelList != null)
                     {
-                        var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && _parameters.CurrentViewModel.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && _parameters.CurrentViewModel.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
-                                                                      _parameters.CurrentViewModel.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && _parameters.CurrentViewModel.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower());
-                        if (isError)
+                        var existingName = _parameters.ViewModelList.FirstOrDefault(c => !c.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() && c.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() &&
+                                                                        !c.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && c.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() &&
+                                                                        !c.Prenom.IsStringNullOrEmptyOrWhiteSpace() && c.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower());
+                        //Si le contact existe hors nom usage et autres prénoms
+                        if (existingName != null)
                         {
-                            ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                            ViewModelPage.ResultMessage = $"Ce contact existe déjà.";
-                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                            ViewModelPage.IsResultMessageOpen = true;
-                            return false;
+                            //Si le contact existe avec nom usage et autres prénoms
+                            if (existingName.NomUsage == ViewModelPage.ViewModel.NomUsage?.Trim()?.ToLower() && existingName.AutresPrenoms == ViewModelPage.ViewModel.AutresPrenoms?.Trim()?.ToLower())
+                            {
+                                var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && _parameters.CurrentViewModel.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && _parameters.CurrentViewModel.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
+                                                                      _parameters.CurrentViewModel.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && _parameters.CurrentViewModel.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower());
+                                if (isError)
+                                {
+                                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                                    ViewModelPage.ResultMessage = $"Ce contact existe déjà.";
+                                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                                    ViewModelPage.IsResultMessageOpen = true;
+                                    return false;
+                                }
+                            }
                         }
+                        
                     }
                 }
                 else if (_parameters.ContactType == ContactType.EditorHouse || _parameters.ContactType == ContactType.Enterprise)

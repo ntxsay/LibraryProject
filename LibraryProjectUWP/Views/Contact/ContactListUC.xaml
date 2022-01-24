@@ -28,6 +28,7 @@
                 <TextBlock TextWrapping="NoWrap" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center">
                         <Run Text="{x:Bind NomNaissance, Mode=OneWay}"/>
                         <Run Text="{x:Bind Prenom, Mode=OneWay}"/>
+                        <Run Text="{x:Bind AutresPrenoms, Mode=OneWay}"/>
                 </TextBlock>
             </StackPanel>
         </DataTemplate>

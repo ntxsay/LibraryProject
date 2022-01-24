@@ -171,6 +171,7 @@ CREATE TABLE IF NOT EXISTS "TBookExemplary" (
 	"Id" INTEGER NOT NULL UNIQUE,
 	"IdBook" INTEGER NOT NULL,
 	"IdContactSource" INTEGER NULL,
+    "NoGroup" TEXT NOT NULL,
     "NoExemplary" TEXT NOT NULL,
     "DateAjout" TEXT NOT NULL,
     "DateEdition" TEXT NULL,

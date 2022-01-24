@@ -38,7 +38,7 @@ namespace LibraryProjectUWP.Views.Contact
         {
             this.InitializeComponent();
             _parameters = parameters;
-            ViewModelPage.Header = $"Tous les contacts";
+            ViewModelPage.Header = $"Les adhérants";
             ViewModelPage.ViewModelList = parameters?.ViewModelList;
             GroupItemsByLetterNomNaissance();
         }
@@ -239,7 +239,7 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private string _Glyph = "&#xe77b;";
+        private string _Glyph = "\ue779";
         public string Glyph
         {
             get => _Glyph;
