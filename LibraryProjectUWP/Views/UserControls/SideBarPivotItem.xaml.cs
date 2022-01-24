@@ -47,8 +47,8 @@ namespace LibraryProjectUWP.Views.UserControls
 
         public String Glyph
         {
-            get { return (String)GetValue(TitleProperty); }
-            set { SetValue(TitleProperty, value); }
+            get { return (String)GetValue(GlyphProperty); }
+            set { SetValue(GlyphProperty, value); }
         }
 
         public static readonly DependencyProperty GlyphProperty = DependencyProperty.Register(nameof(Glyph), typeof(String),
