@@ -24,6 +24,10 @@ namespace LibraryProjectUWP.ViewModels.Book
         public long IdBook { get; set; }
 
         [JsonIgnore]
+        public long? IdContactSource { get; set; }
+
+
+        [JsonIgnore]
         public LivreVM Parent { get; set; }
 
         private string _Source;
@@ -40,6 +44,20 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        private string _NoGroup;
+        public string NoGroup
+        {
+            get => _NoGroup;
+            set
+            {
+                if (_NoGroup != value)
+                {
+                    _NoGroup = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _NoExemplaire;
         public string NoExemplaire
         {
@@ -49,6 +67,20 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_NoExemplaire != value)
                 {
                     _NoExemplaire = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsExemplarySeparated;
+        public bool IsExemplarySeparated
+        {
+            get => _IsExemplarySeparated;
+            set
+            {
+                if (_IsExemplarySeparated != value)
+                {
+                    _IsExemplarySeparated = value;
                     OnPropertyChanged();
                 }
             }
@@ -96,7 +128,7 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private DateTimeOffset _DateAjout;
+        private DateTimeOffset _DateAjout = DateTime.UtcNow;
         public DateTimeOffset DateAjout
         {
             get => _DateAjout;
@@ -208,19 +240,7 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private ObservableCollection<CollectionVM> _Collections = new ObservableCollection<CollectionVM>();
-        public ObservableCollection<CollectionVM> Collections
-        {
-            get => _Collections;
-            set
-            {
-                if (_Collections != value)
-                {
-                    _Collections = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        
 
 
         [JsonIgnore]
@@ -249,6 +269,20 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_DeviceName != value)
                 {
                     _DeviceName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsPriceUnavailable;
+        public bool IsPriceUnavailable
+        {
+            get => _IsPriceUnavailable;
+            set
+            {
+                if (_IsPriceUnavailable != value)
+                {
+                    _IsPriceUnavailable = value;
                     OnPropertyChanged();
                 }
             }

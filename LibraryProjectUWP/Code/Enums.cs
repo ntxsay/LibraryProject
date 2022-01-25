@@ -55,4 +55,12 @@ namespace LibraryProjectUWP.Code
         EditorHouse,
         Enterprise,
     }
+
+    public enum BookTypeVerification : byte
+    {
+        Entree,
+        AvantPret,
+        ApresPret,
+        Sortie,
+    }
 }

@@ -18,10 +18,12 @@ namespace LibraryProjectUWP.Models.Local
         public long Id { get; set; }
         public long IdBook { get; set; }
         public long? IdContactSource { get; set; }
+        public string NoGroup { get; set; }
         public string NoExemplary { get; set; }
+        public long Quantity { get; set; }
         public string DateAjout { get; set; }
         public string DateEdition { get; set; }
-        public string Source { get; set; }
+        public string TypeAcquisition { get; set; }
         public double? Price { get; set; }
         public string DeviceName { get; set; }
         public string DateAcquisition { get; set; }

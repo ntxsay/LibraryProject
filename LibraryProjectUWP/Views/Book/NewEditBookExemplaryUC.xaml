@@ -20,6 +20,8 @@
     <PivotItem.Resources>
         <customConverters:NameToColorConverter x:Key="NameToColorConverter"/>
         <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
+        <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+        <MTUUConverters:BoolToObjectConverter x:Key="boolToInvertVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
         <XamlUICommand x:Name="CancelModificationXUiCommand" 
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
@@ -114,7 +116,7 @@
                             <TextBlock Text="Nombre d'exemplaire" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </MUIXC:NumberBox.Header>
                     </MUIXC:NumberBox>
-                    <CheckBox Grid.Row="1">
+                    <CheckBox Grid.Row="1" IsChecked="{x:Bind ViewModelPage.ViewModel.IsExemplarySeparated, Mode=TwoWay}">
                         <TextBlock Text="Enregistrer les exemplaires distinctement." />
                     </CheckBox>
                 </Grid>
@@ -249,18 +251,26 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="Prix (si acheté)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    <Grid Grid.Row="1" ColumnSpacing="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <MUIXC:NumberBox x:Name="numberBoxPrice" HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Entrez le prix du livre" SpinButtonPlacementMode="Compact" Minimum="0" Value="{x:Bind ViewModelPage.ViewModel.Price, Mode=TwoWay}">
-                        </MUIXC:NumberBox>
-                        <ComboBox x:Name="ComboBoxPrice" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModelPage.ViewModel.MoneyList}"
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" ColumnSpacing="2" Visibility="{x:Bind ViewModelPage.ViewModel.IsPriceUnavailable, Converter={StaticResource boolToInvertVisibilityConverter}, Mode=OneWay}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <MUIXC:NumberBox x:Name="numberBoxPrice" HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Entrez le prix du livre" SpinButtonPlacementMode="Compact" Minimum="0" Value="{x:Bind ViewModelPage.ViewModel.Price, Mode=TwoWay}">
+                            </MUIXC:NumberBox>
+                            <ComboBox x:Name="ComboBoxPrice" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModelPage.ViewModel.MoneyList}"
                                           SelectedItem="{x:Bind ViewModelPage.ViewModel.DeviceName, Mode=TwoWay}" SelectedIndex="1">
-                        </ComboBox>
+                            </ComboBox>
+                        </Grid>
+                        <CheckBox Grid.Row="1" IsChecked="{x:Bind ViewModelPage.ViewModel.IsPriceUnavailable, Mode=TwoWay}">
+                            <TextBlock Text="Le prix n'est pas disponible." />
+                        </CheckBox>
                     </Grid>
-
                 </Grid>
                 <ComboBox Grid.Row="6" ItemsSource="{x:Bind ViewModelPage.ViewModel.Etat.EtatModelList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Etat.Etat, Mode=TwoWay}" PlaceholderText="Etat du livre" HorizontalAlignment="Stretch">
                     <ComboBox.Header>

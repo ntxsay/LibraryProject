@@ -170,6 +170,42 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return Enumerable.Empty<string>().ToList();
                 }
             }
+
+            public static async Task<TbookEtat> GetEtatBookExemplaryAsync(long idBookExemplary)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    var etat = await context.TbookEtat.FirstOrDefaultAsync(w => w.IdBookExemplary == idBookExemplary);
+                    return etat;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+            public static async Task<LivreEtatVM> GetEtatBookExemplaryVMAsync(long idBookExemplary)
+            {
+                try
+                {
+                    var model = await GetEtatBookExemplaryAsync(idBookExemplary);
+                    if (model == null) return null;
+
+                    var value = ViewModelConverter(model);
+                    return value;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
+            
             #endregion
 
             #region Single
@@ -384,6 +420,158 @@ namespace LibraryProjectUWP.Code.Services.Db
                     };
                 }
             }
+
+            public static async Task<OperationStateVM<TbookExemplary>> CreateExemplaryAsync(long idBook, LivreExemplaryVM viewModel)
+            {
+                try
+                {
+                    if (viewModel == null)
+                    {
+                        return new OperationStateVM<TbookExemplary>()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.ViewModelNullOrEmptyMessage,
+                        };
+                    }
+
+                    LibraryDbContext context = new LibraryDbContext();
+                    var bookRecord = await context.Tbook.SingleOrDefaultAsync(c => c.Id == idBook);
+                    if (bookRecord == null)
+                    {
+                        return new OperationStateVM<TbookExemplary>()
+                        {
+                            IsSuccess = true,
+                            Message = DbServices.RecordNotExistMessage
+                        };
+                    }
+
+                    double? nullablePrice;
+                    if (viewModel.IsPriceUnavailable == false)
+                    {
+                        nullablePrice = viewModel.Price;
+                    }
+                    else
+                    {
+                        nullablePrice = null;
+                    }
+
+                    if (!viewModel.IsExemplarySeparated || viewModel.NbExemplaire == 1)
+                    {
+                        var record = new TbookExemplary()
+                        {
+                            IdBook = idBook,
+                            DateAjout = viewModel.DateAjout.ToString(),
+                            DateEdition = viewModel.DateEdition?.ToString(),
+                            DateAcquisition = viewModel.DateAcquisition?.ToString(),
+                            IsJourAcquisitionKnow = viewModel.IsJourAcquisitionKnow ? 1 : 0,
+                            IsMoisAcquisitionKnow = viewModel.IsMoisAcquisitionKnow ? 1 : 0,
+                            DateRemise = viewModel.DateRemiseLivre?.ToString(),
+                            TypeAcquisition = viewModel.Source,
+                            Observations = viewModel.Observations,
+                            Quantity = viewModel.NbExemplaire,
+                            NoGroup = null,
+                            NoExemplary = viewModel.NoExemplaire,
+                            Price = nullablePrice,
+                            DeviceName = viewModel.DeviceName
+                        };
+                        await context.TbookExemplary.AddAsync(record);
+                        await context.SaveChangesAsync();
+
+                        var recordEtat = new TbookEtat()
+                        {
+                            IdBookExemplary = record.Id,
+                            DateAjout = viewModel.DateAjout.ToString(),
+                            Etat = viewModel.Etat.Etat,
+                            Observations = viewModel.Observations,
+                            TypeVerification = (byte)viewModel.Etat.TypeVerification,
+                        };
+
+                        await context.TbookEtat.AddAsync(recordEtat);
+                        await context.SaveChangesAsync();
+
+                        return new OperationStateVM<TbookExemplary>()
+                        {
+                            IsSuccess = true,
+                            Id = record.Id,
+                            Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés avec succès."
+                        };
+                    }
+                    else
+                    {
+                        string group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
+                        while (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == true)
+                        {
+                            group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
+                            if (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == false)
+                            {
+                                break;
+                            }
+                        }
+
+                        List<TbookExemplary> recordCollection = new List<TbookExemplary>();
+                        for (int i = 0; i < viewModel.NbExemplaire; i++)
+                        {
+                            var record = new TbookExemplary()
+                            {
+                                IdBook = idBook,
+                                DateAjout = viewModel.DateAjout.ToString(),
+                                DateEdition = viewModel.DateEdition?.ToString(),
+                                DateAcquisition = viewModel.DateAcquisition?.ToString(),
+                                IsJourAcquisitionKnow = viewModel.IsJourAcquisitionKnow ? 1 : 0,
+                                IsMoisAcquisitionKnow = viewModel.IsMoisAcquisitionKnow ? 1 : 0,
+                                DateRemise = viewModel.DateRemiseLivre?.ToString(),
+                                TypeAcquisition = viewModel.Source,
+                                Observations = viewModel.Observations,
+                                NoExemplary = viewModel.NoExemplaire,
+                                Quantity = 1,
+                                NoGroup = group,
+                                Price = nullablePrice,
+                                DeviceName = viewModel.DeviceName
+                            };
+                            recordCollection.Add(record);
+                        }
+
+                        await context.TbookExemplary.AddRangeAsync(recordCollection);
+                        await context.SaveChangesAsync();
+
+                        List<TbookEtat> etatCollection = new List<TbookEtat>();
+                        foreach (var record in recordCollection)
+                        {
+                            var recordEtat = new TbookEtat()
+                            {
+                                IdBookExemplary = record.Id,
+                                DateAjout = viewModel.DateAjout.ToString(),
+                                Etat = viewModel.Etat.Etat,
+                                Observations = viewModel.Observations,
+                                TypeVerification = (byte)viewModel.Etat.TypeVerification,
+                            };
+
+                            etatCollection.Add(recordEtat);
+                        }
+
+                        await context.TbookEtat.AddRangeAsync(etatCollection);
+                        await context.SaveChangesAsync();
+
+                        return new OperationStateVM<TbookExemplary>(recordCollection)
+                        {
+                            IsSuccess = true,
+                            //Id = record.Id,
+                            Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés distinctement avec succès."
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return new OperationStateVM<TbookExemplary>()
+                    {
+                        IsSuccess = false,
+                        Message = $"Exception : {ex.Message}",
+                    };
+                }
+            }
+
 
             /// <summary>
             /// Met à jour un élément existant dans la base de données
@@ -693,6 +881,80 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
+            private static LivreEtatVM ViewModelConverter(TbookEtat model)
+            {
+                try
+                {
+                    if (model == null) return null;
+
+                    var viewModel = new LivreEtatVM()
+                    {
+                        Id = model.Id,
+                        IdBookExemplary = model.IdBookExemplary,
+                        DateVerification = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
+                        DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
+                        Observations = model.Observations,
+                        Etat = model.Etat,
+                        TypeVerification = (BookTypeVerification)model.TypeVerification,
+                    };
+
+                    return viewModel;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
+            private static async Task<LivreExemplaryVM> ViewModelConverterAsync(TbookExemplary model)
+            {
+                try
+                {
+                    if (model == null) return null;
+
+                    ContactVM contactSource = null;
+                    if (model.IdContactSource != null)
+                    {
+                        contactSource = await DbServices.Contact.SingleVMAsync((long)model.IdContactSource);
+                    }
+
+                    var viewModel = new LivreExemplaryVM()
+                    {
+                        Id = model.Id,
+                        IdBook = model.IdBook,
+                        IdContactSource = model.IdContactSource,
+                        DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
+                        DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
+                        DateAcquisition = DatesHelpers.Converter.GetNullableDateFromString(model.DateAcquisition),
+                        DateRemiseLivre = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemise),
+                        IsJourAcquisitionKnow = model.IsJourAcquisitionKnow >= 1,
+                        IsMoisAcquisitionKnow = model.IsMoisAcquisitionKnow >= 1,
+                        IsJourAcquisitionVisible = model.IsJourAcquisitionKnow >= 1,
+                        IsMoisAcquisitionVisible = model.IsMoisAcquisitionKnow >= 1,
+                        NbExemplaire = (int)(model.Quantity < int.MinValue || model.Quantity > int.MaxValue ? 0 : model.Quantity),
+                        Source = model.TypeAcquisition,
+                        NoExemplaire = model.NoExemplary,
+                        NoGroup = model.NoGroup,
+                        IsExemplarySeparated = !model.NoGroup.IsStringNullOrEmptyOrWhiteSpace(),
+                        Observations = model.Observations,
+                        Price = model.Price ?? 0,
+                        IsPriceUnavailable = model.Price == null,
+                        DeviceName = model.DeviceName,
+                        ContactSource = contactSource,
+                        Etat = await GetEtatBookExemplaryVMAsync(model.Id),
+                    };
+
+                    return viewModel;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
 
             /// <summary>
             /// Convertit un modèle en modèle de vue

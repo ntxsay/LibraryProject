@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.ViewModels.Collection;
+﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.General;
 using Newtonsoft.Json;
 using System;
@@ -18,7 +19,11 @@ namespace LibraryProjectUWP.ViewModels.Book
 
         [JsonIgnore]
         public long Id { get; set; }
-        
+
+        [JsonIgnore]
+        public long IdBookExemplary { get; set; }
+
+
         [JsonIgnore]
         public LivreVM Parent { get; set; }
 
@@ -87,6 +92,20 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_Observations != value)
                 {
                     _Observations = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookTypeVerification _TypeVerification;
+        public BookTypeVerification TypeVerification
+        {
+            get => _TypeVerification;
+            set
+            {
+                if (_TypeVerification != value)
+                {
+                    _TypeVerification = value;
                     OnPropertyChanged();
                 }
             }

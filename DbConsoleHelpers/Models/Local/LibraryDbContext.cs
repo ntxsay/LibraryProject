@@ -157,9 +157,7 @@ namespace DbConsoleHelpers.Models.Local
 
                 entity.Property(e => e.IsVisible).HasDefaultValueSql("1");
 
-                entity.Property(e => e.NoExemplary).IsRequired();
-
-                entity.Property(e => e.Source).IsRequired();
+                entity.Property(e => e.TypeAcquisition).IsRequired();
 
                 entity.HasOne(d => d.IdBookNavigation)
                     .WithMany(p => p.TbookExemplary)

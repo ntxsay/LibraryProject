@@ -1111,7 +1111,10 @@ namespace LibraryProjectUWP.Views.Book
                         Parent = args.Parameter as LivreVM,
                         CurrentViewModel = new LivreExemplaryVM()
                         {
-
+                            Etat = new LivreEtatVM()
+                            {
+                                TypeVerification = Code.BookTypeVerification.Entree,
+                            }
                         }
                     });
 
@@ -1134,9 +1137,44 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void NewEditBookExemplaryUC_Create_CreateItemRequested(NewEditBookExemplaryUC sender, ExecuteRequestedEventArgs e)
+        private async void NewEditBookExemplaryUC_Create_CreateItemRequested(NewEditBookExemplaryUC sender, ExecuteRequestedEventArgs e)
         {
-            throw new NotImplementedException();
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    LivreExemplaryVM newViewModel = sender.ViewModelPage.ViewModel;
+
+                    var creationResult = await DbServices.Book.CreateExemplaryAsync(sender._parameters.Parent.Id, newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        this.RefreshItemsGrouping();
+
+                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+
+                sender.ViewModelPage.ViewModel = new LivreExemplaryVM();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void NewEditBookExemplaryUC_Create_CancelModificationRequested(NewEditBookExemplaryUC sender, ExecuteRequestedEventArgs e)

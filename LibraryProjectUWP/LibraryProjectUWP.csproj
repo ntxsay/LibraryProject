@@ -146,6 +146,7 @@
     <Compile Include="Code\Helpers\CountryHelpers.cs" />
     <Compile Include="Code\Helpers\CultureHelpers.cs" />
     <Compile Include="Code\Helpers\DatesHelpers.cs" />
+    <Compile Include="Code\Helpers\IdHelpers.cs" />
     <Compile Include="Code\Helpers\LibraryHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
