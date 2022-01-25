@@ -8,25 +8,48 @@ namespace LibraryProjectUWP.Code.Helpers
 {
     public class LibraryHelpers
     {
-        public static IEnumerable<string> EntrySourceList => new List<string>()
+        public struct Book
         {
-            "Achat",
-            "Prêt",
-            "Don",
-            "Autre",
-        };
+            public struct Entry
+            {
+                public const string Achat = "Achat";
+                public const string Pret = "Prêt";
+                public const string Don = "Don";
+                public const string Autre = "Autre";
 
-        public static IEnumerable<string> EtatModelList => new List<string>()
-        {
-            "Neuf",
-            "Comme neuf",
-            "Très bon",
-            "Bon",
-            "Assez bon",
-            "Satisfaisant",
-            "Moyen",
-            "Mauvais",
-        };
+                public static IEnumerable<string> EntrySourceList => new List<string>()
+                {
+                    Achat,
+                    Pret,
+                    Don,
+                    Autre,
+                };
+
+                public static Dictionary<byte, string> TypeAcquisitionDictionary = new Dictionary<byte, string>()
+                {
+                    {(byte)BookTypeAcquisition.Achat, Achat },
+                    {(byte)BookTypeAcquisition.Pret, Pret },
+                    {(byte)BookTypeAcquisition.Don, Don },
+                    {(byte)BookTypeAcquisition.Autre, Autre }
+                };
+            }
+
+            public static IEnumerable<string> EtatModelList => new List<string>()
+            {
+                "Neuf",
+                "Comme neuf",
+                "Très bon",
+                "Bon",
+                "Assez bon",
+                "Satisfaisant",
+                "Moyen",
+                "Mauvais",
+                "Je ne sais pas",
+            };
+        }
+        
+
+        
 
         public struct Contact
         {

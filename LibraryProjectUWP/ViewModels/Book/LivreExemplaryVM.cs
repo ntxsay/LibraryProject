@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.ViewModels.Collection;
+﻿using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using Newtonsoft.Json;
@@ -30,7 +31,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         [JsonIgnore]
         public LivreVM Parent { get; set; }
 
-        private string _Source;
+        private string _Source = LibraryHelpers.Book.Entry.Achat;
         public string Source
         {
             get => _Source;
@@ -86,7 +87,7 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private int _NbExemplaire;
+        private int _NbExemplaire = 1;
         public int NbExemplaire
         {
             get => _NbExemplaire;

@@ -440,6 +440,46 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        private void CmbxTypeAcquisition_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is ComboBox combobox && combobox.SelectedItem is string type)
+                {
+                    if (type == LibraryHelpers.Book.Entry.Achat)
+                    {
+                        ViewModelPage.PretVisibility = Visibility.Collapsed;
+                        ViewModelPage.PriceVisibility = Visibility.Visible;
+                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
+                    }
+                    else if (type == LibraryHelpers.Book.Entry.Don)
+                    {
+                        ViewModelPage.PretVisibility = Visibility.Collapsed;
+                        ViewModelPage.PriceVisibility = Visibility.Collapsed;
+                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
+                    }
+                    else if (type == LibraryHelpers.Book.Entry.Pret)
+                    {
+                        ViewModelPage.PretVisibility = Visibility.Visible;
+                        ViewModelPage.PriceVisibility = Visibility.Visible;
+                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
+                    }
+                    else if (type == LibraryHelpers.Book.Entry.Autre)
+                    {
+                        ViewModelPage.PretVisibility = Visibility.Collapsed;
+                        ViewModelPage.PriceVisibility = Visibility.Collapsed;
+                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             CancelModificationRequested?.Invoke(this, args);
@@ -493,14 +533,57 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                //if (ViewModelPage.ViewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace())
-                //{
-                //    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                //    ViewModelPage.ResultMessage = $"Le titre de civilité de l'auteur doit être renseigné.";
-                //    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                //    ViewModelPage.IsResultMessageOpen = true;
-                //    return false;
-                //}
+                if (ViewModelPage.ViewModel.NbExemplaire <= 0)
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Le nombre d'exemplaire ne peut pas être inférieur ou égal à 0.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
+
+                if (ViewModelPage.ViewModel.Etat.Etat.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"L'état de l'exemplaire n'est pas renseigné.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
+
+                if (ViewModelPage.ViewModel.Source == LibraryHelpers.Book.Entry.Achat)
+                {
+                    if (!ViewModelPage.ViewModel.IsPriceUnavailable && ViewModelPage.ViewModel.Price >= 0 &&
+                        ViewModelPage.ViewModel.DeviceName.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"Vous devez spécifier le type de monnaie.";
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return false;
+                    }
+                }
+                else if (ViewModelPage.ViewModel.Source == LibraryHelpers.Book.Entry.Don)
+                {
+
+                }
+                else if (ViewModelPage.ViewModel.Source == LibraryHelpers.Book.Entry.Pret)
+                {
+                    if (!ViewModelPage.ViewModel.IsPriceUnavailable && ViewModelPage.ViewModel.Price >= 0 &&
+                        ViewModelPage.ViewModel.DeviceName.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"Vous devez spécifier le type de monnaie.";
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return false;
+                    }
+                }
+                else if (ViewModelPage.ViewModel.Source == LibraryHelpers.Book.Entry.Autre)
+                {
+
+                }
+
                 //else if (ViewModelPage.ViewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace())
                 //{
                 //    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
@@ -575,11 +658,15 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
+
+        
     }
 
     public class NewEditBookExemplaryUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public readonly IEnumerable<string> SourceList = LibraryHelpers.Book.Entry.EntrySourceList;
+        public readonly IEnumerable<string> EtatList = LibraryHelpers.Book.EtatModelList;
 
         public Guid Guid { get; set; } = Guid.NewGuid();
 
@@ -607,6 +694,48 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     _Glyph = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _ContactSourceVisibility;
+        public Visibility ContactSourceVisibility
+        {
+            get => this._ContactSourceVisibility;
+            set
+            {
+                if (this._ContactSourceVisibility != value)
+                {
+                    this._ContactSourceVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _PriceVisibility;
+        public Visibility PriceVisibility
+        {
+            get => this._PriceVisibility;
+            set
+            {
+                if (this._PriceVisibility != value)
+                {
+                    this._PriceVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _PretVisibility;
+        public Visibility PretVisibility
+        {
+            get => this._PretVisibility;
+            set
+            {
+                if (this._PretVisibility != value)
+                {
+                    this._PretVisibility = value;
+                    this.OnPropertyChanged();
                 }
             }
         }
@@ -667,7 +796,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public readonly IEnumerable<string> SourceList = LibraryHelpers.EntrySourceList;
 
         private LivreExemplaryVM _ViewModel;
         public LivreExemplaryVM ViewModel

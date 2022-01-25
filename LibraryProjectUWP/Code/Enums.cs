@@ -63,4 +63,12 @@ namespace LibraryProjectUWP.Code
         ApresPret,
         Sortie,
     }
+
+    public enum BookTypeAcquisition : byte
+    {
+        Achat,
+        Pret,
+        Don,
+        Autre,
+    }
 }

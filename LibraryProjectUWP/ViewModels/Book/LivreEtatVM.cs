@@ -27,19 +27,6 @@ namespace LibraryProjectUWP.ViewModels.Book
         [JsonIgnore]
         public LivreVM Parent { get; set; }
 
-        [JsonIgnore]
-        public IEnumerable<string> EtatModelList => new List<string>()
-        {
-            "Neuf",
-            "Comme neuf",
-            "Très bon",
-            "Bon",
-            "Assez bon",
-            "Satisfaisant",
-            "Moyen",
-            "Mauvais",
-        };
-
         private string _Etat;
         public string Etat
         {

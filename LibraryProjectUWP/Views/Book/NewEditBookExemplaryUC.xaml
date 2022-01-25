@@ -120,7 +120,8 @@
                         <TextBlock Text="Enregistrer les exemplaires distinctement." />
                     </CheckBox>
                 </Grid>
-                <ComboBox Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.SourceList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Source, Mode=TwoWay}" PlaceholderText="Source" HorizontalAlignment="Stretch">
+                <ComboBox Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.SourceList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Source, Mode=TwoWay}" PlaceholderText="Source" HorizontalAlignment="Stretch"
+                          SelectionChanged="CmbxTypeAcquisition_SelectionChanged">
                     <ComboBox.Header>
                         <TextBlock Text="Type d'acquisition" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </ComboBox.Header>
@@ -160,7 +161,7 @@
                         </Button.Flyout>
                     </Button>
                 </Grid>
-                <Grid Grid.Row="3">
+                <Grid Grid.Row="3" Visibility="{x:Bind ViewModelPage.PretVisibility, Mode=OneWay}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto" />
@@ -191,7 +192,7 @@
                         </Button.Flyout>
                     </Button>
                 </Grid>
-                <Grid Grid.Row="4" RowSpacing="8">
+                <Grid Grid.Row="4" RowSpacing="8" Visibility="{x:Bind ViewModelPage.ContactSourceVisibility, Mode=OneWay}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -236,7 +237,7 @@
                         </Grid>
                         <Grid Grid.Row="1">
                             <TextBlock TextWrapping="Wrap">
-                                <Run Text="Cet/ces exemplaire(s) ont été acquis chez" />
+                                <Run Text="Cet exemplaire a été acquis chez" />
                                 <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.SocietyName, Mode=OneWay}" FontWeight="Medium"/>
                                 <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.TitreCivilite, Mode=OneWay}" FontWeight="Medium" />
                                 <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.NomNaissance, Mode=OneWay}" FontWeight="Medium" />
@@ -245,12 +246,12 @@
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid Grid.Row="5" RowSpacing="8">
+                <Grid Grid.Row="5" RowSpacing="8" Visibility="{x:Bind ViewModelPage.PriceVisibility, Mode=OneWay}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Prix (si acheté)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    <TextBlock Grid.Row="0" Text="Prix" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -272,7 +273,7 @@
                         </CheckBox>
                     </Grid>
                 </Grid>
-                <ComboBox Grid.Row="6" ItemsSource="{x:Bind ViewModelPage.ViewModel.Etat.EtatModelList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Etat.Etat, Mode=TwoWay}" PlaceholderText="Etat du livre" HorizontalAlignment="Stretch">
+                <ComboBox Grid.Row="6" ItemsSource="{x:Bind ViewModelPage.EtatList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Etat.Etat, Mode=TwoWay}" PlaceholderText="Etat du livre" HorizontalAlignment="Stretch">
                     <ComboBox.Header>
                         <TextBlock Text="Etat du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </ComboBox.Header>
