@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Collection;
@@ -75,6 +76,22 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_Auteurs != value)
                 {
                     _Auteurs = value;
+                    OnPropertyChanged();
+                    AuteursStringList = StringHelpers.JoinStringArray(value?.Select(s => $"{s.NomNaissance} {s.Prenom}")?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                }
+            }
+        }
+
+        private string _AuteursStringList;
+        [JsonIgnore]
+        public string AuteursStringList
+        {
+            get => _AuteursStringList;
+            set
+            {
+                if (_AuteursStringList != value)
+                {
+                    _AuteursStringList = value;
                     OnPropertyChanged();
                 }
             }

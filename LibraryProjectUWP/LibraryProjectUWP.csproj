@@ -137,6 +137,7 @@
     <Compile Include="Code\Converters\NullableBooleanConverters.cs" />
     <Compile Include="Code\Converters\SizeDiviserConverter.cs" />
     <Compile Include="Code\Converters\ObjectToBooleanConverter.cs" />
+    <Compile Include="Code\Converters\BookConverters.cs" />
     <Compile Include="Code\Converters\VisibilityConverter.cs" />
     <Compile Include="Code\DataTemplatesSelector\ContactTypeDataTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\DataViewModeTemplateSelector.cs" />
@@ -217,19 +218,12 @@
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
-    <Compile Include="ViewModels\UI\BookCollectionCommonViewVM.cs" />
     <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
     <Compile Include="Views\Book\NewEditBookExemplaryUC.xaml.cs">
       <DependentUpon>NewEditBookExemplaryUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\BookCollectionPage.xaml.cs">
       <DependentUpon>BookCollectionPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Book\Collection\BookCollectionDgViewPage.xaml.cs">
-      <DependentUpon>BookCollectionDgViewPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Book\Collection\BookCollectionGdViewPage.xaml.cs">
-      <DependentUpon>BookCollectionGdViewPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\BookCategorieUC.xaml.cs">
       <DependentUpon>BookCategorieUC.xaml</DependentUpon>
@@ -317,14 +311,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Book\BookCollectionPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Book\Collection\BookCollectionDgViewPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Book\Collection\BookCollectionGdViewPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -22,8 +22,8 @@
         <customConverters:NullableIntToDoubleConverter x:Key="NullIntToDoubleConverter" />
         <customConverters:TimeSpanToStringDisplay x:Key="TimeSpanToStringDisplayConverter" />
         <customConverters:StringTimeToStringDisplay x:Key="StringTimeToStringDisplayConverter"/>
-        <customConverters:ListTypeToString x:Key="ListTypeToStringConverter" />
-        <customConverters:IGroupingToValueConverter x:Key="groupingConverter" />-->
+        <customConverters:ListTypeToString x:Key="ListTypeToStringConverter" />-->
+        <customConverters:ContactListTostringConverter x:Key="contactListTostringConverter" />
         <customConverters:CountToVisibilityConverter x:Key="countToVisibilityConverter" />
         <customConverters:ObjectToBooleanConverter x:Key="objectToBooleanConverter" />
         <customConverters:CountToEnablingConverter x:Key="CountToEnablingConverter" />
@@ -286,12 +286,12 @@
                                         VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
                                         AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
                                         AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
-                                        MaxColumnWidth="500" FrozenColumnCount="1" GridLinesVisibility="None" HeadersVisibility="Column"
+                                        MaxColumnWidth="500" FrozenColumnCount="2" GridLinesVisibility="None" HeadersVisibility="Column"
                                         IsReadOnly="True" BorderThickness="0"
                                         RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
                                         RowGroupHeaderPropertyNameAlternative="Range">
                 <MTUUControls:DataGrid.Columns>
-                    <MTUUControls:DataGridTextColumn Header="#" Binding="{Binding Id}" Tag="Rank"/>
+                    <MTUUControls:DataGridTextColumn Header="Id" Binding="{Binding Id}" Tag="Rank"/>
                     <MTUUControls:DataGridTextColumn Header="Titre" Binding="{Binding MainTitle}" Tag="Rank"/>
                     <MTUUControls:DataGridTemplateColumn Header="Date d'ajout" Tag="First_ascent">
                         <MTUUControls:DataGridTemplateColumn.CellTemplate>
@@ -305,7 +305,9 @@
                             </DataTemplate>
                         </MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
                     </MTUUControls:DataGridTemplateColumn>
+                    <MTUUControls:DataGridTextColumn Header="Auteur(s)" Binding="{Binding AuteursStringList,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Cotation" Binding="{Binding Identification.Cotation, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Pages" Binding="{Binding Format.NbOfPages,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="ISBN" Binding="{Binding Identification.ISBN, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="ISBN-10" Binding="{Binding Identification.ISBN10, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="ISBN13" Binding="{Binding Identification.ISBN13, Mode=OneWay}" Width="Auto"/>
@@ -410,7 +412,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                               ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}">
+                               ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}" SelectionChanged="PivotItems_SelectionChanged">
                             <Pivot.OpacityTransition>
                                 <ScalarTransition />
                             </Pivot.OpacityTransition>

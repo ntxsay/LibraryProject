@@ -7,7 +7,6 @@ using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.General;
-using LibraryProjectUWP.Views.Book.Collection;
 using LibraryProjectUWP.Views.Contact;
 using System;
 using System.Collections.Generic;
@@ -131,6 +130,85 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        #region Selection
+        private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is Pivot pivot)
+                {
+                    this.ViewModelPage.SelectedItems = new List<LivreVM>();
+                    this.ViewModelPage.SelectedPivotIndex = pivot.SelectedIndex;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is GridView gridView)
+                {
+                    this.ViewModelPage.SelectedItems = gridView.SelectedItems.Cast<LivreVM>().ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is DataGrid dataGrid)
+                {
+                    this.ViewModelPage.SelectedItems = dataGrid.SelectedItems.Cast<LivreVM>().ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void Btn_SelectAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Btn_UnSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Btn_OpenAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        #endregion
 
         #region Item MenuFlyout
         private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -836,30 +914,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void Btn_SelectAll_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Btn_UnSelectAll_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Btn_OpenAll_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+        
 
         private void DisplayCategorieListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -2232,10 +2287,6 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
-        private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
 
         private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
@@ -2246,13 +2297,6 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
-
-        private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
