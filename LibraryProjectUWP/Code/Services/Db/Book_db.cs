@@ -270,19 +270,14 @@ namespace LibraryProjectUWP.Code.Services.Db
                     }
 
                     LibraryDbContext context = new LibraryDbContext();
-                    string lang = viewModel.Publication?.Langue?.ToLower() ?? null;
-                    var existingItem = await context.Tbook.FirstOrDefaultAsync(c => c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower() && c.Langue.ToLower() == lang);
-                    if (existingItem != null)
+                    var isExist = await IsBookExistAsync(viewModel);
+                    if (isExist)
                     {
-                        var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Id == existingItem.Id && c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
-                        if (isFormatExist)
+                        return new OperationStateVM()
                         {
-                            return new OperationStateVM()
-                            {
-                                IsSuccess = true,
-                                Message = DbServices.RecordAlreadyExistMessage
-                            };
-                        }
+                            IsSuccess = true,
+                            Message = DbServices.RecordAlreadyExistMessage
+                        };
                     }
 
                     var record = new Tbook()
@@ -614,18 +609,14 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    var isExist = await context.Tbook.AnyAsync(c => c.Id != record.Id && c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower() && c.Langue.ToLower() == viewModel.Publication.Langue.ToLower());
+                    var isExist = await IsBookExistAsync(viewModel, true, record.Id);
                     if (isExist)
                     {
-                        var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
-                        if (isFormatExist)
+                        return new OperationStateVM()
                         {
-                            return new OperationStateVM()
-                            {
-                                IsSuccess = true,
-                                Message = DbServices.RecordAlreadyExistMessage
-                            };
-                        }
+                            IsSuccess = true,
+                            Message = DbServices.RecordAlreadyExistMessage
+                        };
                     }
 
                     record.DateEdition = DateTime.UtcNow.ToString();
@@ -881,6 +872,43 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
+            private static async Task<bool> IsBookExistAsync(LivreVM viewModel, bool isEdit = false, long? modelId = null)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+                    List<Tbook> existingItemList = null;
+
+                    if (!isEdit)
+                    {
+                        existingItemList = await context.Tbook.Where(c => c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower()).ToListAsync();
+                    }
+                    else
+                    {
+                        existingItemList = await context.Tbook.Where(c => c.Id != (long)modelId && c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower()).ToListAsync();
+                    }
+
+                    if (existingItemList != null && existingItemList.Any())
+                    {
+                        string lang = viewModel.Publication?.Langue?.ToLower() ?? null;
+                        foreach (var item in existingItemList)
+                        {
+                            var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Id == item.Id && c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
+                            if (isFormatExist && item.Langue?.ToLower() == lang)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return true;
+                }
+            }
             private static LivreEtatVM ViewModelConverter(TbookEtat model)
             {
                 try

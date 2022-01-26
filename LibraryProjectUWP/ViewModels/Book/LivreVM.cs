@@ -23,21 +23,6 @@ namespace LibraryProjectUWP.ViewModels.Book
         public long Id { get; set; }
         public Guid Guid { get; set; } = Guid.NewGuid();
         public long CountOpening { get; set; }
-        private short _NbExactExemplaire;
-
-        [Obsolete]
-        public short NbExactExemplaire
-        {
-            get => _NbExactExemplaire;
-            set
-            {
-                if (_NbExactExemplaire != value)
-                {
-                    _NbExactExemplaire = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
         private string _MainTitle;
         public string MainTitle

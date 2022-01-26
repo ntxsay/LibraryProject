@@ -853,6 +853,7 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
+        #region SideBar
         private void CmbxSideBarItemTitle_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -860,7 +861,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is ComboBox cmbx && cmbx.SelectedItem is SideBarItemHeaderVM headerVM)
                 {
-                    foreach(var item in this.PivotRightSideBar.Items)
+                    foreach (var item in this.PivotRightSideBar.Items)
                     {
                         if (item is NewEditBookExemplaryUC bookExemplaryUC)
                         {
@@ -914,7 +915,8 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        
+        #endregion
+
 
         private void DisplayCategorieListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -1071,7 +1073,7 @@ namespace LibraryProjectUWP.Views.Book
                         ParentPage = this,
                         EditMode = Code.EditMode.Edit,
                         ViewModelList = ViewModelPage.ViewModelList,
-                        CurrentViewModel = DbServices.Book.DeepCopy(viewModel),
+                        CurrentViewModel = viewModel,
                     });
 
                     userControl.CancelModificationRequested += NewEditBookUC_Edit_CancelModificationRequested;
@@ -1123,11 +1125,21 @@ namespace LibraryProjectUWP.Views.Book
                     if (updateResult.IsSuccess)
                     {
                         sender._parameters.CurrentViewModel.MainTitle = updatedViewModel.MainTitle;
+                        //sender._parameters.CurrentViewModel = updatedViewModel;
+                        //this.RefreshItemsGrouping();
+
+                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
+                        sender.ViewModelPage.ResultMessage = updateResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                     }
                     else
                     {
                         //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
                         sender.ViewModelPage.ResultMessage = updateResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
                         return;
                     }
                 }

@@ -63,7 +63,7 @@ namespace LibraryProjectUWP.Views.Book
             _parameters = parameters;
             ViewModelPage.EditMode = parameters.EditMode;
             ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} un livre";
-            ViewModelPage.ViewModel = parameters?.CurrentViewModel;
+            ViewModelPage.ViewModel = DbServices.Book.DeepCopy(parameters?.CurrentViewModel);
             InitializeActionInfos();
         }
 

@@ -6,6 +6,29 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.Code.Helpers
 {
+    public static class LibraryHelpersExtension
+    {
+        public static bool IsStringNullOrEmptyOrWhiteSpace(this string source)
+        {
+            return StringHelpers.IsStringNullOrEmptyOrWhiteSpace(source);
+        }
+
+        public static string FirstCharToLowerOrUpperCase(this string Value, StringHelpers.UpperLowerMode upperLowerMode)
+        {
+            return StringHelpers.Converter.FirstCharToLowerOrUpperCase(Value, upperLowerMode);
+        }
+
+        public static string GetLastChars(this string Value, int Count)
+        {
+            return StringHelpers.GetLastChars(Value, Count);
+        }
+
+        public static string GetFirstChars(this string Value, int Count)
+        {
+            return StringHelpers.GetFirstChars(Value, Count);
+        }
+    }
+
     public class LibraryHelpers
     {
         public struct Book
