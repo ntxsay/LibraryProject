@@ -52,6 +52,21 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        private string _TitresOeuvreStringList;
+        [JsonIgnore]
+        public string TitresOeuvreStringList
+        {
+            get => _TitresOeuvreStringList;
+            set
+            {
+                if (_TitresOeuvreStringList != value)
+                {
+                    _TitresOeuvreStringList = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private ObservableCollection<ContactVM> _Auteurs = new ObservableCollection<ContactVM>();
         public ObservableCollection<ContactVM> Auteurs
         {
@@ -62,7 +77,6 @@ namespace LibraryProjectUWP.ViewModels.Book
                 {
                     _Auteurs = value;
                     OnPropertyChanged();
-                    AuteursStringList = StringHelpers.JoinStringArray(value?.Select(s => $"{s.NomNaissance} {s.Prenom}")?.ToArray() ?? Array.Empty<string>(), ", ", out _);
                 }
             }
         }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.ViewModels.Book;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.Code.Helpers
 {
-    public static class LibraryHelpersExtension
+    public static class BookHelpersExtension
     {
-        public static bool IsStringNullOrEmptyOrWhiteSpace(this string source)
+        public static void Copy(this LivreVM source, LivreVM viewModelToCopy)
         {
-            return StringHelpers.IsStringNullOrEmptyOrWhiteSpace(source);
+            DbServices.Book.DeepCopy(source, viewModelToCopy);
         }
 
         public static string FirstCharToLowerOrUpperCase(this string Value, StringHelpers.UpperLowerMode upperLowerMode)

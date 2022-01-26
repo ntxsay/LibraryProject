@@ -281,7 +281,7 @@
             </ScrollViewer>
         </DataTemplate>
         <DataTemplate x:Key="DataGridViewTemplate" x:DataType="booktVm:LivreVM">
-            <MTUUControls:DataGrid x:Name="dataGrid" ItemsSource="{Binding }" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 14 0 0"
+            <MTUUControls:DataGrid x:Name="dataGrid" ItemsSource="{Binding Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 14 0 0"
                                                            HorizontalScrollBarVisibility="Visible" SelectionChanged="dataGrid_SelectionChanged"
                                         VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
                                         AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
@@ -291,8 +291,21 @@
                                         RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
                                         RowGroupHeaderPropertyNameAlternative="Range">
                 <MTUUControls:DataGrid.Columns>
-                    <MTUUControls:DataGridTextColumn Header="Id" Binding="{Binding Id}" Tag="Rank"/>
-                    <MTUUControls:DataGridTextColumn Header="Titre" Binding="{Binding MainTitle}" Tag="Rank"/>
+                    <MTUUControls:DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                    <MTUUControls:DataGridTextColumn Header="Titre" Binding="{Binding MainTitle}"/>
+                    <MTUUControls:DataGridTextColumn Header="Autre(s) titre(s)" Binding="{Binding TitresOeuvreStringList,  Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Auteur(s)" Binding="{Binding AuteursStringList,  Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Maison(s) d'édition" Binding="{Binding Publication.EditeursStringList,  Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Collection(s)" Binding="{Binding Publication.CollectionsStringList,  Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Cotation" Binding="{Binding Identification.Cotation, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Format" Binding="{Binding Format.Format, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Pages" Binding="{Binding Format.NbOfPages,  Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Langue" Binding="{Binding Publication.Langue,  Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="ISBN" Binding="{Binding Identification.ISBN, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="ISBN-10" Binding="{Binding Identification.ISBN10, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="ISBN13" Binding="{Binding Identification.ISBN13, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="ISSN" Binding="{Binding Identification.ISSN, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="ASIN" Binding="{Binding Identification.ASIN, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTemplateColumn Header="Date d'ajout" Tag="First_ascent">
                         <MTUUControls:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -305,15 +318,6 @@
                             </DataTemplate>
                         </MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
                     </MTUUControls:DataGridTemplateColumn>
-                    <MTUUControls:DataGridTextColumn Header="Auteur(s)" Binding="{Binding AuteursStringList,  Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="Cotation" Binding="{Binding Identification.Cotation, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="Pages" Binding="{Binding Format.NbOfPages,  Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ISBN" Binding="{Binding Identification.ISBN, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ISBN-10" Binding="{Binding Identification.ISBN10, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ISBN13" Binding="{Binding Identification.ISBN13, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ISSN" Binding="{Binding Identification.ISSN, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="ASIN" Binding="{Binding Identification.ASIN, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="Format" Binding="{Binding Format.Format, Mode=OneWay}" Width="Auto"/>
                 </MTUUControls:DataGrid.Columns>
                 <MTUUControls:DataGrid.RowStyle>
                     <Style TargetType="MTUUControls:DataGridRow">

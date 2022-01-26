@@ -107,6 +107,21 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        private string _CollectionsStringList;
+        [JsonIgnore]
+        public string CollectionsStringList
+        {
+            get => _CollectionsStringList;
+            set
+            {
+                if (_CollectionsStringList != value)
+                {
+                    _CollectionsStringList = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private ObservableCollection<ContactVM> _Editeurs = new ObservableCollection<ContactVM>();
         public ObservableCollection<ContactVM> Editeurs
         {
@@ -116,6 +131,21 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_Editeurs != value)
                 {
                     _Editeurs = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _EditeursStringList;
+        [JsonIgnore]
+        public string EditeursStringList
+        {
+            get => _EditeursStringList;
+            set
+            {
+                if (_EditeursStringList != value)
+                {
+                    _EditeursStringList = value;
                     OnPropertyChanged();
                 }
             }

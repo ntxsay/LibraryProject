@@ -22,7 +22,7 @@ namespace LibraryProjectUWP.Code.Services.Db
         public struct Book
         {
             static string NameEmptyMessage = "Le nom du livre doit être renseigné avant l'enregistrement.";
-            static string NameAlreadyExistMessage = "Ce livre existe déjà.";
+            static readonly string NameAlreadyExistMessage = "Ce livre existe déjà.";
             #region All
             /// <summary>
             /// Retourne tous les objets de la base de données
@@ -1069,9 +1069,19 @@ namespace LibraryProjectUWP.Code.Services.Db
                     IList<ContactVM> authors = await Contact.MultipleVMAsync(model.Id, ContactType.Author);
                     IList<ContactVM> editors = await Contact.MultipleVMAsync(model.Id, ContactType.EditorHouse);
                     IList<CollectionVM> collections = await Collection.MultipleVmInBookAsync(model.Id, CollectionTypeEnum.Collection);
-
+                    
                     viewModel.TitresOeuvre = titres != null && titres.Any() ? new ObservableCollection<string>(titres) : new ObservableCollection<string>();
+                    if (viewModel.TitresOeuvre != null && viewModel.TitresOeuvre.Any())
+                    {
+                        viewModel.TitresOeuvreStringList = StringHelpers.JoinStringArray(viewModel.TitresOeuvre?.Select(s => s)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    }
+
                     viewModel.Auteurs = authors != null && authors.Any() ? new ObservableCollection<ContactVM>(authors) : new ObservableCollection<ContactVM>();
+                    if (viewModel.Auteurs != null && viewModel.Auteurs.Any())
+                    {
+                        viewModel.AuteursStringList = StringHelpers.JoinStringArray(viewModel.Auteurs?.Select(s => $"{s.NomNaissance} {s.Prenom}")?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    }
+
                     viewModel.Publication = new LivrePublicationVM()
                     {
                         Pays = model.Pays,
@@ -1079,13 +1089,26 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Price = model.Price,
                         DeviceName = model.DeviceName,
                         DateParution = DatesHelpers.Converter.GetNullableDateFromString(model.DateParution),
-                        IsJourParutionKnow = model.IsJourParutionKnow >= 1 ? true : false,
-                        IsMoisParutionKnow = model.IsMoisParutionKnow >= 1 ? true : false,
-                        IsJourParutionVisible = model.IsJourParutionKnow >= 1 ? true : false,
-                        IsMoisParutionVisible = model.IsMoisParutionKnow >= 1 ? true : false,
+                        IsJourParutionKnow = model.IsJourParutionKnow >= 1,
+                        IsMoisParutionKnow = model.IsMoisParutionKnow >= 1,
+                        IsJourParutionVisible = model.IsJourParutionKnow >= 1,
+                        IsMoisParutionVisible = model.IsMoisParutionKnow >= 1,
                         Collections = collections != null && collections.Any() ? new ObservableCollection<CollectionVM>(collections) : new ObservableCollection<CollectionVM>(),
                         Editeurs = editors != null && editors.Any() ? new ObservableCollection<ContactVM>(editors) : new ObservableCollection<ContactVM>(),
                     };
+
+                    if (viewModel.Publication != null)
+                    {
+                        if (viewModel.Publication.Collections != null && viewModel.Publication.Collections.Any())
+                        {
+                            viewModel.Publication.CollectionsStringList = StringHelpers.JoinStringArray(viewModel.Publication.Collections?.Select(s => s.Name)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                        }
+
+                        if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
+                        {
+                            viewModel.Publication.EditeursStringList = StringHelpers.JoinStringArray(viewModel.Publication.Editeurs?.Select(s => s.SocietyName)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                        }
+                    }
 
                     return viewModel;
                 }
@@ -1103,81 +1126,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     if (viewModelToCopy == null) return null;
 
-                    LivreVM newViewModel = new LivreVM()
-                    {
-                        Id = viewModelToCopy.Id,
-                        Guid = viewModelToCopy.Guid,
-                        DateAjout = viewModelToCopy.DateAjout,
-                        DateEdition = viewModelToCopy.DateEdition,
-                        MainTitle = viewModelToCopy.MainTitle,
-                        CountOpening = viewModelToCopy.CountOpening,
-                        TitresOeuvre = viewModelToCopy.TitresOeuvre,
-                        Auteurs = viewModelToCopy.Auteurs,
-                        JaquettePath = viewModelToCopy.JaquettePath,
-                    };
+                    LivreVM newViewModel = new LivreVM();
 
-                    if (viewModelToCopy.Identification != null)
-                    {
-                        newViewModel.Identification = new LivreIdentificationVM()
-                        {
-                            Id = viewModelToCopy.Identification.Id,
-                            ISBN = viewModelToCopy.Identification.ISBN,
-                            ISBN10 = viewModelToCopy.Identification.ISBN10,
-                            ISBN13 = viewModelToCopy.Identification.ISBN13,
-                            ISSN = viewModelToCopy.Identification.ISSN,
-                            ASIN = viewModelToCopy.Identification.ASIN,
-                            CodeBarre = viewModelToCopy.Identification.CodeBarre,
-                            Cotation = viewModelToCopy.Identification.Cotation,
-                        };
-                    }
-
-                    if (viewModelToCopy.ClassificationAge != null)
-                    {
-                        newViewModel.ClassificationAge = new LivreClassificationAgeVM()
-                        {
-                            MinAge = viewModelToCopy.ClassificationAge.MinAge,
-                            MaxAge = viewModelToCopy.ClassificationAge.MaxAge,
-                        };
-                    }
-
-                    if (viewModelToCopy.Publication != null)
-                    {
-                        newViewModel.Publication = new LivrePublicationVM()
-                        {
-                            Pays = viewModelToCopy.Publication.Pays,
-                            Langue = viewModelToCopy.Publication.Langue,
-                            Price = viewModelToCopy.Publication.Price,
-                            DeviceName = viewModelToCopy.Publication.DeviceName,
-                            DateParution = viewModelToCopy.Publication.DateParution,
-                            Collections = viewModelToCopy.Publication.Collections,
-                            Editeurs = viewModelToCopy.Publication.Editeurs,
-
-                        };
-                    }
-
-                    if (viewModelToCopy.Format != null)
-                    {
-                        newViewModel.Format = new LivreFormatVM()
-                        {
-                            Format = viewModelToCopy.Format.Format,
-                            NbOfPages = viewModelToCopy.Format.NbOfPages,
-                            Epaisseur = viewModelToCopy.Format.Epaisseur,
-                            Hauteur = viewModelToCopy.Format.Hauteur,
-                            Largeur = viewModelToCopy.Format.Largeur,
-                            Id = viewModelToCopy.Format.Id,
-                        };
-                    }
-
-                    if (viewModelToCopy.Description != null)
-                    {
-                        newViewModel.Description = new LivreDescriptionVM()
-                        {
-                            Resume = viewModelToCopy.Description.Resume,
-                            Notes = viewModelToCopy.Description.Notes,
-                        };
-                    }
-
-                    return newViewModel;
+                    return DeepCopy(newViewModel, viewModelToCopy);
                 }
                 catch (Exception ex)
                 {
@@ -1186,6 +1137,168 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return null;
                 }
             }
+
+            public static LivreVM DeepCopy(LivreVM viewModel, LivreVM viewModelToCopy)
+            {
+                try
+                {
+                    if (viewModel == null) return null;
+                    if (viewModelToCopy == null) return null;
+
+                    viewModel.Id = viewModelToCopy.Id;
+                    viewModel.Guid = viewModelToCopy.Guid;
+                    viewModel.DateAjout = viewModelToCopy.DateAjout;
+                    viewModel.DateEdition = viewModelToCopy.DateEdition;
+                    viewModel.MainTitle = viewModelToCopy.MainTitle;
+                    viewModel.CountOpening = viewModelToCopy.CountOpening;
+                    viewModel.JaquettePath = viewModelToCopy.JaquettePath;
+
+                    if (viewModelToCopy.TitresOeuvre != null && viewModelToCopy.TitresOeuvre.Any())
+                    {
+                        if (viewModel.TitresOeuvre == null)
+                        {
+                            viewModel.TitresOeuvre = new ObservableCollection<string>();
+                        }
+
+                        viewModel.TitresOeuvre.Clear();
+                        foreach (var titre in viewModelToCopy.TitresOeuvre)
+                        {
+                            viewModel.TitresOeuvre.Add(titre);
+                        }
+
+                        viewModel.TitresOeuvreStringList = StringHelpers.JoinStringArray(viewModel.TitresOeuvre?.Select(s => s)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    }
+
+                    if (viewModelToCopy.Auteurs != null && viewModelToCopy.Auteurs.Any())
+                    {
+                        if (viewModel.Auteurs == null)
+                        {
+                            viewModel.Auteurs = new ObservableCollection<ContactVM>();
+                        }
+
+                        viewModel.Auteurs.Clear();
+                        foreach (var contact in viewModelToCopy.Auteurs)
+                        {
+                            viewModel.Auteurs.Add(contact);
+                        }
+
+                        viewModel.AuteursStringList = StringHelpers.JoinStringArray(viewModel.Auteurs?.Select(s => $"{s.NomNaissance} {s.Prenom}")?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    }
+
+                    if (viewModelToCopy.Identification != null)
+                    {
+                        if (viewModel.Identification == null)
+                        {
+                            viewModel.Identification = new LivreIdentificationVM();
+                        }
+
+                        viewModel.Identification.Id = viewModelToCopy.Identification.Id;
+                        viewModel.Identification.ISBN = viewModelToCopy.Identification.ISBN;
+                        viewModel.Identification.ISBN10 = viewModelToCopy.Identification.ISBN10;
+                        viewModel.Identification.ISBN13 = viewModelToCopy.Identification.ISBN13;
+                        viewModel.Identification.ISSN = viewModelToCopy.Identification.ISSN;
+                        viewModel.Identification.ASIN = viewModelToCopy.Identification.ASIN;
+                        viewModel.Identification.CodeBarre = viewModelToCopy.Identification.CodeBarre;
+                        viewModel.Identification.Cotation = viewModelToCopy.Identification.Cotation;
+                    }
+
+                    if (viewModelToCopy.ClassificationAge != null)
+                    {
+                        if (viewModel.ClassificationAge == null)
+                        {
+                            viewModel.ClassificationAge = new LivreClassificationAgeVM();
+                        }
+
+                        viewModel.ClassificationAge.MinAge = viewModelToCopy.ClassificationAge.MinAge;
+                        viewModel.ClassificationAge.MaxAge = viewModelToCopy.ClassificationAge.MaxAge;
+                    }
+
+                    if (viewModelToCopy.Publication != null)
+                    {
+                        if (viewModel.Publication == null)
+                        {
+                            viewModel.Publication = new LivrePublicationVM();
+                        }
+
+                        viewModel.Publication.Pays = viewModelToCopy.Publication.Pays;
+                        viewModel.Publication.Langue = viewModelToCopy.Publication.Langue;
+                        viewModel.Publication.Price = viewModelToCopy.Publication.Price;
+                        viewModel.Publication.DeviceName = viewModelToCopy.Publication.DeviceName;
+                        viewModel.Publication.DateParution = viewModelToCopy.Publication.DateParution;
+                        viewModel.Publication.IsJourParutionKnow = viewModelToCopy.Publication.IsJourParutionKnow;
+                        viewModel.Publication.IsMoisParutionKnow = viewModelToCopy.Publication.IsMoisParutionKnow;
+                        viewModel.Publication.IsJourParutionVisible = viewModelToCopy.Publication.IsJourParutionVisible;
+                        viewModel.Publication.IsMoisParutionVisible = viewModelToCopy.Publication.IsMoisParutionVisible;
+
+                        if (viewModelToCopy.Publication.Editeurs != null && viewModelToCopy.Publication.Editeurs.Any())
+                        {
+                            if (viewModel.Publication.Editeurs == null)
+                            {
+                                viewModel.Publication.Editeurs = new ObservableCollection<ContactVM>();
+                            }
+
+                            viewModel.Publication.Editeurs.Clear();
+                            foreach (var editeur in viewModelToCopy.Publication.Editeurs)
+                            {
+                                viewModel.Publication.Editeurs.Add(editeur);
+                            }
+
+                            viewModel.Publication.EditeursStringList = StringHelpers.JoinStringArray(viewModel.Publication.Editeurs?.Select(s => s.SocietyName)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                        }
+
+                        if (viewModelToCopy.Publication.Collections != null && viewModelToCopy.Publication.Collections.Any())
+                        {
+                            if (viewModel.Publication.Collections == null)
+                            {
+                                viewModel.Publication.Collections = new ObservableCollection<CollectionVM>();
+                            }
+
+                            viewModel.Publication.Collections.Clear();
+                            foreach (var collection in viewModelToCopy.Publication.Collections)
+                            {
+                                viewModel.Publication.Collections.Add(collection);
+                            }
+
+                            viewModel.Publication.CollectionsStringList = StringHelpers.JoinStringArray(viewModel.Publication.Collections?.Select(s => s.Name)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                        }
+                    }
+
+                    if (viewModelToCopy.Format != null)
+                    {
+                        if (viewModel.Format == null)
+                        {
+                            viewModel.Format = new LivreFormatVM();
+                        }
+
+                        viewModel.Format.Format = viewModelToCopy.Format.Format;
+                        viewModel.Format.NbOfPages = viewModelToCopy.Format.NbOfPages;
+                        viewModel.Format.Epaisseur = viewModelToCopy.Format.Epaisseur;
+                        viewModel.Format.Hauteur = viewModelToCopy.Format.Hauteur;
+                        viewModel.Format.Largeur = viewModelToCopy.Format.Largeur;
+                        viewModel.Format.Id = viewModelToCopy.Format.Id;
+                    }
+
+                    if (viewModelToCopy.Description != null)
+                    {
+                        if (viewModel.Description == null)
+                        {
+                            viewModel.Description = new LivreDescriptionVM();
+                        }
+
+                        viewModel.Description.Resume = viewModelToCopy.Description.Resume;
+                        viewModel.Description.Notes = viewModelToCopy.Description.Notes;
+                    }
+
+                    return viewModel;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
             #endregion
         }
     }

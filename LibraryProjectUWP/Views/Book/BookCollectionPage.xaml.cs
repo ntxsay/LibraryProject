@@ -62,12 +62,12 @@ namespace LibraryProjectUWP.Views.Book
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadDataAsync();
+            await LoadDataAsync(true);
         }
 
         private async void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await LoadDataAsync();
+            await LoadDataAsync(false);
         }
 
         private async void Image_Loaded(object sender, RoutedEventArgs e)
@@ -88,14 +88,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async Task LoadDataAsync()
+        private async Task LoadDataAsync(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 var bookList = await DbServices.Book.AllVMAsync();
                 ViewModelPage.ViewModelList = bookList?.ToList() ?? new List<LivreVM>(); ;
-                await InitializeDataAsync();
+                await InitializeDataAsync(firstLoad);
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async Task InitializeDataAsync()
+        private async Task InitializeDataAsync(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -121,7 +121,11 @@ namespace LibraryProjectUWP.Views.Book
 
 
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
-                ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
+                if (firstLoad)
+                {
+                    ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
+                }
+
                 this.RefreshItemsGrouping();
             }
             catch (Exception ex)
@@ -1124,11 +1128,9 @@ namespace LibraryProjectUWP.Views.Book
                     var updateResult = await DbServices.Book.UpdateAsync(updatedViewModel);
                     if (updateResult.IsSuccess)
                     {
-                        sender._parameters.CurrentViewModel.MainTitle = updatedViewModel.MainTitle;
-                        //sender._parameters.CurrentViewModel = updatedViewModel;
-                        //this.RefreshItemsGrouping();
+                        sender._parameters.CurrentViewModel.Copy(updatedViewModel);
 
-                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = updateResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
