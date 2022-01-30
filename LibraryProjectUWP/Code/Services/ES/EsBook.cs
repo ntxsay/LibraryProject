@@ -15,9 +15,100 @@ namespace LibraryProjectUWP.Code.Services.ES
     internal class EsBook
     {
         internal const string BookDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+        internal const string baseBackgroundFile = "Book_Collection_Bacground_Image";
         internal const string baseJaquetteFile = "Book_Jaquette";
 
         readonly EsGeneral _EsGeneral = new EsGeneral();
+
+        public async Task<string> GetBookCollectionBackgroundImagePathAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var bookFolder = await this.GetBooksFolderAsync();
+                if (bookFolder == null)
+                {
+                    return EsGeneral.BookDefaultBackgroundImage;
+                }
+
+                foreach (var ext in Files.ImageExtensions)
+                {
+                    string fileName = $"{baseBackgroundFile}{ext}";
+                    var storageItem = await bookFolder.TryGetItemAsync(fileName);
+                    if (storageItem == null || !storageItem.IsOfType(StorageItemTypes.File))
+                    {
+                        continue;
+                    }
+
+                    return storageItem.Path;
+                }
+
+                return EsGeneral.BookDefaultBackgroundImage;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return EsGeneral.BookDefaultBackgroundImage;
+            }
+        }
+
+        public async Task<OperationStateVM> ChangeBookCollectionBackgroundImageAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var storageFile = await Files.OpenStorageFileAsync(Files.ImageExtensions);
+                if (storageFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le fichier n'a pas pas pû être récupéré par le sélecteur de fichier.",
+                    };
+                }
+
+                var bookFolder = await this.GetBooksFolderAsync();
+                if (bookFolder == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le répertoire des livres n'a pas pû être trouvé.",
+                    };
+                }
+
+                var deleteResult = await _EsGeneral.RemoveFileAsync(baseBackgroundFile, bookFolder, EsGeneral.SearchOptions.StartWith);
+                if (!deleteResult.IsSuccess)
+                {
+                    return deleteResult;
+                }
+
+                var newCopyFile = await storageFile.CopyAsync(bookFolder, baseBackgroundFile + System.IO.Path.GetExtension(storageFile.Path), NameCollisionOption.ReplaceExisting);
+                if (newCopyFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = "Le fichier n'a pû être copié dans le répertoire de l'application.",
+                    };
+                }
+
+                return new OperationStateVM()
+                {
+                    IsSuccess = true,
+                    Result = newCopyFile.Path,
+                };
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return new OperationStateVM()
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
 
         public async Task<OperationStateVM> ChangeBookItemJaquetteAsync(LivreVM viewModel)
         {

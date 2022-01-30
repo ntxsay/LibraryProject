@@ -246,7 +246,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private string _Glyph = "&#xE81E;";
+        private string _Glyph = "\uE81E";
         public string Glyph
         {
             get => _Glyph;

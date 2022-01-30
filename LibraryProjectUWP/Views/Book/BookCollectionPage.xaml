@@ -39,6 +39,10 @@
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:StringFormatConverter x:Key="StringFormatConverter"/>
         <!--Item Flyout-->
+        <XamlUICommand x:Name="ChangeBackgroundImageXUiCmd" 
+                       ExecuteRequested="ChangeBackgroundImageXUiCmd_ExecuteRequested"
+                       Description="Modifie l'image qui sert à présenter le livre">
+        </XamlUICommand>
         <XamlUICommand x:Name="ChangeJaquetteXamlUICommand" 
                        ExecuteRequested="ChangeJaquetteXamlUICommand_ExecuteRequested"
                        Description="Modifie l'image qui sert à présenter le livre" 
@@ -59,16 +63,6 @@
                        Description="Exporte le livre et son contenu dans un dossier">
         </XamlUICommand>
         <!--CommandBar-->
-        <XamlUICommand x:Name="GridViewCollectionXamlUICommand" 
-                       ExecuteRequested="GridViewCollectionXamlUICommand_ExecuteRequested"
-                       Description="Affiche la vue grille des livres" 
-                       Label="Affichage grille">
-        </XamlUICommand>
-        <XamlUICommand x:Name="DataGridViewCollectionXamlUICommand" 
-                       ExecuteRequested="DataGridViewCollectionXamlUICommand_ExecuteRequested"
-                       Description="Affiche la vue de liste des livres" 
-                       Label="Affichage liste">
-        </XamlUICommand>
         <XamlUICommand x:Name="ReloadDataXamlUICommand" 
                        ExecuteRequested="ReloadDataXamlUICommand_ExecuteRequested"
                        Description="Actualise les données depuis la base de données" 
@@ -257,8 +251,8 @@
 
         <DataTemplate x:Key="GridViewTemplate" x:DataType="booktVm:LivreVM">
             <ScrollViewer x:Name="scrollItems" HorizontalScrollMode="Disabled" Grid.Row="0">
-                <GridView x:Name="GridViewItems" ItemsSource="{Binding }" SelectionMode="Extended" IsItemClickEnabled="False" Padding="4,14" SelectionChanged="GridViewItems_SelectionChanged"
-                                  ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled" IsMultiSelectCheckBoxEnabled="True" SingleSelectionFollowsFocus="True">
+                <GridView x:Name="GridViewItems" ItemsSource="{Binding }" SelectionMode="Extended" IsItemClickEnabled="False" Padding="4,14" Loaded="GridViewItems_Loaded" Unloaded="GridViewItems_Unloaded"
+                            ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled" IsMultiSelectCheckBoxEnabled="True" SingleSelectionFollowsFocus="True">
                     <GridView.ItemContainerStyle>
                         <Style TargetType="GridViewItem" >
                             <Setter Property="Margin" Value="7" />
@@ -281,8 +275,8 @@
             </ScrollViewer>
         </DataTemplate>
         <DataTemplate x:Key="DataGridViewTemplate" x:DataType="booktVm:LivreVM">
-            <MTUUControls:DataGrid x:Name="dataGrid" ItemsSource="{Binding Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 14 0 0"
-                                                           HorizontalScrollBarVisibility="Visible" SelectionChanged="dataGrid_SelectionChanged"
+            <MTUUControls:DataGrid x:Name="DataGridItems" ItemsSource="{Binding Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 14 0 0"
+                                                           HorizontalScrollBarVisibility="Visible" Loaded="DataGridItems_Loaded" Unloaded="DataGridItems_Unloaded"
                                         VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
                                         AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
                                         AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
@@ -397,7 +391,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Image Source="ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="1"/>
+        <Image x:Name="ImageBackground" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="1" Loaded="ImageBackground_Loaded"/>
         <Grid Grid.Row="0" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -416,7 +410,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                               ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}" SelectionChanged="PivotItems_SelectionChanged">
+                               ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}" SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}">
                             <Pivot.OpacityTransition>
                                 <ScalarTransition />
                             </Pivot.OpacityTransition>
@@ -501,16 +495,12 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <Button x:Name="Btn_SelectAll" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_SelectAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8b3;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Sélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
                                 </Button>
                                 <Button x:Name="Btn_UnSelectAll" Grid.Column="1" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_UnSelectAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8e6;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Désélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
-                                </Button>
-                                <Button x:Name="Btn_OpenAll" Grid.Column="2" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_OpenAll_Click">
-                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8A7;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Ouvrir les fiches fiches sélectionnées" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
                                 </Button>
                                 <Button x:Name="Btn_DeleteAll" Grid.Column="3" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_DeleteAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74D;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Supprimer les fiches fiches sélectionnées" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
@@ -576,12 +566,12 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='DataGridView'}"  Command="{StaticResource DataGridViewCollectionXamlUICommand}">
+            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='DataGridView'}" Click="ABTBtn_DataGridViewMode_Click" Unchecked="ABTBtn_DataGridViewMode_Unchecked">
                 <AppBarToggleButton.Icon>
                     <FontIcon Glyph="&#xE8FD;"/>
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
-            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='GridView'}" Command="{StaticResource GridViewCollectionXamlUICommand}">
+            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='GridView'}" Click="ABTBtn_GridViewMode_Click" Unchecked="ABTBtn_GridViewMode_Unchecked">
                 <AppBarToggleButton.Icon>
                     <FontIcon Glyph="&#xF0E2;"/>
                 </AppBarToggleButton.Icon>
@@ -657,6 +647,12 @@
             <AppBarButton Icon="RepeatAll" LabelPosition="Collapsed" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ReloadDataXamlUICommand}"/>
             <AppBarSeparator/>
             <CommandBar.SecondaryCommands>
+                <AppBarButton Label="Modifier l'image d'arrière-plan" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ChangeBackgroundImageXUiCmd}">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xEB9F;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarSeparator/>
                 <AppBarButton Label="Exporter tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportAllBookXamlUICommand}">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xEDE1;"/>

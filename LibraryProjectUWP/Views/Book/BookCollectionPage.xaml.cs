@@ -45,21 +45,25 @@ namespace LibraryProjectUWP.Views.Book
     {
         public BookCollectionPageVM ViewModelPage { get; set; } = new BookCollectionPageVM();
         private LibraryToBookNavigationDriverVM _parameters;
+        readonly EsBook esBook = new EsBook();
+
         public BookCollectionPage()
         {
             this.InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             if (e.Parameter is LibraryToBookNavigationDriverVM parameters)
             {
                 _parameters = parameters;
                 ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
+                ViewModelPage.BackgroundImagePath = await esBook.GetBookCollectionBackgroundImagePathAsync();
             }
         }
 
+        #region Loading
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             await LoadDataAsync(true);
@@ -119,14 +123,8 @@ namespace LibraryProjectUWP.Views.Book
                     }
                 }
 
-
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
-                if (firstLoad)
-                {
-                    ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
-                }
-
-                this.RefreshItemsGrouping();
+                this.GridViewMode(firstLoad);
             }
             catch (Exception ex)
             {
@@ -134,6 +132,104 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        private void GridViewItems_Loaded(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is GridView gridView)
+                {
+                    if (this.ViewModelPage.SelectedItems.Any())
+                    {
+                        foreach (var gridViewItem in gridView.Items)
+                        {
+                            foreach (var item in this.ViewModelPage.SelectedItems)
+                            {
+                                if (gridViewItem is LivreVM _viewModel && _viewModel.Id == item.Id && !gridView.SelectedItems.Contains(item))
+                                {
+                                    gridView.SelectedItems.Add(item);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    gridView.SelectionChanged += GridViewItems_SelectionChanged;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DataGridItems_Loaded(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is DataGrid dataGrid)
+                {
+                    if (this.ViewModelPage.SelectedItems.Any())
+                    {
+                        foreach (var dataGridItem in dataGrid.ItemsSource)
+                        {
+                            foreach (var item in this.ViewModelPage.SelectedItems)
+                            {
+                                if (dataGridItem is LivreVM _viewModel && _viewModel.Id == item.Id && !dataGrid.SelectedItems.Contains(item))
+                                {
+                                    dataGrid.SelectedItems.Add(item);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    dataGrid.SelectionChanged += DataGridItems_SelectionChanged;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DataGridItems_Unloaded(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is DataGrid dataGrid)
+                {
+                    dataGrid.SelectionChanged -= DataGridItems_SelectionChanged;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void GridViewItems_Unloaded(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is GridView gridView)
+                {
+                    gridView.SelectionChanged -= GridViewItems_SelectionChanged;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
 
         #region Selection
         private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -171,7 +267,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DataGridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
@@ -190,22 +286,83 @@ namespace LibraryProjectUWP.Views.Book
 
         private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            try
+            {
+                if (sender is ListView listView && listView.SelectedItem is LivreVM viewModel)
+                {
+                    SearchViewModel(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void Btn_SelectAll_Click(object sender, RoutedEventArgs e)
         {
-
+            try
+            {
+                if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                {
+                    var gridViewItems = this.GetSelectedGridView();
+                    if (gridViewItems != null)
+                    {
+                        gridViewItems.SelectAll();
+                    }
+                }
+                else if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                {
+                    var dataGridItems = this.GetSelectedDataGridItems();
+                    if (dataGridItems != null)
+                    {
+                        foreach (var dataGridItem in dataGridItems.ItemsSource)
+                        {
+                            if (!dataGridItems.SelectedItems.Contains(dataGridItem))
+                            {
+                                dataGridItems.SelectedItems.Add(dataGridItem);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void Btn_UnSelectAll_Click(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void Btn_OpenAll_Click(object sender, RoutedEventArgs e)
-        {
-
+            try
+            {
+                if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                {
+                    var gridViewItems = this.GetSelectedGridView();
+                    if (gridViewItems != null)
+                    {
+                        gridViewItems.SelectedItems.Clear();
+                    }
+                }
+                else if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                {
+                    var dataGridItems = this.GetSelectedDataGridItems();
+                    if (dataGridItems != null)
+                    {
+                        dataGridItems.SelectedItems.Clear();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
@@ -297,27 +454,66 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Navigation
-        
-        private void GridViewCollectionXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ABTBtn_GridViewMode_Click(object sender, RoutedEventArgs e)
+        {
+            this.GridViewMode(true);
+        }
+
+        private void ABTBtn_GridViewMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is AppBarToggleButton toggleButton && toggleButton.IsChecked != true && 
+                    ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                {
+                    toggleButton.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ABTBtn_DataGridViewMode_Click(object sender, RoutedEventArgs e)
+        {
+            this.DataGridViewMode(true);
+        }
+
+        private void ABTBtn_DataGridViewMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is AppBarToggleButton toggleButton && toggleButton.IsChecked != true &&
+                    ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                {
+                    toggleButton.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void GridViewMode(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
-                this.RefreshItemsGrouping();
-                //return;
-                //if (FramePartialView.Content is BookCollectionDgViewPage BookCollectionDgViewPage)
-                //{
-                //    NavigateToView(typeof(BookCollectionGdViewPage), new BookCollectionParentChildParamsVM()
-                //    {
-                //        ParentPage = this,
-                //        ViewModelList = ViewModelPage.ViewModelList,
-                //    });
-                //}
+                this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
 
-                //this.ViewModelPage.SelectedItems = new List<LivreVM>();
-                //ViewModelPage.IsGridView = true;
-                //ViewModelPage.IsDataGridView = false;
+                if (firstLoad)
+                {
+                    ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
+                }
+                this.RefreshItemsGrouping();
+                this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
             catch (Exception ex)
             {
@@ -326,26 +522,20 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void DataGridViewCollectionXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void DataGridViewMode(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.DataGridView;
-                this.RefreshItemsGrouping();
-                //return;
-                //if (FramePartialView.Content is BookCollectionGdViewPage)
-                //{
-                //    NavigateToView(typeof(BookCollectionDgViewPage), new BookCollectionParentChildParamsVM()
-                //    {
-                //        ParentPage = this,
-                //        ViewModelList = ViewModelPage.ViewModelList,
-                //    });
-                //}
+                this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
 
-                //this.ViewModelPage.SelectedItems = new List<LivreVM>();
-                //ViewModelPage.IsGridView = false;
-                //ViewModelPage.IsDataGridView = true;
+                if (firstLoad)
+                {
+                    ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.DataGridView;
+                }
+                this.RefreshItemsGrouping();
+                this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
             catch (Exception ex)
             {
@@ -813,7 +1003,7 @@ namespace LibraryProjectUWP.Views.Book
 
                         var _container = this.PivotItems.ContainerFromItem(pivotItem);
                         DataGrid dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(_container);
-                        while (dataGrid != null && dataGrid.Name != "dataGrid")
+                        while (dataGrid != null && dataGrid.Name != "DataGridItems")
                         {
                             dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(dataGrid);
                             if (dataGrid == null)
@@ -822,7 +1012,7 @@ namespace LibraryProjectUWP.Views.Book
                             }
                             else
                             {
-                                if (dataGrid.Name == "dataGrid")
+                                if (dataGrid.Name == "DataGridItems")
                                 {
                                     break;
                                 }
@@ -921,7 +1111,6 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
-
         private void DisplayCategorieListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1013,10 +1202,11 @@ namespace LibraryProjectUWP.Views.Book
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
+                        this.CompleteBookInfos(newViewModel);
                         ViewModelPage.ViewModelList.Add(newViewModel);
                         this.RefreshItemsGrouping();
 
-                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
@@ -1291,6 +1481,31 @@ namespace LibraryProjectUWP.Views.Book
                         Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
                         return;
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void ChangeBackgroundImageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var result = await esBook.ChangeBookCollectionBackgroundImageAsync();
+                if (!result.IsSuccess)
+                {
+                    return;
+                }
+
+                ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.BookDefaultBackgroundImage;
+                if (ImageBackground != null)
+                {
+                    var bitmapImage = await Files.BitmapImageFromFileAsync(ViewModelPage.BackgroundImagePath);
+                    ImageBackground.Source = bitmapImage;
                 }
             }
             catch (Exception ex)
@@ -2042,6 +2257,42 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Functions
+        private void CompleteBookInfos(LivreVM viewModel)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModel == null)
+                {
+                    return;
+                }
+
+                if (viewModel.TitresOeuvre != null && viewModel.TitresOeuvre.Any())
+                {
+                    viewModel.TitresOeuvreStringList = StringHelpers.JoinStringArray(viewModel.TitresOeuvre?.Select(s => s)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                }
+
+                if (viewModel.Auteurs != null && viewModel.Auteurs.Any())
+                {
+                    viewModel.AuteursStringList = StringHelpers.JoinStringArray(viewModel.Auteurs?.Select(s => $"{s.NomNaissance} {s.Prenom}")?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                }
+
+                if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
+                {
+                    viewModel.Publication.EditeursStringList = StringHelpers.JoinStringArray(viewModel.Publication.Editeurs?.Select(s => s.SocietyName)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                }
+
+                if (viewModel.Publication.Collections != null && viewModel.Publication.Collections.Any())
+                {
+                    viewModel.Publication.CollectionsStringList = StringHelpers.JoinStringArray(viewModel.Publication.Collections?.Select(s => s.Name)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         private void AddItemToSideBar(PivotItem item, SideBarItemHeaderVM sideBarItem)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -2299,6 +2550,81 @@ namespace LibraryProjectUWP.Views.Book
                 return null;
             }
         }
+
+        public GridView GetSelectedGridView(string gridViewName = "GridViewItems")
+        {
+            try
+            {
+                if (this.PivotItems.SelectedItem == null)
+                {
+                    return null;
+                }
+
+                var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
+                var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
+                while (gridView != null && gridView.Name != gridViewName)
+                {
+                    gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
+                    if (gridView == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        if (gridView.Name == gridViewName)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                return gridView;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+
+        private DataGrid GetSelectedDataGridItems(string dataGridName = "DataGridItems")
+        {
+            try
+            {
+                if (this.PivotItems.SelectedItem == null)
+                {
+                    return null;
+                }
+
+                var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
+                DataGrid dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(_container);
+                while (dataGrid != null && dataGrid.Name != dataGridName)
+                {
+                    dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(dataGrid);
+                    if (dataGrid == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        if (dataGrid.Name == dataGridName)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                return dataGrid;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
         #endregion
 
 
@@ -2310,6 +2636,24 @@ namespace LibraryProjectUWP.Views.Book
         private void Image_Loaded_1(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private async void ImageBackground_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Image imageCtrl)
+                {
+                    var bitmapImage = await Files.BitmapImageFromFileAsync(ViewModelPage.BackgroundImagePath);
+                    imageCtrl.Source = bitmapImage;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
     }
 
@@ -2525,6 +2869,20 @@ namespace LibraryProjectUWP.Views.Book
                 if (_ParentLibrary != value)
                 {
                     this._ParentLibrary = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _BackgroundImagePath = EsGeneral.BookDefaultBackgroundImage;
+        public string BackgroundImagePath
+        {
+            get => this._BackgroundImagePath;
+            set
+            {
+                if (this._BackgroundImagePath != value)
+                {
+                    this._BackgroundImagePath = value;
                     this.OnPropertyChanged();
                 }
             }

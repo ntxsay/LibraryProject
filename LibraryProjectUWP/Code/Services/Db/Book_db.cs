@@ -35,7 +35,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     LibraryDbContext context = new LibraryDbContext();
 
-                    var collection = await context.Tbook.ToListAsync();
+                    List<Tbook> collection = await context.Tbook.ToListAsync();
+                    foreach (Tbook book in collection)
+                    {
+                        await CompleteModelInfos(context, book);
+                    }
                     if (collection == null || !collection.Any()) return Enumerable.Empty<Tbook>().ToList();
 
                     return collection;
@@ -119,6 +123,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             Tbook model = await context.Tbook.SingleOrDefaultAsync(w => w.Id == driver.IdBook);
                             if (model != null)
                             {
+                                await CompleteModelInfos(context, model);
                                 collection.Add(model);
                             }
                         }
@@ -222,6 +227,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     LibraryDbContext context = new LibraryDbContext();
 
                     var s = await context.Tbook.SingleOrDefaultAsync(d => d.Id == id);
+                    await CompleteModelInfos(context, s);
                     if (s == null) return null;
 
                     return s;
@@ -872,6 +878,26 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
+            private static async Task CompleteModelInfos(LibraryDbContext context,Tbook model)
+            {
+                try
+                {
+                    if (context == null || model == null)
+                    {
+                        return;
+                    }
+
+                    model.TbookFormat = await context.TbookFormat.SingleOrDefaultAsync(s => s.Id == model.Id);
+                    model.TbookIdentification = await context.TbookIdentification.SingleOrDefaultAsync(s => s.Id == model.Id);
+                    
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return;
+                }
+            }
             private static async Task<bool> IsBookExistAsync(LivreVM viewModel, bool isEdit = false, long? modelId = null)
             {
                 try
@@ -1045,6 +1071,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             Hauteur = model.TbookFormat.Hauteur ?? 0,
                             Epaisseur = model.TbookFormat?.Epaisseur ?? 0,
                             Largeur = model.TbookFormat?.Largeur ?? 0,
+                            //Poids = Ajouter dans la base de donnée ?
                         };
                     }
 

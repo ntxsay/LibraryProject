@@ -15,6 +15,8 @@ namespace LibraryProjectUWP.Code.Services.ES
 {
     internal partial class EsGeneral
     {
+        internal const string LibraryDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+        internal const string BookDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
         public enum SearchOptions
         {
             StartWith,
