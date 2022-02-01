@@ -219,18 +219,22 @@
     <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
     <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
+    <Compile Include="Views\AboutCd.xaml.cs">
+      <DependentUpon>AboutCd.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\NewEditBookExemplaryUC.xaml.cs">
       <DependentUpon>NewEditBookExemplaryUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\BookCollectionPage.xaml.cs">
       <DependentUpon>BookCollectionPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\BookCategorieUC.xaml.cs">
-      <DependentUpon>BookCategorieUC.xaml</DependentUpon>
+    <Compile Include="Views\Categories\CategoriesListUC.xaml.cs">
+      <DependentUpon>CategoriesListUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\NewEditBookUC.xaml.cs">
       <DependentUpon>NewEditBookUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Categories\Class1.cs" />
     <Compile Include="Views\Collection\CollectionListUC.xaml.cs">
       <DependentUpon>CollectionListUC.xaml</DependentUpon>
     </Compile>
@@ -306,6 +310,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\AboutCd.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Book\NewEditBookExemplaryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -314,7 +322,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Book\BookCategorieUC.xaml">
+    <Page Include="Views\Categories\CategoriesListUC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -46,7 +46,7 @@
                         <FontIcon Glyph="&#xE713;"/>
                     </MUIXC:NavigationViewItem.Icon>
                 </MUIXC:NavigationViewItem>
-                <MUIXC:NavigationViewItem Content="À Propos" Tag="About">
+                <MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.AboutMenuItem.Text}" Tag="{x:Bind ViewModelPage.AboutMenuItem.Tag}">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE946;"/>
                     </MUIXC:NavigationViewItem.Icon>

@@ -170,6 +170,10 @@ namespace LibraryProjectUWP
                 {
                     await AddElementNavigationAsync();
                 }
+                else if (itemTag == ViewModelPage.AboutMenuItem.Tag)
+                {
+                    await AboutDialogNavigationAsync();
+                }
                 else if (itemTag == ViewModelPage.LibraryCollectionMenuItem.Tag)
                 {
                     LibraryCollectionNavigationAsync();
@@ -251,6 +255,22 @@ namespace LibraryProjectUWP
         }
         #endregion
         #region Navigation-Method
+        private async Task AboutDialogNavigationAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var dialog = new AboutCd();
+
+                var result = await dialog.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         private async Task AddElementNavigationAsync()
         {
@@ -392,6 +412,12 @@ namespace LibraryProjectUWP
         {
 
         }
+
+        public ItemTagContentVM AboutMenuItem => new ItemTagContentVM()
+        {
+            Text = "À propos de ...",
+            Tag = "About"
+        };
 
         public ItemTagContentVM NewElementMenuItem => new ItemTagContentVM()
         {

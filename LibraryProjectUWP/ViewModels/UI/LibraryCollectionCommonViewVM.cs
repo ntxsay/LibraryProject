@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Categories;
 using LibraryProjectUWP.Views.Library;
 using LibraryProjectUWP.Views.Library.Collection;
 using LibraryProjectUWP.Views.Library.Manage;
@@ -366,16 +367,16 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
                 userControl.CreateItemRequested += NewEditCategoryUC_CreateItemRequested;
 
-                if (_libraryCollectionDataGridViewPage != null)
-                {
-                    _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_libraryCollectionGridViewPage != null)
-                {
-                    _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                //if (_libraryCollectionDataGridViewPage != null)
+                //{
+                //    _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                //    _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                //}
+                //else if (_libraryCollectionGridViewPage != null)
+                //{
+                //    _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                //    _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                //}
             }
             catch (Exception ex)
             {
@@ -400,16 +401,16 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
                 userControl.UpdateItemRequested += NewEditCategoryUC_UpdateItemRequested;
 
-                if (_libraryCollectionDataGridViewPage != null)
-                {
-                    _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_libraryCollectionGridViewPage != null)
-                {
-                    _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                //if (_libraryCollectionDataGridViewPage != null)
+                //{
+                //    _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                //    _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                //}
+                //else if (_libraryCollectionGridViewPage != null)
+                //{
+                //    _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                //    _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                //}
             }
             catch (Exception ex)
             {
@@ -445,7 +446,7 @@ namespace LibraryProjectUWP.ViewModels.UI
                     else
                     {
                         //Erreur
-                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
+                        //sender.ViewModelPage.ErrorMessage = creationResult.Message;
                         return;
                     }
                 }
@@ -497,7 +498,7 @@ namespace LibraryProjectUWP.ViewModels.UI
                     else
                     {
                         //Erreur
-                        sender.ViewModelPage.ErrorMessage = updateResult.Message;
+                        //sender.ViewModelPage.ErrorMessage = updateResult.Message;
                         return;
                     }
                 }
@@ -565,16 +566,16 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
                 userControl.CreateItemRequested += NewEditSubCategoryUC_CreateItemRequested;
 
-                if (_libraryCollectionDataGridViewPage != null)
-                {
-                    _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_libraryCollectionGridViewPage != null)
-                {
-                    _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                //if (_libraryCollectionDataGridViewPage != null)
+                //{
+                //    _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                //    _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                //}
+                //else if (_libraryCollectionGridViewPage != null)
+                //{
+                //    _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                //    _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                //}
             }
             catch (Exception ex)
             {
@@ -599,16 +600,16 @@ namespace LibraryProjectUWP.ViewModels.UI
                 userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
                 userControl.UpdateItemRequested += NewEditSubCategoryUC_UpdateItemRequested;
 
-                if (_libraryCollectionDataGridViewPage != null)
-                {
-                    _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_libraryCollectionGridViewPage != null)
-                {
-                    _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
+                //if (_libraryCollectionDataGridViewPage != null)
+                //{
+                //    _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                //    _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                //}
+                //else if (_libraryCollectionGridViewPage != null)
+                //{
+                //    _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
+                //    _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                //}
             }
             catch (Exception ex)
             {
@@ -643,7 +644,7 @@ namespace LibraryProjectUWP.ViewModels.UI
                     else
                     {
                         //Erreur
-                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
+                        //sender.ViewModelPage.ErrorMessage = creationResult.Message;
                         return;
                     }
                 }
@@ -694,7 +695,7 @@ namespace LibraryProjectUWP.ViewModels.UI
                     else
                     {
                         //Erreur
-                        sender.ViewModelPage.ErrorMessage = updateResult.Message;
+                        //sender.ViewModelPage.ErrorMessage = updateResult.Message;
                         return;
                     }
                 }

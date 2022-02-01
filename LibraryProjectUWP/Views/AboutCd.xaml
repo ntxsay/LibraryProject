@@ -1,0 +1,48 @@
+﻿<ContentDialog
+    x:Class="LibraryProjectUWP.Views.AboutCd"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="TITLE"
+    PrimaryButtonText="Fermer"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
+    <ContentDialog.TitleTemplate>
+        <DataTemplate>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE946;" FontSize="16"/>
+                <TextBlock FontWeight="SemiBold" FontSize="16">
+                    <Run Text="À propos de ..." />
+                </TextBlock>
+            </StackPanel>
+        </DataTemplate>
+    </ContentDialog.TitleTemplate>
+    <ContentDialog.CornerRadius>
+        <CornerRadius>8</CornerRadius>
+    </ContentDialog.CornerRadius>
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <TextBlock >
+                    <Run Text="Rostalothèque Preview 1.1.0 build 35478" FontWeight="SemiBold" FontSize="15"/>
+                <LineBreak />
+                    <Run Text="2021 - project Library - by ntxsay" FontSize="14"/>
+            </TextBlock>
+            <Rectangle Fill="DimGray" Height="1" Margin="0 10"/>
+            <Border Background="White" CornerRadius="2" BorderThickness="1" BorderBrush="DimGray">
+                <RichTextBlock FontSize="14" Padding="5">
+                    <Paragraph>
+                        Ce projet vous permet de créer des bibliothèques et d'y créer des livres.
+                        <LineBreak /> Deux modes d’affichages sont possibles, le mode d’affichage grille qui vous permet d’afficher les bibliothèques et les livres sous forme de miniature et le mode d’affichage liste qui vous permet d’afficher immédiatement plus de détails concernant la bibliothèque ou ses livres.
+                    </Paragraph>
+                </RichTextBlock>
+            </Border>
+            <TextBlock TextWrapping="Wrap" Margin="0 10 0 0" FontSize="14">
+                <Run Text="Attention : Ce projet peut contenir des erreurs de français, de frappe, de programmation. C'est une version d'aperçu, elle n'est pas tout à fait stable." />
+                <!--<LineBreak />
+                <Run Text="Je suis encore hélas un débutant dans mon art, alors ne me jugez pas trop sévèrement ;-)" />-->
+            </TextBlock>
+        </StackPanel>
+    </Grid>
+</ContentDialog>

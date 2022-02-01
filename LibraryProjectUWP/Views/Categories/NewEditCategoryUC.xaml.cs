@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.General;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,13 +25,14 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour en savoir plus sur le modèle d'élément Contrôle utilisateur, consultez la page https://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace LibraryProjectUWP.Views.Library.Manage
+namespace LibraryProjectUWP.Views.Categories
 {
-    public sealed partial class NewEditCategoryUC : UserControl
+    public sealed partial class NewEditCategoryUC : PivotItem
     {
         public readonly ManageCategorieDialogParametersVM _categorieParameters;
         public readonly ManageSubCategorieDialogParametersVM _subCategorieParameters;
-        
+        public readonly Guid IdItem = Guid.NewGuid();
+
         public NewEditCategoryUCVM ViewModelPage { get; set; } = new NewEditCategoryUCVM();
 
         public delegate void CancelModificationEventHandler(NewEditCategoryUC sender, ExecuteRequestedEventArgs e);
@@ -213,13 +215,19 @@ namespace LibraryProjectUWP.Views.Library.Manage
             {
                 if (ViewModelPage.Value.IsStringNullOrEmptyOrWhiteSpace())
                 {
-                    ViewModelPage.ErrorMessage = $"Le nom de la {(_subCategorieParameters != null ? "sous-catégorie" : "catégorie")} ne peut pas être vide ou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Le nom de la {(_subCategorieParameters != null ? "sous-catégorie" : "catégorie")} ne peut pas être vide ou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
                     return false;
                 }
 
                 if (_subCategorieParameters != null && !_subCategorieParameters.Categorie.Name.IsStringNullOrEmptyOrWhiteSpace() && _subCategorieParameters.Categorie.Name.ToLower() == ViewModelPage.Value.Trim().ToLower())
                 {
-                    ViewModelPage.ErrorMessage = $"Le nom de la sous-catégorie ne peut pas avoir le même nom que son parent.";
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Le nom de la sous-catégorie ne peut pas avoir le même nom que son parent.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true; 
                     return false;
                 }
 
@@ -227,7 +235,10 @@ namespace LibraryProjectUWP.Views.Library.Manage
                 {
                     if (_categorieParameters.ParentLibrary.Categories != null && _categorieParameters.ParentLibrary.Categories.Any(a => a.Name.ToLower() == ViewModelPage.Value.Trim().ToLower()))
                     {
-                        ViewModelPage.ErrorMessage = $"Cette catégorie existe déjà.";
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"Cette catégorie existe déjà.";
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
                         return false;
                     }
                 }
@@ -235,12 +246,15 @@ namespace LibraryProjectUWP.Views.Library.Manage
                 {
                     if (_subCategorieParameters.Categorie.SubCategorieLivres != null && _subCategorieParameters.Categorie.SubCategorieLivres.Any(a => a.Name.ToLower() == ViewModelPage.Value.Trim().ToLower()))
                     {
-                        ViewModelPage.ErrorMessage = $"Cette sous-catégorie existe déjà.";
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"Cette sous-catégorie existe déjà.";
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
                         return false;
                     }
                 }
 
-                ViewModelPage.ErrorMessage = string.Empty;
+                ViewModelPage.IsResultMessageOpen = false;
                 return true;
             }
             catch (Exception ex)
@@ -287,6 +301,7 @@ namespace LibraryProjectUWP.Views.Library.Manage
     public class NewEditCategoryUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public Guid? Guid { get; set; }
 
         private string _Header;
         public string Header
@@ -302,15 +317,71 @@ namespace LibraryProjectUWP.Views.Library.Manage
             }
         }
 
-        private string _ErrorMessage;
-        public string ErrorMessage
+        private string _Glyph = "\uE81E";
+        public string Glyph
         {
-            get => this._ErrorMessage;
+            get => _Glyph;
             set
             {
-                if (this._ErrorMessage != value)
+                if (_Glyph != value)
                 {
-                    this._ErrorMessage = value;
+                    _Glyph = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ResultMessage;
+        public string ResultMessage
+        {
+            get => this._ResultMessage;
+            set
+            {
+                if (this._ResultMessage != value)
+                {
+                    this._ResultMessage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private InfoBarSeverity _ResultMessageSeverity = InfoBarSeverity.Informational;
+        public InfoBarSeverity ResultMessageSeverity
+        {
+            get => this._ResultMessageSeverity;
+            set
+            {
+                if (this._ResultMessageSeverity != value)
+                {
+                    this._ResultMessageSeverity = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsResultMessageOpen;
+        public bool IsResultMessageOpen
+        {
+            get => this._IsResultMessageOpen;
+            set
+            {
+                if (this._IsResultMessageOpen != value)
+                {
+                    this._IsResultMessageOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ResultMessageTitle;
+        public string ResultMessageTitle
+        {
+            get => this._ResultMessageTitle;
+            set
+            {
+                if (this._ResultMessageTitle != value)
+                {
+                    this._ResultMessageTitle = value;
                     this.OnPropertyChanged();
                 }
             }
