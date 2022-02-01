@@ -119,49 +119,14 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-        private async void AddNewSubCategorieXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void AddNewSubCategorieXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (ViewModelPage.ParentLibrary != null && TreeCategorie.SelectedItem != null && TreeCategorie.SelectedItem is CategorieLivreVM categorieParent)
                 {
-
-                    //var dialog = new NewCategorieCD(new ManageSubCategorieDialogParametersVM()
-                    //{
-                    //    EditMode = Code.EditMode.Create,
-                    //    ViewModelList = categorieParent.SubCategorieLivres,
-                    //    Categorie = categorieParent,
-                    //});
-
-                    //var result = await dialog.ShowAsync();
-                    //if (result == ContentDialogResult.Primary)
-                    //{
-                    //    var value = dialog.Value?.Trim();
-                    //    var description = dialog.Description?.Trim();
-
-                    //    var newViewModel = new SubCategorieLivreVM()
-                    //    {
-                    //        IdCategorie = categorieParent.Id,
-                    //        Name = value,
-                    //        Description = description,
-                    //    };
-
-                    //    var creationResult = await DbServices.SubCategorie.CreateAsync(newViewModel);
-                    //    if (creationResult.IsSuccess)
-                    //    {
-                    //        newViewModel.Id = creationResult.Id;
-                    //        categorieParent.SubCategorieLivres.Add(newViewModel);
-                    //    }
-                    //    else
-                    //    {
-                    //        //Erreur
-                    //    }
-                    //}
-                    //else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                    //{
-                    //    return;
-                    //}
+                    _parameters.ParentPage.AddNewSubCategory(categorieParent, ViewModelPage.Guid);
                 }
                 else
                 {
@@ -191,50 +156,12 @@ namespace LibraryProjectUWP.Views.Categories
                     }
                     else if (TreeCategorie.SelectedItem is SubCategorieLivreVM _viewModelSubCategorie && _viewModelSubCategorie == ViewModelPage.SelectedCategorie)
                     {
-                        //CategorieLivreVM viewModelParentCategorie = GetParentCategorie();
-                        //if (viewModelParentCategorie == null)
-                        //{
-                        //    return;
-                        //}
-
-                        //var dialog = new NewCategorieCD(new ManageSubCategorieDialogParametersVM()
-                        //{
-                        //    Value = _viewModelSubCategorie.Name,
-                        //    Description = _viewModelSubCategorie.Description,
-                        //    EditMode = Code.EditMode.Edit,
-                        //    ViewModelList = viewModelParentCategorie?.SubCategorieLivres,
-                        //    Categorie = viewModelParentCategorie,
-                        //});
-
-                        //var result = await dialog.ShowAsync();
-                        //if (result == ContentDialogResult.Primary)
-                        //{
-                        //    var newValue = dialog.Value?.Trim();
-                        //    var newDescription = dialog.Description?.Trim();
-
-                        //    var updatedViewModel = new SubCategorieLivreVM()
-                        //    {
-                        //        Id = _viewModelSubCategorie.Id,
-                        //        IdCategorie = viewModelParentCategorie.Id,
-                        //        Name = newValue,
-                        //        Description = newDescription,
-                        //    };
-
-                        //    var updateResult = await DbServices.SubCategorie.UpdateAsync(updatedViewModel);
-                        //    if (updateResult.IsSuccess)
-                        //    {
-                        //        _viewModelSubCategorie.Name = newValue;
-                        //        _viewModelSubCategorie.Description = newDescription;
-                        //    }
-                        //    else
-                        //    {
-                        //        //Erreur
-                        //    }
-                        //}
-                        //else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                        //{
-                        //    return;
-                        //}
+                        CategorieLivreVM viewModelParentCategorie = GetParentCategorie();
+                        if (viewModelParentCategorie == null)
+                        {
+                            return;
+                        }
+                        _parameters.ParentPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
                     }
                 }
                 else
@@ -252,6 +179,46 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
+        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.ParentLibrary != null && TreeCategorie.SelectedItem != null)
+                {
+                    DependencyObject treeItem = TreeCategorie.ContainerFromItem(TreeCategorie.SelectedItem);
+                    if (treeItem is Microsoft.UI.Xaml.Controls.TreeViewItem treeViewItem)
+                    {
+                        if (TreeCategorie.SelectedItem is CategorieLivreVM _viewModelCategorie && _viewModelCategorie == ViewModelPage.SelectedCategorie)
+                        {
+                            TtipDeleteSCategorie.Target = treeViewItem;
+                            TtipDeleteSCategorie.Title = "Supprimer une catégorie";
+                            TtipDeleteSCategorie.Subtitle = $"Êtes-vous sûr de vouloir supprimer la catégorie \"{_viewModelCategorie.Name}\" ?\nVeuillez noter que cette action entraînera la suppression des sous-catégories ainsi que la décatégorisation des livres concernés par cette catégorie.";
+                            TtipDeleteSCategorie.IsOpen = true;
+                        }
+                        else if (TreeCategorie.SelectedItem is SubCategorieLivreVM _viewModelSubCategorie && _viewModelSubCategorie == ViewModelPage.SelectedCategorie)
+                        {
+                            TtipDeleteSCategorie.Target = treeViewItem;
+                            TtipDeleteSCategorie.Title = "Supprimer une sous-catégorie";
+                            TtipDeleteSCategorie.Subtitle = $"Êtes-vous sûr de vouloir supprimer la sous-catégorie \"{_viewModelSubCategorie.Name}\" ?\nVeuillez noter que cette action entraînera la décatégorisation des livres concernés par la suppression de cette sous-catégorie.";
+                            TtipDeleteSCategorie.IsOpen = true;
+                        }
+                    }
+                }
+                else
+                {
+                    MyTeachingTip.Target = ABBRenameCategorie;
+                    MyTeachingTip.Title = "Renommer";
+                    MyTeachingTip.Subtitle = "Pour renommer une catégorie ou une sous-catégorie, cliquez d'abord sur la catégorie ou la sous-catégorie que vous souhaitez renommer dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.";
+                    MyTeachingTip.IsOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         #endregion
 
         private async void ExportTreeToJsonXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -397,10 +364,7 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
-        }
+        
 
         private void MenuFlyout_Opened(object sender, object e)
         {

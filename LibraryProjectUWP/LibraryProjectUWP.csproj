@@ -234,7 +234,6 @@
     <Compile Include="Views\Book\NewEditBookUC.xaml.cs">
       <DependentUpon>NewEditBookUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Categories\Class1.cs" />
     <Compile Include="Views\Collection\CollectionListUC.xaml.cs">
       <DependentUpon>CollectionListUC.xaml</DependentUpon>
     </Compile>
@@ -425,9 +424,7 @@
     </None>
     <None Include="LibraryProjectUWP_TemporaryKey.pfx" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\Author\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

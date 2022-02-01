@@ -68,7 +68,7 @@
             </XamlUICommand>
             <XamlUICommand x:Name="DeleteItemXUiCommand" 
                        ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
-                       Description="Supprime l'item">
+                       Description="Supprime la catégorie ou la sous-catégorie sélectionnée">
             </XamlUICommand>
             <Style TargetType="Grid" x:Key="WrapGridChildStyle">
                 <Setter Property="Margin" Value="4 0" />
@@ -92,12 +92,31 @@
                         </Grid>
                         <Rectangle Grid.Row="1" Fill="Black" Height="1" HorizontalAlignment="Stretch"/>
                     </Grid>
+                    <MUIXC:TreeViewItem.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Editer la catégorie" Icon="Edit"/>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Ajouter une sous-catégorie" Icon="Add"/>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Supprimer la catégorie" Icon="Delete"/>
+
+                        </MenuFlyout>
+                    </MUIXC:TreeViewItem.ContextFlyout>
                 </MUIXC:TreeViewItem>
             </DataTemplate>
-
             <DataTemplate x:Key="SubCategorieTemplate" x:DataType="viewModels:SubCategorieLivreVM">
                 <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
-                    <TextBlock Margin="12 0 0 0" Text="{x:Bind Name, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE81E;"/>
+                        <TextBlock Margin="12 0 0 0" Text="{x:Bind Name, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}"/>
+                    </StackPanel>
+                    <MUIXC:TreeViewItem.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Editer {x}" Icon="Edit"/>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Supprimer " Icon="Delete"/>
+                        </MenuFlyout>
+                    </MUIXC:TreeViewItem.ContextFlyout>
                 </MUIXC:TreeViewItem>
             </DataTemplate>
             <dTemplateSelectors:CategoriesDataTemplateSelector x:Key="categorieTemplateSelector"
@@ -144,7 +163,7 @@
             </AppBarButton>
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBRenameCategorie" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource RenameSCategorieXamlUICommand}" CommandParameter="{x:Bind ViewModelPage.SelectedCategorie}"/>
-            <AppBarButton Icon="Delete" Label="Supprimer" ToolTipService.ToolTip="Supprimer la ressource" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
+            <AppBarButton Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DeleteItemXUiCommand}"/>
             <CommandBar.SecondaryCommands>
                 <AppBarButton Label="Exporter au format JSON" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportTreeToJsonXamlUICommand}">
                     <AppBarButton.Icon>
@@ -155,7 +174,7 @@
         </CommandBar>
 
         <MUIXC:TreeView x:Name="TreeCategorie" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.ParentLibrary.Categories, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedCategorie, Mode=TwoWay}"
-                                                    ItemTemplateSelector="{StaticResource categorieTemplateSelector}">
+                                                    ItemTemplateSelector="{StaticResource categorieTemplateSelector}" SelectionMode="Single">
         </MUIXC:TreeView>
         <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
         <Grid Grid.Row="4">
@@ -178,6 +197,18 @@
                                     PreferredPlacement="Bottom">
             <MUIXC:TeachingTip.HeroContent>
                 <Image Source="ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg" AutomationProperties.Name="Sunset" />
+            </MUIXC:TeachingTip.HeroContent>
+            <!--<MUIXC:TeachingTip.Content>
+                                        <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">To change your desktop theme visit the <Hyperlink NavigateUri="ms-settings:colors">Settings app</Hyperlink>.</TextBlock>
+                                    </MUIXC:TeachingTip.Content>-->
+        </MUIXC:TeachingTip>
+        <MUIXC:TeachingTip x:Name="TtipDeleteSCategorie"
+                                    PreferredPlacement="Bottom">
+            <MUIXC:TeachingTip.HeroContent>
+                <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center" Margin="0 10">
+                    <Button Content="Annuler"></Button>
+                    <Button Content="Supprimer"></Button>
+                </StackPanel>
             </MUIXC:TeachingTip.HeroContent>
             <!--<MUIXC:TeachingTip.Content>
                                         <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">To change your desktop theme visit the <Hyperlink NavigateUri="ms-settings:colors">Settings app</Hyperlink>.</TextBlock>
