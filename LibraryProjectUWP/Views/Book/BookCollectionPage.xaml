@@ -18,11 +18,6 @@
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls" Margin="0 38 0 0" Loaded="Page_Loaded">
     <Page.Resources>
-        <!--<customConverters:SlideValueConverter x:Key="slideValueConverter" />
-        <customConverters:NullableIntToDoubleConverter x:Key="NullIntToDoubleConverter" />
-        <customConverters:TimeSpanToStringDisplay x:Key="TimeSpanToStringDisplayConverter" />
-        <customConverters:StringTimeToStringDisplay x:Key="StringTimeToStringDisplayConverter"/>
-        <customConverters:ListTypeToString x:Key="ListTypeToStringConverter" />-->
         <customConverters:ContactListTostringConverter x:Key="contactListTostringConverter" />
         <customConverters:CountToVisibilityConverter x:Key="countToVisibilityConverter" />
         <customConverters:ObjectToBooleanConverter x:Key="objectToBooleanConverter" />

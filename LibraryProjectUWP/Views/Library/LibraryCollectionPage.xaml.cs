@@ -3,10 +3,14 @@ using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Categorie;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Library;
+using LibraryProjectUWP.Views.Categories;
 using LibraryProjectUWP.Views.Library.Collection;
 using LibraryProjectUWP.Views.Library.Manage;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,6 +42,7 @@ namespace LibraryProjectUWP.Views.Library
     public sealed partial class LibraryCollectionPage : Page
     {
         public LibraryCollectionPageVM ViewModelPage { get; set; } = new LibraryCollectionPageVM();
+        EsLibrary esLibrary = new EsLibrary();
         public LibraryCollectionPage()
         {
             this.InitializeComponent();
@@ -48,14 +53,15 @@ namespace LibraryProjectUWP.Views.Library
             base.OnNavigatedTo(e);
         }
 
+        #region Loading
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadDataAsync();
+            await LoadDataAsync(true);
         }
 
         private async void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await LoadDataAsync();
+            await LoadDataAsync(false);
         }
 
         private async void Image_Loaded(object sender, RoutedEventArgs e)
@@ -76,14 +82,14 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private async Task LoadDataAsync()
+        private async Task LoadDataAsync(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var libraryList = await DbServices.Library.AllVMAsync();
-                ViewModelPage.ViewModelList = libraryList?.ToList();
-                await InitializeDataAsync();
+                var itemList = await DbServices.Library.AllVMAsync();
+                ViewModelPage.ViewModelList = itemList?.ToList() ?? new List<BibliothequeVM>(); ;
+                await InitializeDataAsync(firstLoad);
             }
             catch (Exception ex)
             {
@@ -92,25 +98,22 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private async Task InitializeDataAsync()
+        private async Task InitializeDataAsync(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (ViewModelPage.ViewModelList != null && ViewModelPage.ViewModelList.Any())
                 {
-                    EsLibrary esLibrary = new EsLibrary();
-                    foreach (var library in ViewModelPage.ViewModelList)
+                    foreach (var item in ViewModelPage.ViewModelList)
                     {
-                        string combinedPath = await esLibrary.GetLibraryItemJaquettePathAsync(library);
-                        library.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                        string combinedPath = await esLibrary.GetLibraryItemJaquettePathAsync(item);
+                        item.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : EsGeneral.LibraryDefaultJaquette;
                     }
                 }
 
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
-                NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() { ParentPage = this, ViewModelList = ViewModelPage.ViewModelList, });
-                ViewModelPage.IsGridView = true;
-                ViewModelPage.IsDataGridView = false;
+                this.GridViewMode(firstLoad);
             }
             catch (Exception ex)
             {
@@ -119,38 +122,29 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        #region Navigation
-        public void NavigateToView(Type page, object parameters)
+        private void GridViewItems_Loaded(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                _ = FramePartialView.Navigate(page, parameters, new EntranceNavigationTransitionInfo());
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void GridViewCollectionXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                if (sender is GridView gridView)
                 {
-                    NavigateToView(typeof(LibraryCollectionGridViewPage), new LibraryCollectionParentChildParamsVM() 
-                    { 
-                        ParentPage = this, 
-                        ViewModelList = ViewModelPage.ViewModelList, 
-                    });
+                    if (this.ViewModelPage.SelectedItems.Any())
+                    {
+                        foreach (var gridViewItem in gridView.Items)
+                        {
+                            foreach (var item in this.ViewModelPage.SelectedItems)
+                            {
+                                if (gridViewItem is BibliothequeVM _viewModel && _viewModel.Id == item.Id && !gridView.SelectedItems.Contains(item))
+                                {
+                                    gridView.SelectedItems.Add(item);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    gridView.SelectionChanged += GridViewItems_SelectionChanged;
                 }
-
-                this.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
-                ViewModelPage.IsGridView = true;
-                ViewModelPage.IsDataGridView = false;
             }
             catch (Exception ex)
             {
@@ -159,23 +153,64 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private void DataGridViewCollectionXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void DataGridItems_Loaded(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage)
+                if (sender is DataGrid dataGrid)
                 {
-                    NavigateToView(typeof(LibraryCollectionDataGridViewPage), new LibraryCollectionParentChildParamsVM() 
-                    { 
-                        ParentPage = this, 
-                        ViewModelList = ViewModelPage.ViewModelList, 
-                    });
-                }
+                    if (this.ViewModelPage.SelectedItems.Any())
+                    {
+                        foreach (var dataGridItem in dataGrid.ItemsSource)
+                        {
+                            foreach (var item in this.ViewModelPage.SelectedItems)
+                            {
+                                if (dataGridItem is BibliothequeVM _viewModel && _viewModel.Id == item.Id && !dataGrid.SelectedItems.Contains(item))
+                                {
+                                    dataGrid.SelectedItems.Add(item);
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
-                this.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
-                ViewModelPage.IsGridView = false;
-                ViewModelPage.IsDataGridView = true;
+                    dataGrid.SelectionChanged += DataGridItems_SelectionChanged;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DataGridItems_Unloaded(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is DataGrid dataGrid)
+                {
+                    dataGrid.SelectionChanged -= DataGridItems_SelectionChanged;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void GridViewItems_Unloaded(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is GridView gridView)
+                {
+                    gridView.SelectionChanged -= GridViewItems_SelectionChanged;
+                }
             }
             catch (Exception ex)
             {
@@ -185,19 +220,151 @@ namespace LibraryProjectUWP.Views.Library
         }
         #endregion
 
-        #region Sort - Group - Order
-        private void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        #region Navigation
+        private void ABTBtn_GridViewMode_Click(object sender, RoutedEventArgs e)
+        {
+            this.GridViewMode(true);
+        }
+
+        private void ABTBtn_GridViewMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is AppBarToggleButton toggleButton && toggleButton.IsChecked != true &&
+                    ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                {
+                    toggleButton.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ABTBtn_DataGridViewMode_Click(object sender, RoutedEventArgs e)
+        {
+            this.DataGridViewMode(true);
+        }
+
+        private void ABTBtn_DataGridViewMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is AppBarToggleButton toggleButton && toggleButton.IsChecked != true &&
+                    ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                {
+                    toggleButton.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void GridViewMode(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
+
+                if (firstLoad)
                 {
-                    libraryCollectionGridViewPage.GroupItemsByAlphabetic();
+                    ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                this.RefreshItemsGrouping();
+                this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DataGridViewMode(bool firstLoad)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
+
+                if (firstLoad)
                 {
-                    libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
+                    ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.DataGridView;
+                }
+                this.RefreshItemsGrouping();
+                this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+        #region SideBar
+        private void CmbxSideBarItemTitle_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is ComboBox cmbx && cmbx.SelectedItem is SideBarItemHeaderVM headerVM)
+                {
+                    //foreach (var item in this.PivotRightSideBar.Items)
+                    //{
+                    //    if (item is NewEditBookExemplaryUC bookExemplaryUC)
+                    //    {
+                    //        if (bookExemplaryUC.IdItem == headerVM.IdItem)
+                    //        {
+                    //            this.PivotRightSideBar.SelectedItem = item;
+                    //        }
+                    //    }
+                    //    else if (item is NewEditBookUC newEditBookUC)
+                    //    {
+                    //        if (newEditBookUC.IdItem == headerVM.IdItem)
+                    //        {
+                    //            this.PivotRightSideBar.SelectedItem = item;
+                    //        }
+                    //    }
+                    //    else if (item is NewEditCollectionUC newEditCollectionUC)
+                    //    {
+                    //        if (newEditCollectionUC.IdItem == headerVM.IdItem)
+                    //        {
+                    //            this.PivotRightSideBar.SelectedItem = item;
+                    //        }
+                    //    }
+                    //    else if (item is NewEditContactUC newEditContactUC)
+                    //    {
+                    //        if (newEditContactUC.IdItem == headerVM.IdItem)
+                    //        {
+                    //            this.PivotRightSideBar.SelectedItem = item;
+                    //        }
+                    //    }
+                    //    else if (item is ContactListUC contactListUC)
+                    //    {
+                    //        if (contactListUC.IdItem == headerVM.IdItem)
+                    //        {
+                    //            this.PivotRightSideBar.SelectedItem = item;
+                    //        }
+                    //    }
+                    //    else if (item is CollectionListUC collectionListUC)
+                    //    {
+                    //        if (collectionListUC.IdItem == headerVM.IdItem)
+                    //        {
+                    //            this.PivotRightSideBar.SelectedItem = item;
+                    //        }
+                    //    }
+                    //}
                 }
             }
             catch (Exception ex)
@@ -205,48 +372,980 @@ namespace LibraryProjectUWP.Views.Library
                 Logs.Log(ex, m);
                 return;
             }
+        }
+
+        #endregion
+
+        #region Selection
+        private void PivotItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is Pivot pivot)
+                {
+                    this.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
+                    this.ViewModelPage.SelectedPivotIndex = pivot.SelectedIndex;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void GridViewItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is GridView gridView)
+                {
+                    this.ViewModelPage.SelectedItems = gridView.SelectedItems.Cast<BibliothequeVM>().ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DataGridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is DataGrid dataGrid)
+                {
+                    this.ViewModelPage.SelectedItems = dataGrid.SelectedItems.Cast<BibliothequeVM>().ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is ListView listView && listView.SelectedItem is BibliothequeVM viewModel)
+                {
+                    SearchViewModel(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void Btn_SelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                {
+                    var gridViewItems = this.GetSelectedGridView();
+                    if (gridViewItems != null)
+                    {
+                        gridViewItems.SelectAll();
+                    }
+                }
+                else if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                {
+                    var dataGridItems = this.GetSelectedDataGridItems();
+                    if (dataGridItems != null)
+                    {
+                        foreach (var dataGridItem in dataGridItems.ItemsSource)
+                        {
+                            if (!dataGridItems.SelectedItems.Contains(dataGridItem))
+                            {
+                                dataGridItems.SelectedItems.Add(dataGridItem);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void Btn_UnSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                {
+                    var gridViewItems = this.GetSelectedGridView();
+                    if (gridViewItems != null)
+                    {
+                        gridViewItems.SelectedItems.Clear();
+                    }
+                }
+                else if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                {
+                    var dataGridItems = this.GetSelectedDataGridItems();
+                    if (dataGridItems != null)
+                    {
+                        dataGridItems.SelectedItems.Clear();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region Events
+        private void NewLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditLibraryUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    NewEditLibraryUC userControl = new NewEditLibraryUC(new ManageLibraryDialogParametersVM()
+                    {
+                        EditMode = Code.EditMode.Create,
+                        ViewModelList = ViewModelPage.ViewModelList,
+                    });
+
+                    userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditLibraryUC_CreateItemRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void ExportAllLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.ViewModelList != null)
+                {
+                    var suggestedFileName = $"Rostalotheque_Bibliotheques_All_{DateTime.Now:yyyyMMddHHmmss}";
+
+                    var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
+                    {
+                        {"JavaScript Object Notation", new List<string>() { ".json" } }
+                    }, suggestedFileName);
+
+                    if (savedFile == null)
+                    {
+                        Logs.Log(m, "Le fichier n'a pas pû être créé.");
+                        return;
+                    }
+
+                    //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
+                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(ViewModelPage.ViewModelList, savedFile);// savedFile.Path
+                    if (isFileSaved == false)
+                    {
+                        Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditLibraryUC_CreateItemRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    var newValue = sender.ViewModelPage.Value?.Trim();
+                    var newDescription = sender.ViewModelPage.Description?.Trim();
+
+                    var newViewModel = new BibliothequeVM()
+                    {
+                        Name = newValue,
+                        Description = newDescription,
+                    };
+
+                    var creationResult = await DbServices.Library.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        ViewModelPage.ViewModelList.Add(newViewModel);
+
+                        //if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                        //{
+                        //    libraryCollectionGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        //}
+                        //else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                        //{
+                        //    libraryCollectionDataGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                        //}
+
+                        this.RefreshItemsGrouping();
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
+                        return;
+                    }
+                }
+
+                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
+
+                //if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage2)
+                //{
+                //    libraryCollectionGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
+                //    libraryCollectionGridViewPage2.ViewModelPage.SplitViewContent = null;
+                //}
+                //else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage2)
+                //{
+                //    libraryCollectionDataGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
+                //    libraryCollectionDataGridViewPage2.ViewModelPage.SplitViewContent = null;
+                //}
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditLibraryUC_CancelModificationRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
+                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
+
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ImportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+        private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    var result = await esLibrary.ChangeLibraryItemJaquetteAsync(viewModel);
+                    if (!result.IsSuccess)
+                    {
+                        return;
+                    }
+
+                    viewModel.JaquettePath = result.Result?.ToString() ?? EsLibrary.LibraryDefaultJaquette;
+                    var image = GetSelectedThumbnailImage(viewModel);
+                    if (image != null)
+                    {
+                        var bitmapImage = await Files.BitmapImageFromFileAsync(viewModel.JaquettePath);
+                        image.Source = bitmapImage;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void ExportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    //await _commonView.ExportLibraryAsync(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DeleteLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is BibliothequeVM viewModel)
+                {
+                    //_commonView.DeleteLibrary(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        private void EditLibraryInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            
+        }
+
+        private void CategorieListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(CategoriesListUC));
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    if (args.Parameter is BibliothequeVM viewModel)
+                    {
+                        CategoriesListUC userControl = new CategoriesListUC(new CategorieParameterDriverVM()
+                        {
+                            LibraryPage = this,
+                            ParentLibrary = viewModel,
+                        });
+
+                        this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                        {
+                            Glyph = userControl.ViewModelPage.Glyph,
+                            Title = userControl.ViewModelPage.Header,
+                            IdItem = userControl.IdItem,
+                        });
+                    }
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+        #region Events Categorie
+        public void AddNewCategory(BibliothequeVM parentLibrary, Guid? guid = null)
+        {
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditCategoryUC item && item.ViewModelPage.EditMode == Code.EditMode.Create && item._categorieParameters != null);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    NewEditCategoryUC userControl = new NewEditCategoryUC(new ManageCategorieDialogParametersVM()
+                    {
+                        EditMode = Code.EditMode.Create,
+                        ParentLibrary = parentLibrary,
+                    });
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
+
+                    userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditCategoryUC_CreateItemRequested;
+
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void EditCategory(BibliothequeVM parentLibrary, CategorieLivreVM currentCategorie, Guid? guid = null)
+        {
+            NewEditCategoryUC userControl = null;
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditCategoryUC item && item.ViewModelPage.EditMode == Code.EditMode.Edit && item._categorieParameters != null);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    userControl = new NewEditCategoryUC(new ManageCategorieDialogParametersVM()
+                    {
+                        CurrentCategorie = currentCategorie,
+                        EditMode = Code.EditMode.Edit,
+                        ParentLibrary = parentLibrary,
+                    });
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
+
+                    userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
+                    userControl.UpdateItemRequested += NewEditCategoryUC_UpdateItemRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
+        private async void NewEditCategoryUC_CreateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        {
+            try
+            {
+                if (sender._categorieParameters != null)
+                {
+                    var value = sender.ViewModelPage.Value?.Trim();
+                    var description = sender.ViewModelPage.Description?.Trim();
+
+                    var newViewModel = new CategorieLivreVM()
+                    {
+                        IdLibrary = sender._categorieParameters.ParentLibrary.Id,
+                        Name = value,
+                        Description = description,
+                    };
+
+                    var creationResult = await DbServices.Categorie.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            var bookManager = GetCategorieListSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            if (bookManager != null)
+                            {
+                                bookManager.ViewModelPage.ParentLibrary.Categories.Add(newViewModel);
+                                NewEditCategoryUC_CancelModificationRequested(sender, e);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private async void NewEditCategoryUC_UpdateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        {
+            try
+            {
+                if (sender._categorieParameters != null)
+                {
+                    var value = sender.ViewModelPage.Value?.Trim();
+                    var description = sender.ViewModelPage.Description?.Trim();
+
+                    var updatedViewModel = new CategorieLivreVM()
+                    {
+                        Id = sender._categorieParameters.CurrentCategorie.Id,
+                        IdLibrary = sender._categorieParameters.ParentLibrary.Id,
+                        Name = value,
+                        Description = description,
+                    };
+
+                    var updateResult = await DbServices.Categorie.UpdateAsync(updatedViewModel);
+                    if (updateResult.IsSuccess)
+                    {
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
+                        sender.ViewModelPage.ResultMessage = updateResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            var bookManager = GetCategorieListSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            if (bookManager != null)
+                            {
+                                var item = bookManager.ViewModelPage.ParentLibrary.Categories.SingleOrDefault(s => s.Id == sender._categorieParameters.CurrentCategorie.Id);
+                                if (item != null)
+                                {
+                                    item.Name = updatedViewModel.Name;
+                                    item.Description = updatedViewModel.Description;
+                                }
+                                NewEditCategoryUC_CancelModificationRequested(sender, e);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = updateResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void NewEditCategoryUC_CancelModificationRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CreateItemRequested -= NewEditCategoryUC_CreateItemRequested;
+                sender.CancelModificationRequested -= NewEditCategoryUC_CancelModificationRequested;
+                sender.UpdateItemRequested -= NewEditCategoryUC_UpdateItemRequested;
+
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+        #region Events Sub Categorie
+        public void AddNewSubCategory(CategorieLivreVM currentCategorieParent, Guid? guid = null)
+        {
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditCategoryUC item && item.ViewModelPage.EditMode == Code.EditMode.Create && item._subCategorieParameters != null);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    NewEditCategoryUC userControl = new NewEditCategoryUC(new ManageSubCategorieDialogParametersVM()
+                    {
+                        EditMode = Code.EditMode.Create,
+                        Categorie = currentCategorieParent,
+                    });
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
+
+                    userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditSubCategoryUC_CreateItemRequested;
+
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void EditSubCategory(CategorieLivreVM parentCategorie, SubCategorieLivreVM currentSubCategorie, Guid? guid = null)
+        {
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditCategoryUC item && item.ViewModelPage.EditMode == Code.EditMode.Edit && item._subCategorieParameters != null);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    NewEditCategoryUC userControl = new NewEditCategoryUC(new ManageSubCategorieDialogParametersVM()
+                    {
+                        EditMode = Code.EditMode.Edit,
+                        Categorie = parentCategorie,
+                        CurrentSubCategorie = currentSubCategorie,
+                    });
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
+
+                    userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
+                    userControl.UpdateItemRequested += NewEditSubCategoryUC_UpdateItemRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditSubCategoryUC_CreateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        {
+            try
+            {
+                if (sender._subCategorieParameters != null)
+                {
+                    var value = sender.ViewModelPage.Value?.Trim();
+                    var description = sender.ViewModelPage.Description?.Trim();
+
+                    var newViewModel = new SubCategorieLivreVM()
+                    {
+                        IdCategorie = sender._subCategorieParameters.Categorie.Id,
+                        Name = value,
+                        Description = description,
+                    };
+
+                    var creationResult = await DbServices.SubCategorie.CreateAsync(newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        sender._subCategorieParameters.Categorie.SubCategorieLivres.Add(newViewModel);
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            var bookManager = GetCategorieListSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            if (bookManager != null)
+                            {
+                                //bookManager.ViewModelPage.ParentLibrary.Categories.sub.Add(newViewModel);
+                                NewEditSubCategoryUC_CancelModificationRequested(sender, e);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private async void NewEditSubCategoryUC_UpdateItemRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        {
+            try
+            {
+                if (sender._subCategorieParameters != null)
+                {
+                    var newValue = sender.ViewModelPage.Value?.Trim();
+                    var newDescription = sender.ViewModelPage.Description?.Trim();
+                    var updatedViewModel = new SubCategorieLivreVM()
+                    {
+                        Id = sender._subCategorieParameters.CurrentSubCategorie.Id,
+                        IdCategorie = sender._subCategorieParameters.Categorie.Id,
+                        Name = newValue,
+                        Description = newDescription,
+                    };
+
+                    var updateResult = await DbServices.SubCategorie.UpdateAsync(updatedViewModel);
+                    if (updateResult.IsSuccess)
+                    {
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
+                        sender.ViewModelPage.ResultMessage = updateResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            var item = sender._subCategorieParameters.Categorie.SubCategorieLivres.SingleOrDefault(s => s.Id == sender._subCategorieParameters.CurrentSubCategorie.Id);
+                            if (item != null)
+                            {
+                                item.Name = updatedViewModel.Name;
+                                item.Description = updatedViewModel.Description;
+                            }
+                            NewEditSubCategoryUC_CancelModificationRequested(sender, e);
+                        }
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = updateResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void NewEditSubCategoryUC_CancelModificationRequested(NewEditCategoryUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CreateItemRequested -= NewEditSubCategoryUC_CreateItemRequested;
+                sender.CancelModificationRequested -= NewEditSubCategoryUC_CancelModificationRequested;
+                sender.UpdateItemRequested -= NewEditSubCategoryUC_UpdateItemRequested;
+
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+
+        #region Groups
+        public void GroupItemsByNone()
+        {
+            try
+            {
+                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                {
+                    return;
+                }
+
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Any())
+                {
+                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
+                    this.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.None;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        public void GroupItemsByAlphabetic()
+        {
+            try
+            {
+                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                {
+                    return;
+                }
+
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Name.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Count() > 0)
+                {
+                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
+                    this.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.Letter;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void GroupByCreationYear()
+        {
+            try
+            {
+                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                {
+                    return;
+                }
+
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Count() > 0)
+                {
+                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
+                    this.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+        #region Group-Orders
+        private IEnumerable<BibliothequeVM> OrderItems(IEnumerable<BibliothequeVM> Collection, LibraryGroupVM.OrderBy OrderBy = LibraryGroupVM.OrderBy.Croissant, LibraryGroupVM.SortBy SortBy = LibraryGroupVM.SortBy.Name)
+        {
+            try
+            {
+                if (Collection == null || Collection.Count() == 0)
+                {
+                    return null;
+                }
+
+                if (SortBy == LibraryGroupVM.SortBy.Name)
+                {
+                    if (OrderBy == LibraryGroupVM.OrderBy.Croissant)
+                    {
+                        return Collection.Where(w => w != null && !w.Name.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.Name);
+                    }
+                    else if (OrderBy == LibraryGroupVM.OrderBy.DCroissant)
+                    {
+                        return Collection.Where(w => w != null && !w.Name.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.Name);
+                    }
+                }
+                else if (SortBy == LibraryGroupVM.SortBy.DateCreation)
+                {
+                    if (OrderBy == LibraryGroupVM.OrderBy.Croissant)
+                    {
+                        return Collection.OrderBy(o => o.DateAjout);
+                    }
+                    else if (OrderBy == LibraryGroupVM.OrderBy.DCroissant)
+                    {
+                        return Collection.OrderByDescending(o => o.DateAjout);
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return Enumerable.Empty<BibliothequeVM>();
+            }
+        }
+
+        #endregion
+
+
+        #region Sort - Group - Order
+        private void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            this.GroupItemsByAlphabetic();
         }
 
         private void GroupByCreationYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
-                {
-                    libraryCollectionGridViewPage.GroupByCreationYear();
-                }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-                {
-                    libraryCollectionDataGridViewPage.GroupByCreationYear();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            this.GroupByCreationYear();
         }
 
         private void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
-                {
-                    libraryCollectionGridViewPage.GroupItemsByNone();
-                }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-                {
-                    libraryCollectionDataGridViewPage.GroupItemsByNone();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            this.GroupItemsByNone();
         }
 
         private void OrderByCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -314,41 +1413,20 @@ namespace LibraryProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                switch (ViewModelPage.GroupedBy)
                 {
-                    switch (ViewModelPage.GroupedBy)
-                    {
-                        case LibraryGroupVM.GroupBy.None:
-                            libraryCollectionGridViewPage.GroupItemsByNone();
-                            break;
-                        case LibraryGroupVM.GroupBy.Letter:
-                            libraryCollectionGridViewPage.GroupItemsByAlphabetic();
-                            break;
-                        case LibraryGroupVM.GroupBy.CreationYear:
-                            libraryCollectionGridViewPage.GroupByCreationYear();
-                            break;
-                        default:
-                            libraryCollectionGridViewPage.GroupItemsByNone();
-                            break;
-                    }
-                }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-                {
-                    switch (ViewModelPage.GroupedBy)
-                    {
-                        case LibraryGroupVM.GroupBy.None:
-                            libraryCollectionDataGridViewPage.GroupItemsByNone();
-                            break;
-                        case LibraryGroupVM.GroupBy.Letter:
-                            libraryCollectionDataGridViewPage.GroupItemsByAlphabetic();
-                            break;
-                        case LibraryGroupVM.GroupBy.CreationYear:
-                            libraryCollectionDataGridViewPage.GroupByCreationYear();
-                            break;
-                        default:
-                            libraryCollectionDataGridViewPage.GroupItemsByNone();
-                            break;
-                    }
+                    case LibraryGroupVM.GroupBy.None:
+                        this.GroupItemsByNone();
+                        break;
+                    case LibraryGroupVM.GroupBy.Letter:
+                        this.GroupItemsByAlphabetic();
+                        break;
+                    case LibraryGroupVM.GroupBy.CreationYear:
+                        this.GroupByCreationYear();
+                        break;
+                    default:
+                        this.GroupItemsByNone();
+                        break;
                 }
             }
             catch (Exception ex)
@@ -357,7 +1435,6 @@ namespace LibraryProjectUWP.Views.Library
                 return;
             }
         }
-
         #endregion
 
         #region Search
@@ -453,14 +1530,14 @@ namespace LibraryProjectUWP.Views.Library
                     return;
                 }
 
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
-                {
-                    libraryCollectionGridViewPage.SearchViewModel(viewModel);
-                }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-                {
-                    libraryCollectionDataGridViewPage.SearchViewModel(viewModel);
-                }
+                //if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                //{
+                //    libraryCollectionGridViewPage.SearchViewModel(viewModel);
+                //}
+                //else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                //{
+                //    libraryCollectionDataGridViewPage.SearchViewModel(viewModel);
+                //}
             }
             catch (Exception ex)
             {
@@ -471,55 +1548,23 @@ namespace LibraryProjectUWP.Views.Library
         }
         #endregion
 
-        private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void Btn_SelectAll_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Btn_UnSelectAll_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Btn_OpenAll_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void NewLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        #region Functions
+        private void AddItemToSideBar(PivotItem item, SideBarItemHeaderVM sideBarItem)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
-            NewEditLibraryUC userControl = null;
             try
             {
-                userControl = new NewEditLibraryUC(new ManageLibraryDialogParametersVM()
+                this.PivotRightSideBar.Items.Add(item);
+                this.PivotRightSideBar.SelectedItem = item;
+                ViewModelPage.ItemsSideBarHeader.Add(sideBarItem);
+                this.CmbxSideBarItemTitle.SelectedItem = sideBarItem;
+                if (PivotRightSideBar.Items.Count >= 2)
                 {
-                    EditMode = Code.EditMode.Create,
-                    ViewModelList = ViewModelPage.ViewModelList,
-                });
-
-                userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
-                userControl.CreateItemRequested += NewEditLibraryUC_CreateItemRequested;
-
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
-                {
-                    libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                    this.CmbxSideBarItemTitle.Visibility = Visibility.Visible;
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+                else
                 {
-                    libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+                    this.CmbxSideBarItemTitle.Visibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)
@@ -529,33 +1574,43 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private async void ExportAllLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void RemoveItemToSideBar(PivotItem item)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.ViewModelList != null)
+                if (this.PivotRightSideBar.Items.Count == 1)
                 {
-                    var suggestedFileName = $"Rostalotheque_Bibliotheques_All_{DateTime.Now:yyyyMMddHHmmss}";
+                    this.ViewModelPage.IsSplitViewOpen = false;
+                }
 
-                    var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
-                    {
-                        {"JavaScript Object Notation", new List<string>() { ".json" } }
-                    }, suggestedFileName);
+                if (this.CmbxSideBarItemTitle.Items.Count > 0)
+                {
 
-                    if (savedFile == null)
+                    foreach (var cmbxItem in this.CmbxSideBarItemTitle.Items)
                     {
-                        Logs.Log(m, "Le fichier n'a pas pû être créé.");
-                        return;
+                        if (cmbxItem is SideBarItemHeaderVM headerVM)
+                        {
+                            if (item is NewEditLibraryUC bookExemplaryUC)
+                            {
+                                if (bookExemplaryUC.IdItem == headerVM.IdItem)
+                                {
+                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
+                                    break;
+                                }
+                            }
+                        }
                     }
+                }
 
-                    //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
-                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(ViewModelPage.ViewModelList, savedFile);// savedFile.Path
-                    if (isFileSaved == false)
-                    {
-                        Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
-                        return;
-                    }
+                this.PivotRightSideBar.Items.Remove(item);
+                if (PivotRightSideBar.Items.Count < 2)
+                {
+                    this.CmbxSideBarItemTitle.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    this.CmbxSideBarItemTitle.Visibility = Visibility.Visible;
                 }
             }
             catch (Exception ex)
@@ -565,97 +1620,229 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private async void NewEditLibraryUC_CreateItemRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
+        private CategoriesListUC GetCategorieListSideBarByGuid(Guid guid)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (sender._parameters != null)
+
+                if (this.PivotRightSideBar.Items.Count > 0)
                 {
-                    var newValue = sender.ViewModelPage.Value?.Trim();
-                    var newDescription = sender.ViewModelPage.Description?.Trim();
-
-                    var newViewModel = new BibliothequeVM()
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is CategoriesListUC item && item.ViewModelPage.Guid == guid);
+                    if (itemPivot != null)
                     {
-                        Name = newValue,
-                        Description = newDescription,
-                    };
+                        return itemPivot as CategoriesListUC;
+                    }
+                }
 
-                    var creationResult = await DbServices.Library.CreateAsync(newViewModel);
-                    if (creationResult.IsSuccess)
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        private Image GetSelectedThumbnailImage(BibliothequeVM viewModel)
+        {
+            try
+            {
+                if (viewModel == null)
+                {
+                    return null;
+                }
+
+                if (this.PivotItems.SelectedItem != null)
+                {
+                    if (this.PivotItems.SelectedItem is IGrouping<string, BibliothequeVM> group && group.Any(f => f == viewModel))
                     {
-                        newViewModel.Id = creationResult.Id;
-                        ViewModelPage.ViewModelList.Add(newViewModel);
 
-                        if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                        var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
+                        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
+                        while (gridView != null && gridView.Name != "GridViewItems")
                         {
-                            libraryCollectionGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
-                        }
-                        else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
-                        {
-                            libraryCollectionDataGridViewPage.ViewModelPage.ViewModelList.Add(newViewModel);
+                            gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
+                            if (gridView == null)
+                            {
+                                return null;
+                            }
+                            else
+                            {
+                                if (gridView.Name == "GridViewItems")
+                                {
+                                    break;
+                                }
+                            }
                         }
 
-                        this.RefreshItemsGrouping();
+                        if (gridView != null)
+                        {
+                            foreach (var gridViewItem in gridView.Items)
+                            {
+                                if (gridViewItem is BibliothequeVM _viewModel && _viewModel == viewModel)
+                                {
+                                    if (gridView.SelectedItem != gridViewItem)
+                                    {
+                                        gridView.SelectedItem = gridViewItem;
+                                    }
+
+                                    var _gridViewItemContainer = gridView.ContainerFromItem(gridViewItem);
+                                    return SelectImageFromContainer(_gridViewItemContainer);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        private Image SelectImageFromContainer(DependencyObject _gridViewItemContainer)
+        {
+            try
+            {
+                if (_gridViewItemContainer == null)
+                {
+                    return null;
+                }
+
+                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
+                if (grid != null)
+                {
+                    Viewbox viewboxThumbnailContainer = grid.Children.FirstOrDefault(f => f is Viewbox _viewboxThumbnailContainer && _viewboxThumbnailContainer.Name == "ViewboxSimpleThumnailDatatemplate") as Viewbox;
+                    if (viewboxThumbnailContainer != null)
+                    {
+                        Border border = viewboxThumbnailContainer.Child as Border;
+                        if (border != null)
+                        {
+                            Grid gridImageContainer = border.Child as Grid;
+                            if (gridImageContainer != null)
+                            {
+                                Image image = gridImageContainer.Children.FirstOrDefault(f => f is Image _image) as Image;
+                                return image;
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        public GridView GetSelectedGridView(string gridViewName = "GridViewItems")
+        {
+            try
+            {
+                if (this.PivotItems.SelectedItem == null)
+                {
+                    return null;
+                }
+
+                var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
+                var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
+                while (gridView != null && gridView.Name != gridViewName)
+                {
+                    gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
+                    if (gridView == null)
+                    {
+                        return null;
                     }
                     else
                     {
-                        //Erreur
-                        sender.ViewModelPage.ErrorMessage = creationResult.Message;
-                        return;
+                        if (gridView.Name == gridViewName)
+                        {
+                            break;
+                        }
                     }
                 }
 
-                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
-
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage2)
-                {
-                    libraryCollectionGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
-                    libraryCollectionGridViewPage2.ViewModelPage.SplitViewContent = null;
-                }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage2)
-                {
-                    libraryCollectionDataGridViewPage2.ViewModelPage.IsSplitViewOpen = false;
-                    libraryCollectionDataGridViewPage2.ViewModelPage.SplitViewContent = null;
-                }
+                return gridView;
             }
             catch (Exception ex)
             {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
-                return;
+                return null;
             }
         }
 
-        private void NewEditLibraryUC_CancelModificationRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
+        private DataGrid GetSelectedDataGridItems(string dataGridName = "DataGridItems")
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                sender.CancelModificationRequested -= NewEditLibraryUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditLibraryUC_CreateItemRequested;
-
-                if (FramePartialView.Content is LibraryCollectionGridViewPage libraryCollectionGridViewPage)
+                if (this.PivotItems.SelectedItem == null)
                 {
-                    libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = null;
+                    return null;
                 }
-                else if (FramePartialView.Content is LibraryCollectionDataGridViewPage libraryCollectionDataGridViewPage)
+
+                var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
+                DataGrid dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(_container);
+                while (dataGrid != null && dataGrid.Name != dataGridName)
                 {
-                    libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = false;
-                    libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = null;
+                    dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(dataGrid);
+                    if (dataGrid == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        if (dataGrid.Name == dataGridName)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                return dataGrid;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Ouvre la liste des livre de la bibliothèque
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Viewbox viewbox && viewbox.Tag is BibliothequeVM viewModel)
+                {
+                    VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
+                    var mainPage = mainControlsUI.GetMainPage;
+                    if (mainPage != null)
+                    {
+                        mainPage.BookCollectionNavigationAsync(viewModel);
+                    }
                 }
             }
             catch (Exception ex)
             {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
             }
-        }
-
-        private void ImportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
         }
 
         
@@ -665,6 +1852,61 @@ namespace LibraryProjectUWP.Views.Library
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+        private ObservableCollection<SideBarItemHeaderVM> _ItemsSideBarHeader = new ObservableCollection<SideBarItemHeaderVM>();
+        public ObservableCollection<SideBarItemHeaderVM> ItemsSideBarHeader
+        {
+            get => this._ItemsSideBarHeader;
+            set
+            {
+                if (_ItemsSideBarHeader != value)
+                {
+                    this._ItemsSideBarHeader = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ICollection<BibliothequeVM> _SelectedItems = new List<BibliothequeVM>();
+        public ICollection<BibliothequeVM> SelectedItems
+        {
+            get => this._SelectedItems;
+            set
+            {
+                if (_SelectedItems != value)
+                {
+                    this._SelectedItems = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private int _SelectedPivotIndex;
+        public int SelectedPivotIndex
+        {
+            get => this._SelectedPivotIndex;
+            set
+            {
+                if (_SelectedPivotIndex != value)
+                {
+                    this._SelectedPivotIndex = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private LibraryGroupVM _GroupedRelatedViewModel = new LibraryGroupVM();
+        public LibraryGroupVM GroupedRelatedViewModel
+        {
+            get => this._GroupedRelatedViewModel;
+            set
+            {
+                if (this._GroupedRelatedViewModel != value)
+                {
+                    this._GroupedRelatedViewModel = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private LibraryGroupVM.GroupBy _GroupedBy = LibraryGroupVM.GroupBy.None;
         public LibraryGroupVM.GroupBy GroupedBy
@@ -707,34 +1949,6 @@ namespace LibraryProjectUWP.Views.Library
                 }
             }
         }
-
-        private bool _IsDataGridView;
-        public bool IsDataGridView
-        {
-            get => this._IsDataGridView;
-            set
-            {
-                if (_IsDataGridView != value)
-                {
-                    this._IsDataGridView = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsGridView;
-        public bool IsGridView
-        {
-            get => this._IsGridView;
-            set
-            {
-                if (_IsGridView != value)
-                {
-                    this._IsGridView = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
         
         private Visibility _SearchingLibraryVisibility = Visibility.Visible;
         public Visibility SearchingLibraryVisibility
@@ -750,34 +1964,50 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private int _SelectedPivotIndex;
-        public int SelectedPivotIndex
+        private bool _IsSplitViewOpen;
+        public bool IsSplitViewOpen
         {
-            get => this._SelectedPivotIndex;
+            get => this._IsSplitViewOpen;
             set
             {
-                if (_SelectedPivotIndex != value)
+                if (_IsSplitViewOpen != value)
                 {
-                    this._SelectedPivotIndex = value;
+                    this._IsSplitViewOpen = value;
                     this.OnPropertyChanged();
                 }
             }
         }
 
-        private ICollection<BibliothequeVM> _SelectedItems = new List<BibliothequeVM>();
-        public ICollection<BibliothequeVM> SelectedItems
+        private UserControl _SplitViewContent;
+        public UserControl SplitViewContent
         {
-            get => this._SelectedItems;
+            get => this._SplitViewContent;
             set
             {
-                if (_SelectedItems != value)
+                if (_SplitViewContent != value)
                 {
-                    this._SelectedItems = value;
+                    this._SplitViewContent = value;
                     this.OnPropertyChanged();
                 }
             }
         }
-        
+
+        public const double MinSplitViewWidth = 400;
+
+        private double _SplitViewWidth = MinSplitViewWidth;
+        public double SplitViewWidth
+        {
+            get => this._SplitViewWidth;
+            set
+            {
+                if (_SplitViewWidth != value)
+                {
+                    this._SplitViewWidth = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         private List<BibliothequeVM> _ViewModelList;
         public List<BibliothequeVM> ViewModelList
         {

@@ -71,35 +71,35 @@ namespace LibraryProjectUWP.ViewModels.UI
 
         internal void EditLibrary(BibliothequeVM viewModel)
         {
-            try
-            {
-                NewEditLibraryUC userControl = new NewEditLibraryUC(new ManageLibraryDialogParametersVM()
-                {
-                    CurrentLibrary = viewModel,
-                    EditMode = Code.EditMode.Edit,
-                    ViewModelList = _parentPage.ViewModelPage.ViewModelList,
-                });
+            //try
+            //{
+            //    NewEditLibraryUC userControl = new NewEditLibraryUC(new ManageLibraryDialogParametersVM()
+            //    {
+            //        CurrentLibrary = viewModel,
+            //        EditMode = Code.EditMode.Edit,
+            //        ViewModelList = _parentPage.ViewModelPage.ViewModelList,
+            //    });
 
-                userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
-                userControl.UpdateItemRequested += NewEditLibraryUC_UpdateItemRequested;
+            //    userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
+            //    userControl.UpdateItemRequested += NewEditLibraryUC_UpdateItemRequested;
 
-                if (_libraryCollectionDataGridViewPage != null)
-                {
-                    _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-                else if (_libraryCollectionGridViewPage != null)
-                {
-                    _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
-                    _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
+            //    if (_libraryCollectionDataGridViewPage != null)
+            //    {
+            //        _libraryCollectionDataGridViewPage.ViewModelPage.SplitViewContent = userControl;
+            //        _libraryCollectionDataGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+            //    }
+            //    else if (_libraryCollectionGridViewPage != null)
+            //    {
+            //        _libraryCollectionGridViewPage.ViewModelPage.SplitViewContent = userControl;
+            //        _libraryCollectionGridViewPage.ViewModelPage.IsSplitViewOpen = true;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MethodBase m = MethodBase.GetCurrentMethod();
+            //    Logs.Log(ex, m);
+            //    return;
+            //}
         }
 
         private async void NewEditLibraryUC_UpdateItemRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)

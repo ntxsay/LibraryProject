@@ -205,6 +205,7 @@
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
     <Compile Include="ViewModels\Book\ManageBookParametersDriverVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
+    <Compile Include="ViewModels\Categorie\CategorieParameterDriverVM.cs" />
     <Compile Include="ViewModels\Collection\CollectionVM.cs" />
     <Compile Include="ViewModels\Collection\ManageCollectionParametersDriverVM.cs" />
     <Compile Include="ViewModels\Contact\ContactGroupVM.cs" />
@@ -258,7 +259,7 @@
     <Compile Include="Views\Library\Manage\DeleteLibraryUC.xaml.cs">
       <DependentUpon>DeleteLibraryUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Library\Manage\NewEditLibraryUC.xaml.cs">
+    <Compile Include="Views\Library\NewEditLibraryUC.xaml.cs">
       <DependentUpon>NewEditLibraryUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Categories\NewEditCategoryUC.xaml.cs">
@@ -361,7 +362,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Library\Manage\NewEditLibraryUC.xaml">
+    <Page Include="Views\Library\NewEditLibraryUC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

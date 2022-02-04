@@ -6,6 +6,7 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Categorie;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,7 +34,7 @@ namespace LibraryProjectUWP.Views.Categories
 {
     public sealed partial class CategoriesListUC : PivotItem
     {
-        public readonly BookCategorieParametersDriverVM _parameters;
+        public readonly CategorieParameterDriverVM _parameters;
         public readonly Guid IdItem = Guid.NewGuid();
 
         public CategoriesListUCVM ViewModelPage { get; set; } = new CategoriesListUCVM();
@@ -54,7 +55,7 @@ namespace LibraryProjectUWP.Views.Categories
             this.InitializeComponent();
         }
 
-        public CategoriesListUC(BookCategorieParametersDriverVM parameters)
+        public CategoriesListUC(CategorieParameterDriverVM parameters)
         {
             this.InitializeComponent();
             _parameters = parameters;
@@ -109,7 +110,14 @@ namespace LibraryProjectUWP.Views.Categories
             {
                 if (ViewModelPage.ParentLibrary != null)
                 {
-                    _parameters.ParentPage.AddNewCategory(ViewModelPage.ParentLibrary, ViewModelPage.Guid);
+                    if (_parameters.BookPage != null)
+                    {
+                        _parameters.BookPage.AddNewCategory(ViewModelPage.ParentLibrary, ViewModelPage.Guid);
+                    }
+                    else if (_parameters.LibraryPage != null)
+                    {
+                        _parameters.LibraryPage.AddNewCategory(ViewModelPage.ParentLibrary, ViewModelPage.Guid);
+                    }
                 }
             }
             catch (Exception ex)
@@ -126,7 +134,14 @@ namespace LibraryProjectUWP.Views.Categories
             {
                 if (ViewModelPage.ParentLibrary != null && TreeCategorie.SelectedItem != null && TreeCategorie.SelectedItem is CategorieLivreVM categorieParent)
                 {
-                    _parameters.ParentPage.AddNewSubCategory(categorieParent, ViewModelPage.Guid);
+                    if (_parameters.BookPage != null)
+                    {
+                        _parameters.BookPage.AddNewSubCategory(categorieParent, ViewModelPage.Guid);
+                    }
+                    else if (_parameters.LibraryPage != null)
+                    {
+                        _parameters.LibraryPage.AddNewSubCategory(categorieParent, ViewModelPage.Guid);
+                    }
                 }
                 else
                 {
@@ -152,7 +167,14 @@ namespace LibraryProjectUWP.Views.Categories
                 {
                     if (TreeCategorie.SelectedItem is CategorieLivreVM _viewModelCategorie && _viewModelCategorie == ViewModelPage.SelectedCategorie)
                     {
-                        _parameters.ParentPage.EditCategory(ViewModelPage.ParentLibrary, _viewModelCategorie, ViewModelPage.Guid);
+                        if (_parameters.BookPage != null)
+                        {
+                            _parameters.BookPage.EditCategory(ViewModelPage.ParentLibrary, _viewModelCategorie, ViewModelPage.Guid);
+                        }
+                        else if (_parameters.LibraryPage != null)
+                        {
+                            _parameters.LibraryPage.EditCategory(ViewModelPage.ParentLibrary, _viewModelCategorie, ViewModelPage.Guid);
+                        }
                     }
                     else if (TreeCategorie.SelectedItem is SubCategorieLivreVM _viewModelSubCategorie && _viewModelSubCategorie == ViewModelPage.SelectedCategorie)
                     {
@@ -161,7 +183,15 @@ namespace LibraryProjectUWP.Views.Categories
                         {
                             return;
                         }
-                        _parameters.ParentPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
+
+                        if (_parameters.BookPage != null)
+                        {
+                            _parameters.BookPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
+                        }
+                        else if (_parameters.LibraryPage != null)
+                        {
+                            _parameters.LibraryPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
+                        }
                     }
                 }
                 else

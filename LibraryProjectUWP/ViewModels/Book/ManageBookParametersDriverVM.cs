@@ -31,6 +31,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreVM CurrentViewModel { get; set; }
     }
 
+    [Obsolete]
     public class BookCategorieParametersDriverVM
     {
         public BibliothequeVM ParentLibrary { get; set; }

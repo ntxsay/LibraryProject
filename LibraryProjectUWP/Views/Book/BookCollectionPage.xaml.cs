@@ -34,6 +34,7 @@ using System.Collections.ObjectModel;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using LibraryProjectUWP.Views.UserControls;
 using LibraryProjectUWP.Views.Categories;
+using LibraryProjectUWP.ViewModels.Categorie;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -1122,9 +1123,9 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    CategoriesListUC userControl = new CategoriesListUC(new BookCategorieParametersDriverVM()
+                    CategoriesListUC userControl = new CategoriesListUC(new CategorieParameterDriverVM()
                     {
-                        ParentPage = this,
+                        BookPage = this,
                         ParentLibrary = ViewModelPage.ParentLibrary,
                     });
 
@@ -3043,7 +3044,6 @@ namespace LibraryProjectUWP.Views.Book
                 return null;
             }
         }
-
 
         private DataGrid GetSelectedDataGridItems(string dataGridName = "DataGridItems")
         {

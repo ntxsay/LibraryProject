@@ -26,10 +26,11 @@ using Windows.UI.Xaml.Navigation;
 
 namespace LibraryProjectUWP.Views.Library.Manage
 {
-    public sealed partial class NewEditLibraryUC : UserControl
+    public sealed partial class NewEditLibraryUC : PivotItem
     {
         public readonly ManageLibraryDialogParametersVM _parameters;
-        
+        public readonly Guid IdItem = Guid.NewGuid();
+
         public NewEditLibraryUCVM ViewModelPage { get; set; } = new NewEditLibraryUCVM();
 
         public delegate void CancelModificationEventHandler(NewEditLibraryUC sender, ExecuteRequestedEventArgs e);
@@ -208,6 +209,8 @@ namespace LibraryProjectUWP.Views.Library.Manage
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+        public Guid? Guid { get; set; }
+
         private string _Header;
         public string Header
         {
@@ -218,6 +221,20 @@ namespace LibraryProjectUWP.Views.Library.Manage
                 {
                     this._Header = value;
                     this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _Glyph = "\uE81E";
+        public string Glyph
+        {
+            get => _Glyph;
+            set
+            {
+                if (_Glyph != value)
+                {
+                    _Glyph = value;
+                    OnPropertyChanged();
                 }
             }
         }
