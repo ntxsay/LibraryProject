@@ -210,10 +210,27 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            
+
             #endregion
 
             #region Single
+            public static async Task<long?> GetLibraryIdAsync(long idBook, LibraryDbContext _context = null)
+            {
+                try
+                {
+                    LibraryDbContext context = _context ?? new LibraryDbContext();
+                    var tlibraryBookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(w => w.IdBook == idBook);
+                    if (tlibraryBookConnector == null) return null;
+                    return tlibraryBookConnector.IdLibrary;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
             /// <summary>
             /// Retourne un élément de la base de données avec un identifiant unique
             /// </summary>
@@ -253,7 +270,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
-            public static async Task<OperationStateVM> CreateAsync(LivreVM viewModel)
+            public static async Task<OperationStateVM> CreateAsync(LivreVM viewModel, long idLibrary)
             {
                 try
                 {
@@ -307,6 +324,15 @@ namespace LibraryProjectUWP.Code.Services.Db
                     };
 
                     await context.Tbook.AddAsync(record);
+                    await context.SaveChangesAsync();
+
+                    var libraryBookConnector = new TlibraryBookConnector()
+                    {
+                        IdLibrary = idLibrary,
+                        IdBook = record.Id,
+                    };
+
+                    await context.TlibraryBookConnector.AddAsync(libraryBookConnector);
                     await context.SaveChangesAsync();
 
                     if (viewModel.Identification != null)
@@ -1029,6 +1055,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var viewModel = new LivreVM()
                     {
                         Id = model.Id,
+                        IdLibrary = await GetLibraryIdAsync(model.Id),
                         Guid = isGuidCorrect ? guid : Guid.Empty,
                         DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
                         DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
@@ -1173,6 +1200,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     if (viewModelToCopy == null) return null;
 
                     viewModel.Id = viewModelToCopy.Id;
+                    viewModel.IdLibrary = viewModelToCopy.IdLibrary;
                     viewModel.Guid = viewModelToCopy.Guid;
                     viewModel.DateAjout = viewModelToCopy.DateAjout;
                     viewModel.DateEdition = viewModelToCopy.DateEdition;

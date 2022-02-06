@@ -176,7 +176,11 @@
         <MUIXC:TreeView x:Name="TreeCategorie" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.ParentLibrary.Categories, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedCategorie, Mode=TwoWay}"
                                                     ItemTemplateSelector="{StaticResource categorieTemplateSelector}" SelectionMode="Single">
         </MUIXC:TreeView>
-        <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
+        <Grid Grid.Row="3" Margin="0 10 0 10">
+            <MUIXC:InfoBar IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+                       IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}">
+            </MUIXC:InfoBar>
+        </Grid>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

@@ -219,7 +219,6 @@
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
-    <Compile Include="ViewModels\UI\LibraryCollectionCommonViewVM.cs" />
     <Compile Include="Views\AboutCd.xaml.cs">
       <DependentUpon>AboutCd.xaml</DependentUpon>
     </Compile>
@@ -247,12 +246,6 @@
     <Compile Include="Views\Contact\NewEditContactUC.xaml.cs">
       <DependentUpon>NewEditContactUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml.cs">
-      <DependentUpon>LibraryCollectionDataGridViewPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Library\Collection\LibraryCollectionGridViewPage.xaml.cs">
-      <DependentUpon>LibraryCollectionGridViewPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Library\LibraryCollectionPage.xaml.cs">
       <DependentUpon>LibraryCollectionPage.xaml</DependentUpon>
     </Compile>
@@ -279,6 +272,9 @@
     </Compile>
     <Compile Include="Views\UserControls\SideBarItemHeader.xaml.cs">
       <DependentUpon>SideBarItemHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserControls\TitleBar\TitleBarLibraryName.xaml.cs">
+      <DependentUpon>TitleBarLibraryName.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -346,14 +342,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Library\Collection\LibraryCollectionDataGridViewPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Library\Collection\LibraryCollectionGridViewPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\Library\LibraryCollectionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -387,6 +375,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\UserControls\SideBarItemHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\TitleBar\TitleBarLibraryName.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -425,7 +417,9 @@
     </None>
     <None Include="LibraryProjectUWP_TemporaryKey.pfx" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ViewModels\UI\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

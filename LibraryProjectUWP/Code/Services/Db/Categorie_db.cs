@@ -179,6 +179,94 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
+            public static async Task<OperationStateVM> CreateCategorieConnectorAsync(IEnumerable<long> idBooks, long idCategorie, long? idSubCategorie = null)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+                    
+                    List<long> validIdList = new List<long>();
+                    
+                    foreach (var idBook in idBooks)
+                    {
+                        var isBookExist = await context.Tbook.AnyAsync(a => a.Id == idBook);
+                        if (!isBookExist)
+                        {
+                            continue;
+                        }
+                        validIdList.Add(idBook);
+                    }
+
+                    if (!validIdList.Any())
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.RecordNotExistMessage,
+                        };
+                    }
+
+                    var isCategorieExist = await context.TlibraryCategorie.AnyAsync(a => a.Id == idCategorie);
+                    if (!isCategorieExist)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.RecordNotExistMessage,
+                        };
+                    }
+
+                    if (idSubCategorie != null)
+                    {
+                        var isSubCategorieExist = await context.TlibrarySubCategorie.AnyAsync(a => a.Id == (long)idSubCategorie);
+                        if (!isSubCategorieExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage,
+                            };
+                        }
+                    }
+
+                    foreach (var idBook in validIdList)
+                    {
+                        var bookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(c => c.IdBook == idBook);
+                        if (bookConnector == null)
+                        {
+                            continue;
+                        }
+
+                        bookConnector.IdCategorie = idCategorie;
+                        if (idSubCategorie != null)
+                        {
+                            bookConnector.IdSubCategorie = (long)idSubCategorie;
+                        }
+
+                        context.TlibraryBookConnector.Update(bookConnector);
+                        await context.SaveChangesAsync();
+                    }
+                    
+
+                    return new OperationStateVM()
+                    {
+                        Message = "Les livres ont été ajoutés à la catégorie",
+                        IsSuccess = true,
+                    };
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Exception : {ex.Message}",
+                    };
+                }
+            }
+
+
             public static async Task<OperationStateVM> CreateAsync(CategorieLivreVM viewModel)
             {
                 try

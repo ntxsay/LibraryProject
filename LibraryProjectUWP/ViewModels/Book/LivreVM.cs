@@ -21,6 +21,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         public long Id { get; set; }
+        public long? IdLibrary { get; set; }
         public Guid Guid { get; set; } = Guid.NewGuid();
         public long CountOpening { get; set; }
 

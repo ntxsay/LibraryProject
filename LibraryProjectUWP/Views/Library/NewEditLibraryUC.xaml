@@ -43,20 +43,26 @@
         </Grid>
     </PivotItem.Header>
     <Grid>
-        <Grid RowSpacing="8" Margin="0 8 0 0" VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
+        <Grid Grid.Row="1" RowSpacing="8" Margin="0 8 0 0" VerticalAlignment="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
-            <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.Value, Mode=TwoWay}" PlaceholderText="{x:Bind ViewModelPage.NamePlaceHolderText, Mode=OneWay}"/>
-            <TextBox Grid.Row="2" Text="{x:Bind ViewModelPage.Description, Mode=TwoWay}" MinHeight="100" PlaceholderText="{x:Bind ViewModelPage.DescriptionPlaceHolderText, Mode=OneWay}"
+            <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.Value, Mode=TwoWay}" PlaceholderText="{x:Bind ViewModelPage.NamePlaceHolderText, Mode=OneWay}"/>
+            <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.Description, Mode=TwoWay}" MinHeight="100" PlaceholderText="{x:Bind ViewModelPage.DescriptionPlaceHolderText, Mode=OneWay}"
                  TextWrapping="Wrap" AcceptsReturn="True"/>
-            <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="OrangeRed" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ErrorMessage, Mode=OneWay}"/>
         </Grid>
-        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+        <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="2" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+                       IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}" Margin="0 10 0 5">
+        </MUIXC:InfoBar>
+        <StackPanel Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
             <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>

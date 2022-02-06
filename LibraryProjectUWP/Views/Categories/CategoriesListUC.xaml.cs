@@ -7,6 +7,7 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Categorie;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -479,31 +480,43 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-        private string _ArgName;
-        public string ArgName
+        private InfoBarSeverity _ResultMessageSeverity = InfoBarSeverity.Informational;
+        public InfoBarSeverity ResultMessageSeverity
         {
-            get => this._ArgName;
+            get => this._ResultMessageSeverity;
             set
             {
-                if (this._ArgName != value)
+                if (this._ResultMessageSeverity != value)
                 {
-                    this._ArgName = value;
+                    this._ResultMessageSeverity = value;
                     this.OnPropertyChanged();
                 }
             }
         }
 
-        
-
-        private Brush _ResultMessageForeGround;
-        public Brush ResultMessageForeGround
+        private bool _IsResultMessageOpen;
+        public bool IsResultMessageOpen
         {
-            get => this._ResultMessageForeGround;
+            get => this._IsResultMessageOpen;
             set
             {
-                if (this._ResultMessageForeGround != value)
+                if (this._IsResultMessageOpen != value)
                 {
-                    this._ResultMessageForeGround = value;
+                    this._IsResultMessageOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ResultMessageTitle;
+        public string ResultMessageTitle
+        {
+            get => this._ResultMessageTitle;
+            set
+            {
+                if (this._ResultMessageTitle != value)
+                {
+                    this._ResultMessageTitle = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -520,6 +533,34 @@ namespace LibraryProjectUWP.Views.Categories
                 {
                     this._ParentLibrary = value;
                     this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private CategorieLivreVM _SelectedSCategorie;
+        public CategorieLivreVM SelectedSCategorie
+        {
+            get => _SelectedSCategorie;
+            set
+            {
+                if (_SelectedSCategorie != value)
+                {
+                    _SelectedSCategorie = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private SubCategorieLivreVM _SelectedSSubCategorie;
+        public SubCategorieLivreVM SelectedSSubCategorie
+        {
+            get => _SelectedSSubCategorie;
+            set
+            {
+                if (_SelectedSSubCategorie != value)
+                {
+                    _SelectedSSubCategorie = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -580,12 +621,16 @@ namespace LibraryProjectUWP.Views.Categories
                     {
                         if (value is CategorieLivreVM categorie)
                         {
+                            SelectedSCategorie = categorie;
+                            SelectedSSubCategorie = null;
                             SelectedSCategorieName = categorie.Name;
                             SelectedCategorieName = categorie.Name;
                             SelectedSubCategorieName = String.Empty;
                         }
                         else if (value is SubCategorieLivreVM subCategorie)
                         {
+                            SelectedSSubCategorie = subCategorie;
+                            SelectedSCategorie = null;
                             SelectedSCategorieName = subCategorie.Name;
                             SelectedCategorieName = String.Empty;
                             SelectedSubCategorieName = subCategorie.Name;
@@ -593,6 +638,8 @@ namespace LibraryProjectUWP.Views.Categories
                     }
                     else
                     {
+                        SelectedSCategorie = null;
+                        SelectedSSubCategorie = null;
                         SelectedSCategorieName = String.Empty;
                         SelectedCategorieName = String.Empty;
                         SelectedSubCategorieName = String.Empty;

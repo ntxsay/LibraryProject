@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.General;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -147,7 +148,10 @@ namespace LibraryProjectUWP.Views.Library.Manage
             {
                 if (ViewModelPage.Value.IsStringNullOrEmptyOrWhiteSpace())
                 {
-                    ViewModelPage.ErrorMessage = $"Le nom de la bibliothèque ne peut pas être vide\nou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Le nom de la bibliothèque ne peut pas être vide\nou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
                     return false;
                 }
 
@@ -156,12 +160,15 @@ namespace LibraryProjectUWP.Views.Library.Manage
                     var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentLibrary?.Name?.Trim().ToLower() == ViewModelPage.Value?.Trim().ToLower());
                     if (isError)
                     {
-                        TbxErrorMessage.Text = $"Cette bibliothèque existe déjà.";
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"Cette bibliothèque existe déjà.";
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
                         return false;
                     }
                 }
 
-                ViewModelPage.ErrorMessage = string.Empty;
+                ViewModelPage.IsResultMessageOpen = false;
                 return true;
             }
             catch (Exception ex)
@@ -239,15 +246,57 @@ namespace LibraryProjectUWP.Views.Library.Manage
             }
         }
 
-        private string _ErrorMessage;
-        public string ErrorMessage
+        private string _ResultMessage;
+        public string ResultMessage
         {
-            get => this._ErrorMessage;
+            get => this._ResultMessage;
             set
             {
-                if (this._ErrorMessage != value)
+                if (this._ResultMessage != value)
                 {
-                    this._ErrorMessage = value;
+                    this._ResultMessage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private InfoBarSeverity _ResultMessageSeverity = InfoBarSeverity.Informational;
+        public InfoBarSeverity ResultMessageSeverity
+        {
+            get => this._ResultMessageSeverity;
+            set
+            {
+                if (this._ResultMessageSeverity != value)
+                {
+                    this._ResultMessageSeverity = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsResultMessageOpen;
+        public bool IsResultMessageOpen
+        {
+            get => this._IsResultMessageOpen;
+            set
+            {
+                if (this._IsResultMessageOpen != value)
+                {
+                    this._IsResultMessageOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ResultMessageTitle;
+        public string ResultMessageTitle
+        {
+            get => this._ResultMessageTitle;
+            set
+            {
+                if (this._ResultMessageTitle != value)
+                {
+                    this._ResultMessageTitle = value;
                     this.OnPropertyChanged();
                 }
             }

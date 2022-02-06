@@ -30,6 +30,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using LibraryProjectUWP.Views.UserControls.TitleBar;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -351,6 +352,10 @@ namespace LibraryProjectUWP
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                this.ChangeAppTitle(new TitleBarLibraryName(parentLibrary) 
+                { 
+                    Margin = new Thickness(0, 14, 0, 0),
+                });
                 return NavigateToView("Book.BookCollectionPage", new LibraryToBookNavigationDriverVM() { ParentLibrary = parentLibrary });
             }
             catch (Exception ex)
@@ -400,9 +405,28 @@ namespace LibraryProjectUWP
             }
         }
 
+        public void ChangeAppTitle(UIElement element)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.AppTitleContainer.Children.Any())
+                {
+                    this.AppTitleContainer.Children.Clear();
+                }
+
+                this.AppTitleContainer.Children.Add(element);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #endregion
 
-        
+
     }
 
     public class MainPageViewModel : INotifyPropertyChanged
@@ -447,6 +471,20 @@ namespace LibraryProjectUWP
                 if (_IsBackArrowVisible != value)
                 {
                     _IsBackArrowVisible = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private object _AppBarTitle;
+        public object AppBarTitle
+        {
+            get => _AppBarTitle;
+            set
+            {
+                if (_AppBarTitle != value)
+                {
+                    _AppBarTitle = value;
                     OnPropertyChanged();
                 }
             }

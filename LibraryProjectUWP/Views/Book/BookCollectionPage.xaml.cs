@@ -1111,32 +1111,27 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
-        private void DisplayCategorieListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        #region Events
+        private async void Btn_Collection_Categorie_Click(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(CategoriesListUC));
-                if (checkedItem != null)
+                if (ViewModelPage.SelectedItems.Count > 0)
                 {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
-                }
-                else
-                {
-                    CategoriesListUC userControl = new CategoriesListUC(new CategorieParameterDriverVM()
+                    var pivotItem = GetCategorieListSideBar();
+                    if (pivotItem != null && pivotItem.ViewModelPage.SelectedCategorie != null)
                     {
-                        BookPage = this,
-                        ParentLibrary = ViewModelPage.ParentLibrary,
-                    });
-
-                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                    {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
-                    });
+                        if (pivotItem.ViewModelPage.SelectedCategorie is CategorieLivreVM categorie)
+                        {
+                            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), categorie.Id);
+                        }
+                        else if (pivotItem.ViewModelPage.SelectedCategorie is SubCategorieLivreVM subCategorie)
+                        {
+                            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), subCategorie.IdCategorie, subCategorie.Id);
+                        }
+                    }
                 }
-                this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -1144,6 +1139,8 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        #endregion
 
         #region New Book
         private void NewBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -1165,7 +1162,7 @@ namespace LibraryProjectUWP.Views.Book
                         ViewModelList = ViewModelPage.ViewModelList,
                         CurrentViewModel = new LivreVM()
                         {
-
+                            IdLibrary = _parameters.ParentLibrary.Id,
                         }
                     });
 
@@ -1197,7 +1194,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     LivreVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                    var creationResult = await DbServices.Book.CreateAsync(newViewModel);
+                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, _parameters.ParentLibrary.Id);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
@@ -1221,7 +1218,10 @@ namespace LibraryProjectUWP.Views.Book
                     }
                 }
 
-                sender.ViewModelPage.ViewModel = new LivreVM();
+                sender.ViewModelPage.ViewModel = new LivreVM()
+                {
+                    IdLibrary = _parameters.ParentLibrary.Id,
+                };
             }
             catch (Exception ex)
             {
@@ -2256,6 +2256,71 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Events Categorie
+        private void DisplayCategorieListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(CategoriesListUC));
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    CategoriesListUC userControl = new CategoriesListUC(new CategorieParameterDriverVM()
+                    {
+                        BookPage = this,
+                        ParentLibrary = ViewModelPage.ParentLibrary,
+                    });
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
+        private async Task AddBookToCategorie(CategoriesListUC categoriesListUC,IEnumerable<long> idBooks, long idCategorie, long? idSubCategorie = null)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var creationResult = await DbServices.Categorie.CreateCategorieConnectorAsync(idBooks, idCategorie, idSubCategorie);
+                if (creationResult.IsSuccess)
+                {
+                    categoriesListUC.ViewModelPage.ResultMessageTitle = "Succès";
+                    categoriesListUC.ViewModelPage.ResultMessage = creationResult.Message;
+                    categoriesListUC.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                    categoriesListUC.ViewModelPage.IsResultMessageOpen = true;
+
+                }
+                else
+                {
+                    //Erreur
+                    categoriesListUC.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    categoriesListUC.ViewModelPage.ResultMessage = creationResult.Message;
+                    categoriesListUC.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                    categoriesListUC.ViewModelPage.IsResultMessageOpen = true;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         public void AddNewCategory(BibliothequeVM parentLibrary, Guid? guid = null)
         {
             try
@@ -2861,6 +2926,30 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private CategoriesListUC GetCategorieListSideBar()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is CategoriesListUC);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as CategoriesListUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
         private CategoriesListUC GetCategorieListSideBarByGuid(Guid guid)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -3111,6 +3200,8 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
