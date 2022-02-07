@@ -6,6 +6,7 @@ using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Settings;
 using LibraryProjectUWP.Views;
 using System;
 using System.Collections.Generic;
@@ -183,6 +184,11 @@ namespace LibraryProjectUWP
                 {
                     ContactCollectionNavigationAsync();
                 }
+                else if (itemTag == ViewModelPage.SettingsMenuItem.Tag)
+                {
+                    OpenSettingsPage();
+                }
+
             }
             catch (Exception)
             {
@@ -385,6 +391,22 @@ namespace LibraryProjectUWP
             }
         }
 
+        public bool OpenSettingsPage()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                
+
+                return NavigateToView("ManageContainerPage", new ManageParametersDriverVM() { });
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return false;
+            }
+        }
+
         public bool OpenManageBookPage(ManageBookParametersVM manageBookParameters)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -441,6 +463,12 @@ namespace LibraryProjectUWP
         {
             Text = "À propos de ...",
             Tag = "About"
+        };
+
+        public ItemTagContentVM SettingsMenuItem => new ItemTagContentVM()
+        {
+            Text = "Paramètres",
+            Tag = "settings"
         };
 
         public ItemTagContentVM NewElementMenuItem => new ItemTagContentVM()

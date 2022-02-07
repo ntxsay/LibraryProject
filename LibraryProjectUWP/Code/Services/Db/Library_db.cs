@@ -112,6 +112,21 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
+            public static async Task<long> CountBookAsync(long idLibrary)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+                    return await context.TlibraryBookConnector.LongCountAsync(c => c.IdLibrary == idLibrary);
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return 0;
+                }
+            }
+
             public static async Task<OperationStateVM> CreateAsync(BibliothequeVM viewModel)
             {
                 try
@@ -356,14 +371,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     if (viewModel.Categories.Any())
                     {
-                        foreach (var category in viewModel.Categories)
-                        {
-                            var subCategoriesList = await SubCategorie.MultipleVmAsync(category.Id);
-                            if (subCategoriesList != null && subCategoriesList.Any())
-                            {
-                                category.SubCategorieLivres = subCategoriesList != null && subCategoriesList.Any() ? new ObservableCollection<SubCategorieLivreVM>(subCategoriesList) : new ObservableCollection<SubCategorieLivreVM>();
-                            }
-                        }
+                        await Categorie.AddSubCategoriesToCategoriesVmAsync(viewModel.Categories);
                     }
 
                     return viewModel;

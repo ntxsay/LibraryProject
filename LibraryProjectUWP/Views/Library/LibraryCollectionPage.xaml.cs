@@ -1305,7 +1305,6 @@ namespace LibraryProjectUWP.Views.Library
         }
         #endregion
 
-
         #region Groups
         public void GroupItemsByNone()
         {

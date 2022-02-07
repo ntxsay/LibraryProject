@@ -17,6 +17,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 {
     internal partial class DbServices
     {
+        [Obsolete]
         public struct SubCategorie
         {
             static string NameEmptyMessage = "Le nom de la sous-catégorie doit être renseigné avant l'enregistrement.";
@@ -369,6 +370,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <typeparam name="T2">Type sortie</typeparam>
             /// <param name="model">Modèle de base de données</param>
             /// <returns>Un modèle de vue</returns>
+            [Obsolete]
             private static SubCategorieLivreVM ViewModelConverterAsync(TlibrarySubCategorie model)
             {
                 try

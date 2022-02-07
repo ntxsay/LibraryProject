@@ -1,0 +1,128 @@
+﻿<Page
+    x:Class="LibraryProjectUWP.Views.Settings.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views.Settings"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    xmlns:generalVM="using:LibraryProjectUWP.ViewModels.General"
+    Background="Transparent" NavigationCacheMode="Disabled" Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <ThemeShadow x:Name="BackgroundGridShadow"/>
+    </Page.Resources>
+    <Grid Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32"
+                    Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
+        <Grid.CornerRadius>
+            <CornerRadius>8</CornerRadius>
+        </Grid.CornerRadius>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <!--Header-->
+        <Grid Grid.Row="0" Margin="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="430"/>
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Paramètres"/>
+            <Button Grid.Column="1"  VerticalAlignment="Bottom" Margin="5 0 0 5" Background="Transparent" BorderThickness="0"
+                        Click="BtnCancel_Click"  Visibility="{x:Bind PageViewModel.TopCloseButtonVisibility, Mode=OneWay}">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8BB;"/>
+            </Button>
+        </Grid>
+        <!--Content-->
+        <MUIXC:NavigationView x:Name="MyNavigationView" Grid.Row="1" PaneDisplayMode="Auto" IsBackButtonVisible="Collapsed"  IsTitleBarAutoPaddingEnabled="False" IsSettingsVisible="False" Margin="0,0,0,0"
+                              ItemInvoked="MyNavigationView_ItemInvoked"  IsBackEnabled="False" IsPaneToggleButtonVisible="True" PaneTitle="Menu">
+            <!--PaneTitle="Editer un animé"-->
+            <MUIXC:NavigationView.AutoSuggestBox>
+                <AutoSuggestBox QueryIcon="Find" AutomationProperties.Name="Search" PlaceholderText="Rechercher un paramètre"/>
+            </MUIXC:NavigationView.AutoSuggestBox>
+            <MUIXC:NavigationView.MenuItems>
+                <MUIXC:NavigationViewItem Tag="{x:Bind PageViewModel.GeneralMenuItem.Tag, Mode=OneWay}" Content="{x:Bind PageViewModel.GeneralMenuItem.Text, Mode=OneWay}" >
+                    <MUIXC:NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xEA98;"/>
+                    </MUIXC:NavigationViewItem.Icon>
+                </MUIXC:NavigationViewItem>
+                <MUIXC:NavigationViewItem Tag="{x:Bind PageViewModel.CategorieMenuItem.Tag, Mode=OneWay}" Content="{x:Bind PageViewModel.CategorieMenuItem.Text, Mode=OneWay}" >
+                    <MUIXC:NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8EC;"/>
+                    </MUIXC:NavigationViewItem.Icon>
+                </MUIXC:NavigationViewItem>
+            </MUIXC:NavigationView.MenuItems>
+            <MUIXC:NavigationView.Content>
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid x:Name="GridNavigationError" Grid.Row="0" HorizontalAlignment="Stretch" Padding="40 20 40 20" ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid>
+                                <MUIXC:ProgressRing Height="120" Width="120" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" 
+                                                        Foreground="{x:Bind PageViewModel.BrushColorState, Mode=OneWay}" IsActive="True" Minimum="0" Value="100" Maximum="100" IsIndeterminate="{x:Bind PageViewModel.IsProgressRingIndeterminate, Mode=OneWay}"/>
+                                <TextBlock Text="{x:Bind PageViewModel.ErrorList.Count, Mode=OneWay}" FontSize="48" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{x:Bind PageViewModel.BrushColorState, Mode=OneWay}"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{x:Bind PageViewModel.MessageState, Mode=OneWay}" FontSize="28" Foreground="{x:Bind PageViewModel.BrushColorState, Mode=OneWay}"/>
+                            <Grid Grid.Row="1">
+                                <ScrollViewer MaxHeight="200">
+                                    <ListView ItemsSource="{x:Bind PageViewModel.ErrorList, Mode=OneWay}" SelectionMode="None" IsItemClickEnabled="True">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="generalVM:OperationStateVM">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="190" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <FontIcon Glyph="{x:Bind Glyph}"/>
+                                                        <TextBlock>
+                                                        <Run Text="{x:Bind Title}" FontWeight="SemiBold" />
+                                                        <Run Text=":" FontWeight="SemiBold"/>
+                                                        <Run Text="" />
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1" Text="{x:Bind Message}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </ScrollViewer>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="1" HorizontalAlignment="Stretch">
+                        <Frame x:Name="FrameContainer" x:FieldModifier="Public" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent">
+
+                        </Frame>
+                    </Grid>
+                </Grid>
+            </MUIXC:NavigationView.Content>
+        </MUIXC:NavigationView>
+        <!--Footer-->
+        <Grid Grid.Row="2" Margin="8">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <Button x:Name="BtnCancel" Grid.Column="1" Margin="5 0 0 0" Click="BtnCancel_Click">
+                    <TextBlock Text="Fermer"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

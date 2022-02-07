@@ -1124,11 +1124,11 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         if (pivotItem.ViewModelPage.SelectedCategorie is CategorieLivreVM categorie)
                         {
-                            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), categorie.Id);
+                            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), categorie);
                         }
                         else if (pivotItem.ViewModelPage.SelectedCategorie is SubCategorieLivreVM subCategorie)
                         {
-                            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), subCategorie.IdCategorie, subCategorie.Id);
+                            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), pivotItem.GetParentCategorie(), subCategorie);
                         }
                     }
                 }
@@ -2291,18 +2291,28 @@ namespace LibraryProjectUWP.Views.Book
         }
 
 
-        private async Task AddBookToCategorie(CategoriesListUC categoriesListUC,IEnumerable<long> idBooks, long idCategorie, long? idSubCategorie = null)
+        private async Task AddBookToCategorie(CategoriesListUC categoriesListUC,IEnumerable<long> idBooks, CategorieLivreVM selectedCategorie, SubCategorieLivreVM selectedSubCategorie = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var creationResult = await DbServices.Categorie.CreateCategorieConnectorAsync(idBooks, idCategorie, idSubCategorie);
+                var creationResult = await DbServices.Categorie.CreateCategorieConnectorAsync(idBooks, selectedCategorie, selectedSubCategorie);
                 if (creationResult.IsSuccess)
                 {
                     categoriesListUC.ViewModelPage.ResultMessageTitle = "Succès";
                     categoriesListUC.ViewModelPage.ResultMessage = creationResult.Message;
                     categoriesListUC.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                     categoriesListUC.ViewModelPage.IsResultMessageOpen = true;
+
+                    await UpdateLibraryCategoriesAsync();
+                    //if (selectedSubCategorie != null)
+                    //{
+                    //    selectedSubCategorie.BooksId = (await DbServices.Categorie.GetBooksIdInSubCategorie(selectedSubCategorie.Id)).ToList();
+                    //}
+                    //else
+                    //{
+                    //    selectedCategorie.BooksId = (await DbServices.Categorie.GetBooksIdInCategorie(selectedCategorie.Id)).ToList();
+                    //}
 
                 }
                 else
@@ -2321,6 +2331,34 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        public async Task UpdateLibraryCategoriesAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (_parameters.ParentLibrary != null && _parameters.ParentLibrary.Categories.Any())
+                {
+                    _parameters.ParentLibrary.Categories.Clear();
+                    var categorieList = await DbServices.Categorie.MultipleVmAsync(_parameters.ParentLibrary.Id);
+                    if (categorieList != null && categorieList.Any())
+                    {
+                        foreach (var category in categorieList)
+                        {
+                            _parameters.ParentLibrary.Categories.Add(category);
+                        }
+
+                        await DbServices.Categorie.AddSubCategoriesToCategoriesVmAsync(_parameters.ParentLibrary.Categories);
+                    } 
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         public void AddNewCategory(BibliothequeVM parentLibrary, Guid? guid = null)
         {
             try
@@ -2644,7 +2682,7 @@ namespace LibraryProjectUWP.Views.Book
                         Description = description,
                     };
 
-                    var creationResult = await DbServices.SubCategorie.CreateAsync(newViewModel);
+                    var creationResult = await DbServices.Categorie.CreateSubCategorieAsync(newViewModel);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
@@ -2698,7 +2736,7 @@ namespace LibraryProjectUWP.Views.Book
                         Description = newDescription,
                     };
 
-                    var updateResult = await DbServices.SubCategorie.UpdateAsync(updatedViewModel);
+                    var updateResult = await DbServices.Categorie.UpdateAsync(updatedViewModel);
                     if (updateResult.IsSuccess)
                     {
                         sender.ViewModelPage.ResultMessageTitle = "Succès";

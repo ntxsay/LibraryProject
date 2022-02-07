@@ -41,7 +41,7 @@
                 </MUIXC:NavigationViewItem>
             </MUIXC:NavigationView.MenuItems>
             <MUIXC:NavigationView.FooterMenuItems>
-                <MUIXC:NavigationViewItem Content="Paramètres" Tag="Settings">
+                <MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.SettingsMenuItem.Text}" Tag="{x:Bind ViewModelPage.SettingsMenuItem.Tag}">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE713;"/>
                     </MUIXC:NavigationViewItem.Icon>

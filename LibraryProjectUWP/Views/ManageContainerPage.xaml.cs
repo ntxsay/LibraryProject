@@ -2,8 +2,10 @@
 using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Settings;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Library;
+using LibraryProjectUWP.Views.Settings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,8 +33,7 @@ namespace LibraryProjectUWP.Views
     /// </summary>
     public sealed partial class ManageContainerPage : Page
     {
-        private ManageBookParametersVM BookParameters { get; set; }
-        private ManageLibraryParametersVM LibraryParameters { get; set; }
+        private ManageParametersDriverVM _parameters { get; set; }
         public ManageContainerPage()
         {
             this.InitializeComponent();
@@ -41,15 +42,10 @@ namespace LibraryProjectUWP.Views
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is ManageLibraryParametersVM libraryParameters)
+            if (e.Parameter is ManageParametersDriverVM parametersDriverVM)
             {
-                LibraryParameters = libraryParameters;
-                //NavigateToView(typeof(ManageLibraryPage), new ManageLibraryParametersVM() { ParentPage = this, ViewModelList = libraryParameters.ViewModelList, EditMode = libraryParameters.EditMode });
-            }
-            else if (e.Parameter is ManageBookParametersVM bookParameters)
-            {
-                BookParameters = bookParameters;
-                //NavigateToView(typeof(ManageBookPage), new ManageBookParametersVM() { ParentPage = this, ViewModel = bookParameters.ViewModel, EditMode = bookParameters.EditMode });
+                _parameters = parametersDriverVM;
+                NavigateToView(typeof(SettingsPage), new ManageSettingsParentChildVM() { ParentPage = this });
             }
         }
 

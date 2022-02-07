@@ -59,6 +59,19 @@ namespace LibraryProjectUWP.ViewModels
             }
         }
         public List<LivreVM> Livres { get; set; }
+        private List<long> _BooksId = new List<long>();
+        public List<long> BooksId
+        {
+            get => _BooksId;
+            set
+            {
+                if (_BooksId != value)
+                {
+                    _BooksId = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
@@ -101,6 +114,20 @@ namespace LibraryProjectUWP.ViewModels
         }
 
         public List<LivreVM> Livres { get; set; }
+
+        private List<long> _BooksId = new List<long>();
+        public List<long> BooksId
+        {
+            get => _BooksId;
+            set
+            {
+                if (_BooksId != value)
+                {
+                    _BooksId = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

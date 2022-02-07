@@ -83,7 +83,7 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-        private CategorieLivreVM GetParentCategorie()
+        public CategorieLivreVM GetParentCategorie()
         {
             try
             {

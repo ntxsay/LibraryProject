@@ -21,6 +21,9 @@ namespace LibraryProjectUWP.Code.Services.Db
         {
             static string NameEmptyMessage = "Le nom de la catégorie doit être renseigné avant l'enregistrement.";
             static string NameAlreadyExistMessage = "Cette catégorie existe déjà.";
+            static string SubCategorieNameEmptyMessage = "Le nom de la sous-catégorie doit être renseigné avant l'enregistrement.";
+            static string SubCategorieNameAlreadyExistMessage = "Cette sous-catégorie existe déjà.";
+
             #region All
             /// <summary>
             /// Retourne tous les objets de la base de données
@@ -99,6 +102,84 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return Enumerable.Empty<long>().ToList();
                 }
             }
+
+            /// <summary>
+            /// Retourne tous les objets de la base de données
+            /// </summary>
+            /// <typeparam name="T">Modèle de base de données</typeparam>
+            /// <returns></returns>
+            public static async Task<IList<TlibrarySubCategorie>> AllSubCategorieAsync()
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    var collection = await context.TlibrarySubCategorie.ToListAsync();
+                    if (collection == null || !collection.Any()) return Enumerable.Empty<TlibrarySubCategorie>().ToList();
+
+                    return collection;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<TlibrarySubCategorie>().ToList();
+                }
+            }
+
+            /// <summary>
+            /// Retourne tous les modèles de vue depuis la base de données
+            /// </summary>
+            /// <typeparam name="T1">Type d'entrée (Modèle)</typeparam>
+            /// <typeparam name="T2">Type sortie (Modèle de vue)</typeparam>
+            /// <returns></returns>
+            public static async Task<IList<SubCategorieLivreVM>> AllSubCategorieVMAsync()
+            {
+                try
+                {
+                    var collection = await AllSubCategorieAsync();
+                    if (!collection.Any()) return Enumerable.Empty<SubCategorieLivreVM>().ToList();
+
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<SubCategorieLivreVM>().ToList();
+                }
+            }
+
+            public static async Task<IList<long>> AllSubCategorieIdAsync()
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+                    return await context.TlibrarySubCategorie.Select(s => s.Id).ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<long>().ToList();
+                }
+            }
+
+            public static async Task<IList<long>> AllSubCategorieIdAsync(long idCategorie)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+                    return await context.TlibrarySubCategorie.Where(w => w.IdCategorie == idCategorie).Select(s => s.Id).ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<long>().ToList();
+                }
+            }
             #endregion
 
             #region Multiple
@@ -125,10 +206,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    var collection = await Categorie.MultipleAsync(idLibrary);
+                    var collection = await MultipleAsync(idLibrary);
                     if (!collection.Any()) return Enumerable.Empty<CategorieLivreVM>().ToList();
 
-                    var values = collection.Select(async s => await Categorie.ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
                     return values;
                 }
                 catch (Exception ex)
@@ -136,6 +217,68 @@ namespace LibraryProjectUWP.Code.Services.Db
                     MethodBase m = MethodBase.GetCurrentMethod();
                     Debug.WriteLine(Logs.GetLog(ex, m));
                     return Enumerable.Empty<CategorieLivreVM>().ToList();
+                }
+            }
+
+            public static async Task<IList<TlibrarySubCategorie>> MultipleSubCategorieAsync(long idCategorie)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    var collection = await context.TlibrarySubCategorie.Where(w => w.IdCategorie == idCategorie).ToListAsync();
+                    if (collection == null || !collection.Any()) return Enumerable.Empty<TlibrarySubCategorie>().ToList();
+
+                    return collection;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<TlibrarySubCategorie>().ToList();
+                }
+            }
+
+            public static async Task<IList<SubCategorieLivreVM>> MultipleSubCategorieVmAsync(long idCategorie)
+            {
+                try
+                {
+                    var collection = await MultipleSubCategorieAsync(idCategorie);
+                    if (!collection.Any()) return Enumerable.Empty<SubCategorieLivreVM>().ToList();
+
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(d => d.Result).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<SubCategorieLivreVM>().ToList();
+                }
+            }
+
+            public static async Task AddSubCategoriesToCategoriesVmAsync(ICollection<CategorieLivreVM> viewModelList)
+            {
+                try
+                {
+                    if (viewModelList != null && viewModelList.Any())
+                    {
+                        foreach (var category in viewModelList)
+                        {
+                            var subCategoriesList = await MultipleSubCategorieVmAsync(category.Id);
+                            if (subCategoriesList != null && subCategoriesList.Any())
+                            {
+                                category.SubCategorieLivres = subCategoriesList != null && subCategoriesList.Any() ? 
+                                    new ObservableCollection<SubCategorieLivreVM>(subCategoriesList) : new ObservableCollection<SubCategorieLivreVM>();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return;
                 }
             }
             #endregion
@@ -179,10 +322,51 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
-            public static async Task<OperationStateVM> CreateCategorieConnectorAsync(IEnumerable<long> idBooks, long idCategorie, long? idSubCategorie = null)
+            public static async Task<IList<long>> GetBooksIdInCategorie(long idCategorie)
             {
                 try
                 {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    return await context.TlibraryBookConnector.Where(d => d.IdCategorie == idCategorie && d.IdSubCategorie == null).Select(s => s.IdBook).ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return new List<long>();
+                }
+            }
+
+            public static async Task<IList<long>> GetBooksIdInSubCategorie(long idSubCategorie)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    return await context.TlibraryBookConnector.Where(d => d.IdSubCategorie == idSubCategorie).Select(s => s.IdBook).ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return new List<long>();
+                }
+            }
+
+            public static async Task<OperationStateVM> CreateCategorieConnectorAsync(IEnumerable<long> idBooks, CategorieLivreVM categorie, SubCategorieLivreVM subCategorie = null)
+            {
+                try
+                {
+                    if (categorie == null)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.RecordNotExistMessage,
+                        };
+                    }
+
                     LibraryDbContext context = new LibraryDbContext();
                     
                     List<long> validIdList = new List<long>();
@@ -206,7 +390,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    var isCategorieExist = await context.TlibraryCategorie.AnyAsync(a => a.Id == idCategorie);
+                    var isCategorieExist = await context.TlibraryCategorie.AnyAsync(a => a.Id == categorie.Id);
                     if (!isCategorieExist)
                     {
                         return new OperationStateVM()
@@ -216,9 +400,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    if (idSubCategorie != null)
+                    if (subCategorie != null)
                     {
-                        var isSubCategorieExist = await context.TlibrarySubCategorie.AnyAsync(a => a.Id == (long)idSubCategorie);
+                        var isSubCategorieExist = await context.TlibrarySubCategorie.AnyAsync(a => a.Id == subCategorie.Id);
                         if (!isSubCategorieExist)
                         {
                             return new OperationStateVM()
@@ -237,10 +421,10 @@ namespace LibraryProjectUWP.Code.Services.Db
                             continue;
                         }
 
-                        bookConnector.IdCategorie = idCategorie;
-                        if (idSubCategorie != null)
+                        bookConnector.IdCategorie = categorie.Id;
+                        if (subCategorie != null)
                         {
-                            bookConnector.IdSubCategorie = (long)idSubCategorie;
+                            bookConnector.IdSubCategorie = subCategorie.Id;
                         }
 
                         context.TlibraryBookConnector.Update(bookConnector);
@@ -250,7 +434,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     return new OperationStateVM()
                     {
-                        Message = "Les livres ont été ajoutés à la catégorie",
+                        Message =  subCategorie == null ? $"Les livres ont été ajoutés à la catégorie : {categorie.Name}." : $"Les livres ont été ajoutés à la sous-catégorie : {subCategorie.Name}",
                         IsSuccess = true,
                     };
                 }
@@ -448,6 +632,187 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static async Task<OperationStateVM> CreateSubCategorieAsync(SubCategorieLivreVM viewModel)
+            {
+                try
+                {
+                    if (viewModel == null)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.ViewModelNullOrEmptyMessage,
+                        };
+                    }
+
+                    if (viewModel.Name.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = NameEmptyMessage,
+                        };
+                    }
+
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    var isExist = await context.TlibrarySubCategorie.AnyAsync(c => c.IdCategorie == viewModel.IdCategorie && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
+                    if (isExist)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = true,
+                            Message = DbServices.RecordAlreadyExistMessage
+                        };
+                    }
+
+                    var record = new TlibrarySubCategorie()
+                    {
+                        IdCategorie = viewModel.IdCategorie,
+                        Name = viewModel.Name,
+                        Description = viewModel.Description,
+                    };
+
+                    await context.TlibrarySubCategorie.AddAsync(record);
+                    await context.SaveChangesAsync();
+
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = true,
+                        Id = record.Id,
+                    };
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Exception : {ex.Message}",
+                    };
+                }
+            }
+
+            /// <summary>
+            /// Met à jour un élément existant dans la base de données
+            /// </summary>
+            /// <typeparam name="T">Type d'entrée (Modèle de vue)</typeparam>
+            /// <param name="viewModel">Modèle de vue</param>
+            /// <returns></returns>
+            public static async Task<OperationStateVM> UpdateAsync(SubCategorieLivreVM viewModel)
+            {
+                try
+                {
+
+                    if (viewModel == null)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.ViewModelNullOrEmptyMessage,
+                        };
+                    }
+
+                    if (viewModel.Name.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = NameEmptyMessage,
+                        };
+                    }
+
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    var record = await context.TlibrarySubCategorie.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
+                    if (record == null)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.RecordNotExistMessage,
+                        };
+                    }
+
+                    var isExist = await context.TlibrarySubCategorie.AnyAsync(c => c.Id != record.Id && c.IdCategorie == viewModel.IdCategorie && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
+                    if (isExist)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = true,
+                            Message = NameAlreadyExistMessage
+                        };
+                    }
+
+                    record.Name = viewModel.Name;
+                    record.Description = viewModel.Description;
+
+                    context.TlibrarySubCategorie.Update(record);
+                    await context.SaveChangesAsync();
+
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = true,
+                        Id = record.Id,
+                    };
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Exception : {ex.Message}",
+                    };
+                }
+            }
+
+            /// <summary>
+            /// Supprime un élément de la base de données
+            /// </summary>
+            /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
+            /// <param name="Id"></param>
+            /// <returns></returns>
+            public static async Task<OperationStateVM> DeleteSubCategorieAsync(long Id)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    var record = await context.TlibrarySubCategorie.SingleOrDefaultAsync(a => a.Id == Id);
+                    if (record == null)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.RecordNotExistMessage
+                        };
+                    }
+
+                    context.TlibrarySubCategorie.Remove(record);
+                    await context.SaveChangesAsync();
+
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = true,
+                    };
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Exception : {ex.Message}",
+                    };
+                }
+            }
+
             #region Helpers
 
             /// <summary>
@@ -463,7 +828,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     if (model == null) return null;
 
-                    var subCategoriesList = await SubCategorie.MultipleVmAsync(model.Id);
+                    var subCategoriesList = await MultipleSubCategorieVmAsync(model.Id);
 
                     var viewModel = new CategorieLivreVM()
                     {
@@ -472,6 +837,39 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Description = model.Description,
                         Name = model.Name,
                         SubCategorieLivres = subCategoriesList != null && subCategoriesList.Any() ? new ObservableCollection<SubCategorieLivreVM>(subCategoriesList) : new ObservableCollection<SubCategorieLivreVM>(),
+                        BooksId = (await GetBooksIdInCategorie(model.Id))?.ToList(),
+                    };
+
+                    return viewModel;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// Convertit un modèle en modèle de vue
+            /// </summary>
+            /// <typeparam name="T1">Type d'entrée</typeparam>
+            /// <typeparam name="T2">Type sortie</typeparam>
+            /// <param name="model">Modèle de base de données</param>
+            /// <returns>Un modèle de vue</returns>
+            private static async Task<SubCategorieLivreVM> ViewModelConverterAsync(TlibrarySubCategorie model)
+            {
+                try
+                {
+                    if (model == null) return null;
+
+                    var viewModel = new SubCategorieLivreVM()
+                    {
+                        Id = model.Id,
+                        IdCategorie = model.IdCategorie,
+                        Description = model.Description,
+                        Name = model.Name,
+                        BooksId = (await GetBooksIdInSubCategorie(model.Id))?.ToList(),
                     };
 
                     return viewModel;
