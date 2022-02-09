@@ -144,6 +144,9 @@
         <XamlUICommand x:Name="SortByDateCreationXamlUICommand" 
                        ExecuteRequested="SortByDateCreationXamlUICommand_ExecuteRequested">
         </XamlUICommand>
+        <XamlUICommand x:Name="GotoPageXUiCmd" 
+                       ExecuteRequested="GotoPageXUiCmd_ExecuteRequested">
+        </XamlUICommand>
         <ThemeShadow x:Name="BackgroundGridShadow"/>
         <DataTemplate x:DataType="booktVm:LivreVM" x:Key="ThumbnailSimpleDataTemplate">
             <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
@@ -415,8 +418,24 @@
                                 </DataTemplate>
                             </Pivot.HeaderTemplate>
                         </Pivot>
-
-                        <MUIXC:PipsPager Grid.Row="1" Orientation="Horizontal" PreviousButtonVisibility="Visible" NextButtonVisibility="Visible" HorizontalAlignment="Center" Margin="0 10"/>
+                        <Grid Grid.Row="1">
+                            <ScrollViewer VerticalScrollMode="Disabled" HorizontalScrollBarVisibility="Hidden" Padding="0 5">
+                                <ItemsControl ItemsSource="{x:Bind ViewModelPage.PagesList, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="4"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="x:Int32">
+                                            <Button Command="{StaticResource GotoPageXUiCmd}" CommandParameter="{x:Bind }">
+                                                <TextBlock Text="{x:Bind }" />
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
                     </Grid>
                     <SplitView.Pane>
                         <Grid RowSpacing="4">
