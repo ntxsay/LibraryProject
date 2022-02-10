@@ -169,6 +169,7 @@
     <Compile Include="Code\Services\ES\Files.cs" />
     <Compile Include="Code\Services\ES\Files_JsonSerialization.cs" />
     <Compile Include="Code\Services\ES\Folders.cs" />
+    <Compile Include="Code\Services\Excel\ExcelServices.cs" />
     <Compile Include="Code\Services\Logging\Logs.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -393,6 +394,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ClosedXML">
+      <Version>0.95.4</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore">
       <Version>3.1.21</Version>
     </PackageReference>
