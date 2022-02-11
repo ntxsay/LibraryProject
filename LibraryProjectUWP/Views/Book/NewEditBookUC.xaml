@@ -81,10 +81,13 @@
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
             </XamlUICommand>
-            <XamlUICommand x:Name="ImportBookXamlUICommand" 
-                       ExecuteRequested="ImportBookXamlUICommand_ExecuteRequested"
-                       Description="Importe un livre existant" 
-                       Label="Importer un livre">
+            <XamlUICommand x:Name="ImportBookFromWebSiteXamlUICommand" 
+                       ExecuteRequested="ImportBookFromWebSiteXamlUICommand_ExecuteRequested"
+                       Description="Importe un livre existant">
+            </XamlUICommand>
+            <XamlUICommand x:Name="ImportBookFromFileXamlUICommand" 
+                       ExecuteRequested="ImportBookFromFileXamlUICommand_ExecuteRequested"
+                       Description="Importe un livre existant">
             </XamlUICommand>
             <XamlUICommand x:Name="CreateItemXUiCommand" 
                        ExecuteRequested="CreateItemXUiCommand_ExecuteRequested"
@@ -588,11 +591,45 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
-                <Button Command="{StaticResource ImportBookXamlUICommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
+                <Button  Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8B5;" FontSize="14"/>
                         <TextBlock Text="Importer" FontSize="14" />
                     </StackPanel>
+                    <Button.Flyout>
+                        <Flyout Placement="BottomEdgeAlignedRight">
+                            <Grid RowSpacing="18">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Vertical" Spacing="4">
+                                    <TextBlock Text="Importer depuis un site Web" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="300" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="Tbx_GenerateAnimeFromSite" Grid.Column="0" VerticalAlignment="Stretch" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" PlaceholderText="Url du lien de la fiche" Margin="0 0 5 0" />
+                                        <Button x:Name="Btn_GenerateAnimeFromSite" Grid.Column="1" VerticalAlignment="Center" 
+                                                Command="{StaticResource ImportBookFromWebSiteXamlUICommand}" CommandParameter="{x:Bind Tbx_GenerateAnimeFromSite.Text}">
+                                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xF6FA;"/>
+                                        </Button>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Orientation="Vertical" Spacing="4">
+                                    <TextBlock Text="Importer depuis un fichier" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    <Button VerticalAlignment="Center" Command="{StaticResource ImportBookFromFileXamlUICommand}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE773;"/>
+                                            <TextBlock Text="Importer un fichier" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Flyout>
+                    </Button.Flyout>
                 </Button>
                 <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
