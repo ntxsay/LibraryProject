@@ -613,7 +613,7 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBox x:Name="Tbx_GenerateAnimeFromSite" Grid.Column="0" VerticalAlignment="Stretch" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" PlaceholderText="Url du lien de la fiche" Margin="0 0 5 0" />
                                         <Button x:Name="Btn_GenerateAnimeFromSite" Grid.Column="1" VerticalAlignment="Center" 
-                                                Command="{StaticResource ImportBookFromWebSiteXamlUICommand}" CommandParameter="{x:Bind Tbx_GenerateAnimeFromSite.Text}">
+                                                Command="{StaticResource ImportBookFromWebSiteXamlUICommand}" CommandParameter="{x:Bind Tbx_GenerateAnimeFromSite.Text, Mode=OneWay}">
                                             <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xF6FA;"/>
                                         </Button>
                                     </Grid>

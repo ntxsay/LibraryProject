@@ -827,7 +827,6 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     htmlServices htmlservices = new htmlServices();
                     ViewModelPage.ViewModel = await htmlservices.GetBookFromAmazonAsync(new Uri(url), ViewModelPage.ViewModel);
-
                 }
                 else
                 {
