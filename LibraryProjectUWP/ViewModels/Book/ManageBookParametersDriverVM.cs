@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace LibraryProjectUWP.ViewModels.Book
 {
@@ -14,6 +15,13 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreVM CurrentViewModel { get; set; }
         public EditMode EditMode { get; set; }
         public BookCollectionPage ParentPage { get; set; }
+    }
+
+    public class ImportBookParametersDriverVM
+    {
+        public IEnumerable<LivreVM> ViewModelList { get; set; }
+        public BookCollectionPage ParentPage { get; set; }
+        public StorageFile ExcelFile { get; set; }
     }
 
     public class ManageBookExemplaryParametersDriverVM

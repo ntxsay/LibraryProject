@@ -862,8 +862,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                ExcelServices excelServices = new ExcelServices();
-                var data = await  excelServices.ImportExceltoDatatable(storageFile);
+                _parameters.ParentPage.ImportBook(storageFile);
             }
             catch (Exception ex)
             {

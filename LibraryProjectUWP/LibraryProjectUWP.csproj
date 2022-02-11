@@ -225,6 +225,9 @@
     <Compile Include="Views\AboutCd.xaml.cs">
       <DependentUpon>AboutCd.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\ImportBookFromExcelUC.xaml.cs">
+      <DependentUpon>ImportBookFromExcelUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\NewEditBookExemplaryUC.xaml.cs">
       <DependentUpon>NewEditBookExemplaryUC.xaml</DependentUpon>
     </Compile>
@@ -316,6 +319,10 @@
     <Page Include="Views\AboutCd.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\ImportBookFromExcelUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Book\NewEditBookExemplaryUC.xaml">
       <SubType>Designer</SubType>

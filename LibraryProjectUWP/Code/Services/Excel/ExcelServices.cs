@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
 using System;
@@ -16,17 +17,54 @@ namespace LibraryProjectUWP.Code.Services.Excel
 {
     public class ExcelServices 
     {
-
+        readonly StorageFile _file;
         public ExcelServices()
         {
 
         }
 
-        public async Task<DataTable> ImportExceltoDatatable(StorageFile file, string sheetName = "Feuil1")
+        public ExcelServices(StorageFile file)
+        {
+            _file = file;
+        }
+
+        public async Task<IEnumerable<string>> GetExcelSheetsName(StorageFile file = null)
         {
             try
             {
-                using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read))
+                StorageFile excelFile = file ?? _file;
+                using (IRandomAccessStream stream = await excelFile.OpenAsync(FileAccessMode.Read))
+                {
+                    using (XLWorkbook workBook = new XLWorkbook(stream.AsStream()))
+                    {
+                        return workBook.Worksheets.Select(s => s.Name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return Enumerable.Empty<string>();
+            }
+        }
+
+        public async Task<DataTable> ImportExcelToDatatable(string sheetName, string range, bool isContainsHeader = true, StorageFile file = null)
+        {
+            try
+            {
+                if (sheetName.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    return null;
+                }
+
+                if (range.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    return null;
+                }
+
+                StorageFile excelFile = file ?? _file;
+                using (IRandomAccessStream stream = await excelFile.OpenAsync(FileAccessMode.Read))
                 {
                     using (XLWorkbook workBook = new XLWorkbook(stream.AsStream()))
                     {
@@ -38,29 +76,47 @@ namespace LibraryProjectUWP.Code.Services.Excel
 
                         //Loop through the Worksheet rows.
                         bool firstRow = true;
-                        foreach (IXLRow row in workSheet.Rows())
+                        foreach (var row in workSheet.Range(range).Rows())
                         {
+                            
                             //Use the first row to add columns to DataTable.
                             if (firstRow)
                             {
-                                foreach (IXLCell cell in row.Cells())
+                                if (isContainsHeader)
                                 {
-                                    dt.Columns.Add(cell.Value.ToString());
-                                }
-                                firstRow = false;
-                            }
-                            else
-                            {
-                                //Add rows to DataTable.
-                                dt.Rows.Add();
-                                int i = 0;
+                                    foreach (IXLCell cell in row.Cells())
+                                    {
+                                        dt.Columns.Add(cell.Value.ToString());
+                                    }
 
-                                foreach (IXLCell cell in row.Cells(row.FirstCellUsed().Address.ColumnNumber, row.LastCellUsed().Address.ColumnNumber))
+                                    firstRow = false;
+                                    continue;
+                                }
+                                else
                                 {
-                                    dt.Rows[dt.Rows.Count - 1][i] = cell.Value.ToString();
-                                    i++;
+                                    for (int j = 0; j < row.CellCount(); j++)
+                                    {
+                                        dt.Columns.Add($"Colonne {j + 1}");
+                                    }
                                 }
                             }
+
+                            //Add rows to DataTable.
+                            dt.Rows.Add();
+
+                            int i = 0;
+                            int firstColumn = row.FirstCellUsed().Address.ColumnNumber;
+                            int lastColumn = row.LastCellUsed().Address.ColumnNumber;
+                            //var cellf = row.Cells($"{firstColumn}:{lastColumn}");
+                            var cellf = row.Cells();
+
+                            foreach (IXLCell cell in cellf)
+                            {
+                                dt.Rows[dt.Rows.Count - 1][i] = cell.Value.ToString();
+                                i++;
+                            }
+
+                            firstRow = false;
                         }
 
                         return dt;
