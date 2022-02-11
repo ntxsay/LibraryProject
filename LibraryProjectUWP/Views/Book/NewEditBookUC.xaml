@@ -86,7 +86,11 @@
                        Description="Importe un livre existant">
             </XamlUICommand>
             <XamlUICommand x:Name="ImportBookFromFileXamlUICommand" 
-                       ExecuteRequested="ImportBookFromFileXamlUICommand_ExecuteRequested"
+                       ExecuteRequested="ImportBookFromJsonFileXamlUICommand_ExecuteRequested"
+                       Description="Importe un livre existant">
+            </XamlUICommand>
+            <XamlUICommand x:Name="ImportBookFromExcelFileXamlUICommand" 
+                       ExecuteRequested="ImportBookFromExcelFileXamlUICommand_ExecuteRequested"
                        Description="Importe un livre existant">
             </XamlUICommand>
             <XamlUICommand x:Name="CreateItemXUiCommand" 
@@ -619,7 +623,16 @@
                                     </Grid>
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Orientation="Vertical" Spacing="4">
-                                    <TextBlock Text="Importer depuis un fichier" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    <TextBlock Text="Importer depuis un fichier Excel" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                                    <Button VerticalAlignment="Center" Command="{StaticResource ImportBookFromExcelFileXamlUICommand}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE773;"/>
+                                            <TextBlock Text="Importer un fichier" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="4">
+                                    <TextBlock Text="Importer depuis un fichier JSON" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                     <Button VerticalAlignment="Center" Command="{StaticResource ImportBookFromFileXamlUICommand}">
                                         <StackPanel Orientation="Horizontal" Spacing="4">
                                             <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE773;"/>

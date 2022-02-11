@@ -34,6 +34,15 @@ namespace LibraryProjectUWP.Code.Services.ES
                 };
         }
 
+        public static IEnumerable<string> ExcelExtensions
+        {
+            get => new List<string>()
+                {
+                    ".xls",
+                    ".xlsx",
+                };
+        }
+
         public static IEnumerable<string> VideosExtensions
         {
             get => new List<string>()

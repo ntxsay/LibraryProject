@@ -1,10 +1,16 @@
 ﻿using ClosedXML.Excel;
+using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace LibraryProjectUWP.Code.Services.Excel
 {
@@ -14,6 +20,98 @@ namespace LibraryProjectUWP.Code.Services.Excel
         public ExcelServices()
         {
 
+        }
+
+        public async Task<DataTable> ImportExceltoDatatable(StorageFile file, string sheetName = "Feuil1")
+        {
+            try
+            {
+                using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    using (XLWorkbook workBook = new XLWorkbook(stream.AsStream()))
+                    {
+                        //Read the first Sheet from Excel file.
+                        IXLWorksheet workSheet = workBook.Worksheet(sheetName);
+
+                        //Create a new DataTable.
+                        DataTable dt = new DataTable();
+
+                        //Loop through the Worksheet rows.
+                        bool firstRow = true;
+                        foreach (IXLRow row in workSheet.Rows())
+                        {
+                            //Use the first row to add columns to DataTable.
+                            if (firstRow)
+                            {
+                                foreach (IXLCell cell in row.Cells())
+                                {
+                                    dt.Columns.Add(cell.Value.ToString());
+                                }
+                                firstRow = false;
+                            }
+                            else
+                            {
+                                //Add rows to DataTable.
+                                dt.Rows.Add();
+                                int i = 0;
+
+                                foreach (IXLCell cell in row.Cells(row.FirstCellUsed().Address.ColumnNumber, row.LastCellUsed().Address.ColumnNumber))
+                                {
+                                    dt.Rows[dt.Rows.Count - 1][i] = cell.Value.ToString();
+                                    i++;
+                                }
+                            }
+                        }
+
+                        return dt;
+                    }
+                }
+                //// Open the Excel file using ClosedXML.
+                //// Keep in mind the Excel file cannot be open when trying to read it
+                //using (XLWorkbook workBook = new XLWorkbook(filePath))
+                //{
+                //    //Read the first Sheet from Excel file.
+                //    IXLWorksheet workSheet = workBook.Worksheet(1);
+
+                //    //Create a new DataTable.
+                //    DataTable dt = new DataTable();
+
+                //    //Loop through the Worksheet rows.
+                //    bool firstRow = true;
+                //    foreach (IXLRow row in workSheet.Rows())
+                //    {
+                //        //Use the first row to add columns to DataTable.
+                //        if (firstRow)
+                //        {
+                //            foreach (IXLCell cell in row.Cells())
+                //            {
+                //                dt.Columns.Add(cell.Value.ToString());
+                //            }
+                //            firstRow = false;
+                //        }
+                //        else
+                //        {
+                //            //Add rows to DataTable.
+                //            dt.Rows.Add();
+                //            int i = 0;
+
+                //            foreach (IXLCell cell in row.Cells(row.FirstCellUsed().Address.ColumnNumber, row.LastCellUsed().Address.ColumnNumber))
+                //            {
+                //                dt.Rows[dt.Rows.Count - 1][i] = cell.Value.ToString();
+                //                i++;
+                //            }
+                //        }
+                //    }
+
+                //    return dt;
+                //}
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
         }
 
         public IXLWorksheet ExcelAddValue(IXLWorksheet worksheet, int row, int currentColumnTitle, int currentColumnValue, string title, object value, IXLStyle rangeStyle)

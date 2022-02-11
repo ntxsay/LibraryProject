@@ -1,12 +1,15 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.Code.Services.ES;
+using LibraryProjectUWP.Code.Services.Excel;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Code.Services.Web;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.UserControls;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -845,10 +848,36 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void ImportBookFromFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void ImportBookFromExcelFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                var storageFile = await Files.OpenStorageFileAsync(Files.ExcelExtensions);
+                if (storageFile == null)
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Vous devez sélectionner un fichier de type Microsoft Excel.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return;
+                }
+
+                ExcelServices excelServices = new ExcelServices();
+                var data = await  excelServices.ImportExceltoDatatable(storageFile);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ImportBookFromJsonFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
         }
+
         #endregion
 
         private void PipsPager_SelectedIndexChanged(Microsoft.UI.Xaml.Controls.PipsPager sender, Microsoft.UI.Xaml.Controls.PipsPagerSelectedIndexChangedEventArgs args)
