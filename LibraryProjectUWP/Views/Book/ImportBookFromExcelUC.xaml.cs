@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -97,12 +98,15 @@ namespace LibraryProjectUWP.Views.Book
                 if (ViewModelPage.TableRange.IsStringNullOrEmptyOrWhiteSpace())
                 {
                     ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Vous devez sélectionner une plage de cellule pou délimiter votre tableau.";
+                    ViewModelPage.ResultMessage = $"Vous devez sélectionner une plage de cellule pour délimiter votre tableau.";
                     ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
                     ViewModelPage.IsResultMessageOpen = true;
                     return;
                 }
+
                 var rr = await excelServices.ImportExcelToDatatable(ViewModelPage.SelectedWorkSheetName, ViewModelPage.TableRange, ViewModelPage.IsTableRangeContainsHeader);
+                ViewModelPage.DataTable = rr;
+                SearchingResult();
             }
             catch (Exception ex)
             {
@@ -112,286 +116,60 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        #region Date Acquisition
-        private void MfiClearRemiseDate_Click(object sender, RoutedEventArgs e)
+        private void SearchingResult()
         {
             try
             {
-                if (ViewModelPage.ViewModel.DateRemiseLivre != null)
-                {
-                    ViewModelPage.ViewModel.DateRemiseLivre = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void MfiClearParutionDate_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (ViewModelPage.ViewModel.DateAcquisition != null)
-                {
-                    ViewModelPage.ViewModel.DateAcquisition = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void TmfiDayKnow_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is ToggleMenuFlyoutItem toggle)
-                {
-                    if (toggle.IsChecked)
-                    {
-                        if (ViewModelPage.ViewModel.IsMoisAcquisitionKnow == false || ViewModelPage.ViewModel.DateAcquisition == null)
-                        {
-                            ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                            ViewModelPage.ViewModel.IsJourAcquisitionVisible = false;
-                            toggle.IsChecked = false;
-                        }
-                        else
-                        {
-                            ViewModelPage.ViewModel.IsJourAcquisitionKnow = true;
-                            ViewModelPage.ViewModel.IsJourAcquisitionVisible = true;
-                        }
-                    }
-                    else
-                    {
-                        ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                        ViewModelPage.ViewModel.IsJourAcquisitionVisible = false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void TmfiMonthKnow_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is ToggleMenuFlyoutItem toggle)
-                {
-                    if (toggle.IsChecked)
-                    {
-                        if (ViewModelPage.ViewModel.DateAcquisition == null)
-                        {
-                            ViewModelPage.ViewModel.IsJourAcquisitionVisible = true;
-                            ViewModelPage.ViewModel.IsMoisAcquisitionVisible = true;
-                            ViewModelPage.ViewModel.IsMoisAcquisitionKnow = false;
-                            ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                        }
-                        else
-                        {
-                            ViewModelPage.ViewModel.IsMoisAcquisitionVisible = true;
-                            ViewModelPage.ViewModel.IsMoisAcquisitionKnow = true;
-                        }
-                    }
-                    else
-                    {
-                        ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                        ViewModelPage.ViewModel.IsJourAcquisitionVisible = false;
-                        ViewModelPage.ViewModel.IsMoisAcquisitionKnow = false;
-                        ViewModelPage.ViewModel.IsMoisAcquisitionVisible = false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void DP_DateAcquisition_SelectedDateChanged(DatePicker sender, DatePickerSelectedValueChangedEventArgs args)
-        {
-            try
-            {
-                if (args.NewDate != null)
-                {
-                    ViewModelPage.ViewModel.IsJourAcquisitionVisible = true;
-                    ViewModelPage.ViewModel.IsMoisAcquisitionVisible = true;
-                    ViewModelPage.ViewModel.IsJourAcquisitionKnow = true;
-                    ViewModelPage.ViewModel.IsMoisAcquisitionKnow = true;
-                }
-                else
-                {
-                    ViewModelPage.ViewModel.IsJourAcquisitionVisible = true;
-                    ViewModelPage.ViewModel.IsMoisAcquisitionVisible = true;
-                    ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                    ViewModelPage.ViewModel.IsMoisAcquisitionKnow = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void DateParution_MenuFlyout_Opening(object sender, object e)
-        {
-            try
-            {
-                
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        #endregion
-
-        #region Contact Source
-        private async Task LoadDataAsync()
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var itemList = await DbServices.Contact.AllVMAsync();
-                ViewModelPage.ContactViewModelList = itemList?.ToList() ?? new List<ContactVM>(); ;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void ASB_SearchContact_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-            try
-            {
-                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.ContactViewModelList == null)
+                ViewModelPage.ItemstVisibility = Visibility.Collapsed;
+                if (ViewModelPage.DataTable == null)
                 {
                     return;
                 }
 
-                var FilteredItems = new List<ContactVM>();
-                var splitSearchTerm = sender.Text.ToLower().Split(" ");
-
-                foreach (var value in ViewModelPage.ContactViewModelList)
+                Run lineCount = new Run()
                 {
-                    if (!value.SocietyName.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        var found = splitSearchTerm.All((key) =>
-                        {
-                            return value.SocietyName.ToLower().Contains(key.ToLower());
-                        });
-
-                        if (found)
-                        {
-                            FilteredItems.Add(value);
-                            continue;
-                        }
-                    }
-
-                    if (!value.NomNaissance.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        var found = splitSearchTerm.All((key) =>
-                        {
-                            return value.NomNaissance.ToLower().Contains(key.ToLower());
-                        });
-
-                        if (found)
-                        {
-                            FilteredItems.Add(value);
-                            continue;
-                        }
-                    }
-
-                    if (!value.NomUsage.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        var found = splitSearchTerm.All((key) =>
-                        {
-                            return value.NomUsage.ToLower().Contains(key.ToLower());
-                        });
-
-                        if (found)
-                        {
-                            FilteredItems.Add(value);
-                        }
-                    }
-
-                    if (!value.Prenom.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        var found = splitSearchTerm.All((key) =>
-                        {
-                            return value.Prenom.ToLower().Contains(key.ToLower());
-                        });
-
-                        if (found)
-                        {
-                            FilteredItems.Add(value);
-                            continue;
-                        }
-                    }
-
-                    if (!value.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        var found = splitSearchTerm.All((key) =>
-                        {
-                            return value.AutresPrenoms.ToLower().Contains(key.ToLower());
-                        });
-
-                        if (found)
-                        {
-                            FilteredItems.Add(value);
-                            continue;
-                        }
-                    }
+                    Text = $"{ViewModelPage.DataTable.Rows.Count} {(ViewModelPage.DataTable.Rows.Count > 1 ? "lignes ont été trouvées" : "ligne a été trouvée")}. ",
+                    FontWeight = FontWeights.Medium,
+                };
+                TbcAfterSearching.Inlines.Add(lineCount);
+                
+                if (ViewModelPage.DataTable.Rows.Count == 0)
+                {
+                    return;
                 }
 
-                if (!FilteredItems.Any())
+                ViewModelPage.ItemstVisibility = Visibility.Visible;
+                Run runTitle = new Run()
                 {
-                    FilteredItems.Add(new ContactVM()
-                    {
-                        Id = -1,
-                        NomNaissance = "Ajouter un contact",
-                    });
-                }
+                    Text = $"La première ligne a été sélectionnée afin de nous aider à importer vos livres.",
+                    //FontWeight = FontWeights.Medium,
+                };
+                TbcAfterSearching.Inlines.Add(runTitle);
 
-                sender.ItemsSource = FilteredItems;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void ASB_SearchContact_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-            try
-            {
-                if (args.SelectedItem != null && args.SelectedItem is ContactVM value)
+                ViewModelPage.Titles.Clear();
+                ViewModelPage.Auteurs.Clear();
+                ViewModelPage.MaisonsEdition.Clear();
+                ViewModelPage.Langues.Clear();
+                ViewModelPage.DateParution.Clear();
+                ViewModelPage.Formats.Clear();
+                ViewModelPage.NumberOfPages.Clear();
+                for (int i = 0; i < ViewModelPage.DataTable.Columns.Count; i++)
                 {
-                    if (value.Id != -1)
+                    var item = new BookImportDataTableVM()
                     {
-                        sender.Text = value.SocietyName + " " + value.NomNaissance + " " + value.Prenom;
-                        return;
-                    }
+                        ColumnIndex = i,
+                        ColumnName = ViewModelPage.DataTable.Columns[i].ColumnName,
+                        RowName = ViewModelPage.DataTable.Rows[0].ItemArray[i]?.ToString(),
+                    };
+
+                    ViewModelPage.Titles.Add(item);
+                    ViewModelPage.Auteurs.Add(item);
+                    ViewModelPage.Langues.Add(item);
+                    ViewModelPage.MaisonsEdition.Add(item);
+                    ViewModelPage.Formats.Add(item);
+                    ViewModelPage.DateParution.Add(item);
+                    ViewModelPage.NumberOfPages.Add(item);
+
                 }
             }
             catch (Exception ex)
@@ -402,91 +180,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ASB_SearchContact_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            try
-            {
-                if (args.ChosenSuggestion != null && args.ChosenSuggestion is ContactVM viewModel)
-                {
-                    if (viewModel.Id != -1)
-                    {
-                        //
-                        ViewModelPage.ViewModel.ContactSource = viewModel;
-                    }
-                    else
-                    {
-                        //Ajoute un nouvel auteur
-                        if (_parameters.ParentPage != null)
-                        {
-                            if (!sender.Text.IsStringNullOrEmptyOrWhiteSpace())
-                            {
-                                var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
-                                if (split.Length == 1)
-                                {
-                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], string.Empty, ViewModelPage.Guid);
-                                }
-                                else if (split.Length >= 2)
-                                {
-                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], split[1], ViewModelPage.Guid);
-                                }
-                            }
-                            else
-                            {
-                                await _parameters.ParentPage.NewFreeContactAsync(string.Empty, string.Empty, ViewModelPage.Guid);
-                            }
-                            sender.Text = String.Empty;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        #endregion
 
-        private void CmbxTypeAcquisition_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                if (sender is ComboBox combobox && combobox.SelectedItem is string type)
-                {
-                    if (type == LibraryHelpers.Book.Entry.Achat)
-                    {
-                        ViewModelPage.PretVisibility = Visibility.Collapsed;
-                        ViewModelPage.PriceVisibility = Visibility.Visible;
-                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
-                    }
-                    else if (type == LibraryHelpers.Book.Entry.Don)
-                    {
-                        ViewModelPage.PretVisibility = Visibility.Collapsed;
-                        ViewModelPage.PriceVisibility = Visibility.Collapsed;
-                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
-                    }
-                    else if (type == LibraryHelpers.Book.Entry.Pret)
-                    {
-                        ViewModelPage.PretVisibility = Visibility.Visible;
-                        ViewModelPage.PriceVisibility = Visibility.Visible;
-                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
-                    }
-                    else if (type == LibraryHelpers.Book.Entry.Autre)
-                    {
-                        ViewModelPage.PretVisibility = Visibility.Collapsed;
-                        ViewModelPage.PriceVisibility = Visibility.Collapsed;
-                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -519,58 +213,26 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var rr = await excelServices.ImportExcelToDatatable(ViewModelPage.SelectedWorkSheetName, ViewModelPage.TableRange);
-                if (ViewModelPage.ViewModel.NbExemplaire <= 0)
+                if (ViewModelPage.SelectedTitle == null)
                 {
                     ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Le nombre d'exemplaire ne peut pas être inférieur ou égal à 0.";
+                    ViewModelPage.ResultMessage = $"Vous devez sélectionner la donnée qui correspond au titre.";
                     ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
                     ViewModelPage.IsResultMessageOpen = true;
                     return false;
                 }
-
-                if (ViewModelPage.ViewModel.Etat.Etat.IsStringNullOrEmptyOrWhiteSpace())
+                List<LivreVM> list = new List<LivreVM>();
+                for (int i = 0; i < ViewModelPage.DataTable.Rows.Count; i++)
                 {
-                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"L'état de l'exemplaire n'est pas renseigné.";
-                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                    ViewModelPage.IsResultMessageOpen = true;
-                    return false;
-                }
-
-                if (ViewModelPage.ViewModel.Source == LibraryHelpers.Book.Entry.Achat)
-                {
-                    if (!ViewModelPage.ViewModel.IsPriceUnavailable && ViewModelPage.ViewModel.Price >= 0 &&
-                        ViewModelPage.ViewModel.DeviceName.IsStringNullOrEmptyOrWhiteSpace())
+                    var viewModel = new LivreVM()
                     {
-                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                        ViewModelPage.ResultMessage = $"Vous devez spécifier le type de monnaie.";
-                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                        ViewModelPage.IsResultMessageOpen = true;
-                        return false;
-                    }
-                }
-                else if (ViewModelPage.ViewModel.Source == LibraryHelpers.Book.Entry.Don)
-                {
+                        MainTitle = ViewModelPage.DataTable.Rows[i].ItemArray[ViewModelPage.SelectedTitle.ColumnIndex].ToString(),
+                    };
 
-                }
-                else if (ViewModelPage.ViewModel.Source == LibraryHelpers.Book.Entry.Pret)
-                {
-                    if (!ViewModelPage.ViewModel.IsPriceUnavailable && ViewModelPage.ViewModel.Price >= 0 &&
-                        ViewModelPage.ViewModel.DeviceName.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                        ViewModelPage.ResultMessage = $"Vous devez spécifier le type de monnaie.";
-                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                        ViewModelPage.IsResultMessageOpen = true;
-                        return false;
-                    }
-                }
-                else if (ViewModelPage.ViewModel.Source == LibraryHelpers.Book.Entry.Autre)
-                {
-
+                    list.Add(viewModel);
                 }
 
+                ViewModelPage.NewViewModel = list;
                 ViewModelPage.IsResultMessageOpen = false;
                 return true;
             }
@@ -690,6 +352,20 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private DataTable _DataTable;
+        public DataTable DataTable
+        {
+            get => this._DataTable;
+            set
+            {
+                if (this._DataTable != value)
+                {
+                    this._DataTable = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         private bool _IsTableRangeContainsHeader;
         public bool IsTableRangeContainsHeader
         {
@@ -704,43 +380,226 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private Visibility _ContactSourceVisibility;
-        public Visibility ContactSourceVisibility
+        private ObservableCollection<BookImportDataTableVM> _Titles = new ObservableCollection<BookImportDataTableVM>();
+        public ObservableCollection<BookImportDataTableVM> Titles
         {
-            get => this._ContactSourceVisibility;
+            get => this._Titles;
             set
             {
-                if (this._ContactSourceVisibility != value)
+                if (this._Titles != value)
                 {
-                    this._ContactSourceVisibility = value;
+                    this._Titles = value;
                     this.OnPropertyChanged();
                 }
             }
         }
 
-        private Visibility _PriceVisibility;
-        public Visibility PriceVisibility
+        private BookImportDataTableVM _SelectedTitle;
+        public BookImportDataTableVM SelectedTitle
         {
-            get => this._PriceVisibility;
+            get => this._SelectedTitle;
             set
             {
-                if (this._PriceVisibility != value)
+                if (this._SelectedTitle != value)
                 {
-                    this._PriceVisibility = value;
+                    this._SelectedTitle = value;
                     this.OnPropertyChanged();
                 }
             }
         }
 
-        private Visibility _PretVisibility;
-        public Visibility PretVisibility
+        private ObservableCollection<BookImportDataTableVM> _Auteurs = new ObservableCollection<BookImportDataTableVM>();
+        public ObservableCollection<BookImportDataTableVM> Auteurs
         {
-            get => this._PretVisibility;
+            get => this._Auteurs;
             set
             {
-                if (this._PretVisibility != value)
+                if (this._Auteurs != value)
                 {
-                    this._PretVisibility = value;
+                    this._Auteurs = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookImportDataTableVM _SelectedAuteur;
+        public BookImportDataTableVM SelectedAuteur
+        {
+            get => this._SelectedAuteur;
+            set
+            {
+                if (this._SelectedAuteur != value)
+                {
+                    this._SelectedAuteur = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<BookImportDataTableVM> _MaisonsEdition = new ObservableCollection<BookImportDataTableVM>();
+        public ObservableCollection<BookImportDataTableVM> MaisonsEdition
+        {
+            get => this._MaisonsEdition;
+            set
+            {
+                if (this._MaisonsEdition != value)
+                {
+                    this._MaisonsEdition = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookImportDataTableVM _SelectedMaisonEdition;
+        public BookImportDataTableVM SelectedMaisonEdition
+        {
+            get => this._SelectedMaisonEdition;
+            set
+            {
+                if (this._SelectedMaisonEdition != value)
+                {
+                    this._SelectedMaisonEdition = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<BookImportDataTableVM> _Langues = new ObservableCollection<BookImportDataTableVM>();
+        public ObservableCollection<BookImportDataTableVM> Langues
+        {
+            get => this._Langues;
+            set
+            {
+                if (this._Langues != value)
+                {
+                    this._Langues = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookImportDataTableVM _SelectedLangue;
+        public BookImportDataTableVM SelectedLangue
+        {
+            get => this._SelectedLangue;
+            set
+            {
+                if (this._SelectedLangue != value)
+                {
+                    this._SelectedLangue = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<BookImportDataTableVM> _DateParution = new ObservableCollection<BookImportDataTableVM>();
+        public ObservableCollection<BookImportDataTableVM> DateParution
+        {
+            get => this._DateParution;
+            set
+            {
+                if (this._DateParution != value)
+                {
+                    this._DateParution = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookImportDataTableVM _SelectedDateParution;
+        public BookImportDataTableVM SelectedDateParution
+        {
+            get => this._SelectedDateParution;
+            set
+            {
+                if (this._SelectedDateParution != value)
+                {
+                    this._SelectedDateParution = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<BookImportDataTableVM> _NumberOfPages = new ObservableCollection<BookImportDataTableVM>();
+        public ObservableCollection<BookImportDataTableVM> NumberOfPages
+        {
+            get => this._NumberOfPages;
+            set
+            {
+                if (this._NumberOfPages != value)
+                {
+                    this._NumberOfPages = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookImportDataTableVM _SelectedNumberOfPages;
+        public BookImportDataTableVM SelectedNumberOfPages
+        {
+            get => this._SelectedNumberOfPages;
+            set
+            {
+                if (this._SelectedNumberOfPages != value)
+                {
+                    this._SelectedNumberOfPages = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<BookImportDataTableVM> _Formats = new ObservableCollection<BookImportDataTableVM>();
+        public ObservableCollection<BookImportDataTableVM> Formats
+        {
+            get => this._Formats;
+            set
+            {
+                if (this._Formats != value)
+                {
+                    this._Formats = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookImportDataTableVM _SelectedFormat;
+        public BookImportDataTableVM SelectedFormat
+        {
+            get => this._SelectedFormat;
+            set
+            {
+                if (this._SelectedFormat != value)
+                {
+                    this._SelectedFormat = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private Visibility _ItemstVisibility = Visibility.Collapsed;
+        public Visibility ItemstVisibility
+        {
+            get => this._ItemstVisibility;
+            set
+            {
+                if (this._ItemstVisibility != value)
+                {
+                    this._ItemstVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<LivreVM> _NewViewModel = new List<LivreVM>();
+        public List<LivreVM> NewViewModel
+        {
+            get => this._NewViewModel;
+            set
+            {
+                if (this._NewViewModel != value)
+                {
+                    this._NewViewModel = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -803,47 +662,7 @@ namespace LibraryProjectUWP.Views.Book
         }
 
 
-        private LivreExemplaryVM _ViewModel;
-        public LivreExemplaryVM ViewModel
-        {
-            get => this._ViewModel;
-            set
-            {
-                if (this._ViewModel != value)
-                {
-                    this._ViewModel = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private EditMode _EditMode;
-        public EditMode EditMode
-        {
-            get => this._EditMode;
-            set
-            {
-                if (this._EditMode != value)
-                {
-                    this._EditMode = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private IEnumerable<ContactVM> _ContactViewModelList = Enumerable.Empty<ContactVM>();
-        public IEnumerable<ContactVM> ContactViewModelList
-        {
-            get => this._ContactViewModelList;
-            set
-            {
-                if (_ContactViewModelList != value)
-                {
-                    this._ContactViewModelList = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
+        
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

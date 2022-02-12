@@ -8,7 +8,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-   xmlns:contactVm="using:LibraryProjectUWP.ViewModels.Contact"
+    xmlns:bookVm="using:LibraryProjectUWP.ViewModels.Book"
+    xmlns:contactVm="using:LibraryProjectUWP.ViewModels.Contact"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
@@ -42,32 +43,13 @@
             <Setter Property="Margin" Value="4 0" />
             <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
-        <DataTemplate x:DataType="contactVm:ContactVM" x:Key="PersonTemplate">
-            <Grid Margin="0,4" ColumnSpacing="8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="24" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid Height="24" Width="24" Grid.Column="0">
-                    <Ellipse Fill="{x:Bind DisplayName, Converter={StaticResource NameToColorConverter}}" />
-                    <MUIXC:PersonPicture DisplayName="{x:Bind DisplayName, Mode=OneWay}" Height="24" Width="24"/>
-                </Grid>
-                <TextBlock Grid.Column="1" Text="{x:Bind DisplayName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            </Grid>
+        <DataTemplate x:DataType="bookVm:BookImportDataTableVM" x:Key="itemImportTemplate">
+            <TextBlock>
+                <Run Text="{x:Bind ColumnName, Mode=OneWay}" FontWeight="Medium"/>
+                <Run Text=":" FontWeight="Medium"/>
+                <Run Text="{x:Bind RowName, Mode=OneWay}" />
+            </TextBlock>
         </DataTemplate>
-        <DataTemplate x:DataType="contactVm:ContactVM" x:Key="EnterpriseTemplate">
-            <Grid Margin="0,4" ColumnSpacing="8">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Column="0" Text="{x:Bind SocietyName, Mode=OneWay}" FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <TextBlock Grid.Column="1" Text="{x:Bind AdressePostal, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-            </Grid>
-        </DataTemplate>
-        <dTemplateSelectors:ContactTypeDataTemplateSelector x:Key="contactTypeTemplateSelector"
-        PersonTemplate="{StaticResource PersonTemplate}"
-        EnterpriseTemplate="{StaticResource EnterpriseTemplate}" />
     </PivotItem.Resources>
     <PivotItem.Header>
         <Grid ColumnSpacing="8">
@@ -89,7 +71,11 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
+        <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap">
+            <Run Text="Vous êtes en train d'importer des livres à partir du fichier Excel «" />
+            <Run Text="{x:Bind _parameters.ExcelFile.Name}" FontWeight="SemiBold"/>
+            <Run Text="»." />
+        </TextBlock>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
             <Grid RowSpacing="16" Margin="0 8 0 0" VerticalAlignment="Top">
                 <Grid.RowDefinitions>
@@ -107,8 +93,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ComboBox Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.WorkSheetsName, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedWorkSheetName, Mode=TwoWay}" PlaceholderText="Sélectionnez une feuille" HorizontalAlignment="Stretch"
-                          SelectionChanged="CmbxTypeAcquisition_SelectionChanged">
+                <ComboBox Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.WorkSheetsName, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedWorkSheetName, Mode=TwoWay}" PlaceholderText="Sélectionnez une feuille" HorizontalAlignment="Stretch">
                     <ComboBox.Header>
                         <TextBlock Text="Nom de la feuille" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </ComboBox.Header>
@@ -118,7 +103,8 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBox Grid.Row="0"  PlaceholderText="Entrez la plage de cellule représentant votre table" HorizontalAlignment="Stretch" Text="{x:Bind ViewModelPage.TableRange, Mode=TwoWay}">
+                    <TextBox Grid.Row="0"  PlaceholderText="B2:P12" HorizontalAlignment="Stretch" 
+                             Text="{x:Bind ViewModelPage.TableRange, Mode=TwoWay}">
                         <TextBox.Header>
                             <TextBlock Text="Plage de cellule" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
@@ -132,128 +118,53 @@
                                         VerticalAlignment="Center" VerticalContentAlignment="Center">
                     <TextBlock Text="Chercher les données" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                 </Button>
-                <Grid Grid.Row="3" Visibility="{x:Bind ViewModelPage.PretVisibility, Mode=OneWay}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <DatePicker Grid.Column="0" x:Name="DP_DateRemise" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.DateRemiseLivre, Mode=TwoWay}" ToolTipService.ToolTip="Date de remise du ou des livres"
-                                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default">
-                        <DatePicker.Header>
-                            <TextBlock Text="Date de remise" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </DatePicker.Header>
-                    </DatePicker>
-                    <Button BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
-                                        VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0 25 0 0">
-                        <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
-                            <Border.BorderBrush>
-                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                    <GradientStop Color="Yellow" Offset="0.0" />
-                                    <GradientStop Color="Red" Offset="0.25" />
-                                    <GradientStop Color="Blue" Offset="0.75" />
-                                    <GradientStop Color="LimeGreen" Offset="1.0" />
-                                </LinearGradientBrush>
-                            </Border.BorderBrush>
-                            <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
-                        </Border>
-                        <Button.Flyout>
-                            <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                <MenuFlyoutItem x:Name="MfiClearRemiseDate" Text="Effacer la date" Click="MfiClearRemiseDate_Click"/>
-                            </MenuFlyout>
-                        </Button.Flyout>
-                    </Button>
-                </Grid>
-                <Grid Grid.Row="4" RowSpacing="8" Visibility="{x:Bind ViewModelPage.ContactSourceVisibility, Mode=OneWay}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Nom de la source" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    <Grid Grid.Row="1" RowSpacing="4">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0" ColumnSpacing="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <AutoSuggestBox x:Name="ASB_SearchContact" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    PlaceholderText="Rechercher un auteur" IsSuggestionListOpen="False" ItemTemplateSelector="{StaticResource contactTypeTemplateSelector}"
-                                    TextChanged="ASB_SearchContact_TextChanged" SuggestionChosen="ASB_SearchContact_SuggestionChosen" QuerySubmitted="ASB_SearchContact_QuerySubmitted">
-                                <AutoSuggestBox.QueryIcon>
-                                    <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
-                                </AutoSuggestBox.QueryIcon>
-                            </AutoSuggestBox>
-                            <Button BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
-                                        VerticalAlignment="Center" VerticalContentAlignment="Center">
-                                <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
-                                    <Border.BorderBrush>
-                                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                            <GradientStop Color="Yellow" Offset="0.0" />
-                                            <GradientStop Color="Red" Offset="0.25" />
-                                            <GradientStop Color="Blue" Offset="0.75" />
-                                            <GradientStop Color="LimeGreen" Offset="1.0" />
-                                        </LinearGradientBrush>
-                                    </Border.BorderBrush>
-                                    <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
-                                </Border>
-                                <Button.Flyout>
-                                    <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                        <MenuFlyoutItem Text="Effacer le contact" Click="MfiClearRemiseDate_Click"/>
-                                    </MenuFlyout>
-                                </Button.Flyout>
-                            </Button>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <TextBlock TextWrapping="Wrap">
-                                <Run Text="Cet exemplaire a été acquis chez" />
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.SocietyName, Mode=OneWay}" FontWeight="Medium"/>
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.TitreCivilite, Mode=OneWay}" FontWeight="Medium" />
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.NomNaissance, Mode=OneWay}" FontWeight="Medium" />
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.Prenom, Mode=OneWay}" FontWeight="Medium" />
-                            </TextBlock>
-                        </Grid>
-                    </Grid>
-                </Grid>
-                <Grid Grid.Row="5" RowSpacing="8" Visibility="{x:Bind ViewModelPage.PriceVisibility, Mode=OneWay}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Prix et devise" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    <Grid Grid.Row="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0" ColumnSpacing="2" Visibility="{x:Bind ViewModelPage.ViewModel.IsPriceUnavailable, Converter={StaticResource boolToInvertVisibilityConverter}, Mode=OneWay}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <MUIXC:NumberBox x:Name="numberBoxPrice" HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Entrez le prix du livre" SpinButtonPlacementMode="Compact" Minimum="0" Value="{x:Bind ViewModelPage.ViewModel.Price, Mode=TwoWay}">
-                            </MUIXC:NumberBox>
-                            <ComboBox x:Name="ComboBoxPrice" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModelPage.ViewModel.MoneyList}"
-                                          SelectedItem="{x:Bind ViewModelPage.ViewModel.DeviceName, Mode=TwoWay}" SelectedIndex="1">
-                            </ComboBox>
-                        </Grid>
-                        <CheckBox Grid.Row="1" IsChecked="{x:Bind ViewModelPage.ViewModel.IsPriceUnavailable, Mode=TwoWay}">
-                            <TextBlock Text="Le prix n'est pas disponible." />
-                        </CheckBox>
-                    </Grid>
-                </Grid>
-                <ComboBox Grid.Row="6" ItemsSource="{x:Bind ViewModelPage.EtatList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Etat.Etat, Mode=TwoWay}" PlaceholderText="Etat du livre" HorizontalAlignment="Stretch">
-                    <ComboBox.Header>
-                        <TextBlock Text="Etat du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </ComboBox.Header>
-                </ComboBox>
-                <TextBox Grid.Row="7" Text="{x:Bind ViewModelPage.ViewModel.Observations, Mode=TwoWay}" MinHeight="100" PlaceholderText="Observations" TextWrapping="Wrap" AcceptsReturn="True">
-                    <TextBox.Header>
-                        <TextBlock Text="Observations" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </TextBox.Header>
-                </TextBox>
+                <TextBlock x:Name="TbcAfterSearching" Grid.Row="3" Margin="0 5 0 15" TextWrapping="Wrap" TextAlignment="Left" HorizontalTextAlignment="Left" HorizontalAlignment="Stretch">
+            
+                </TextBlock>
+                <StackPanel Grid.Row="4" Orientation="Vertical" Spacing="16" Visibility="{x:Bind ViewModelPage.ItemstVisibility, Mode=OneWay}">
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Titles, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedTitle, Mode=TwoWay}"
+                          PlaceholderText="Sélectionnez une donnée représentant le titre" HorizontalAlignment="Stretch" ItemTemplate="{StaticResource itemImportTemplate}">
+                        <ComboBox.Header>
+                            <TextBlock Text="Titre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Auteurs, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedAuteur, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
+                          PlaceholderText="Sélectionnez une donnée représentant l'auteur" HorizontalAlignment="Stretch">
+                        <ComboBox.Header>
+                            <TextBlock Text="Auteur(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.MaisonsEdition, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedMaisonEdition, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
+                          PlaceholderText="Sélectionnez une donnée représentant la maison d'édition" HorizontalAlignment="Stretch">
+                        <ComboBox.Header>
+                            <TextBlock Text="Maison d'édition" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Langues, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedLangue, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
+                          PlaceholderText="Sélectionnez une donnée représentant la langue" HorizontalAlignment="Stretch">
+                        <ComboBox.Header>
+                            <TextBlock Text="Langue" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.DateParution, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedDateParution, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
+                          PlaceholderText="Sélectionnez une donnée représentant la date de parution" HorizontalAlignment="Stretch">
+                        <ComboBox.Header>
+                            <TextBlock Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Formats, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedFormat, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
+                          PlaceholderText="Sélectionnez une donnée représentant le format" HorizontalAlignment="Stretch">
+                        <ComboBox.Header>
+                            <TextBlock Text="Format" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.NumberOfPages, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedNumberOfPages, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
+                          PlaceholderText="Sélectionnez une donnée représentant le nombre de page" HorizontalAlignment="Stretch">
+                        <ComboBox.Header>
+                            <TextBlock Text="Nombre de pages" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                </StackPanel>
             </Grid>
         </ScrollViewer>
         <Grid Grid.Row="2" Margin="0 10 0 10">
@@ -267,7 +178,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
-                <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
+                <Button Command="{StaticResource CreateItemXUiCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
                         <TextBlock Text="Importer" />

@@ -903,6 +903,21 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static async Task<bool> IsExistAsync(string mainTitle, string format, string langue)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+                    return await context.Tbook.AnyAsync(a => a.MainTitle == mainTitle && a.TbookFormat.Format == format && a.Langue == langue);                    
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return false;
+                }
+            }
+
             #region Helpers
             private static async Task CompleteModelInfos(LibraryDbContext context,Tbook model)
             {

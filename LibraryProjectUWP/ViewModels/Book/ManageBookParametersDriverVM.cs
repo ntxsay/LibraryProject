@@ -24,6 +24,13 @@ namespace LibraryProjectUWP.ViewModels.Book
         public StorageFile ExcelFile { get; set; }
     }
 
+    public class BookImportDataTableVM
+    {
+        public int ColumnIndex { get; set; }
+        public string ColumnName { get; set; }
+        public string RowName { get; set; }
+    }
+
     public class ManageBookExemplaryParametersDriverVM
     {
         public IEnumerable<LivreExemplaryVM> ExemplaryViewModelList { get; set; }
