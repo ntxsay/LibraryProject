@@ -229,6 +229,25 @@ namespace LibraryProjectUWP.Views.Book
                         MainTitle = ViewModelPage.DataTable.Rows[i].ItemArray[ViewModelPage.SelectedTitle.ColumnIndex].ToString(),
                     };
 
+                    if (ViewModelPage.SelectedAuteur != null)
+                    {
+                        var authors = ViewModelPage.DataTable.Rows[i].ItemArray[ViewModelPage.SelectedAuteur.ColumnIndex].ToString();
+                        if (!authors.IsStringNullOrEmptyOrWhiteSpace())
+                        {
+
+                            var split = StringHelpers.SplitWord(authors, new string[] { " " });
+                            if (split.Length == 1)
+                            {
+                                await _parameters.ParentPage.NewAuthorAsync(split[0], string.Empty, ViewModelPage.Guid);
+                            }
+                            else if (split.Length >= 2)
+                            {
+                                await _parameters.ParentPage.NewAuthorAsync(split[0], split[1], ViewModelPage.Guid);
+                            }
+                        }
+                        
+                    }
+
                     list.Add(viewModel);
                 }
 
