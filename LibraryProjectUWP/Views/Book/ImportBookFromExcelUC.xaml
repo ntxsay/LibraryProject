@@ -164,6 +164,12 @@
                             <TextBlock Text="Nombre de pages" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </ComboBox.Header>
                     </ComboBox>
+                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Collections, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedCollection, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
+                          PlaceholderText="Sélectionnez une donnée représentant la collection" HorizontalAlignment="Stretch">
+                        <ComboBox.Header>
+                            <TextBlock Text="Collection(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
                 </StackPanel>
             </Grid>
         </ScrollViewer>

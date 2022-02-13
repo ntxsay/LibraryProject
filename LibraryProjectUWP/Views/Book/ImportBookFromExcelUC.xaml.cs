@@ -5,6 +5,7 @@ using LibraryProjectUWP.Code.Services.Excel;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -153,6 +154,7 @@ namespace LibraryProjectUWP.Views.Book
                 ViewModelPage.DateParution.Clear();
                 ViewModelPage.Formats.Clear();
                 ViewModelPage.NumberOfPages.Clear();
+                ViewModelPage.Collections.Clear();
                 for (int i = 0; i < ViewModelPage.DataTable.Columns.Count; i++)
                 {
                     var item = new BookImportDataTableVM()
@@ -169,7 +171,7 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.Formats.Add(item);
                     ViewModelPage.DateParution.Add(item);
                     ViewModelPage.NumberOfPages.Add(item);
-
+                    ViewModelPage.Collections.Add(item);
                 }
             }
             catch (Exception ex)
@@ -226,26 +228,68 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     var viewModel = new LivreVM()
                     {
+                        Publication = new LivrePublicationVM(),
                         MainTitle = ViewModelPage.DataTable.Rows[i].ItemArray[ViewModelPage.SelectedTitle.ColumnIndex].ToString(),
                     };
 
                     if (ViewModelPage.SelectedAuteur != null)
                     {
+                        List<ContactVM> authorViewModelList = new List<ContactVM>();
                         var authors = ViewModelPage.DataTable.Rows[i].ItemArray[ViewModelPage.SelectedAuteur.ColumnIndex].ToString();
                         if (!authors.IsStringNullOrEmptyOrWhiteSpace())
                         {
+                            var authorsList = StringHelpers.SplitWord(authors, new string[] { "," });
+                            if (authorsList != null && authorsList.Length > 0)
+                            {
+                                foreach (var author in authorsList)
+                                {
+                                    ContactVM authorVm = new ContactVM()
+                                    {
+                                        ContactType = ContactType.Author,
+                                        TitreCivilite = CivilityHelpers.NonSpecifie,
+                                    };
 
-                            var split = StringHelpers.SplitWord(authors, new string[] { " " });
-                            if (split.Length == 1)
-                            {
-                                await _parameters.ParentPage.NewAuthorAsync(split[0], string.Empty, ViewModelPage.Guid);
+                                    var split = StringHelpers.SplitWord(author, new string[] { " " });
+                                    
+                                    if (split.Length == 1)
+                                    {
+                                        authorVm.Prenom = split[0];
+                                    }
+                                    else if (split.Length >= 2)
+                                    {
+                                        authorVm.Prenom = split[0];
+                                        authorVm.NomNaissance = split[1];
+                                    }
+
+                                    authorViewModelList.Add(authorVm);
+                                }
                             }
-                            else if (split.Length >= 2)
-                            {
-                                await _parameters.ParentPage.NewAuthorAsync(split[0], split[1], ViewModelPage.Guid);
-                            }
+                            
                         }
-                        
+                        viewModel.Auteurs = new ObservableCollection<ContactVM>(authorViewModelList);
+                    }
+
+                    if (ViewModelPage.SelectedCollection != null)
+                    {
+                        List<CollectionVM> collectionViewModelList = new List<CollectionVM>();
+                        var collections = ViewModelPage.DataTable.Rows[i].ItemArray[ViewModelPage.SelectedCollection.ColumnIndex].ToString();
+                        if (!collections.IsStringNullOrEmptyOrWhiteSpace())
+                        {
+                            var collectionList = StringHelpers.SplitWord(collections, new string[] { "," });
+                            if (collectionList != null && collectionList.Length > 0)
+                            {
+                                foreach (var collection in collectionList)
+                                {
+                                    CollectionVM collectionVm = new CollectionVM()
+                                    {
+                                        Name = collection,
+                                    };
+                                    collectionViewModelList.Add(collectionVm);
+                                }
+                            }
+
+                        }
+                        viewModel.Publication.Collections = new ObservableCollection<CollectionVM>(collectionViewModelList);
                     }
 
                     list.Add(viewModel);
@@ -590,6 +634,34 @@ namespace LibraryProjectUWP.Views.Book
                 if (this._SelectedFormat != value)
                 {
                     this._SelectedFormat = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<BookImportDataTableVM> _Collections = new ObservableCollection<BookImportDataTableVM>();
+        public ObservableCollection<BookImportDataTableVM> Collections
+        {
+            get => this._Collections;
+            set
+            {
+                if (this._Collections != value)
+                {
+                    this._Collections = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookImportDataTableVM _SelectedCollection;
+        public BookImportDataTableVM SelectedCollection
+        {
+            get => this._SelectedCollection;
+            set
+            {
+                if (this._SelectedCollection != value)
+                {
+                    this._SelectedCollection = value;
                     this.OnPropertyChanged();
                 }
             }

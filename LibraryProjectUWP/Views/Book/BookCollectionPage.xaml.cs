@@ -1435,9 +1435,91 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void ImportBookFromExcelUC_ImportDataRequested(ImportBookFromExcelUC sender, ExecuteRequestedEventArgs e)
+        private async void ImportBookFromExcelUC_ImportDataRequested(ImportBookFromExcelUC sender, ExecuteRequestedEventArgs e)
         {
-            throw new NotImplementedException();
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                List<LivreVM> newViewModelList = sender.ViewModelPage.NewViewModel;
+                foreach (var newViewModel in newViewModelList)
+                {
+                    if (newViewModel.Auteurs != null && newViewModel.Auteurs.Any())
+                    {
+                        foreach(var author in newViewModel.Auteurs)
+                        {
+                            var auteurResult = await DbServices.Contact.CreateAsync(author);
+                            if (auteurResult.IsSuccess)
+                            {
+                                newViewModel.Id = auteurResult.Id;
+                            }
+                            else
+                            {
+                                //Erreur
+                                sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                                sender.ViewModelPage.ResultMessage += "\n" + auteurResult.Message;
+                                sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                                sender.ViewModelPage.IsResultMessageOpen = true;
+                                continue;
+                            }
+                        }
+                    }
+
+                    if (newViewModel.Publication.Collections != null && newViewModel.Auteurs.Any())
+                    {
+                        foreach (var author in newViewModel.Auteurs)
+                        {
+                            var auteurResult = await DbServices.Contact.CreateAsync(author);
+                            if (auteurResult.IsSuccess)
+                            {
+                                newViewModel.Id = auteurResult.Id;
+                            }
+                            else
+                            {
+                                //Erreur
+                                sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                                sender.ViewModelPage.ResultMessage += "\n" + auteurResult.Message;
+                                sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                                sender.ViewModelPage.IsResultMessageOpen = true;
+                                continue;
+                            }
+                        }
+                    }
+
+                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, _parameters.ParentLibrary.Id);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        this.CompleteBookInfos(newViewModel);
+                        ViewModelPage.ViewModelList.Add(newViewModel);
+                        this.RefreshItemsGrouping();
+
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+                
+
+                sender.CancelModificationRequested -= ImportBookFromExcelUC_CancelModificationRequested;
+                sender.ImportDataRequested -= ImportBookFromExcelUC_ImportDataRequested;
+
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void ImportBookFromExcelUC_CancelModificationRequested(ImportBookFromExcelUC sender, ExecuteRequestedEventArgs e)
