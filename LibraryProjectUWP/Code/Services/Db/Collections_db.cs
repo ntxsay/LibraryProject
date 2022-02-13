@@ -259,7 +259,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
-            public static async Task<OperationStateVM> CreateAsync(CollectionVM viewModel)
+            public static async Task<OperationStateVM> CreateAsync(CollectionVM viewModel, long idLibrary)
             {
                 try
                 {
@@ -295,7 +295,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     var record = new Tcollection()
                     {
-                        IdLibrary = viewModel.IdLibrary,
+                        IdLibrary = idLibrary,
                         Name = viewModel.Name,
                         Description = viewModel.Description,
                     };

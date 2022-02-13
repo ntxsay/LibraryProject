@@ -419,7 +419,7 @@
                             </Pivot.HeaderTemplate>
                         </Pivot>
                         <Grid Grid.Row="1">
-                            <ScrollViewer VerticalScrollMode="Disabled" HorizontalScrollBarVisibility="Hidden" Padding="0 5">
+                            <ScrollViewer VerticalScrollMode="Disabled" HorizontalScrollBarVisibility="Auto" Padding="15 5 15 10">
                                 <ItemsControl ItemsSource="{x:Bind ViewModelPage.PagesList, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -429,7 +429,15 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="x:Int32">
                                             <Button Command="{StaticResource GotoPageXUiCmd}" CommandParameter="{x:Bind }">
-                                                <TextBlock Text="{x:Bind }" />
+                                                <TextBlock Text="{x:Bind  Mode=OneWay}" />
+                                                <ToolTipService.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock>
+                                                            <Run Text="Accéder à la page" />
+                                                            <Run Text="{x:Bind Mode=OneWay}" FontWeight="Medium"/>
+                                                        </TextBlock>
+                                                    </ToolTip>
+                                                </ToolTipService.ToolTip>
                                             </Button>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>

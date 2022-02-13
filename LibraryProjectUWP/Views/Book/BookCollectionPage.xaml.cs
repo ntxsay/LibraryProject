@@ -1445,12 +1445,14 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (newViewModel.Auteurs != null && newViewModel.Auteurs.Any())
                     {
-                        foreach(var author in newViewModel.Auteurs)
+                        List<ContactVM> contactVMs = new List<ContactVM>();
+                        foreach (var author in newViewModel.Auteurs)
                         {
                             var auteurResult = await DbServices.Contact.CreateAsync(author);
                             if (auteurResult.IsSuccess)
                             {
-                                newViewModel.Id = auteurResult.Id;
+                                author.Id = auteurResult.Id;
+                                contactVMs.Add(author);
                             }
                             else
                             {
@@ -1462,26 +1464,34 @@ namespace LibraryProjectUWP.Views.Book
                                 continue;
                             }
                         }
+
+                        newViewModel.Auteurs = contactVMs.Count > 0 ? new ObservableCollection<ContactVM>(contactVMs) : new ObservableCollection<ContactVM>();
                     }
 
-                    if (newViewModel.Publication.Collections != null && newViewModel.Auteurs.Any())
+                    if (newViewModel.Publication != null)
                     {
-                        foreach (var author in newViewModel.Auteurs)
+                        if (newViewModel.Publication.Collections != null && newViewModel.Publication.Collections.Any())
                         {
-                            var auteurResult = await DbServices.Contact.CreateAsync(author);
-                            if (auteurResult.IsSuccess)
+                            List<CollectionVM> collectionVMs = new List<CollectionVM>();
+                            foreach (var collection in newViewModel.Publication.Collections)
                             {
-                                newViewModel.Id = auteurResult.Id;
+                                var collectionResult = await DbServices.Collection.CreateAsync(collection, _parameters.ParentLibrary.Id);
+                                if (collectionResult.IsSuccess)
+                                {
+                                    collection.Id = collectionResult.Id;
+                                    collectionVMs.Add(collection);
+                                }
+                                else
+                                {
+                                    //Erreur
+                                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                                    sender.ViewModelPage.ResultMessage += "\n" + collectionResult.Message;
+                                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                                    sender.ViewModelPage.IsResultMessageOpen = true;
+                                    continue;
+                                }
                             }
-                            else
-                            {
-                                //Erreur
-                                sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                                sender.ViewModelPage.ResultMessage += "\n" + auteurResult.Message;
-                                sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                                sender.ViewModelPage.IsResultMessageOpen = true;
-                                continue;
-                            }
+                            newViewModel.Publication.Collections = collectionVMs.Count > 0 ? new ObservableCollection<CollectionVM>(collectionVMs) : new ObservableCollection<CollectionVM>();
                         }
                     }
 
@@ -1491,7 +1501,6 @@ namespace LibraryProjectUWP.Views.Book
                         newViewModel.Id = creationResult.Id;
                         this.CompleteBookInfos(newViewModel);
                         ViewModelPage.ViewModelList.Add(newViewModel);
-                        this.RefreshItemsGrouping();
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
@@ -1514,6 +1523,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.ImportDataRequested -= ImportBookFromExcelUC_ImportDataRequested;
 
                 this.RemoveItemToSideBar(sender);
+                this.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -2207,7 +2217,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     CollectionVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                    var creationResult = await DbServices.Collection.CreateAsync(newViewModel);
+                    var creationResult = await DbServices.Collection.CreateAsync(newViewModel, _parameters.ParentLibrary.Id);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
