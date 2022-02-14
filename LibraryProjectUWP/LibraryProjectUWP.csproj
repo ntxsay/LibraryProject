@@ -135,6 +135,7 @@
     <Compile Include="Code\Converters\GroupConverters.cs" />
     <Compile Include="Code\Converters\NameToColorConverter.cs" />
     <Compile Include="Code\Converters\NullableBooleanConverters.cs" />
+    <Compile Include="Code\Converters\SelectedPageConverter.cs" />
     <Compile Include="Code\Converters\SizeDiviserConverter.cs" />
     <Compile Include="Code\Converters\ObjectToBooleanConverter.cs" />
     <Compile Include="Code\Converters\BookConverters.cs" />
@@ -171,6 +172,7 @@
     <Compile Include="Code\Services\ES\Folders.cs" />
     <Compile Include="Code\Services\Excel\ExcelServices.cs" />
     <Compile Include="Code\Services\Logging\Logs.cs" />
+    <Compile Include="Code\Services\Tasks\BookBackgroundTask.cs" />
     <Compile Include="Code\Services\Web\htmlServices.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -216,8 +218,10 @@
     <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\General\ManageCategorieParametersVM.cs" />
+    <Compile Include="ViewModels\General\PageSystemVM.cs" />
     <Compile Include="ViewModels\General\PriceVM.cs" />
     <Compile Include="ViewModels\General\SideBarItemHeaderVM.cs" />
+    <Compile Include="ViewModels\General\WorkerState.cs" />
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreVM.cs" />
     <Compile Include="ViewModels\General\OperationStateVM.cs" />
@@ -421,6 +425,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.13</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
+      <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI">
       <Version>7.1.2</Version>

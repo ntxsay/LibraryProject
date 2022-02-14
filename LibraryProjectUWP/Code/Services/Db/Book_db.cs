@@ -108,6 +108,38 @@ namespace LibraryProjectUWP.Code.Services.Db
             #endregion
 
             #region Multiple
+            public static async Task<long> CountBooksInLibraryAsync(long idLibrary)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    return await context.TlibraryBookConnector.LongCountAsync(w => w.IdLibrary == idLibrary && w.IdBook > -1);
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return 0;
+                }
+            }
+
+            public static async Task<IList<long>> GetIdBooksAsync(long idLibrary)
+            {
+                try
+                {
+                    LibraryDbContext context = new LibraryDbContext();
+
+                    return await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).Select(s => s.IdBook).ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<long>().ToList();
+                }
+            }
+
             public static async Task<IList<Tbook>> MultipleWithIdLibraryAsync(long idLibrary)
             {
                 try

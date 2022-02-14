@@ -26,6 +26,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
@@ -60,7 +61,7 @@ namespace LibraryProjectUWP.Views.Book
         #region Loading
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadDataAsync(true);
+            await InitializeDataAsync(true);
         }
 
         private async void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -91,8 +92,9 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var bookList = await DbServices.Book.MultipleVmWithIdLibraryAsync(_parameters.ParentLibrary.Id);
-                ViewModelPage.ViewModelList = bookList?.ToList() ?? new List<LivreVM>(); ;
+                _parameters.ParentPage?.InitializeSearchingBookWorker(_parameters.ParentLibrary);
+                //var bookList = await DbServices.Book.MultipleVmWithIdLibraryAsync(_parameters.ParentLibrary.Id);
+                //_parameters.ParentLibrary.Books = bookList?.ToList() ?? new List<LivreVM>(); ;
                 await InitializeDataAsync(firstLoad);
             }
             catch (Exception ex)
@@ -107,10 +109,10 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.ViewModelList != null && ViewModelPage.ViewModelList.Any())
+                if (_parameters.ParentLibrary.Books != null && _parameters.ParentLibrary.Books.Any())
                 {
                     EsBook esBook = new EsBook();
-                    foreach (var book in ViewModelPage.ViewModelList)
+                    foreach (var book in _parameters.ParentLibrary.Books)
                     {
                         string combinedPath = await esBook.GetBookItemJaquettePathAsync(book);
                         book.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
@@ -130,21 +132,27 @@ namespace LibraryProjectUWP.Views.Book
 
         private void InitializePages()
         {
+            Button btn = new Button();
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 ViewModelPage.PagesList.Clear();
 
-                if (ViewModelPage.ViewModelList != null && ViewModelPage.ViewModelList.Any())
+                if (_parameters.ParentLibrary.Books != null && _parameters.ParentLibrary.Books.Any())
                 {
-                    int nbPageDefault = ViewModelPage.ViewModelList.Count() / ViewModelPage.MaxItemsPerPage;
-                    double nbPageExact = ViewModelPage.ViewModelList.Count() / Convert.ToDouble(ViewModelPage.MaxItemsPerPage);
+                    int nbPageDefault = _parameters.ParentLibrary.Books.Count() / ViewModelPage.MaxItemsPerPage;
+                    double nbPageExact = _parameters.ParentLibrary.Books.Count() / Convert.ToDouble(ViewModelPage.MaxItemsPerPage);
                     int nbPageRounded = nbPageExact > nbPageDefault ? nbPageDefault + 1 : nbPageDefault;
                     ViewModelPage.CountPages = nbPageRounded;
 
                     for (int i = 0; i < ViewModelPage.CountPages; i++)
                     {
-                        ViewModelPage.PagesList.Add(i + 1);
+                        ViewModelPage.PagesList.Add(new PageSystemVM()
+                        {
+                            CurrentPage = i + 1,
+                            IsPageSelected = i == 0,
+                            BackgroundColor = i == 0 ? Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush : Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush,
+                        });
                     }
                 }
             }
@@ -573,8 +581,20 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (args.Parameter is int page)
                 {
-                    ViewModelPage.SelectedPage = page;
-                    this.RefreshItemsGrouping();
+                    foreach ( var pageVm in ViewModelPage.PagesList)
+                    {
+                        if (pageVm.CurrentPage != page && pageVm.IsPageSelected == true)
+                        {
+                            pageVm.IsPageSelected = false;
+                            pageVm.BackgroundColor = Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush;
+                        }
+                        else if (pageVm.CurrentPage == page && pageVm.IsPageSelected == false)
+                        {
+                            pageVm.IsPageSelected = true;
+                            pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
+                        }
+                    }
+                    this.RefreshItemsGrouping(false);
                 }
             }
             catch (Exception ex)
@@ -610,7 +630,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                if (_parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
                 {
                     return;
                 }
@@ -635,7 +655,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                if (_parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
                 {
                     return;
                 }
@@ -661,7 +681,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                if (_parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
                 {
                     return;
                 }
@@ -687,7 +707,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                if (_parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
                 {
                     return;
                 }
@@ -812,7 +832,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void RefreshItemsGrouping()
+        public void RefreshItemsGrouping(bool resetPage = true)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -836,7 +856,10 @@ namespace LibraryProjectUWP.Views.Book
                         break;
                 }
 
-                this.InitializePages();
+                if (resetPage)
+                {
+                    this.InitializePages();
+                }
             }
             catch (Exception ex)
             {
@@ -852,7 +875,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || _parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
                 {
                     return;
                 }
@@ -860,7 +883,7 @@ namespace LibraryProjectUWP.Views.Book
                 var FilteredItems = new List<LivreVM>();
                 var splitSearchTerm = sender.Text.ToLower().Split(" ");
 
-                foreach (var value in ViewModelPage.ViewModelList)
+                foreach (var value in _parameters.ParentLibrary.Books)
                 {
                     if (value.MainTitle.IsStringNullOrEmptyOrWhiteSpace()) continue;
 
@@ -1207,7 +1230,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         EditMode = Code.EditMode.Create,
-                        ViewModelList = ViewModelPage.ViewModelList,
+                        ViewModelList = _parameters.ParentLibrary.Books,
                         CurrentViewModel = new LivreVM()
                         {
                             IdLibrary = _parameters.ParentLibrary.Id,
@@ -1247,7 +1270,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         newViewModel.Id = creationResult.Id;
                         this.CompleteBookInfos(newViewModel);
-                        ViewModelPage.ViewModelList.Add(newViewModel);
+                        _parameters.ParentLibrary.Books.Add(newViewModel);
                         this.RefreshItemsGrouping();
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
@@ -1313,7 +1336,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         EditMode = Code.EditMode.Edit,
-                        ViewModelList = ViewModelPage.ViewModelList,
+                        ViewModelList = _parameters.ParentLibrary.Books,
                         CurrentViewModel = viewModel,
                     });
 
@@ -1413,7 +1436,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         ExcelFile = excelFile,
-                        ViewModelList = ViewModelPage.ViewModelList,
+                        ViewModelList = _parameters.ParentLibrary.Books,
                     });
 
                     userControl.CancelModificationRequested += ImportBookFromExcelUC_CancelModificationRequested;
@@ -1500,7 +1523,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         newViewModel.Id = creationResult.Id;
                         this.CompleteBookInfos(newViewModel);
-                        ViewModelPage.ViewModelList.Add(newViewModel);
+                        _parameters.ParentLibrary.Books.Add(newViewModel);
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
@@ -1567,7 +1590,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         EditMode = Code.EditMode.Create,
-                        //ViewModelList = ViewModelPage.ViewModelList,
+                        //ViewModelList = _parameters.ParentLibrary.Books,
                         Parent = args.Parameter as LivreVM,
                         CurrentViewModel = new LivreExemplaryVM()
                         {
@@ -1660,7 +1683,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.ViewModelList != null)
+                if (_parameters.ParentLibrary.Books != null)
                 {
                     var suggestedFileName = $"Rostalotheque_Livres_All_{DateTime.Now:yyyyMMddHHmmss}";
 
@@ -1676,7 +1699,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
 
                     //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
-                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(ViewModelPage.ViewModelList, savedFile);// savedFile.Path
+                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(_parameters.ParentLibrary.Books, savedFile);// savedFile.Path
                     if (isFileSaved == false)
                     {
                         Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
@@ -3000,22 +3023,23 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                var selectedPage = ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
                 IEnumerable<LivreVM> itemsPage = Enumerable.Empty<LivreVM>();
 
                 //Si la séquence contient plus d'items que le nombre max éléments par page
-                if (ViewModelPage.ViewModelList.Count > ViewModelPage.MaxItemsPerPage)
+                if (_parameters.ParentLibrary.Books.Count > ViewModelPage.MaxItemsPerPage)
                 {
                     //Si la première page (ou moins ^^')
-                    if (ViewModelPage.SelectedPage <= 1)
+                    if (selectedPage <= 1)
                     {
-                        itemsPage = ViewModelPage.ViewModelList.Take(ViewModelPage.MaxItemsPerPage);
+                        itemsPage = _parameters.ParentLibrary.Books.Take(ViewModelPage.MaxItemsPerPage);
                     }
                     else //Si plus que la première page
                     {
-                        var nbItemsToSkip = ViewModelPage.MaxItemsPerPage * (ViewModelPage.SelectedPage - 1);
-                        if (ViewModelPage.ViewModelList.Count >= nbItemsToSkip)
+                        var nbItemsToSkip = ViewModelPage.MaxItemsPerPage * (selectedPage - 1);
+                        if (_parameters.ParentLibrary.Books.Count >= nbItemsToSkip)
                         {
-                            var getRest = ViewModelPage.ViewModelList.Skip(nbItemsToSkip);
+                            var getRest = _parameters.ParentLibrary.Books.Skip(nbItemsToSkip);
                             //Si reste de la séquence contient plus d'items que le nombre max éléments par page
                             if (getRest.Count() > ViewModelPage.MaxItemsPerPage)
                             {
@@ -3030,7 +3054,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else //Si la séquence contient moins ou le même nombre d'items que le nombre max éléments par page
                 {
-                    itemsPage = ViewModelPage.ViewModelList;
+                    itemsPage = _parameters.ParentLibrary.Books;
                 }
 
                 return itemsPage;
@@ -3663,8 +3687,22 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private ObservableCollection<int> _PagesList = new ObservableCollection<int>();
-        public ObservableCollection<int> PagesList
+        //private ObservableCollection<int> _PagesList = new ObservableCollection<int>();
+        //public ObservableCollection<int> PagesList
+        //{
+        //    get => this._PagesList;
+        //    set
+        //    {
+        //        if (_PagesList != value)
+        //        {
+        //            this._PagesList = value;
+        //            this.OnPropertyChanged();
+        //        }
+        //    }
+        //}
+
+        private ObservableCollection<PageSystemVM> _PagesList = new ObservableCollection<PageSystemVM>();
+        public ObservableCollection<PageSystemVM> PagesList
         {
             get => this._PagesList;
             set
@@ -3720,6 +3758,7 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         private List<LivreVM> _ViewModelList;
+        [Obsolete]
         public List<LivreVM> ViewModelList
         {
             get => this._ViewModelList;

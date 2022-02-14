@@ -9,6 +9,16 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="PageSelectedBackground" Color="{ThemeResource SystemAccentColor}"/>
+                    <SolidColorBrush x:Key="PageNotSelectedBackground" Color="{ThemeResource ButtonBackgroundPressed}"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="PageSelectedBackground" Color="{ThemeResource SystemAccentColor}"/>
+                    <SolidColorBrush x:Key="PageNotSelectedBackground" Color="{ThemeResource ButtonBackgroundPressed}"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
             <!--<ResourceDictionary.ThemeDictionaries>
                 <SolidColorBrush x:Key="ItemInfoContainerThemeColor" Color="{ThemeResource SystemControlChromeHighAcrylicElementMediumBrush}"/>
             </ResourceDictionary.ThemeDictionaries>-->

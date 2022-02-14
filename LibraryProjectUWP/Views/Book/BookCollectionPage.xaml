@@ -18,6 +18,7 @@
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls" Margin="0 38 0 0" Loaded="Page_Loaded">
     <Page.Resources>
+        <customConverters:SelectedPageColorConverter x:Key="selectedPageColorConverter" />
         <customConverters:ContactListTostringConverter x:Key="contactListTostringConverter" />
         <customConverters:CountToVisibilityConverter x:Key="countToVisibilityConverter" />
         <customConverters:ObjectToBooleanConverter x:Key="objectToBooleanConverter" />
@@ -427,14 +428,14 @@
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="x:Int32">
-                                            <Button Command="{StaticResource GotoPageXUiCmd}" CommandParameter="{x:Bind }">
-                                                <TextBlock Text="{x:Bind  Mode=OneWay}" />
+                                        <DataTemplate x:DataType="generalVm:PageSystemVM">
+                                            <Button x:Name="btnSel" Command="{StaticResource GotoPageXUiCmd}" CommandParameter="{x:Bind CurrentPage, Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" Background="{x:Bind BackgroundColor, Mode=OneWay}">
+                                                <TextBlock Text="{x:Bind CurrentPage, Mode=OneWay}" />
                                                 <ToolTipService.ToolTip>
                                                     <ToolTip>
                                                         <TextBlock>
                                                             <Run Text="Accéder à la page" />
-                                                            <Run Text="{x:Bind Mode=OneWay}" FontWeight="Medium"/>
+                                                            <Run Text="{x:Bind CurrentPage, Mode=OneWay}" FontWeight="Medium"/>
                                                         </TextBlock>
                                                     </ToolTip>
                                                 </ToolTipService.ToolTip>

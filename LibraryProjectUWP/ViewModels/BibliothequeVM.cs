@@ -73,8 +73,8 @@ namespace LibraryProjectUWP.ViewModels
                 }
             }
         }
-        private ObservableCollection<LivreVM> _Books = new ObservableCollection<LivreVM>();
-        public ObservableCollection<LivreVM> Books
+        private List<LivreVM> _Books = new List<LivreVM>();
+        public List<LivreVM> Books
         {
             get => _Books;
             set

@@ -367,7 +367,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind ViewModelPage.SearchingLibraryVisibility, Mode=OneWay}">
                     <MUIXC:ProgressRing IsIndeterminate="True" Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" Height="20" Width="20"/>
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium"
-                               Text="Recherche de bibliothèques en cours ..."/>
+                               Text="{x:Bind ViewModelPage.SearchingLibraryMessage, Mode=OneWay}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">

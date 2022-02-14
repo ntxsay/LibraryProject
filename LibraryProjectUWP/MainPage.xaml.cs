@@ -32,6 +32,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using LibraryProjectUWP.Views.UserControls.TitleBar;
+using LibraryProjectUWP.Views.Library;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -353,7 +354,7 @@ namespace LibraryProjectUWP
             }
         }
 
-        internal bool BookCollectionNavigationAsync(BibliothequeVM parentLibrary)
+        internal bool BookCollectionNavigationAsync(BibliothequeVM parentLibrary, LibraryCollectionPage parentPage)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -362,7 +363,7 @@ namespace LibraryProjectUWP
                 { 
                     Margin = new Thickness(0, 14, 0, 0),
                 });
-                return NavigateToView("Book.BookCollectionPage", new LibraryToBookNavigationDriverVM() { ParentLibrary = parentLibrary });
+                return NavigateToView("Book.BookCollectionPage", new LibraryToBookNavigationDriverVM() { ParentLibrary = parentLibrary, ParentPage = parentPage });
             }
             catch (Exception ex)
             {

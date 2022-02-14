@@ -9,6 +9,7 @@ using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Categories;
 using LibraryProjectUWP.Views.Library.Manage;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -40,6 +43,7 @@ namespace LibraryProjectUWP.Views.Library
     /// </summary>
     public sealed partial class LibraryCollectionPage : Page
     {
+        private BackgroundWorker worker;
         public LibraryCollectionPageVM ViewModelPage { get; set; } = new LibraryCollectionPageVM();
         EsLibrary esLibrary = new EsLibrary();
         public LibraryCollectionPage()
@@ -2057,12 +2061,17 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is Viewbox viewbox && viewbox.Tag is BibliothequeVM viewModel)
                 {
-                    VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
-                    var mainPage = mainControlsUI.GetMainPage;
-                    if (mainPage != null)
+                    if (viewModel.Books != null && viewModel.Books.Count > 0)
                     {
-                        mainPage.BookCollectionNavigationAsync(viewModel);
+                        VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
+                        var mainPage = mainControlsUI.GetMainPage;
+                        if (mainPage != null)
+                        {
+                            mainPage.BookCollectionNavigationAsync(viewModel, this);
+                        }
+                        return;
                     }
+                    InitializeSearchingBookWorker(viewModel);
                 }
             }
             catch (Exception ex)
@@ -2073,7 +2082,117 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        
+        #region SearchBooks
+        public void InitializeSearchingBookWorker(BibliothequeVM viewModel)
+        {
+            try
+            {
+                if (worker == null)
+                {
+                    worker = new BackgroundWorker()
+                    {
+                        WorkerReportsProgress = false,
+                        WorkerSupportsCancellation = false,
+                    };
+
+                    //worker.ProgressChanged += Worker_ProgressChanged;
+                    worker.DoWork += Worker_DoWork;
+                    worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+                }
+
+                if (worker != null)
+                {
+                    if (!worker.IsBusy)
+                    {
+                        ViewModelPage.SearchingLibraryVisibility = Visibility.Visible;
+                        ViewModelPage.SearchingLibraryMessage = $"Récupération des livres de la bibliothèque {viewModel.Name}";
+
+                        worker.RunWorkerAsync(viewModel);
+                        new ToastContentBuilder()
+                        .AddText($"Bibliothèque {viewModel.Name}")
+                        .AddText("Nous sommes en train de récupérer vos livres, nous vous prions de patienter quelques instants.")
+                        .Show();
+                    }
+                    else
+                    {
+                        new ToastContentBuilder()
+                        .AddText($"Bibliothèque {viewModel.Name}")
+                        .AddText("Nous sommes toujours en train de récupérer vos livres, nous vous prions de patienter quelques instants.")
+                        .Show();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                if (e.Argument is BibliothequeVM viewModel)
+                {
+                    Task<IList<LivreVM>> task = DbServices.Book.MultipleVmWithIdLibraryAsync(viewModel.Id);
+                    task.Wait();
+
+                    var result = task.Result;
+                    viewModel.Books = result?.ToList();
+                    e.Result = viewModel;
+                    Thread.Sleep(1000);
+                    task.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            try
+            {
+                // Si erreur
+                if (e.Error != null)
+                {
+                    
+                }
+                else if (e.Cancelled)
+                {
+                    // Support de l'annulation a été désactivée
+                }
+                else
+                {
+                    if (e.Result is BibliothequeVM viewModel)
+                    {
+                        VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
+                        var mainPage = mainControlsUI.GetMainPage;
+                        if (mainPage != null)
+                        {
+                            mainPage.BookCollectionNavigationAsync(viewModel, this);
+                        }
+                    }
+                }
+
+                ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
+                ViewModelPage.SearchingLibraryMessage = string.Empty;
+
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #endregion
+
     }
 
     public class LibraryCollectionPageVM : INotifyPropertyChanged
@@ -2192,6 +2311,20 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
+        private string _SearchingLibraryMessage;
+        public string SearchingLibraryMessage
+        {
+            get => this._SearchingLibraryMessage;
+            set
+            {
+                if (_SearchingLibraryMessage != value)
+                {
+                    this._SearchingLibraryMessage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         private bool _IsSplitViewOpen;
         public bool IsSplitViewOpen
         {
@@ -2206,19 +2339,7 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private UserControl _SplitViewContent;
-        public UserControl SplitViewContent
-        {
-            get => this._SplitViewContent;
-            set
-            {
-                if (_SplitViewContent != value)
-                {
-                    this._SplitViewContent = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
+        
 
         public const double MinSplitViewWidth = 400;
 
