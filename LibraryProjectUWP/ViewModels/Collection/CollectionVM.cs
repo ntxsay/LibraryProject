@@ -11,7 +11,7 @@ namespace LibraryProjectUWP.ViewModels.Collection
     public class CollectionVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public long Id { get; set; }
+        public long Id { get; set; } = -1;
         public long IdBook { get; set; } = -1;
         public long IdLibrary { get; set; } = -1;
 

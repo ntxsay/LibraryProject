@@ -33,6 +33,7 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using LibraryProjectUWP.Views.UserControls.TitleBar;
 using LibraryProjectUWP.Views.Library;
+using LibraryProjectUWP.Views.Book;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -243,13 +244,26 @@ namespace LibraryProjectUWP
             }
         }
 
-        public void GoToBack()
+        public async Task GoToBack()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (this.MainFrameContainer.CanGoBack)
                 {
+                    if (this.MainFrameContainer.Content is BookCollectionPage bookCollection && bookCollection._parameters.ParentLibrary.Books.Count > 100)
+                    {
+                        var dialog = new BookBeforeGoBackCD()
+                        {
+                            Title = $"Quitter la bibliothèque {bookCollection._parameters.ParentLibrary.Name}"
+                        };
+
+                        var result = await dialog.ShowAsync();
+                        if (result == ContentDialogResult.Secondary)
+                        {
+                            return;
+                        }
+                    }
                     this.MainFrameContainer.GoBack();
                 }
 

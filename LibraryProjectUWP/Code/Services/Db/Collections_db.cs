@@ -272,6 +272,15 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
+                    if (idLibrary <= 0)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = "L'id de la bibliothèque n'est pas valide",
+                        };
+                    }
+
                     if (viewModel.Name.IsStringNullOrEmptyOrWhiteSpace())
                     {
                         return new OperationStateVM()

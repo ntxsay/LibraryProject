@@ -420,14 +420,16 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         foreach (ContactVM author in viewModel.Auteurs)
                         {
-                            var authorConnector = new TbookAuthorConnector()
+                            if (await context.Tcontact.AnyAsync(a => a.Id == author.Id))
                             {
-                                IdBook = record.Id,
-                                IdAuthor = author.Id,
-                            };
-
-                            _ = await context.TbookAuthorConnector.AddAsync(authorConnector);
-                            await context.SaveChangesAsync();
+                                var authorConnector = new TbookAuthorConnector()
+                                {
+                                    IdBook = record.Id,
+                                    IdAuthor = author.Id,
+                                };
+                                _ = await context.TbookAuthorConnector.AddAsync(authorConnector);
+                                await context.SaveChangesAsync();
+                            }
                         }
                     }
 
@@ -435,14 +437,17 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         foreach (CollectionVM collection in viewModel.Publication.Collections)
                         {
-                            var itemConnector = new TbookCollectionConnector()
+                            if (await context.Tcollection.AnyAsync(a => a.Id == collection.Id))
                             {
-                                IdBook = record.Id,
-                                IdCollection = collection.Id,
-                            };
+                                var itemConnector = new TbookCollectionConnector()
+                                {
+                                    IdBook = record.Id,
+                                    IdCollection = collection.Id,
+                                };
 
-                            _ = await context.TbookCollectionConnector.AddAsync(itemConnector);
-                            await context.SaveChangesAsync();
+                                _ = await context.TbookCollectionConnector.AddAsync(itemConnector);
+                                await context.SaveChangesAsync();
+                            }
                         }
                     }
 
@@ -450,14 +455,17 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         foreach (ContactVM editeur in viewModel.Publication.Editeurs)
                         {
-                            var itemConnector = new TbookEditeurConnector()
+                            if (await context.Tcollection.AnyAsync(a => a.Id == editeur.Id))
                             {
-                                IdBook = record.Id,
-                                IdEditeur = editeur.Id,
-                            };
+                                var itemConnector = new TbookEditeurConnector()
+                                {
+                                    IdBook = record.Id,
+                                    IdEditeur = editeur.Id,
+                                };
 
-                            _ = await context.TbookEditeurConnector.AddAsync(itemConnector);
-                            await context.SaveChangesAsync();
+                                _ = await context.TbookEditeurConnector.AddAsync(itemConnector);
+                                await context.SaveChangesAsync();
+                            }
                         }
                     }
 
