@@ -160,7 +160,7 @@
                             </TextBlock>
                         </ToolTip>
                     </ToolTipService.ToolTip>
-                    <Border Height="301" Width="192" Background="WhiteSmoke" BorderThickness="0" CornerRadius="0">
+                    <Border Height="301" Width="192" Background="WhiteSmoke" BorderThickness="0" CornerRadius="8">
                         <Grid Height="301" Width="192">
                             <Image Source="{x:Bind JaquettePath, Mode=OneWay}" Tag="{x:Bind JaquettePath, Mode=OneWay}" Stretch="UniformToFill" Loaded="Image_Loaded_1"/>
                             <!--<Grid Height="150" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left">
@@ -176,7 +176,7 @@
                         </Grid>
                     </Border>
                 </Viewbox>
-                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="4, 8" BorderThickness="0" CornerRadius="12 12 0 0">
+                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="4, 8" BorderThickness="0" CornerRadius="8 8 8 8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="2"/>
@@ -409,7 +409,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                               ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}" SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}">
+                               ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}" SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}" PivotItemLoaded="PivotItems_PivotItemLoaded">
                             <Pivot.OpacityTransition>
                                 <ScalarTransition />
                             </Pivot.OpacityTransition>
@@ -420,8 +420,8 @@
                             </Pivot.HeaderTemplate>
                         </Pivot>
                         <Grid Grid.Row="1">
-                            <ScrollViewer VerticalScrollMode="Disabled" HorizontalScrollBarVisibility="Auto" Padding="15 5 15 10">
-                                <ItemsControl ItemsSource="{x:Bind ViewModelPage.PagesList, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ScrollViewer x:Name="scrollVPages" VerticalScrollMode="Disabled" HorizontalScrollBarVisibility="Auto" Padding="15 5 15 10">
+                                <ItemsControl x:Name="itemControlPageList" ItemsSource="{x:Bind ViewModelPage.PagesList, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal" Spacing="4"/>
@@ -429,7 +429,7 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="generalVm:PageSystemVM">
-                                            <Button x:Name="btnSel" Command="{StaticResource GotoPageXUiCmd}" CommandParameter="{x:Bind CurrentPage, Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" Background="{x:Bind BackgroundColor, Mode=OneWay}">
+                                            <Button Command="{StaticResource GotoPageXUiCmd}" CommandParameter="{x:Bind CurrentPage, Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" Background="{x:Bind BackgroundColor, Mode=OneWay}">
                                                 <TextBlock Text="{x:Bind CurrentPage, Mode=OneWay}" />
                                                 <ToolTipService.ToolTip>
                                                     <ToolTip>

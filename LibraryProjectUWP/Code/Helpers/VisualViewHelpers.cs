@@ -1,6 +1,8 @@
-﻿using System;
+﻿using LibraryProjectUWP.Code.Services.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -46,6 +48,40 @@ namespace LibraryProjectUWP.Code.Helpers
             {
 
                 throw;
+            }
+        }
+
+        public static IEnumerable<T> FindVisualChilds<T>(DependencyObject elementCible) where T : DependencyObject
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var count = VisualTreeHelper.GetChildrenCount(elementCible);
+                if (count == 0) return Enumerable.Empty<T>();
+
+                List<T> result = new List<T>();
+                for (int i = 0; i < count; i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(elementCible, i);
+                    if (child != null && child is T t)
+                    {
+                        result.Add(t);
+                    }
+                    else
+                    {
+                        var elList = FindVisualChilds<T>(child);
+                        if (elList != null && elList.Any())
+                        {
+                            result.AddRange(elList);
+                        }
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return Enumerable.Empty<T>();
             }
         }
 
