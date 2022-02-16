@@ -9,6 +9,63 @@ namespace LibraryProjectUWP.Code.Helpers
 {
     internal class DatesHelpers
     {
+        public const string NoAnswer = "N/A";
+        public static IEnumerable<string> ChooseDays() => new List<string>()
+        {
+            {NoAnswer },
+            {"1" },
+            {"2" },
+            {"3" },
+            {"4" },
+            {"5" },
+            {"6" },
+            {"7" },
+            {"8" },
+            {"9" },
+            {"10" },
+            {"11" },
+            {"12" },
+            {"13" },
+            {"14" },
+            {"15" },
+            {"16" },
+            {"17" },
+            {"18" },
+            {"19" },
+            {"20" },
+            {"21" },
+            {"22" },
+            {"23" },
+            {"24" },
+            {"25" },
+            {"26" },
+            {"27" },
+            {"28" },
+            {"29" },
+            {"30" },
+            {"31" },
+        };
+
+        public static IEnumerable<string> ChooseMonth() => new List<string>()
+        {
+            {NoAnswer },
+            {"Janvier" },
+            {"Février" },
+            {"Mars" },
+            {"Avril" },
+            {"Mai" },
+            {"Juin" },
+            {"Juillet" },
+            {"Août" },
+            {"Septembre" },
+            {"Octobre" },
+            {"Novembre" },
+            {"Décembre" },
+        };
+
+        public static IEnumerable<string> ChooseYear() => Enumerable.Range(1900, 130).Select(s => s.ToString());
+        
+
         internal struct StringFormat
         {
             public const string FrenchDateStringFormat = "ddd dd MMMM yyyy";

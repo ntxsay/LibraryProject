@@ -176,14 +176,14 @@
                         </Grid>
                     </Border>
                 </Viewbox>
-                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="4, 8" BorderThickness="0" CornerRadius="8 8 8 8">
+                <Grid x:Name="GridActions" Margin="1,0,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" 
+                      Padding="4, 8" BorderThickness="0" CornerRadius="8 8 8 8" ColumnSpacing="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="2"/>
-                        <ColumnDefinition Width="44"/>
+                        <ColumnDefinition Width="22"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="{x:Bind MainTitle, Mode=OneWay}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
-                    <Button x:Name="BtnActions" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                    <Button x:Name="BtnActions" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="2" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand" Padding="0" Width="22" HorizontalAlignment="Right">
                         <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
                             <Border.BorderBrush>
                                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
@@ -249,7 +249,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="GridViewTemplate" x:DataType="booktVm:LivreVM">
-            <ScrollViewer x:Name="scrollItems" HorizontalScrollMode="Disabled" Grid.Row="0">
+            <ScrollViewer x:Name="scrollItems" HorizontalScrollMode="Disabled" ViewChanged="ScrollItems_ViewChanged">
                 <GridView x:Name="GridViewItems" ItemsSource="{Binding }" SelectionMode="Extended" IsItemClickEnabled="False" Padding="4,14" Loaded="GridViewItems_Loaded" Unloaded="GridViewItems_Unloaded"
                             ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled" IsMultiSelectCheckBoxEnabled="True" SingleSelectionFollowsFocus="True">
                     <GridView.ItemContainerStyle>

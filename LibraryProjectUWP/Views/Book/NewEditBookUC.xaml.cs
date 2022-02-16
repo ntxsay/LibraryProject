@@ -1086,7 +1086,16 @@ namespace LibraryProjectUWP.Views.Book
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+        public NewEditBookUCVM()
+        {
+            chooseYear.Add(DatesHelpers.NoAnswer);
+            chooseYear.AddRange(DatesHelpers.ChooseYear());
+        }
         public Guid Guid { get; private set; } = Guid.NewGuid();
+
+        public IEnumerable<string> chooseDays = DatesHelpers.ChooseDays();
+        public IEnumerable<string> chooseMonths = DatesHelpers.ChooseMonth();
+        public List<string> chooseYear = new List<string>();
 
 
         private string _Header;

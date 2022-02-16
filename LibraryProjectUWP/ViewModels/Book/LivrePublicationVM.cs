@@ -23,6 +23,48 @@ namespace LibraryProjectUWP.ViewModels.Book
         [JsonIgnore]
         public LivreVM Parent { get; set; }
 
+        private string _DayParution;
+        public string DayParution
+        {
+            get => this._DayParution;
+            set
+            {
+                if (this._DayParution != value)
+                {
+                    this._DayParution = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _MonthParution;
+        public string MonthParution
+        {
+            get => this._MonthParution;
+            set
+            {
+                if (this._MonthParution != value)
+                {
+                    this._MonthParution = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _YearParution;
+        public string YearParution
+        {
+            get => this._YearParution;
+            set
+            {
+                if (this._YearParution != value)
+                {
+                    this._YearParution = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         private DateTimeOffset? _DateParution;
         public DateTimeOffset? DateParution
         {
