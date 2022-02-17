@@ -251,7 +251,8 @@
         <DataTemplate x:Key="GridViewTemplate" x:DataType="booktVm:LivreVM">
             <ScrollViewer x:Name="scrollItems" HorizontalScrollMode="Disabled" ViewChanged="ScrollItems_ViewChanged">
                 <GridView x:Name="GridViewItems" ItemsSource="{Binding }" SelectionMode="Extended" IsItemClickEnabled="False" Padding="4,14" Loaded="GridViewItems_Loaded" Unloaded="GridViewItems_Unloaded"
-                            ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled" IsMultiSelectCheckBoxEnabled="True" SingleSelectionFollowsFocus="True">
+                            ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled" IsMultiSelectCheckBoxEnabled="True" SingleSelectionFollowsFocus="True"
+                          KeyDown="GridViewItems_KeyDown">
                     <GridView.ItemContainerStyle>
                         <Style TargetType="GridViewItem" >
                             <Setter Property="Margin" Value="7" />

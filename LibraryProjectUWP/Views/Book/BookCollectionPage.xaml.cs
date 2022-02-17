@@ -208,6 +208,7 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     }
                     gridView.SelectionChanged += GridViewItems_SelectionChanged;
+                    gridView.Focus(FocusState.Pointer);
                 }
             }
             catch (Exception ex)
@@ -468,6 +469,73 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        #region Paginations
+        private void GotoPageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (args.Parameter is int page)
+                {
+                    GotoPage(page);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void GridViewItems_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (e.Key == Windows.System.VirtualKey.Q)
+                {
+                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    () =>
+                    {
+                        var selectedPage = this.GetSelectedPage - 1;
+                        if (selectedPage >= 1)
+                        {
+                            this.GotoPage(selectedPage);
+                        }
+                    });
+                }
+                else if (e.Key == Windows.System.VirtualKey.D)
+                {
+                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    () =>
+                    {
+                        var selectedPage = this.GetSelectedPage;
+                        this.GotoPage(selectedPage + 1);
+                    });
+                }
+                else if (e.Key == Windows.System.VirtualKey.Z)
+                {
+                    if (sender is GridView gridView && gridView.Items.Count > 0)
+                    {
+                        gridView.SelectedItem = gridView.Items[0];
+                    }
+                }
+                else if (e.Key == Windows.System.VirtualKey.S)
+                {
+                    if (sender is GridView gridView && gridView.Items.Count > 0)
+                    {
+                        gridView.SelectedItem = gridView.Items[gridView.Items.Count - 1];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        } 
+        #endregion
+
         #region Item MenuFlyout
         private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -641,22 +709,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void GotoPageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (args.Parameter is int page)
-                {
-                    GotoPage(page);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        
         #endregion
 
         #region Sort - Group - Order
@@ -3663,34 +3716,34 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is ScrollViewer scrollViewer)
                 {
-                    var scrolledOffset = scrollViewer.VerticalOffset;
-                    var scrollable = scrollViewer.ScrollableHeight;
-                    if (e.IsIntermediate)
-                    {
-                        if (scrolledOffset >= scrollable)
-                        {
-                            PivotItems.InvalidateMeasure();
-                            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                            () =>
-                            {
-                                var selectedPage = this.GetSelectedPage;
-                                this.GotoPage(selectedPage + 1);
-                            });
-                        }
-                        else if (scrolledOffset <= 0)
-                        {
-                            PivotItems.InvalidateMeasure();
-                            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                            () =>
-                            {
-                                var selectedPage = this.GetSelectedPage - 1;
-                                if (selectedPage >= 1)
-                                {
-                                    this.GotoPage(selectedPage);
-                                }
-                            });
-                        }
-                    }
+                    //var scrolledOffset = scrollViewer.VerticalOffset;
+                    //var scrollable = scrollViewer.ScrollableHeight;
+                    //if (e.IsIntermediate)
+                    //{
+                    //    if (scrolledOffset >= scrollable)
+                    //    {
+                    //        PivotItems.InvalidateMeasure();
+                    //        await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    //        () =>
+                    //        {
+                    //            var selectedPage = this.GetSelectedPage;
+                    //            this.GotoPage(selectedPage + 1);
+                    //        });
+                    //    }
+                    //    else if (scrolledOffset <= 0)
+                    //    {
+                    //        PivotItems.InvalidateMeasure();
+                    //        await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    //        () =>
+                    //        {
+                    //            var selectedPage = this.GetSelectedPage - 1;
+                    //            if (selectedPage >= 1)
+                    //            {
+                    //                this.GotoPage(selectedPage);
+                    //            }
+                    //        });
+                    //    }
+                    //}
                     
                     //Debug.WriteLine("scroll " + scrolledOffset);
                     //Debug.WriteLine("scrollable " + ee);
@@ -3728,6 +3781,8 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
+
+        
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged
@@ -4052,5 +4107,4 @@ namespace LibraryProjectUWP.Views.Book
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
 }
