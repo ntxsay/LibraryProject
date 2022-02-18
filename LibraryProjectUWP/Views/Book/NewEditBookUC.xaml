@@ -145,10 +145,6 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <userControls:SideBarItemHeader x:Name="header" Grid.Column="0" Title="{x:Bind ViewModelPage.Header, Mode=OneWay}" Glyph="{x:Bind ViewModelPage.Glyph, Mode=OneWay}" />
-            <!--<StackPanel Orientation="Horizontal" Spacing="8">
-                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind ViewModelPage.Glyph, Mode=OneWay}" FontSize="20"/>
-                <TextBlock Text="{x:Bind ViewModelPage.Header, Mode=OneWay}" FontSize="16" VerticalAlignment="Center" Margin="0 0 0 5" />
-            </StackPanel>-->
             <Button Grid.Column="1" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fermer cet onglet"
                     Command="{StaticResource CancelModificationXUiCommand}">
                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="16"/>
@@ -378,13 +374,13 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <ComboBox Grid.Column="0" ItemsSource="{x:Bind ViewModelPage.chooseDays}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.DayParution, Mode=TwoWay}" PlaceholderText="JJ" Background="Transparent" BorderThickness="0">
+                                <ComboBox Grid.Column="0" ItemsSource="{x:Bind ViewModelPage.chooseDays}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.DayParution, Mode=TwoWay}" PlaceholderText="JJ" Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center">
 
                                 </ComboBox>
-                                <ComboBox Grid.Column="1" ItemsSource="{x:Bind ViewModelPage.chooseMonths}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.MonthParution, Mode=TwoWay}" PlaceholderText="MM" Background="Transparent" BorderThickness="0">
+                                <ComboBox Grid.Column="1" ItemsSource="{x:Bind ViewModelPage.chooseMonths}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.MonthParution, Mode=TwoWay}" PlaceholderText="MM" Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center">
 
                                 </ComboBox>
-                                <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModelPage.chooseYear}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.YearParution, Mode=TwoWay}" PlaceholderText="AAAA" Background="Transparent" BorderThickness="0">
+                                <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModelPage.chooseYear}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.YearParution, Mode=TwoWay}" PlaceholderText="AAAA" Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center">
 
                                 </ComboBox>
                             </Grid>

@@ -104,13 +104,11 @@ CREATE TABLE IF NOT EXISTS "TBook" (
     "CountOpening" INTEGER NOT NULL DEFAULT 0,
     "MinAge" INTEGER NULL DEFAULT 0,
     "MaxAge" INTEGER NULL DEFAULT 0,
-    "DayParution" TEXT NULL,
-    "MonthParution" TEXT NULL,
-    "YearParution" TEXT NULL,
+    "DateParution" TEXT NULL,
     "Resume" TEXT NULL,
     "Notes" TEXT NULL,
-    "Price" REAL NOT NULL DEFAULT 0,
-	"DeviceName" TEXT NOT NULL,
+    --"Price" REAL NOT NULL DEFAULT 0,
+	--"DeviceName" TEXT NOT NULL,
 	"Langue" TEXT NULL,
 	"Pays" TEXT NULL,
     PRIMARY KEY("Id" AUTOINCREMENT)
@@ -146,6 +144,7 @@ CREATE TABLE IF NOT EXISTS "TBookFormat" (
     "Largeur" REAL NULL,
     "Hauteur" REAL NULL,
     "Epaisseur" REAL NULL,
+    "Weight" REAL NULL,
 	PRIMARY KEY("Id" AUTOINCREMENT)
     FOREIGN KEY("Id") REFERENCES "TBook"("Id") ON DELETE CASCADE
 );
@@ -181,8 +180,6 @@ CREATE TABLE IF NOT EXISTS "TBookExemplary" (
 	"DeviceName" TEXT NULL,
     "DateAcquisition" TEXT NULL, --Date emprunt, Achat, Donation
     "DateRemise" TEXT NULL, --Si emprunt
-    "IsJourAcquisitionKnow" INTEGER NOT NULL DEFAULT 0,
-    "IsMoisAcquisitionKnow" INTEGER NOT NULL DEFAULT 0,
     "IsVisible" INTEGER NOT NULL DEFAULT 1,
     "Observations" TEXT NULL,
 	PRIMARY KEY("Id" AUTOINCREMENT)

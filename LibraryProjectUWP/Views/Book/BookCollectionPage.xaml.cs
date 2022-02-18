@@ -3710,69 +3710,13 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ScrollItems_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        private void ScrollItems_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
             try
             {
                 if (sender is ScrollViewer scrollViewer)
                 {
-                    //var scrolledOffset = scrollViewer.VerticalOffset;
-                    //var scrollable = scrollViewer.ScrollableHeight;
-                    //if (e.IsIntermediate)
-                    //{
-                    //    if (scrolledOffset >= scrollable)
-                    //    {
-                    //        PivotItems.InvalidateMeasure();
-                    //        await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                    //        () =>
-                    //        {
-                    //            var selectedPage = this.GetSelectedPage;
-                    //            this.GotoPage(selectedPage + 1);
-                    //        });
-                    //    }
-                    //    else if (scrolledOffset <= 0)
-                    //    {
-                    //        PivotItems.InvalidateMeasure();
-                    //        await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                    //        () =>
-                    //        {
-                    //            var selectedPage = this.GetSelectedPage - 1;
-                    //            if (selectedPage >= 1)
-                    //            {
-                    //                this.GotoPage(selectedPage);
-                    //            }
-                    //        });
-                    //    }
-                    //}
                     
-                    //Debug.WriteLine("scroll " + scrolledOffset);
-                    //Debug.WriteLine("scrollable " + ee);
-
-
-                    //var scrolledHeight = G_ItemInfoContainer.Margin.Top + 20;
-                    //var scrolledOffset = scrollViewer.VerticalOffset;
-                    //if (scrolledOffset >= scrolledHeight)
-                    //{
-                    //    //TB_ItemTitle.Visibility = Visibility.Visible;
-                    //    if (this.TB_ItemTitle.Visibility != Visibility.Visible)
-                    //    {
-                    //        this.TB_ItemTitle.Visibility = Visibility.Visible;
-                    //    }
-                    //    //SolidColorBrush myBrush = new SolidColorBrush(Colors.White);//100
-                    //    //TB_ItemTitle.Foreground = myBrush;
-                    //    BackgroundMainTopBarAcrylic();
-                    //}
-                    //else
-                    //{
-                    //    //TB_ItemTitle.Visibility = Visibility.Collapsed;
-                    //    if (this.TB_ItemTitle.Visibility != Visibility.Collapsed)
-                    //    {
-                    //        this.TB_ItemTitle.Visibility = Visibility.Collapsed;
-                    //    }
-                    //    //SolidColorBrush myBrush = new SolidColorBrush(Colors.Black);//100
-                    //    //TB_ItemTitle.Foreground = myBrush;
-                    //    BackgroundMainTopBarAcrylic(); //BackgroundCommand();
-                    //}
                 }
             }
             catch (Exception)
