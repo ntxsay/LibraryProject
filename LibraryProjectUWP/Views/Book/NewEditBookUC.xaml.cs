@@ -879,6 +879,28 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
+        private void HBtnDisplayOtherIdentifications_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (ViewModelPage.DisplayOthersIdentificationVisibility == Visibility.Visible)
+                {
+                    ViewModelPage.DisplayOthersIdentificationVisibility = Visibility.Collapsed;
+                    ViewModelPage.DisplayOthersIdentificationText = "Autres formats d'identification";
+                }
+                else if (ViewModelPage.DisplayOthersIdentificationVisibility == Visibility.Collapsed)
+                {
+                    ViewModelPage.DisplayOthersIdentificationVisibility = Visibility.Visible;
+                    ViewModelPage.DisplayOthersIdentificationText = "Masquer « autres formats d'identification »";
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         private void PipsPager_SelectedIndexChanged(Microsoft.UI.Xaml.Controls.PipsPager sender, Microsoft.UI.Xaml.Controls.PipsPagerSelectedIndexChangedEventArgs args)
         {
             try
@@ -905,22 +927,6 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
                 }
                 else if (sender.SelectedPageIndex == 2)
-                {
-                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
-                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
-                    ViewModelPage.IdentificationStepVisibility = Visibility.Visible;
-                    ViewModelPage.FormatStepVisibility = Visibility.Collapsed;
-                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
-                }
-                else if (sender.SelectedPageIndex == 3)
-                {
-                    ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
-                    ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
-                    ViewModelPage.IdentificationStepVisibility = Visibility.Collapsed;
-                    ViewModelPage.FormatStepVisibility = Visibility.Visible;
-                    ViewModelPage.DescriptionStepVisibility = Visibility.Collapsed;
-                }
-                else if (sender.SelectedPageIndex == 4)
                 {
                     ViewModelPage.GeneralStepVisibility = Visibility.Collapsed;
                     ViewModelPage.PublicationStepVisibility = Visibility.Collapsed;
@@ -1250,6 +1256,34 @@ namespace LibraryProjectUWP.Views.Book
                 if (this._ResultMessageTitle != value)
                 {
                     this._ResultMessageTitle = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _DisplayOthersIdentificationVisibility = Visibility.Collapsed;
+        public Visibility DisplayOthersIdentificationVisibility
+        {
+            get => this._DisplayOthersIdentificationVisibility;
+            set
+            {
+                if (this._DisplayOthersIdentificationVisibility != value)
+                {
+                    this._DisplayOthersIdentificationVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _DisplayOthersIdentificationText = "Autres formats d'identification";
+        public string DisplayOthersIdentificationText
+        {
+            get => this._DisplayOthersIdentificationText;
+            set
+            {
+                if (this._DisplayOthersIdentificationText != value)
+                {
+                    this._DisplayOthersIdentificationText = value;
                     this.OnPropertyChanged();
                 }
             }
