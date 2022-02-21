@@ -939,44 +939,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public Task RefreshItemsGroupingAsync(int goToPage = 1, bool resetPage = true)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                switch (ViewModelPage.GroupedBy)
-                {
-                    case BookGroupVM.GroupBy.None:
-                        this.GroupItemsByNone(goToPage);
-                        break;
-                    case BookGroupVM.GroupBy.Letter:
-                        this.GroupItemsByAlphabetic(goToPage);
-                        break;
-                    case BookGroupVM.GroupBy.CreationYear:
-                        this.GroupByCreationYear(goToPage);
-                        break;
-                    case BookGroupVM.GroupBy.ParutionYear:
-                        this.GroupByParutionYear(goToPage);
-                        break;
-                    default:
-                        this.GroupItemsByNone(goToPage);
-                        break;
-                }
-
-                if (resetPage)
-                {
-                    this.InitializePages();
-                }
-
-                return Task.CompletedTask;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return Task.CompletedTask;
-            }
-        }
-
         public void RefreshItemsGrouping(int goToPage = 1, bool resetPage = true)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -3918,7 +3880,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private int _MaxItemsPerPage = 20;
+        private int _MaxItemsPerPage = 100;
         public int MaxItemsPerPage
         {
             get => this._MaxItemsPerPage;

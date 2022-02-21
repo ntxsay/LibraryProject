@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.Code.Services.Db
@@ -108,13 +109,13 @@ namespace LibraryProjectUWP.Code.Services.Db
             #endregion
 
             #region Multiple
-            public static async Task<long> CountBooksInLibraryAsync(long idLibrary)
+            public static async Task<long> CountBooksInLibraryAsync(long idLibrary, CancellationToken cancellationToken = default)
             {
                 try
                 {
                     LibraryDbContext context = new LibraryDbContext();
 
-                    return await context.TlibraryBookConnector.LongCountAsync(w => w.IdLibrary == idLibrary && w.IdBook > -1);
+                    return await context.TlibraryBookConnector.LongCountAsync(w => w.IdLibrary == idLibrary && w.IdBook > -1, cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -140,19 +141,24 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tbook>> MultipleWithIdLibraryAsync(long idLibrary)
+            public static async Task<IList<Tbook>> MultipleWithIdLibraryAsync(long idLibrary, CancellationToken cancellationToken = default)
             {
                 try
                 {
                     LibraryDbContext context = new LibraryDbContext();
 
-                    var preCollection = await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).ToListAsync();
+                    var preCollection = await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
                     if (preCollection.Any())
                     {
                         List<Tbook> collection = new List<Tbook>();
                         foreach (TlibraryBookConnector driver in preCollection)
                         {
-                            Tbook model = await context.Tbook.SingleOrDefaultAsync(w => w.Id == driver.IdBook);
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                return collection;
+                            }
+
+                            Tbook model = await context.Tbook.SingleOrDefaultAsync(w => w.Id == driver.IdBook, cancellationToken);
                             if (model != null)
                             {
                                 await CompleteModelInfos(context, model);
@@ -173,11 +179,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<LivreVM>> MultipleVmWithIdLibraryAsync(long idLibrary)
+            public static async Task<IList<LivreVM>> MultipleVmWithIdLibraryAsync(long idLibrary, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    var collection = await MultipleWithIdLibraryAsync(idLibrary);
+                    var collection = await MultipleWithIdLibraryAsync(idLibrary, cancellationToken);
                     if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
 
                     var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
