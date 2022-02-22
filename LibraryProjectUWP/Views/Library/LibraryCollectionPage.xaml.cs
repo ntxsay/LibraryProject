@@ -2326,7 +2326,7 @@ namespace LibraryProjectUWP.Views.Library
                         var mainPage = mainControlsUI.GetMainPage;
                         if (mainPage != null)
                         {
-                            mainPage.BookCollectionNavigationAsync(viewModel, this);
+                            mainPage.BookCollectionNavigationAsync(viewModel, null);
                         }
                         return;
                     }
@@ -2475,7 +2475,7 @@ namespace LibraryProjectUWP.Views.Library
                             var mainPage = mainControlsUI.GetMainPage;
                             if (mainPage != null)
                             {
-                                mainPage.BookCollectionNavigationAsync(viewModel, this);
+                                mainPage.BookCollectionNavigationAsync(viewModel, null);
                             }
                         }
                     }
