@@ -222,6 +222,7 @@
     <Compile Include="ViewModels\General\PageSystemVM.cs" />
     <Compile Include="ViewModels\General\PriceVM.cs" />
     <Compile Include="ViewModels\General\SideBarItemHeaderVM.cs" />
+    <Compile Include="ViewModels\General\TaskVM.cs" />
     <Compile Include="ViewModels\General\WorkerState.cs" />
     <Compile Include="ViewModels\Library\LibraryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreVM.cs" />
@@ -232,6 +233,9 @@
     </Compile>
     <Compile Include="Views\Book\BookBeforeGoBackCD.xaml.cs">
       <DependentUpon>BookBeforeGoBackCD.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Book\BookExemplaryListUC.xaml.cs">
+      <DependentUpon>BookExemplaryListUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\ImportBookFromExcelUC.xaml.cs">
       <DependentUpon>ImportBookFromExcelUC.xaml</DependentUpon>
@@ -331,6 +335,10 @@
     <Page Include="Views\Book\BookBeforeGoBackCD.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\BookExemplaryListUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Book\ImportBookFromExcelUC.xaml">
       <Generator>MSBuild:Compile</Generator>

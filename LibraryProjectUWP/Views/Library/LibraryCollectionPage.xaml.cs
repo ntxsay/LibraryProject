@@ -33,6 +33,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using LibraryProjectUWP.Code.Extensions;
+using Windows.UI.Core;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -44,8 +46,13 @@ namespace LibraryProjectUWP.Views.Library
     public sealed partial class LibraryCollectionPage : Page
     {
         private BackgroundWorker worker;
+        private BackgroundWorker workerCountBooks;
         public LibraryCollectionPageVM ViewModelPage { get; set; } = new LibraryCollectionPageVM();
         EsLibrary esLibrary = new EsLibrary();
+        private bool IsWorkerBusy
+        {
+            get => worker != null && worker.IsBusy || workerCountBooks != null && workerCountBooks.IsBusy;
+        }
         public LibraryCollectionPage()
         {
             this.InitializeComponent();
@@ -117,6 +124,7 @@ namespace LibraryProjectUWP.Views.Library
 
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
                 this.GridViewMode(firstLoad);
+                this.InitializeCountBookWorker();
             }
             catch (Exception ex)
             {
@@ -519,6 +527,74 @@ namespace LibraryProjectUWP.Views.Library
         }
         #endregion
 
+        #region Paginations
+        private void GotoPageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (args.Parameter is int page)
+                {
+                    GotoPage(page);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void GridViewItems_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (e.Key == Windows.System.VirtualKey.Q)
+                {
+                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    () =>
+                    {
+                        var selectedPage = this.GetSelectedPage - 1;
+                        if (selectedPage >= 1)
+                        {
+                            this.GotoPage(selectedPage);
+                        }
+                    });
+                }
+                else if (e.Key == Windows.System.VirtualKey.D)
+                {
+                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    () =>
+                    {
+                        var selectedPage = this.GetSelectedPage;
+                        this.GotoPage(selectedPage + 1);
+                    });
+                }
+                else if (e.Key == Windows.System.VirtualKey.Z)
+                {
+                    if (sender is GridView gridView && gridView.Items.Count > 0)
+                    {
+                        gridView.SelectedItem = gridView.Items[0];
+                    }
+                }
+                else if (e.Key == Windows.System.VirtualKey.S)
+                {
+                    if (sender is GridView gridView && gridView.Items.Count > 0)
+                    {
+                        gridView.SelectedItem = gridView.Items[gridView.Items.Count - 1];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+
         #region Events
         private async void ExportAllLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -561,6 +637,12 @@ namespace LibraryProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                if (IsWorkerBusy)
+                {
+                    ViewModelPage.OperationRunning.Show();
+                    return;
+                }
+
                 var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditLibraryUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
                 if (checkedItem != null)
                 {
@@ -598,6 +680,12 @@ namespace LibraryProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                if (IsWorkerBusy)
+                {
+                    ViewModelPage.OperationRunning.Show();
+                    return;
+                }
+
                 var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditLibraryUC item && item.ViewModelPage.EditMode == Code.EditMode.Edit);
                 if (checkedItem != null)
                 {
@@ -788,6 +876,12 @@ namespace LibraryProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                if (IsWorkerBusy)
+                {
+                    ViewModelPage.OperationRunning.Show();
+                    return;
+                }
+
                 if (args.Parameter is BibliothequeVM viewModel)
                 {
                     var suggestedFileName = $"Rostalotheque_Bibliotheque_{viewModel.Name}_{DateTime.Now:yyyyMMddHHmmss}";
@@ -823,6 +917,12 @@ namespace LibraryProjectUWP.Views.Library
         {
             try
             {
+                if (IsWorkerBusy)
+                {
+                    ViewModelPage.OperationRunning.Show();
+                    return;
+                }
+
                 if (args.Parameter is BibliothequeVM viewModel)
                 {
                     //_commonView.DeleteLibrary(viewModel);
@@ -1310,7 +1410,7 @@ namespace LibraryProjectUWP.Views.Library
         #endregion
 
         #region Groups
-        public void GroupItemsByNone()
+        public void GroupItemsByNone(int goToPage = 1)
         {
             try
             {
@@ -1319,7 +1419,9 @@ namespace LibraryProjectUWP.Views.Library
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
+                IEnumerable<BibliothequeVM> itemsPage = GetPaginatedItems(goToPage);
+
+                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
                 {
                     this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
@@ -1333,7 +1435,7 @@ namespace LibraryProjectUWP.Views.Library
                 return;
             }
         }
-        public void GroupItemsByAlphabetic()
+        public void GroupItemsByAlphabetic(int goToPage = 1)
         {
             try
             {
@@ -1342,7 +1444,9 @@ namespace LibraryProjectUWP.Views.Library
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Name.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                IEnumerable<BibliothequeVM> itemsPage = GetPaginatedItems(goToPage);
+
+                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Name.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
@@ -1357,7 +1461,7 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        public void GroupByCreationYear()
+        public void GroupByCreationYear(int goToPage = 1)
         {
             try
             {
@@ -1366,7 +1470,9 @@ namespace LibraryProjectUWP.Views.Library
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                IEnumerable<BibliothequeVM> itemsPage = GetPaginatedItems(goToPage);
+
+                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
@@ -1503,7 +1609,7 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        public void RefreshItemsGrouping()
+        public void RefreshItemsGrouping(int goToPage = 1, bool resetPage = true)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1511,17 +1617,22 @@ namespace LibraryProjectUWP.Views.Library
                 switch (ViewModelPage.GroupedBy)
                 {
                     case LibraryGroupVM.GroupBy.None:
-                        this.GroupItemsByNone();
+                        this.GroupItemsByNone(goToPage);
                         break;
                     case LibraryGroupVM.GroupBy.Letter:
                         this.GroupItemsByAlphabetic();
                         break;
                     case LibraryGroupVM.GroupBy.CreationYear:
-                        this.GroupByCreationYear();
+                        this.GroupByCreationYear(goToPage);
                         break;
                     default:
-                        this.GroupItemsByNone();
+                        this.GroupItemsByNone(goToPage);
                         break;
+                }
+
+                if (resetPage)
+                {
+                    this.InitializePages();
                 }
             }
             catch (Exception ex)
@@ -1781,6 +1892,154 @@ namespace LibraryProjectUWP.Views.Library
         #endregion
 
         #region Functions
+        private void InitializePages()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ViewModelPage.PagesList.Clear();
+
+                if (ViewModelPage.ViewModelList != null && ViewModelPage.ViewModelList.Any())
+                {
+                    int nbPageDefault = ViewModelPage.ViewModelList.Count() / ViewModelPage.MaxItemsPerPage;
+                    double nbPageExact = ViewModelPage.ViewModelList.Count() / Convert.ToDouble(ViewModelPage.MaxItemsPerPage);
+                    int nbPageRounded = nbPageExact > nbPageDefault ? nbPageDefault + 1 : nbPageDefault;
+                    ViewModelPage.CountPages = nbPageRounded;
+
+                    for (int i = 0; i < ViewModelPage.CountPages; i++)
+                    {
+                        ViewModelPage.PagesList.Add(new PageSystemVM()
+                        {
+                            CurrentPage = i + 1,
+                            IsPageSelected = i == 0,
+                            BackgroundColor = i == 0 ? Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush : Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush,
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void GotoPage(int page)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                foreach (var pageVm in ViewModelPage.PagesList)
+                {
+                    if (pageVm.CurrentPage != page && pageVm.IsPageSelected == true)
+                    {
+                        pageVm.IsPageSelected = false;
+                        pageVm.BackgroundColor = Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush;
+                    }
+                    else if (pageVm.CurrentPage == page && pageVm.IsPageSelected == false)
+                    {
+                        pageVm.IsPageSelected = true;
+                        pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
+                    }
+                }
+                //this.RefreshItemsGrouping(page, false);
+                var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
+                if (buttonsPage != null && buttonsPage.Any())
+                {
+                    var buttonPage = buttonsPage.FirstOrDefault(f => f.CommandParameter is int commandPage && commandPage == page);
+                    if (buttonPage != null)
+                    {
+                        scrollVPages.ScrollToElement(buttonPage, false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private int GetSelectedPage
+        {
+            get
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                try
+                {
+                    var selectedPage = ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
+                    return selectedPage;
+                }
+                catch (Exception ex)
+                {
+                    Logs.Log(ex, m);
+                    return 1;
+                }
+            }
+        }
+
+        private IEnumerable<BibliothequeVM> GetPaginatedItems()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var selectedPage = ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
+                return GetPaginatedItems(selectedPage);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return Enumerable.Empty<BibliothequeVM>();
+            }
+        }
+
+        private IEnumerable<BibliothequeVM> GetPaginatedItems(int goToPage = 1)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                IEnumerable<BibliothequeVM> itemsPage = Enumerable.Empty<BibliothequeVM>();
+
+                //Si la séquence contient plus d'items que le nombre max éléments par page
+                if (ViewModelPage.ViewModelList.Count > ViewModelPage.MaxItemsPerPage)
+                {
+                    //Si la première page (ou moins ^^')
+                    if (goToPage <= 1)
+                    {
+                        itemsPage = ViewModelPage.ViewModelList.Take(ViewModelPage.MaxItemsPerPage);
+                    }
+                    else //Si plus que la première page
+                    {
+                        var nbItemsToSkip = ViewModelPage.MaxItemsPerPage * (goToPage - 1);
+                        if (ViewModelPage.ViewModelList.Count >= nbItemsToSkip)
+                        {
+                            var getRest = ViewModelPage.ViewModelList.Skip(nbItemsToSkip);
+                            //Si reste de la séquence contient plus d'items que le nombre max éléments par page
+                            if (getRest.Count() > ViewModelPage.MaxItemsPerPage)
+                            {
+                                itemsPage = getRest.Take(ViewModelPage.MaxItemsPerPage);
+                            }
+                            else
+                            {
+                                itemsPage = getRest;
+                            }
+                        }
+                    }
+                }
+                else //Si la séquence contient moins ou le même nombre d'items que le nombre max éléments par page
+                {
+                    itemsPage = ViewModelPage.ViewModelList;
+                }
+
+                return itemsPage;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return Enumerable.Empty<BibliothequeVM>();
+            }
+        }
+
         private void AddItemToSideBar(PivotItem item, SideBarItemHeaderVM sideBarItem)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -2067,7 +2326,7 @@ namespace LibraryProjectUWP.Views.Library
                         var mainPage = mainControlsUI.GetMainPage;
                         if (mainPage != null)
                         {
-                            mainPage.BookCollectionNavigationAsync(viewModel, this);
+                            mainPage.BookCollectionNavigationAsync(viewModel, null);
                         }
                         return;
                     }
@@ -2083,6 +2342,7 @@ namespace LibraryProjectUWP.Views.Library
         }
 
         #region SearchBooks
+        CancellationTokenSource cancellationTokenSourceSearchBook = new CancellationTokenSource();
         public void InitializeSearchingBookWorker(BibliothequeVM viewModel)
         {
             try
@@ -2092,7 +2352,7 @@ namespace LibraryProjectUWP.Views.Library
                     worker = new BackgroundWorker()
                     {
                         WorkerReportsProgress = false,
-                        WorkerSupportsCancellation = false,
+                        WorkerSupportsCancellation = true,
                     };
 
                     //worker.ProgressChanged += Worker_ProgressChanged;
@@ -2104,8 +2364,19 @@ namespace LibraryProjectUWP.Views.Library
                 {
                     if (!worker.IsBusy)
                     {
-                        ViewModelPage.SearchingLibraryVisibility = Visibility.Visible;
-                        ViewModelPage.SearchingLibraryMessage = $"Récupération des livres de la bibliothèque {viewModel.Name}";
+                        cancellationTokenSourceSearchBook = new CancellationTokenSource();
+                        ViewModelPage.IsProgressBarUnderterminate = true;
+                        ViewModelPage.SearchingLibraryIconVisibility = Visibility.Collapsed;
+                        ViewModelPage.SearchingLibraryMessage = LibraryCollectionPageVM.taskOperationRunning;
+
+                        if (!ViewModelPage.TaskList.Any(a => a.Id == LibraryCollectionPageVM.SearchBookTaskId))
+                        {
+                            ViewModelPage.TaskList.Add(new TaskVM()
+                            {
+                                Id = LibraryCollectionPageVM.SearchBookTaskId,
+                                Description = $"Récupération des livres de la bibliothèque {viewModel.Name}"
+                            });
+                        }
 
                         worker.RunWorkerAsync(viewModel);
                         new ToastContentBuilder()
@@ -2133,15 +2404,32 @@ namespace LibraryProjectUWP.Views.Library
         {
             try
             {
+                var worker = sender as BackgroundWorker;
                 if (e.Argument is BibliothequeVM viewModel)
                 {
-                    Task<IList<LivreVM>> task = DbServices.Book.MultipleVmWithIdLibraryAsync(viewModel.Id);
+                    Task<IList<LivreVM>> task = DbServices.Book.MultipleVmWithIdLibraryAsync(viewModel.Id, cancellationTokenSourceSearchBook.Token);                    
                     task.Wait();
 
+                    if (worker.CancellationPending || cancellationTokenSourceSearchBook.IsCancellationRequested)
+                    {
+                        if (!cancellationTokenSourceSearchBook.IsCancellationRequested)
+                        {
+                            cancellationTokenSourceSearchBook.Cancel();
+                        }
+
+                        e.Cancel = true;
+                        task.Dispose();
+                        return;
+                    }
+
                     var result = task.Result;
-                    viewModel.Books = result?.ToList();
-                    e.Result = viewModel;
-                    Thread.Sleep(1000);
+                    var state = new WorkerState<LivreVM, LivreVM>()
+                    {
+                        Id = viewModel.Id,
+                        ResultList = result,
+                    };
+
+                    e.Result = state;
                     task.Dispose();
                 }
             }
@@ -2157,6 +2445,15 @@ namespace LibraryProjectUWP.Views.Library
         {
             try
             {
+                ViewModelPage.IsProgressBarUnderterminate = false;
+                ViewModelPage.SearchingLibraryIconVisibility = Visibility.Visible;
+                ViewModelPage.SearchingLibraryMessage = LibraryCollectionPageVM.taskOperationStopped;
+                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == LibraryCollectionPageVM.SearchBookTaskId);
+                if (item != null)
+                {
+                    ViewModelPage.TaskList.Remove(item);
+                }
+
                 // Si erreur
                 if (e.Error != null)
                 {
@@ -2168,20 +2465,21 @@ namespace LibraryProjectUWP.Views.Library
                 }
                 else
                 {
-                    if (e.Result is BibliothequeVM viewModel)
+                    if (e.Result is WorkerState<LivreVM, LivreVM> state)
                     {
-                        VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
-                        var mainPage = mainControlsUI.GetMainPage;
-                        if (mainPage != null)
+                        var viewModel = ViewModelPage.ViewModelList.SingleOrDefault(a => a.Id == state.Id);
+                        if (viewModel != null)
                         {
-                            mainPage.BookCollectionNavigationAsync(viewModel, this);
+                            viewModel.Books = state.ResultList?.ToList();
+                            VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
+                            var mainPage = mainControlsUI.GetMainPage;
+                            if (mainPage != null)
+                            {
+                                mainPage.BookCollectionNavigationAsync(viewModel, null);
+                            }
                         }
                     }
                 }
-
-                ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
-                ViewModelPage.SearchingLibraryMessage = string.Empty;
-
             }
             catch (Exception ex)
             {
@@ -2193,11 +2491,259 @@ namespace LibraryProjectUWP.Views.Library
 
         #endregion
 
+        #region CountBooks
+        CancellationTokenSource s_cts = new CancellationTokenSource();
+        public void InitializeCountBookWorker()
+        {
+            try
+            {
+                if (workerCountBooks == null)
+                {
+                    workerCountBooks = new BackgroundWorker()
+                    {
+                        WorkerReportsProgress = false,
+                        WorkerSupportsCancellation = true,
+                    };
+
+                    //worker.ProgressChanged += Worker_ProgressChanged;
+                    workerCountBooks.DoWork += WorkerCountBooks_DoWork; ;
+                    workerCountBooks.RunWorkerCompleted += WorkerCountBooks_RunWorkerCompleted; ;
+                }
+
+                if (workerCountBooks != null)
+                {
+                    if (!workerCountBooks.IsBusy)
+                    {
+                        ViewModelPage.IsProgressBarUnderterminate = true;
+                        ViewModelPage.SearchingLibraryIconVisibility = Visibility.Collapsed;
+                        ViewModelPage.SearchingLibraryMessage = LibraryCollectionPageVM.taskOperationRunning;
+                        if (!ViewModelPage.TaskList.Any(a => a.Id == LibraryCollectionPageVM.CountBookTaskId))
+                        {
+                            ViewModelPage.TaskList.Add(new TaskVM()
+                            {
+                                Id = LibraryCollectionPageVM.CountBookTaskId,
+                                Description = "Recherche du nombre de livre par bibliothèque."
+                            });
+                        }
+
+                        workerCountBooks.RunWorkerAsync();
+                    }
+                    else
+                    {
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void WorkerCountBooks_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                var worker = sender as BackgroundWorker;
+                List<WorkerState<long>> workerStates = new List<WorkerState<long>>();
+                foreach (BibliothequeVM viewModel in ViewModelPage.ViewModelList)
+                {
+                    Task<long> task = DbServices.Book.CountBooksInLibraryAsync(viewModel.Id, s_cts.Token);
+                    task.Wait();
+                    var result = task.Result;
+                    workerStates.Add(new WorkerState<long>()
+                    {
+                        Id = viewModel.Id,
+                        Result = result,
+                    });
+                    task.Dispose();
+
+                    if (worker.CancellationPending)
+                    {
+                        s_cts.Cancel();
+                        e.Cancel = true;
+                        return;
+                    }
+                    Thread.Sleep(1000);
+                }
+                e.Result = workerStates.ToArray();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+
+        }
+
+        private void WorkerCountBooks_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            try
+            {
+                // Si erreur
+                if (e.Error != null)
+                {
+
+                }
+                else if (e.Cancelled)
+                {
+                    // Support de l'annulation a été désactivée
+                }
+                else
+                {
+                    if (e.Result is IEnumerable<WorkerState<long>> workerStates)
+                    {
+                        foreach (BibliothequeVM viewModel in ViewModelPage.ViewModelList)
+                        {
+                            var state = workerStates.SingleOrDefault(w => w.Id == viewModel.Id);
+                            if (state != null)
+                            {
+                                viewModel.CountBooks = state.Result;
+                            }
+                        }
+                    }
+                }
+
+                ViewModelPage.IsProgressBarUnderterminate = false;
+                ViewModelPage.SearchingLibraryIconVisibility = Visibility.Visible;
+                ViewModelPage.SearchingLibraryMessage = LibraryCollectionPageVM.taskOperationStopped;
+                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == LibraryCollectionPageVM.CountBookTaskId);
+                if (item != null)
+                {
+                    ViewModelPage.TaskList.Remove(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+
+        }
+
+        private void CancelTaskXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is TaskVM taskVM)
+                {
+                    if (taskVM.Id == LibraryCollectionPageVM.CountBookTaskId)
+                    {
+                        s_cts?.Cancel();
+                        if (workerCountBooks !=null && workerCountBooks.IsBusy)
+                        {
+                            workerCountBooks.CancelAsync();
+                        }
+                    }
+                    else if (taskVM.Id == LibraryCollectionPageVM.SearchBookTaskId)
+                    {
+                        cancellationTokenSourceSearchBook?.Cancel();
+                        if (worker != null && worker.IsBusy)
+                        {
+                            worker.CancelAsync();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #endregion
+
+
     }
 
     public class LibraryCollectionPageVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public ToastContentBuilder OperationRunning
+        {
+            get => new ToastContentBuilder()
+                        .AddText($"Une tâche en cours d'exécution")
+                        .AddText("Une ou plusieurs tâches d'arrière-plan sont en cours d'exécution, nous vous prions de patienter quelques instants.");
+        }
+
+        private int _CountPages;
+        public int CountPages
+        {
+            get => this._CountPages;
+            set
+            {
+                if (_CountPages != value)
+                {
+                    this._CountPages = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BibliothequeVM _SearchedViewModel = null;
+        public BibliothequeVM SearchedViewModel
+        {
+            get => this._SearchedViewModel;
+            set
+            {
+                if (_SearchedViewModel != value)
+                {
+                    this._SearchedViewModel = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private int _MaxItemsPerPage = 20;
+        public int MaxItemsPerPage
+        {
+            get => this._MaxItemsPerPage;
+            set
+            {
+                if (_MaxItemsPerPage != value)
+                {
+                    this._MaxItemsPerPage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<PageSystemVM> _PagesList = new ObservableCollection<PageSystemVM>();
+        public ObservableCollection<PageSystemVM> PagesList
+        {
+            get => this._PagesList;
+            set
+            {
+                if (_PagesList != value)
+                {
+                    this._PagesList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        public const int CountBookTaskId = 1;
+        public const int SearchBookTaskId = 2;
+        public const string taskOperationRunning = "Des tâches sont en cours d'exécution";
+        public const string taskOperationStopped = "Pas de tâches en cours d'exécution";
+        private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
+        public ObservableCollection<TaskVM> TaskList
+        {
+            get => this._TaskList;
+            set
+            {
+                if (_TaskList != value)
+                {
+                    this._TaskList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private ObservableCollection<SideBarItemHeaderVM> _ItemsSideBarHeader = new ObservableCollection<SideBarItemHeaderVM>();
         public ObservableCollection<SideBarItemHeaderVM> ItemsSideBarHeader
@@ -2311,7 +2857,35 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private string _SearchingLibraryMessage;
+        private Visibility _SearchingLibraryIconVisibility = Visibility.Collapsed;
+        public Visibility SearchingLibraryIconVisibility
+        {
+            get => this._SearchingLibraryIconVisibility;
+            set
+            {
+                if (_SearchingLibraryIconVisibility != value)
+                {
+                    this._SearchingLibraryIconVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsProgressBarUnderterminate = false;
+        public bool IsProgressBarUnderterminate
+        {
+            get => this._IsProgressBarUnderterminate;
+            set
+            {
+                if (_IsProgressBarUnderterminate != value)
+                {
+                    this._IsProgressBarUnderterminate = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _SearchingLibraryMessage = taskOperationStopped;
         public string SearchingLibraryMessage
         {
             get => this._SearchingLibraryMessage;

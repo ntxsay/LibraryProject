@@ -53,4 +53,11 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreVM CurrentViewModel { get; set; }
         public BookCollectionPage ParentPage { get; set; }
     }
+
+    public class BookExemplaryListParametersDriverVM
+    {
+        public long BookId { get; set; }
+        public string BookTitle { get; set; }
+        public BookCollectionPage ParentPage { get; set; }
+    }
 }
