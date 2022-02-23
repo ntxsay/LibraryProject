@@ -34,16 +34,17 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    List<Tbook> collection = await context.Tbook.ToListAsync();
-                    foreach (Tbook book in collection)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        await CompleteModelInfos(context, book);
-                    }
-                    if (collection == null || !collection.Any()) return Enumerable.Empty<Tbook>().ToList();
+                        List<Tbook> collection = await context.Tbook.ToListAsync();
+                        foreach (Tbook book in collection)
+                        {
+                            await CompleteModelInfos(context, book);
+                        }
+                        if (collection == null || !collection.Any()) return Enumerable.Empty<Tbook>().ToList();
 
-                    return collection;
+                        return collection;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -81,8 +82,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-                    return await context.Tbook.Select(s => s.Id).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext()) 
+                    { 
+                        return await context.Tbook.Select(s => s.Id).ToListAsync(); 
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -96,8 +99,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-                    return await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).Select(s => s.IdBook).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).Select(s => s.IdBook).ToListAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -113,9 +118,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    return await context.TlibraryBookConnector.LongCountAsync(w => w.IdLibrary == idLibrary && w.IdBook > -1, cancellationToken);
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibraryBookConnector.LongCountAsync(w => w.IdLibrary == idLibrary && w.IdBook > -1, cancellationToken);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -129,9 +135,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    return await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).Select(s => s.IdBook).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).Select(s => s.IdBook).ToListAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -145,28 +152,30 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var preCollection = await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
-                    if (preCollection.Any())
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        List<Tbook> collection = new List<Tbook>();
-                        foreach (TlibraryBookConnector driver in preCollection)
+                        var preCollection = await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
+                        if (preCollection.Any())
                         {
-                            if (cancellationToken.IsCancellationRequested)
+                            List<Tbook> collection = new List<Tbook>();
+                            foreach (TlibraryBookConnector driver in preCollection)
                             {
-                                return collection;
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    return collection;
+                                }
+
+                                Tbook model = await context.Tbook.SingleOrDefaultAsync(w => w.Id == driver.IdBook, cancellationToken);
+                                if (model != null)
+                                {
+                                    await CompleteModelInfos(context, model);
+                                    collection.Add(model);
+                                }
                             }
 
-                            Tbook model = await context.Tbook.SingleOrDefaultAsync(w => w.Id == driver.IdBook, cancellationToken);
-                            if (model != null)
-                            {
-                                await CompleteModelInfos(context, model);
-                                collection.Add(model);
-                            }
+                            return collection;
                         }
 
-                        return collection;
                     }
 
                     return Enumerable.Empty<Tbook>().ToList();
@@ -201,10 +210,12 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        List<string> collection = await context.TbookOtherTitle.Where(w => w.IdBook == idBook).Select(s => s.Title).ToListAsync();
+                        return collection;
+                    }
 
-                    List<string> collection = await context.TbookOtherTitle.Where(w => w.IdBook == idBook).Select(s => s.Title).ToListAsync();
-                    return collection;
                 }
                 catch (Exception ex)
                 {
@@ -218,10 +229,11 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var etat = await context.TbookEtat.FirstOrDefaultAsync(w => w.IdBookExemplary == idBookExemplary);
-                    return etat;
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var etat = await context.TbookEtat.FirstOrDefaultAsync(w => w.IdBookExemplary == idBookExemplary);
+                        return etat;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -256,10 +268,12 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = _context ?? new LibraryDbContext();
-                    var tlibraryBookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(w => w.IdBook == idBook);
-                    if (tlibraryBookConnector == null) return null;
-                    return tlibraryBookConnector.IdLibrary;
+                    using (LibraryDbContext context = _context ?? new LibraryDbContext())
+                    {
+                        var tlibraryBookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(w => w.IdBook == idBook);
+                        if (tlibraryBookConnector == null) return null;
+                        return tlibraryBookConnector.IdLibrary;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -279,13 +293,14 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var s = await context.Tbook.SingleOrDefaultAsync(d => d.Id == id);
+                        await CompleteModelInfos(context, s);
+                        if (s == null) return null;
 
-                    var s = await context.Tbook.SingleOrDefaultAsync(d => d.Id == id);
-                    await CompleteModelInfos(context, s);
-                    if (s == null) return null;
-
-                    return s;
+                        return s;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -330,157 +345,160 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-                    var isExist = await IsBookExistAsync(viewModel);
-                    if (isExist)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
+                        var isExist = await IsBookExistAsync(viewModel);
+                        if (isExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordAlreadyExistMessage
+                            };
+                        }
+
+                        var record = new Tbook()
+                        {
+                            Guid = viewModel.Guid.ToString(),
+                            DateAjout = viewModel.DateAjout.ToString(),
+                            DateEdition = viewModel.DateEdition?.ToString(),
+                            DateParution = viewModel.Publication.DateParution?.ToString(),
+                            IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0,
+                            IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0,
+                            MainTitle = viewModel.MainTitle,
+                            CountOpening = viewModel.CountOpening,
+                            Resume = viewModel.Description?.Resume,
+                            Notes = viewModel.Description?.Notes,
+                            MinAge = viewModel.ClassificationAge?.MinAge,
+                            MaxAge = viewModel.ClassificationAge?.MaxAge,
+                            Pays = viewModel.Publication?.Pays,
+                            Langue = viewModel.Publication?.Langue,
+                            Price = viewModel.Publication?.Price ?? 0,
+                            DeviceName = viewModel.Publication?.DeviceName ?? "€"
+                        };
+
+                        await context.Tbook.AddAsync(record);
+                        await context.SaveChangesAsync();
+
+                        var libraryBookConnector = new TlibraryBookConnector()
+                        {
+                            IdLibrary = idLibrary,
+                            IdBook = record.Id,
+                        };
+
+                        await context.TlibraryBookConnector.AddAsync(libraryBookConnector);
+                        await context.SaveChangesAsync();
+
+                        if (viewModel.Identification != null)
+                        {
+                            var recordConnector = new TbookIdentification()
+                            {
+                                Id = record.Id,
+                                Isbn = viewModel.Identification.ISBN,
+                                Isbn10 = viewModel.Identification.ISBN10,
+                                Isbn13 = viewModel.Identification.ISBN13,
+                                Issn = viewModel.Identification.ISSN,
+                                Asin = viewModel.Identification.ASIN,
+                                CodeBarre = viewModel.Identification.CodeBarre,
+                                Cotation = viewModel.Identification.Cotation,
+                            };
+
+                            await context.TbookIdentification.AddAsync(recordConnector);
+                            await context.SaveChangesAsync();
+                        }
+
+                        if (viewModel.Format != null)
+                        {
+                            var recordConnector = new TbookFormat()
+                            {
+                                Id = record.Id,
+                                Format = viewModel.Format.Format,
+                                NbOfPages = viewModel.Format.NbOfPages,
+                                Epaisseur = viewModel.Format.Epaisseur,
+                                Hauteur = viewModel.Format.Hauteur,
+                                Largeur = viewModel.Format.Largeur,
+                            };
+
+                            await context.TbookFormat.AddAsync(recordConnector);
+                            await context.SaveChangesAsync();
+                        }
+
+                        if (viewModel.TitresOeuvre != null && viewModel.TitresOeuvre.Any())
+                        {
+                            foreach (string title in viewModel.TitresOeuvre)
+                            {
+                                var titleConnector = new TbookOtherTitle()
+                                {
+                                    IdBook = record.Id,
+                                    Title = title,
+                                };
+
+                                _ = await context.TbookOtherTitle.AddAsync(titleConnector);
+                                await context.SaveChangesAsync();
+                            }
+                        }
+
+                        if (viewModel.Auteurs != null && viewModel.Auteurs.Any())
+                        {
+                            foreach (ContactVM author in viewModel.Auteurs)
+                            {
+                                if (await context.Tcontact.AnyAsync(a => a.Id == author.Id))
+                                {
+                                    var authorConnector = new TbookAuthorConnector()
+                                    {
+                                        IdBook = record.Id,
+                                        IdAuthor = author.Id,
+                                    };
+                                    _ = await context.TbookAuthorConnector.AddAsync(authorConnector);
+                                    await context.SaveChangesAsync();
+                                }
+                            }
+                        }
+
+                        if (viewModel.Publication.Collections != null && viewModel.Publication.Collections.Any())
+                        {
+                            foreach (CollectionVM collection in viewModel.Publication.Collections)
+                            {
+                                if (await context.Tcollection.AnyAsync(a => a.Id == collection.Id))
+                                {
+                                    var itemConnector = new TbookCollectionConnector()
+                                    {
+                                        IdBook = record.Id,
+                                        IdCollection = collection.Id,
+                                    };
+
+                                    _ = await context.TbookCollectionConnector.AddAsync(itemConnector);
+                                    await context.SaveChangesAsync();
+                                }
+                            }
+                        }
+
+                        if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
+                        {
+                            foreach (ContactVM editeur in viewModel.Publication.Editeurs)
+                            {
+                                if (await context.Tcollection.AnyAsync(a => a.Id == editeur.Id))
+                                {
+                                    var itemConnector = new TbookEditeurConnector()
+                                    {
+                                        IdBook = record.Id,
+                                        IdEditeur = editeur.Id,
+                                    };
+
+                                    _ = await context.TbookEditeurConnector.AddAsync(itemConnector);
+                                    await context.SaveChangesAsync();
+                                }
+                            }
+                        }
+
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
-                            Message = DbServices.RecordAlreadyExistMessage
-                        };
-                    }
-
-                    var record = new Tbook()
-                    {
-                        Guid = viewModel.Guid.ToString(),
-                        DateAjout = viewModel.DateAjout.ToString(),
-                        DateEdition = viewModel.DateEdition?.ToString(),
-                        DateParution = viewModel.Publication.DateParution?.ToString(),
-                        IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0,
-                        IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0,
-                        MainTitle = viewModel.MainTitle,
-                        CountOpening = viewModel.CountOpening,
-                        Resume = viewModel.Description?.Resume,
-                        Notes = viewModel.Description?.Notes,
-                        MinAge = viewModel.ClassificationAge?.MinAge,
-                        MaxAge = viewModel.ClassificationAge?.MaxAge,
-                        Pays = viewModel.Publication?.Pays,
-                        Langue = viewModel.Publication?.Langue,
-                        Price = viewModel.Publication?.Price ?? 0,
-                        DeviceName = viewModel.Publication?.DeviceName ?? "€"
-                    };
-
-                    await context.Tbook.AddAsync(record);
-                    await context.SaveChangesAsync();
-
-                    var libraryBookConnector = new TlibraryBookConnector()
-                    {
-                        IdLibrary = idLibrary,
-                        IdBook = record.Id,
-                    };
-
-                    await context.TlibraryBookConnector.AddAsync(libraryBookConnector);
-                    await context.SaveChangesAsync();
-
-                    if (viewModel.Identification != null)
-                    {
-                        var recordConnector = new TbookIdentification()
-                        {
                             Id = record.Id,
-                            Isbn = viewModel.Identification.ISBN,
-                            Isbn10 = viewModel.Identification.ISBN10,
-                            Isbn13 = viewModel.Identification.ISBN13,
-                            Issn = viewModel.Identification.ISSN,
-                            Asin = viewModel.Identification.ASIN,
-                            CodeBarre = viewModel.Identification.CodeBarre,
-                            Cotation = viewModel.Identification.Cotation,
+                            Message = $"Le livre {viewModel.MainTitle} a été créé avec succès."
                         };
-
-                        await context.TbookIdentification.AddAsync(recordConnector);
-                        await context.SaveChangesAsync();
                     }
-
-                    if (viewModel.Format != null)
-                    {
-                        var recordConnector = new TbookFormat()
-                        {
-                            Id = record.Id,
-                            Format = viewModel.Format.Format,
-                            NbOfPages = viewModel.Format.NbOfPages,
-                            Epaisseur = viewModel.Format.Epaisseur,
-                            Hauteur = viewModel.Format.Hauteur,
-                            Largeur = viewModel.Format.Largeur,
-                        };
-
-                        await context.TbookFormat.AddAsync(recordConnector);
-                        await context.SaveChangesAsync();
-                    }
-
-                    if (viewModel.TitresOeuvre != null && viewModel.TitresOeuvre.Any())
-                    {
-                        foreach (string title in viewModel.TitresOeuvre)
-                        {
-                            var titleConnector = new TbookOtherTitle()
-                            {
-                                IdBook = record.Id,
-                                Title = title,
-                            };
-
-                            _ = await context.TbookOtherTitle.AddAsync(titleConnector);
-                            await context.SaveChangesAsync();
-                        }
-                    }
-
-                    if (viewModel.Auteurs != null && viewModel.Auteurs.Any())
-                    {
-                        foreach (ContactVM author in viewModel.Auteurs)
-                        {
-                            if (await context.Tcontact.AnyAsync(a => a.Id == author.Id))
-                            {
-                                var authorConnector = new TbookAuthorConnector()
-                                {
-                                    IdBook = record.Id,
-                                    IdAuthor = author.Id,
-                                };
-                                _ = await context.TbookAuthorConnector.AddAsync(authorConnector);
-                                await context.SaveChangesAsync();
-                            }
-                        }
-                    }
-
-                    if (viewModel.Publication.Collections != null && viewModel.Publication.Collections.Any())
-                    {
-                        foreach (CollectionVM collection in viewModel.Publication.Collections)
-                        {
-                            if (await context.Tcollection.AnyAsync(a => a.Id == collection.Id))
-                            {
-                                var itemConnector = new TbookCollectionConnector()
-                                {
-                                    IdBook = record.Id,
-                                    IdCollection = collection.Id,
-                                };
-
-                                _ = await context.TbookCollectionConnector.AddAsync(itemConnector);
-                                await context.SaveChangesAsync();
-                            }
-                        }
-                    }
-
-                    if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
-                    {
-                        foreach (ContactVM editeur in viewModel.Publication.Editeurs)
-                        {
-                            if (await context.Tcollection.AnyAsync(a => a.Id == editeur.Id))
-                            {
-                                var itemConnector = new TbookEditeurConnector()
-                                {
-                                    IdBook = record.Id,
-                                    IdEditeur = editeur.Id,
-                                };
-
-                                _ = await context.TbookEditeurConnector.AddAsync(itemConnector);
-                                await context.SaveChangesAsync();
-                            }
-                        }
-                    }
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                        Id = record.Id,
-                        Message = $"Le livre {viewModel.MainTitle} a été créé avec succès."
-                    };
+                    
                 }
                 catch (Exception ex)
                 {
@@ -507,82 +525,29 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-                    var bookRecord = await context.Tbook.SingleOrDefaultAsync(c => c.Id == idBook);
-                    if (bookRecord == null)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return new OperationStateVM<TbookExemplary>()
+                        var bookRecord = await context.Tbook.SingleOrDefaultAsync(c => c.Id == idBook);
+                        if (bookRecord == null)
                         {
-                            IsSuccess = true,
-                            Message = DbServices.RecordNotExistMessage
-                        };
-                    }
-
-                    double? nullablePrice;
-                    if (viewModel.IsPriceUnavailable == false)
-                    {
-                        nullablePrice = viewModel.Price;
-                    }
-                    else
-                    {
-                        nullablePrice = null;
-                    }
-
-                    if (!viewModel.IsExemplarySeparated || viewModel.NbExemplaire == 1)
-                    {
-                        var record = new TbookExemplary()
-                        {
-                            IdBook = idBook,
-                            DateAjout = viewModel.DateAjout.ToString(),
-                            DateEdition = viewModel.DateEdition?.ToString(),
-                            DateAcquisition = viewModel.DateAcquisition?.ToString(),
-                            IsJourAcquisitionKnow = viewModel.IsJourAcquisitionKnow ? 1 : 0,
-                            IsMoisAcquisitionKnow = viewModel.IsMoisAcquisitionKnow ? 1 : 0,
-                            DateRemise = viewModel.DateRemiseLivre?.ToString(),
-                            TypeAcquisition = viewModel.Source,
-                            Observations = viewModel.Observations,
-                            Quantity = viewModel.NbExemplaire,
-                            NoGroup = null,
-                            NoExemplary = viewModel.NoExemplaire,
-                            Price = nullablePrice,
-                            DeviceName = viewModel.DeviceName
-                        };
-                        await context.TbookExemplary.AddAsync(record);
-                        await context.SaveChangesAsync();
-
-                        var recordEtat = new TbookEtat()
-                        {
-                            IdBookExemplary = record.Id,
-                            DateAjout = viewModel.DateAjout.ToString(),
-                            Etat = viewModel.Etat.Etat,
-                            Observations = viewModel.Observations,
-                            TypeVerification = (byte)viewModel.Etat.TypeVerification,
-                        };
-
-                        await context.TbookEtat.AddAsync(recordEtat);
-                        await context.SaveChangesAsync();
-
-                        return new OperationStateVM<TbookExemplary>()
-                        {
-                            IsSuccess = true,
-                            Id = record.Id,
-                            Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés avec succès."
-                        };
-                    }
-                    else
-                    {
-                        string group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
-                        while (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == true)
-                        {
-                            group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
-                            if (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == false)
+                            return new OperationStateVM<TbookExemplary>()
                             {
-                                break;
-                            }
+                                IsSuccess = true,
+                                Message = DbServices.RecordNotExistMessage
+                            };
                         }
 
-                        List<TbookExemplary> recordCollection = new List<TbookExemplary>();
-                        for (int i = 0; i < viewModel.NbExemplaire; i++)
+                        double? nullablePrice;
+                        if (viewModel.IsPriceUnavailable == false)
+                        {
+                            nullablePrice = viewModel.Price;
+                        }
+                        else
+                        {
+                            nullablePrice = null;
+                        }
+
+                        if (!viewModel.IsExemplarySeparated || viewModel.NbExemplaire == 1)
                         {
                             var record = new TbookExemplary()
                             {
@@ -595,21 +560,15 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 DateRemise = viewModel.DateRemiseLivre?.ToString(),
                                 TypeAcquisition = viewModel.Source,
                                 Observations = viewModel.Observations,
+                                Quantity = viewModel.NbExemplaire,
+                                NoGroup = null,
                                 NoExemplary = viewModel.NoExemplaire,
-                                Quantity = 1,
-                                NoGroup = group,
                                 Price = nullablePrice,
                                 DeviceName = viewModel.DeviceName
                             };
-                            recordCollection.Add(record);
-                        }
+                            await context.TbookExemplary.AddAsync(record);
+                            await context.SaveChangesAsync();
 
-                        await context.TbookExemplary.AddRangeAsync(recordCollection);
-                        await context.SaveChangesAsync();
-
-                        List<TbookEtat> etatCollection = new List<TbookEtat>();
-                        foreach (var record in recordCollection)
-                        {
                             var recordEtat = new TbookEtat()
                             {
                                 IdBookExemplary = record.Id,
@@ -619,19 +578,81 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 TypeVerification = (byte)viewModel.Etat.TypeVerification,
                             };
 
-                            etatCollection.Add(recordEtat);
+                            await context.TbookEtat.AddAsync(recordEtat);
+                            await context.SaveChangesAsync();
+
+                            return new OperationStateVM<TbookExemplary>()
+                            {
+                                IsSuccess = true,
+                                Id = record.Id,
+                                Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés avec succès."
+                            };
                         }
-
-                        await context.TbookEtat.AddRangeAsync(etatCollection);
-                        await context.SaveChangesAsync();
-
-                        return new OperationStateVM<TbookExemplary>(recordCollection)
+                        else
                         {
-                            IsSuccess = true,
-                            //Id = record.Id,
-                            Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés distinctement avec succès."
-                        };
+                            string group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
+                            while (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == true)
+                            {
+                                group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
+                                if (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == false)
+                                {
+                                    break;
+                                }
+                            }
+
+                            List<TbookExemplary> recordCollection = new List<TbookExemplary>();
+                            for (int i = 0; i < viewModel.NbExemplaire; i++)
+                            {
+                                var record = new TbookExemplary()
+                                {
+                                    IdBook = idBook,
+                                    DateAjout = viewModel.DateAjout.ToString(),
+                                    DateEdition = viewModel.DateEdition?.ToString(),
+                                    DateAcquisition = viewModel.DateAcquisition?.ToString(),
+                                    IsJourAcquisitionKnow = viewModel.IsJourAcquisitionKnow ? 1 : 0,
+                                    IsMoisAcquisitionKnow = viewModel.IsMoisAcquisitionKnow ? 1 : 0,
+                                    DateRemise = viewModel.DateRemiseLivre?.ToString(),
+                                    TypeAcquisition = viewModel.Source,
+                                    Observations = viewModel.Observations,
+                                    NoExemplary = viewModel.NoExemplaire,
+                                    Quantity = 1,
+                                    NoGroup = group,
+                                    Price = nullablePrice,
+                                    DeviceName = viewModel.DeviceName
+                                };
+                                recordCollection.Add(record);
+                            }
+
+                            await context.TbookExemplary.AddRangeAsync(recordCollection);
+                            await context.SaveChangesAsync();
+
+                            List<TbookEtat> etatCollection = new List<TbookEtat>();
+                            foreach (var record in recordCollection)
+                            {
+                                var recordEtat = new TbookEtat()
+                                {
+                                    IdBookExemplary = record.Id,
+                                    DateAjout = viewModel.DateAjout.ToString(),
+                                    Etat = viewModel.Etat.Etat,
+                                    Observations = viewModel.Observations,
+                                    TypeVerification = (byte)viewModel.Etat.TypeVerification,
+                                };
+
+                                etatCollection.Add(recordEtat);
+                            }
+
+                            await context.TbookEtat.AddRangeAsync(etatCollection);
+                            await context.SaveChangesAsync();
+
+                            return new OperationStateVM<TbookExemplary>(recordCollection)
+                            {
+                                IsSuccess = true,
+                                //Id = record.Id,
+                                Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés distinctement avec succès."
+                            };
+                        }
                     }
+                        
                 }
                 catch (Exception ex)
                 {
@@ -675,186 +696,187 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var record = await context.Tbook.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
-                    if (record == null)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return new OperationStateVM()
+                        var record = await context.Tbook.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
+                        if (record == null)
                         {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage,
-                        };
-                    }
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage,
+                            };
+                        }
 
-                    var isExist = await IsBookExistAsync(viewModel, true, record.Id);
-                    if (isExist)
-                    {
+                        var isExist = await IsBookExistAsync(viewModel, true, record.Id);
+                        if (isExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordAlreadyExistMessage
+                            };
+                        }
+
+                        record.DateEdition = DateTime.UtcNow.ToString();
+                        record.DateParution = viewModel.Publication.DateParution?.ToString();
+                        record.IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0;
+                        record.IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0;
+                        record.MainTitle = viewModel.MainTitle;
+                        record.CountOpening = viewModel.CountOpening;
+                        record.Resume = viewModel.Description.Resume;
+                        record.Notes = viewModel.Description.Notes;
+                        record.MinAge = viewModel.ClassificationAge?.MinAge;
+                        record.MaxAge = viewModel.ClassificationAge?.MaxAge;
+                        record.Langue = viewModel.Publication?.Langue;
+                        record.Pays = viewModel.Publication?.Pays;
+                        record.Price = viewModel.Publication?.Price ?? 0;
+                        record.DeviceName = viewModel.Publication?.DeviceName;
+
+                        context.Tbook.Update(record);
+
+                        if (viewModel.TitresOeuvre != null)
+                        {
+                            var recordTitles = await context.TbookOtherTitle.Where(a => a.IdBook == record.Id).ToListAsync();
+                            if (recordTitles.Any())
+                            {
+                                context.TbookOtherTitle.RemoveRange(recordTitles);
+                            }
+
+                            if (viewModel.TitresOeuvre.Any())
+                            {
+                                foreach (string title in viewModel.TitresOeuvre)
+                                {
+                                    var titleConnector = new TbookOtherTitle()
+                                    {
+                                        IdBook = record.Id,
+                                        Title = title,
+                                    };
+
+                                    _ = await context.TbookOtherTitle.AddAsync(titleConnector);
+                                }
+                            }
+                        }
+
+                        if (viewModel.Auteurs != null)
+                        {
+                            var recordAuthors = await context.TbookAuthorConnector.Where(a => a.IdBook == record.Id).ToListAsync();
+                            if (recordAuthors.Any())
+                            {
+                                context.TbookAuthorConnector.RemoveRange(recordAuthors);
+                            }
+
+                            if (viewModel.Auteurs.Any())
+                            {
+                                foreach (ContactVM author in viewModel.Auteurs)
+                                {
+                                    var authorConnector = new TbookAuthorConnector()
+                                    {
+                                        IdBook = record.Id,
+                                        IdAuthor = author.Id,
+                                    };
+
+                                    _ = await context.TbookAuthorConnector.AddAsync(authorConnector);
+                                }
+                            }
+                        }
+
+                        if (viewModel.Publication.Collections != null)
+                        {
+                            var recorditemList = await context.TbookCollectionConnector.Where(a => a.IdBook == record.Id).ToListAsync();
+                            if (recorditemList.Any())
+                            {
+                                context.TbookCollectionConnector.RemoveRange(recorditemList);
+                            }
+
+                            if (viewModel.Publication.Collections.Any())
+                            {
+                                foreach (CollectionVM collection in viewModel.Publication.Collections)
+                                {
+                                    var itemConnector = new TbookCollectionConnector()
+                                    {
+                                        IdBook = record.Id,
+                                        IdCollection = collection.Id,
+                                    };
+
+                                    _ = await context.TbookCollectionConnector.AddAsync(itemConnector);
+                                }
+                            }
+                        }
+
+                        if (viewModel.Publication.Editeurs != null)
+                        {
+                            var recorditemList = await context.TbookEditeurConnector.Where(a => a.IdBook == record.Id).ToListAsync();
+                            if (recorditemList.Any())
+                            {
+                                context.TbookEditeurConnector.RemoveRange(recorditemList);
+                            }
+
+                            if (viewModel.Publication.Editeurs.Any())
+                            {
+                                foreach (ContactVM editeur in viewModel.Publication.Editeurs)
+                                {
+                                    var itemConnector = new TbookEditeurConnector()
+                                    {
+                                        IdBook = record.Id,
+                                        IdEditeur = editeur.Id,
+                                    };
+
+                                    _ = await context.TbookEditeurConnector.AddAsync(itemConnector);
+                                }
+                            }
+                        }
+
+                        if (viewModel.Identification != null)
+                        {
+                            var recordIdentification = await context.TbookIdentification.SingleOrDefaultAsync(a => a.Id == record.Id);
+                            if (recordIdentification == null)
+                            {
+                                return new OperationStateVM()
+                                {
+                                    IsSuccess = false,
+                                    Message = DbServices.RecordNotExistMessage,
+                                };
+                            }
+
+                            recordIdentification.Isbn = viewModel.Identification.ISBN;
+                            recordIdentification.Isbn10 = viewModel.Identification.ISBN10;
+                            recordIdentification.Isbn13 = viewModel.Identification.ISBN13;
+                            recordIdentification.Issn = viewModel.Identification.ISSN;
+                            recordIdentification.Asin = viewModel.Identification.ASIN;
+                            recordIdentification.CodeBarre = viewModel.Identification.CodeBarre;
+                            recordIdentification.Cotation = viewModel.Identification.Cotation;
+                            _ = context.TbookIdentification.Update(recordIdentification);
+                        }
+
+                        if (viewModel.Format != null)
+                        {
+                            var recordFormat = await context.TbookFormat.SingleOrDefaultAsync(a => a.Id == record.Id);
+                            if (recordFormat == null)
+                            {
+                                return new OperationStateVM()
+                                {
+                                    IsSuccess = false,
+                                    Message = DbServices.RecordNotExistMessage,
+                                };
+                            }
+
+                            recordFormat.Format = viewModel.Format.Format;
+                            recordFormat.NbOfPages = viewModel.Format.NbOfPages;
+                            recordFormat.Largeur = viewModel.Format.Largeur;
+                            recordFormat.Epaisseur = viewModel.Format.Epaisseur;
+                            recordFormat.Hauteur = viewModel.Format.Hauteur;
+                            _ = context.TbookFormat.Update(recordFormat);
+                        }
+
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
-                            Message = DbServices.RecordAlreadyExistMessage
+                            Id = record.Id,
                         };
                     }
-
-                    record.DateEdition = DateTime.UtcNow.ToString();
-                    record.DateParution = viewModel.Publication.DateParution?.ToString();
-                    record.IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0;
-                    record.IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0;
-                    record.MainTitle = viewModel.MainTitle;
-                    record.CountOpening = viewModel.CountOpening;
-                    record.Resume = viewModel.Description.Resume;
-                    record.Notes = viewModel.Description.Notes;
-                    record.MinAge = viewModel.ClassificationAge?.MinAge;
-                    record.MaxAge = viewModel.ClassificationAge?.MaxAge;
-                    record.Langue = viewModel.Publication?.Langue;
-                    record.Pays = viewModel.Publication?.Pays;
-                    record.Price = viewModel.Publication?.Price ?? 0;
-                    record.DeviceName = viewModel.Publication?.DeviceName;
-                    
-                    context.Tbook.Update(record);
-
-                    if (viewModel.TitresOeuvre != null)
-                    {
-                        var recordTitles = await context.TbookOtherTitle.Where(a => a.IdBook == record.Id).ToListAsync();
-                        if (recordTitles.Any())
-                        {
-                            context.TbookOtherTitle.RemoveRange(recordTitles);
-                        }
-
-                        if (viewModel.TitresOeuvre.Any())
-                        {
-                            foreach (string title in viewModel.TitresOeuvre)
-                            {
-                                var titleConnector = new TbookOtherTitle()
-                                {
-                                    IdBook = record.Id,
-                                    Title = title,
-                                };
-
-                                _ = await context.TbookOtherTitle.AddAsync(titleConnector);
-                            }
-                        }
-                    }
-
-                    if (viewModel.Auteurs != null)
-                    {
-                        var recordAuthors = await context.TbookAuthorConnector.Where(a => a.IdBook == record.Id).ToListAsync();
-                        if (recordAuthors.Any())
-                        {
-                            context.TbookAuthorConnector.RemoveRange(recordAuthors);
-                        }
-
-                        if (viewModel.Auteurs.Any())
-                        {
-                            foreach (ContactVM author in viewModel.Auteurs)
-                            {
-                                var authorConnector = new TbookAuthorConnector()
-                                {
-                                    IdBook = record.Id,
-                                    IdAuthor = author.Id,
-                                };
-
-                                _ = await context.TbookAuthorConnector.AddAsync(authorConnector);
-                            }
-                        }
-                    }
-
-                    if (viewModel.Publication.Collections != null)
-                    {
-                        var recorditemList = await context.TbookCollectionConnector.Where(a => a.IdBook == record.Id).ToListAsync();
-                        if (recorditemList.Any())
-                        {
-                            context.TbookCollectionConnector.RemoveRange(recorditemList);
-                        }
-                        
-                        if (viewModel.Publication.Collections.Any())
-                        {
-                            foreach (CollectionVM collection in viewModel.Publication.Collections)
-                            {
-                                var itemConnector = new TbookCollectionConnector()
-                                {
-                                    IdBook = record.Id,
-                                    IdCollection = collection.Id,
-                                };
-
-                                _ = await context.TbookCollectionConnector.AddAsync(itemConnector);
-                            }
-                        }
-                    }
-
-                    if (viewModel.Publication.Editeurs != null)
-                    {
-                        var recorditemList = await context.TbookEditeurConnector.Where(a => a.IdBook == record.Id).ToListAsync();
-                        if (recorditemList.Any())
-                        {
-                            context.TbookEditeurConnector.RemoveRange(recorditemList);
-                        }
-
-                        if (viewModel.Publication.Editeurs.Any())
-                        {
-                            foreach (ContactVM editeur in viewModel.Publication.Editeurs)
-                            {
-                                var itemConnector = new TbookEditeurConnector()
-                                {
-                                    IdBook = record.Id,
-                                    IdEditeur = editeur.Id,
-                                };
-
-                                _ = await context.TbookEditeurConnector.AddAsync(itemConnector);
-                            }
-                        }
-                    }
-
-                    if (viewModel.Identification != null)
-                    {
-                        var recordIdentification = await context.TbookIdentification.SingleOrDefaultAsync(a => a.Id == record.Id);
-                        if (recordIdentification == null)
-                        {
-                            return new OperationStateVM()
-                            {
-                                IsSuccess = false,
-                                Message = DbServices.RecordNotExistMessage,
-                            };
-                        }
-
-                        recordIdentification.Isbn = viewModel.Identification.ISBN;
-                        recordIdentification.Isbn10 = viewModel.Identification.ISBN10;
-                        recordIdentification.Isbn13 = viewModel.Identification.ISBN13;
-                        recordIdentification.Issn = viewModel.Identification.ISSN;
-                        recordIdentification.Asin = viewModel.Identification.ASIN;
-                        recordIdentification.CodeBarre = viewModel.Identification.CodeBarre;
-                        recordIdentification.Cotation = viewModel.Identification.Cotation;
-                        _ = context.TbookIdentification.Update(recordIdentification);
-                    }
-
-                    if (viewModel.Format != null)
-                    {
-                        var recordFormat = await context.TbookFormat.SingleOrDefaultAsync(a => a.Id == record.Id);
-                        if (recordFormat == null)
-                        {
-                            return new OperationStateVM()
-                            {
-                                IsSuccess = false,
-                                Message = DbServices.RecordNotExistMessage,
-                            };
-                        }
-
-                        recordFormat.Format = viewModel.Format.Format;
-                        recordFormat.NbOfPages = viewModel.Format.NbOfPages;
-                        recordFormat.Largeur = viewModel.Format.Largeur;
-                        recordFormat.Epaisseur = viewModel.Format.Epaisseur;
-                        recordFormat.Hauteur = viewModel.Format.Hauteur;
-                        _ = context.TbookFormat.Update(recordFormat);
-                    }
-
-                    await context.SaveChangesAsync();
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                        Id = record.Id,
-                    };
                 }
                 catch (Exception ex)
                 {
@@ -879,62 +901,63 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    Tbook record = await context.Tbook.SingleOrDefaultAsync(a => a.Id == Id);
-                    if (record == null)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
+                        Tbook record = await context.Tbook.SingleOrDefaultAsync(a => a.Id == Id);
+                        if (record == null)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage
+                            };
+                        }
+
+                        List<TlibraryBookConnector> libraryDriverCollection = await context.TlibraryBookConnector.Where(w => w.IdBook == record.Id).ToListAsync();
+                        if (libraryDriverCollection.Any())
+                        {
+                            context.TlibraryBookConnector.RemoveRange(libraryDriverCollection);
+                            //await context.SaveChangesAsync();
+                        }
+
+                        var recordTitles = await context.TbookOtherTitle.Where(a => a.IdBook == record.Id).ToListAsync();
+                        if (recordTitles.Any())
+                        {
+                            context.TbookOtherTitle.RemoveRange(recordTitles);
+                        }
+
+                        var recordAuthors = await context.TbookAuthorConnector.Where(a => a.IdBook == record.Id).ToListAsync();
+                        if (recordAuthors.Any())
+                        {
+                            context.TbookAuthorConnector.RemoveRange(recordAuthors);
+                        }
+
+                        var recordEditors = await context.TbookEditeurConnector.Where(a => a.IdBook == record.Id).ToListAsync();
+                        if (recordEditors.Any())
+                        {
+                            context.TbookEditeurConnector.RemoveRange(recordEditors);
+                        }
+
+                        var recordCollection = await context.TbookCollectionConnector.Where(a => a.IdBook == record.Id).ToListAsync();
+                        if (recordCollection.Any())
+                        {
+                            context.TbookCollectionConnector.RemoveRange(recordCollection);
+                        }
+
+                        TbookIdentification recordIdentification = await context.TbookIdentification.SingleOrDefaultAsync(a => a.Id == record.Id);
+                        if (recordIdentification != null)
+                        {
+                            context.TbookIdentification.Remove(recordIdentification);
+                        }
+
+                        context.Tbook.Remove(record);
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage
+                            IsSuccess = true,
                         };
                     }
-
-                    List<TlibraryBookConnector> libraryDriverCollection = await context.TlibraryBookConnector.Where(w => w.IdBook == record.Id).ToListAsync();
-                    if (libraryDriverCollection.Any())
-                    {
-                        context.TlibraryBookConnector.RemoveRange(libraryDriverCollection);
-                        //await context.SaveChangesAsync();
-                    }
-
-                    var recordTitles = await context.TbookOtherTitle.Where(a => a.IdBook == record.Id).ToListAsync();
-                    if (recordTitles.Any())
-                    {
-                        context.TbookOtherTitle.RemoveRange(recordTitles);
-                    }
-
-                    var recordAuthors = await context.TbookAuthorConnector.Where(a => a.IdBook == record.Id).ToListAsync();
-                    if (recordAuthors.Any())
-                    {
-                        context.TbookAuthorConnector.RemoveRange(recordAuthors);
-                    }
-
-                    var recordEditors = await context.TbookEditeurConnector.Where(a => a.IdBook == record.Id).ToListAsync();
-                    if (recordEditors.Any())
-                    {
-                        context.TbookEditeurConnector.RemoveRange(recordEditors);
-                    }
-
-                    var recordCollection = await context.TbookCollectionConnector.Where(a => a.IdBook == record.Id).ToListAsync();
-                    if (recordCollection.Any())
-                    {
-                        context.TbookCollectionConnector.RemoveRange(recordCollection);
-                    }
-
-                    TbookIdentification recordIdentification = await context.TbookIdentification.SingleOrDefaultAsync(a => a.Id == record.Id);
-                    if (recordIdentification != null)
-                    {
-                        context.TbookIdentification.Remove(recordIdentification);
-                    }
-
-                    context.Tbook.Remove(record);
-                    await context.SaveChangesAsync();
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                    };
                 }
                 catch (Exception ex)
                 {
@@ -989,30 +1012,33 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-                    List<Tbook> existingItemList = null;
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        List<Tbook> existingItemList = null;
 
-                    if (!isEdit)
-                    {
-                        existingItemList = await context.Tbook.Where(c => c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower()).ToListAsync();
-                    }
-                    else
-                    {
-                        existingItemList = await context.Tbook.Where(c => c.Id != (long)modelId && c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower()).ToListAsync();
-                    }
-
-                    if (existingItemList != null && existingItemList.Any())
-                    {
-                        string lang = viewModel.Publication?.Langue?.ToLower() ?? null;
-                        foreach (var item in existingItemList)
+                        if (!isEdit)
                         {
-                            var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Id == item.Id && c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
-                            if (isFormatExist && item.Langue?.ToLower() == lang)
+                            existingItemList = await context.Tbook.Where(c => c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower()).ToListAsync();
+                        }
+                        else
+                        {
+                            existingItemList = await context.Tbook.Where(c => c.Id != (long)modelId && c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower()).ToListAsync();
+                        }
+
+                        if (existingItemList != null && existingItemList.Any())
+                        {
+                            string lang = viewModel.Publication?.Langue?.ToLower() ?? null;
+                            foreach (var item in existingItemList)
                             {
-                                return true;
+                                var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Id == item.Id && c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
+                                if (isFormatExist && item.Langue?.ToLower() == lang)
+                                {
+                                    return true;
+                                }
                             }
                         }
                     }
+                        
                     return false;
                 }
                 catch (Exception ex)

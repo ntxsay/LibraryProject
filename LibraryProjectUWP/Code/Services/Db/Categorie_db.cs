@@ -34,12 +34,13 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var collection = await context.TlibraryCategorie.ToListAsync();
+                        if (collection == null || !collection.Any()) return Enumerable.Empty<TlibraryCategorie>().ToList();
 
-                    var collection = await context.TlibraryCategorie.ToListAsync();
-                    if (collection == null || !collection.Any()) return Enumerable.Empty<TlibraryCategorie>().ToList();
-
-                    return collection;
+                        return collection;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -62,7 +63,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var collection = await Categorie.AllAsync();
                     if (!collection.Any()) return Enumerable.Empty<CategorieLivreVM>().ToList();
 
-                    var values = collection.Select(async s => await Categorie.ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
                     return values;
                 }
                 catch (Exception ex)
@@ -77,8 +78,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-                    return await context.TlibraryCategorie.Select(s => s.Id).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibraryCategorie.Select(s => s.Id).ToListAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -92,8 +95,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-                    return await context.TlibraryCategorie.Where(w => w.IdLibrary == idLibrary).Select(s => s.Id).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibraryCategorie.Where(w => w.IdLibrary == idLibrary).Select(s => s.Id).ToListAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -112,12 +117,13 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var collection = await context.TlibrarySubCategorie.ToListAsync();
+                        if (collection == null || !collection.Any()) return Enumerable.Empty<TlibrarySubCategorie>().ToList();
 
-                    var collection = await context.TlibrarySubCategorie.ToListAsync();
-                    if (collection == null || !collection.Any()) return Enumerable.Empty<TlibrarySubCategorie>().ToList();
-
-                    return collection;
+                        return collection;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -155,8 +161,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-                    return await context.TlibrarySubCategorie.Select(s => s.Id).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibrarySubCategorie.Select(s => s.Id).ToListAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -170,8 +178,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-                    return await context.TlibrarySubCategorie.Where(w => w.IdCategorie == idCategorie).Select(s => s.Id).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibrarySubCategorie.Where(w => w.IdCategorie == idCategorie).Select(s => s.Id).ToListAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -187,12 +197,13 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var collection = await context.TlibraryCategorie.Where(w => w.IdLibrary == idLibrary).ToListAsync();
+                        if (collection == null || !collection.Any()) return Enumerable.Empty<TlibraryCategorie>().ToList();
 
-                    var collection = await context.TlibraryCategorie.Where(w => w.IdLibrary == idLibrary).ToListAsync();
-                    if (collection == null || !collection.Any()) return Enumerable.Empty<TlibraryCategorie>().ToList();
-
-                    return collection;
+                        return collection;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -224,12 +235,13 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var collection = await context.TlibrarySubCategorie.Where(w => w.IdCategorie == idCategorie).ToListAsync();
+                        if (collection == null || !collection.Any()) return Enumerable.Empty<TlibrarySubCategorie>().ToList();
 
-                    var collection = await context.TlibrarySubCategorie.Where(w => w.IdCategorie == idCategorie).ToListAsync();
-                    if (collection == null || !collection.Any()) return Enumerable.Empty<TlibrarySubCategorie>().ToList();
-
-                    return collection;
+                        return collection;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -294,12 +306,13 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var s = await context.TlibraryCategorie.SingleOrDefaultAsync(d => d.Id == id);
+                        if (s == null) return null;
 
-                    var s = await context.TlibraryCategorie.SingleOrDefaultAsync(d => d.Id == id);
-                    if (s == null) return null;
-
-                    return s;
+                        return s;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -326,9 +339,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    return await context.TlibraryBookConnector.Where(d => d.IdCategorie == idCategorie && d.IdSubCategorie == null).Select(s => s.IdBook).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibraryBookConnector.Where(d => d.IdCategorie == idCategorie && d.IdSubCategorie == null).Select(s => s.IdBook).ToListAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -342,9 +356,10 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    return await context.TlibraryBookConnector.Where(d => d.IdSubCategorie == idSubCategorie).Select(s => s.IdBook).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibraryBookConnector.Where(d => d.IdSubCategorie == idSubCategorie).Select(s => s.IdBook).ToListAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -367,43 +382,21 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-                    
-                    List<long> validIdList = new List<long>();
-                    
-                    foreach (var idBook in idBooks)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var isBookExist = await context.Tbook.AnyAsync(a => a.Id == idBook);
-                        if (!isBookExist)
+                        List<long> validIdList = new List<long>();
+
+                        foreach (var idBook in idBooks)
                         {
-                            continue;
+                            var isBookExist = await context.Tbook.AnyAsync(a => a.Id == idBook);
+                            if (!isBookExist)
+                            {
+                                continue;
+                            }
+                            validIdList.Add(idBook);
                         }
-                        validIdList.Add(idBook);
-                    }
 
-                    if (!validIdList.Any())
-                    {
-                        return new OperationStateVM()
-                        {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage,
-                        };
-                    }
-
-                    var isCategorieExist = await context.TlibraryCategorie.AnyAsync(a => a.Id == categorie.Id);
-                    if (!isCategorieExist)
-                    {
-                        return new OperationStateVM()
-                        {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage,
-                        };
-                    }
-
-                    if (subCategorie != null)
-                    {
-                        var isSubCategorieExist = await context.TlibrarySubCategorie.AnyAsync(a => a.Id == subCategorie.Id);
-                        if (!isSubCategorieExist)
+                        if (!validIdList.Any())
                         {
                             return new OperationStateVM()
                             {
@@ -411,32 +404,55 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 Message = DbServices.RecordNotExistMessage,
                             };
                         }
-                    }
 
-                    foreach (var idBook in validIdList)
-                    {
-                        var bookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(c => c.IdBook == idBook);
-                        if (bookConnector == null)
+                        var isCategorieExist = await context.TlibraryCategorie.AnyAsync(a => a.Id == categorie.Id);
+                        if (!isCategorieExist)
                         {
-                            continue;
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage,
+                            };
                         }
 
-                        bookConnector.IdCategorie = categorie.Id;
                         if (subCategorie != null)
                         {
-                            bookConnector.IdSubCategorie = subCategorie.Id;
+                            var isSubCategorieExist = await context.TlibrarySubCategorie.AnyAsync(a => a.Id == subCategorie.Id);
+                            if (!isSubCategorieExist)
+                            {
+                                return new OperationStateVM()
+                                {
+                                    IsSuccess = false,
+                                    Message = DbServices.RecordNotExistMessage,
+                                };
+                            }
                         }
 
-                        context.TlibraryBookConnector.Update(bookConnector);
-                        await context.SaveChangesAsync();
-                    }
-                    
+                        foreach (var idBook in validIdList)
+                        {
+                            var bookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(c => c.IdBook == idBook);
+                            if (bookConnector == null)
+                            {
+                                continue;
+                            }
 
-                    return new OperationStateVM()
-                    {
-                        Message =  subCategorie == null ? $"Les livres ont été ajoutés à la catégorie : {categorie.Name}." : $"Les livres ont été ajoutés à la sous-catégorie : {subCategorie.Name}",
-                        IsSuccess = true,
-                    };
+                            bookConnector.IdCategorie = categorie.Id;
+                            if (subCategorie != null)
+                            {
+                                bookConnector.IdSubCategorie = subCategorie.Id;
+                            }
+
+                            context.TlibraryBookConnector.Update(bookConnector);
+                            await context.SaveChangesAsync();
+                        }
+
+
+                        return new OperationStateVM()
+                        {
+                            Message = subCategorie == null ? $"Les livres ont été ajoutés à la catégorie : {categorie.Name}." : $"Les livres ont été ajoutés à la sous-catégorie : {subCategorie.Name}",
+                            IsSuccess = true,
+                        };
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -473,33 +489,34 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-                    
-                    var isExist = await context.TlibraryCategorie.AnyAsync(c => c.IdLibrary == viewModel.IdLibrary && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
-                    if (isExist)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
+                        var isExist = await context.TlibraryCategorie.AnyAsync(c => c.IdLibrary == viewModel.IdLibrary && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
+                        if (isExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordAlreadyExistMessage
+                            };
+                        }
+
+                        var record = new TlibraryCategorie()
+                        {
+                            IdLibrary = viewModel.IdLibrary,
+                            Name = viewModel.Name,
+                            Description = viewModel.Description,
+                        };
+
+                        await context.TlibraryCategorie.AddAsync(record);
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
-                            Message = DbServices.RecordAlreadyExistMessage
+                            Id = record.Id,
                         };
                     }
-
-                    var record = new TlibraryCategorie()
-                    {
-                        IdLibrary = viewModel.IdLibrary,
-                        Name = viewModel.Name,
-                        Description = viewModel.Description,
-                    };
-
-                    await context.TlibraryCategorie.AddAsync(record);
-                    await context.SaveChangesAsync();
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                        Id = record.Id,
-                    };
                 }
                 catch (Exception ex)
                 {
@@ -542,39 +559,40 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var record = await context.TlibraryCategorie.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
-                    if (record == null)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return new OperationStateVM()
+                        var record = await context.TlibraryCategorie.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
+                        if (record == null)
                         {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage,
-                        };
-                    }
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage,
+                            };
+                        }
 
-                    var isExist = await context.TlibraryCategorie.AnyAsync(c => c.Id != record.Id && c.IdLibrary == viewModel.IdLibrary && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
-                    if (isExist)
-                    {
+                        var isExist = await context.TlibraryCategorie.AnyAsync(c => c.Id != record.Id && c.IdLibrary == viewModel.IdLibrary && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
+                        if (isExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = NameAlreadyExistMessage
+                            };
+                        }
+
+                        record.Name = viewModel.Name;
+                        record.Description = viewModel.Description;
+
+                        context.TlibraryCategorie.Update(record);
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
-                            Message = NameAlreadyExistMessage
+                            Id = record.Id,
                         };
                     }
-
-                    record.Name = viewModel.Name;
-                    record.Description = viewModel.Description;
-
-                    context.TlibraryCategorie.Update(record);
-                    await context.SaveChangesAsync();
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                        Id = record.Id,
-                    };
                 }
                 catch (Exception ex)
                 {
@@ -599,25 +617,26 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var record = await context.TlibraryCategorie.SingleOrDefaultAsync(a => a.Id == Id);
-                    if (record == null)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
+                        var record = await context.TlibraryCategorie.SingleOrDefaultAsync(a => a.Id == Id);
+                        if (record == null)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage
+                            };
+                        }
+
+                        context.TlibraryCategorie.Remove(record);
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage
+                            IsSuccess = true,
                         };
                     }
-
-                    context.TlibraryCategorie.Remove(record);
-                    await context.SaveChangesAsync();
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                    };
                 }
                 catch (Exception ex)
                 {
@@ -654,33 +673,34 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var isExist = await context.TlibrarySubCategorie.AnyAsync(c => c.IdCategorie == viewModel.IdCategorie && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
-                    if (isExist)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
+                        var isExist = await context.TlibrarySubCategorie.AnyAsync(c => c.IdCategorie == viewModel.IdCategorie && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
+                        if (isExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordAlreadyExistMessage
+                            };
+                        }
+
+                        var record = new TlibrarySubCategorie()
+                        {
+                            IdCategorie = viewModel.IdCategorie,
+                            Name = viewModel.Name,
+                            Description = viewModel.Description,
+                        };
+
+                        await context.TlibrarySubCategorie.AddAsync(record);
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
-                            Message = DbServices.RecordAlreadyExistMessage
+                            Id = record.Id,
                         };
                     }
-
-                    var record = new TlibrarySubCategorie()
-                    {
-                        IdCategorie = viewModel.IdCategorie,
-                        Name = viewModel.Name,
-                        Description = viewModel.Description,
-                    };
-
-                    await context.TlibrarySubCategorie.AddAsync(record);
-                    await context.SaveChangesAsync();
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                        Id = record.Id,
-                    };
                 }
                 catch (Exception ex)
                 {
@@ -723,39 +743,40 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var record = await context.TlibrarySubCategorie.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
-                    if (record == null)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return new OperationStateVM()
+                        var record = await context.TlibrarySubCategorie.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
+                        if (record == null)
                         {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage,
-                        };
-                    }
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage,
+                            };
+                        }
 
-                    var isExist = await context.TlibrarySubCategorie.AnyAsync(c => c.Id != record.Id && c.IdCategorie == viewModel.IdCategorie && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
-                    if (isExist)
-                    {
+                        var isExist = await context.TlibrarySubCategorie.AnyAsync(c => c.Id != record.Id && c.IdCategorie == viewModel.IdCategorie && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
+                        if (isExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = NameAlreadyExistMessage
+                            };
+                        }
+
+                        record.Name = viewModel.Name;
+                        record.Description = viewModel.Description;
+
+                        context.TlibrarySubCategorie.Update(record);
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
-                            Message = NameAlreadyExistMessage
+                            Id = record.Id,
                         };
                     }
-
-                    record.Name = viewModel.Name;
-                    record.Description = viewModel.Description;
-
-                    context.TlibrarySubCategorie.Update(record);
-                    await context.SaveChangesAsync();
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                        Id = record.Id,
-                    };
                 }
                 catch (Exception ex)
                 {
@@ -780,20 +801,21 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var record = await context.TlibrarySubCategorie.SingleOrDefaultAsync(a => a.Id == Id);
-                    if (record == null)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return new OperationStateVM()
+                        var record = await context.TlibrarySubCategorie.SingleOrDefaultAsync(a => a.Id == Id);
+                        if (record == null)
                         {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage
-                        };
-                    }
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage
+                            };
+                        }
 
-                    context.TlibrarySubCategorie.Remove(record);
-                    await context.SaveChangesAsync();
+                        context.TlibrarySubCategorie.Remove(record);
+                        await context.SaveChangesAsync();
+                    }
 
                     return new OperationStateVM()
                     {
