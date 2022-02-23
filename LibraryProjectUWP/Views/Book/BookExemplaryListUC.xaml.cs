@@ -6,6 +6,7 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
+using LibraryProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +16,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -34,6 +36,7 @@ namespace LibraryProjectUWP.Views.Book
 {
     public sealed partial class BookExemplaryListUC : PivotItem
     {
+        private BackgroundWorker worker;
         public readonly BookExemplaryListParametersDriverVM _parameters;
         public readonly Guid IdItem = Guid.NewGuid();
 
@@ -59,21 +62,43 @@ namespace LibraryProjectUWP.Views.Book
         {
             this.InitializeComponent();
             _parameters = parameters;
-            ViewModelPage.Header = $"Exemplaires de {parameters.BookTitle}";
+            ViewModelPage.Header = $"Exemplaires d'un livre";
             
-            InitializeActionInfos();
         }
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
-
+            InitializeSearchingBookExemplaryWorker();
         }
 
-        private void InitializeActionInfos()
+        #region SearchBooks
+        CancellationTokenSource cancellationTokenSourceSearchExemplary = new CancellationTokenSource();
+        public void InitializeSearchingBookExemplaryWorker()
         {
             try
             {
-                
+                if (worker == null)
+                {
+                    worker = new BackgroundWorker()
+                    {
+                        WorkerReportsProgress = false,
+                        WorkerSupportsCancellation = true,
+                    };
+
+                    //worker.ProgressChanged += Worker_ProgressChanged;
+                    worker.DoWork += Worker_DoWork;
+                    worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+                }
+
+                if (worker != null)
+                {
+                    if (!worker.IsBusy)
+                    {
+                        cancellationTokenSourceSearchExemplary = new CancellationTokenSource();
+
+                        worker.RunWorkerAsync();
+                    }
+                }
             }
             catch (Exception)
             {
@@ -81,6 +106,74 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
+
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                var worker = sender as BackgroundWorker;
+                Task<IList<LivreExemplaryVM>> task = DbServices.Book.GetBookExemplaryVMAsync(_parameters.BookId, cancellationTokenSourceSearchExemplary.Token);
+                task.Wait();
+
+                if (worker.CancellationPending || cancellationTokenSourceSearchExemplary.IsCancellationRequested)
+                {
+                    if (!cancellationTokenSourceSearchExemplary.IsCancellationRequested)
+                    {
+                        cancellationTokenSourceSearchExemplary.Cancel();
+                    }
+
+                    e.Cancel = true;
+                    task.Dispose();
+                    return;
+                }
+
+                var result = task.Result;
+                var state = new WorkerState<LivreExemplaryVM, LivreExemplaryVM>()
+                {
+                    ResultList = result,
+                };
+
+                e.Result = state;
+                task.Dispose();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            try
+            {
+                // Si erreur
+                if (e.Error != null)
+                {
+
+                }
+                else if (e.Cancelled)
+                {
+                    // Support de l'annulation a été désactivée
+                }
+                else
+                {
+                    if (e.Result is WorkerState<LivreExemplaryVM, LivreExemplaryVM> state)
+                    {
+                        ViewModelPage.ViewModelList = new ObservableCollection<LivreExemplaryVM>(state.ResultList);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #endregion
 
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -382,15 +475,15 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private ObservableCollection<CollectionVM> _CollectionViewModelList = new ObservableCollection<CollectionVM>();
-        public ObservableCollection<CollectionVM> CollectionViewModelList
+        private ObservableCollection<LivreExemplaryVM> _ViewModelList = new ObservableCollection<LivreExemplaryVM>();
+        public ObservableCollection<LivreExemplaryVM> ViewModelList
         {
-            get => this._CollectionViewModelList;
+            get => this._ViewModelList;
             set
             {
-                if (_CollectionViewModelList != value)
+                if (_ViewModelList != value)
                 {
-                    this._CollectionViewModelList = value;
+                    this._ViewModelList = value;
                     this.OnPropertyChanged();
                 }
             }

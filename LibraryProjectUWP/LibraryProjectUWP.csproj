@@ -140,6 +140,7 @@
     <Compile Include="Code\Converters\ObjectToBooleanConverter.cs" />
     <Compile Include="Code\Converters\BookConverters.cs" />
     <Compile Include="Code\Converters\VisibilityConverter.cs" />
+    <Compile Include="Code\DataTemplatesSelector\BookExemplaryDataTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\ContactTypeDataTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\DataViewModeTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\CategoriesDataTemplateSelector.cs" />

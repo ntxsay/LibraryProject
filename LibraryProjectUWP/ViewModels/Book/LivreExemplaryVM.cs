@@ -289,6 +289,20 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        private ObservableCollection<LivreEtatVM> _Etats = new ObservableCollection<LivreEtatVM>();
+        public ObservableCollection<LivreEtatVM> Etats
+        {
+            get => _Etats;
+            set
+            {
+                if (_Etats != value)
+                {
+                    _Etats = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private LivreEtatVM _Etat = new LivreEtatVM();
         public LivreEtatVM Etat
         {

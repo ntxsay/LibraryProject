@@ -225,6 +225,67 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static async Task<IList<TbookExemplary>> GetBookExemplaryAsync(long idBook, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var preCollection = await context.TbookExemplary.Where(w => w.IdBook == idBook).ToListAsync(cancellationToken);
+                        if (preCollection.Any())
+                        {
+                            foreach (TbookExemplary item in preCollection)
+                            {
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    return preCollection;
+                                }
+
+                                if (item.IdContactSource != null && item.IdContactSourceNavigation == null)
+                                {
+                                    item.IdContactSourceNavigation = await context.Tcontact.SingleOrDefaultAsync(s => s.Id == item.IdContactSource);
+                                }
+
+                                if (item.TbookEtat == null)
+                                {
+                                    item.TbookEtat = await context.TbookEtat.Where(s => s.IdBookExemplary == item.Id).ToListAsync(cancellationToken);
+                                }
+
+                                if (item.TbookPret == null)
+                                {
+                                    item.TbookPret = await context.TbookPret.Where(s => s.IdBookExemplary == item.Id).ToListAsync(cancellationToken);
+                                }
+                            }
+                        }
+                        return preCollection;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
+            public static async Task<IList<LivreExemplaryVM>> GetBookExemplaryVMAsync(long idBook, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    var collection = await GetBookExemplaryAsync(idBook);
+                    if (!collection.Any()) return Enumerable.Empty<LivreExemplaryVM>().ToList();
+
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).Where(w => w != null).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
             public static async Task<TbookEtat> GetEtatBookExemplaryAsync(long idBookExemplary)
             {
                 try
@@ -1082,9 +1143,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                     if (model == null) return null;
 
                     ContactVM contactSource = null;
-                    if (model.IdContactSource != null)
+                    if (model.IdContactSourceNavigation != null)
                     {
-                        contactSource = await DbServices.Contact.SingleVMAsync((long)model.IdContactSource);
+                        contactSource = await Contact.ViewModelConverterAsync(model.IdContactSourceNavigation);
                     }
 
                     var viewModel = new LivreExemplaryVM()
@@ -1110,8 +1171,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                         IsPriceUnavailable = model.Price == null,
                         DeviceName = model.DeviceName,
                         ContactSource = contactSource,
-                        Etat = await GetEtatBookExemplaryVMAsync(model.Id),
                     };
+
+                    if (model.TbookEtat != null && model.TbookEtat.Count > 0)
+                    {
+                        var collection = model.TbookEtat.Select(s => ViewModelConverter(s)).Where(w => w != null).ToList();
+                        viewModel.Etats = new ObservableCollection<LivreEtatVM>(collection);
+                    }
 
                     return viewModel;
                 }

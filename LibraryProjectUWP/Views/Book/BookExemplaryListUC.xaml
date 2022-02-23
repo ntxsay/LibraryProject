@@ -7,9 +7,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
     xmlns:generalVM="using:LibraryProjectUWP.ViewModels.General"
     xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
-    xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
@@ -59,10 +59,61 @@
                 <Setter Property="Margin" Value="4 0" />
                 <Setter Property="VerticalAlignment" Value="Top" />
             </Style>
-            
-            <DataTemplate x:DataType="booktVm:LivreExemplaryVM" x:Key="ItemAutoSuggestCollectionDataTemplate">
-                <TextBlock Text="{x:Bind Id, Mode=OneWay}" FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <DataTemplate x:Key="ExemplaryTemplate" x:DataType="booktVm:LivreExemplaryVM">
+                <MUIXC:TreeViewItem Padding="0 5"
+            ItemsSource="{x:Bind Etats, Mode=OneWay}" IsExpanded="True">
+                    <Grid ColumnSpacing="2" HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <!--<Grid Grid.Column="0" VerticalAlignment="Top">
+                            <Ellipse Height="40" Width="40" Fill="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"/>
+                            <TextBlock Text="{x:Bind Id, Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center"/>
+                        </Grid>-->
+                        <Grid Grid.Column="1" ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Left" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}">
+                                <Run Text="N°"/>
+                                <Run Text="{x:Bind Id}" FontWeight="SemiBold"/>
+                            </TextBlock>
+                            <TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Right" Text="{x:Bind DateAcquisition, Mode=OneWay}" FontSize="12"/>
+                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" FontSize="12">
+                                <Run Text="Source :"/>
+                                <Run Text="{x:Bind ContactSource.SocietyName}"/>
+                                <Run Text="{x:Bind ContactSource.NomNaissance}"/>
+                            </TextBlock>
+                            <TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Left" FontSize="12">
+                                <Run Text="Prix :"/>
+                                <Run Text="{x:Bind Price}"/>
+                                <Run Text="{x:Bind DeviceName}"/>
+                            </TextBlock>
+                        </Grid>
+                    </Grid>
+                </MUIXC:TreeViewItem>
             </DataTemplate>
+            <DataTemplate x:Key="ExemplaryEtatTemplate" x:DataType="booktVm:LivreEtatVM">
+                <MUIXC:TreeViewItem >
+                    <!--<StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE81E;"/>
+                        <TextBlock Margin="12 0 0 0" FontSize="18">
+                                <Run Text="{x:Bind Name, Mode=OneWay}"/>
+                                <Run Text="("/><Run Text="{x:Bind BooksId.Count, Mode=OneWay}"/><Run Text=")"/>
+                        </TextBlock>
+                    </StackPanel>-->
+                </MUIXC:TreeViewItem>
+            </DataTemplate>
+            <dTemplateSelectors:BookExemplaryDataTemplateSelector x:Key="exemplaryTemplateSelector"
+        ExemplaryTemplate="{StaticResource ExemplaryTemplate}"
+        ExemplaryEtatTemplate="{StaticResource ExemplaryEtatTemplate}" />
 
         </ResourceDictionary>
     </PivotItem.Resources>
@@ -87,13 +138,13 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap">
-            <Run Text="Vous naviguez parmi les collections de la bibliothèque «" />
-            <Run Text="{x:Bind ViewModelPage.ParentLibrary.Name, Mode=OneWay}" FontWeight="Bold" />
+            <Run Text="Vous naviguez parmi les exemplaires du livre «" />
+            <Run Text="{x:Bind _parameters.BookTitle}" FontWeight="Bold" />
             <Run Text="»" />
         </TextBlock>
-        <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.CollectionViewModelList, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" SelectedItem="{x:Bind ViewModelPage.SelectedViewModel, Mode=TwoWay}" SelectionChanged="ListView_SelectionChanged">
-            
-        </ListView>
+        <MUIXC:TreeView x:Name="TreeCategorie" Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.ViewModelList, Mode=OneWay}" CanDrag="False" CanDragItems="False" CanReorderItems="False" AllowDrop="False"
+                                                    ItemTemplateSelector="{StaticResource exemplaryTemplateSelector}" SelectionMode="Multiple">
+        </MUIXC:TreeView>
         <TextBlock x:Name="TbxErrorMessage" Grid.Row="2" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>

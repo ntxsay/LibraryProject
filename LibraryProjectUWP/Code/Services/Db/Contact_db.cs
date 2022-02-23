@@ -540,7 +540,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <typeparam name="T2">Type sortie</typeparam>
             /// <param name="model">Modèle de base de données</param>
             /// <returns>Un modèle de vue</returns>
-            private static async Task<ContactVM> ViewModelConverterAsync(Tcontact model)
+            public static async Task<ContactVM> ViewModelConverterAsync(Tcontact model)
             {
                 try
                 {
