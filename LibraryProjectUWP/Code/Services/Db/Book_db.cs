@@ -615,7 +615,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 IdBook = idBook,
                                 DateAjout = viewModel.DateAjout.ToString(),
                                 DateEdition = viewModel.DateEdition?.ToString(),
-                                DateAcquisition = viewModel.DateAcquisition?.ToString(),
+                                DateAcquisition = viewModel.DateAcquisition,
                                 IsJourAcquisitionKnow = viewModel.IsJourAcquisitionKnow ? 1 : 0,
                                 IsMoisAcquisitionKnow = viewModel.IsMoisAcquisitionKnow ? 1 : 0,
                                 DateRemise = viewModel.DateRemiseLivre?.ToString(),
@@ -669,13 +669,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     IdBook = idBook,
                                     DateAjout = viewModel.DateAjout.ToString(),
                                     DateEdition = viewModel.DateEdition?.ToString(),
-                                    DateAcquisition = viewModel.DateAcquisition?.ToString(),
+                                    DateAcquisition = viewModel.DateAcquisition,
                                     IsJourAcquisitionKnow = viewModel.IsJourAcquisitionKnow ? 1 : 0,
                                     IsMoisAcquisitionKnow = viewModel.IsMoisAcquisitionKnow ? 1 : 0,
                                     DateRemise = viewModel.DateRemiseLivre?.ToString(),
                                     TypeAcquisition = viewModel.Source,
                                     Observations = viewModel.Observations,
-                                    NoExemplary = viewModel.NoExemplaire,
+                                    NoExemplary = (i + 1).ToString("00"),
                                     Quantity = 1,
                                     NoGroup = group,
                                     Price = nullablePrice,
@@ -1155,7 +1155,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                         IdContactSource = model.IdContactSource,
                         DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
                         DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
-                        DateAcquisition = DatesHelpers.Converter.GetNullableDateFromString(model.DateAcquisition),
                         DateRemiseLivre = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemise),
                         IsJourAcquisitionKnow = model.IsJourAcquisitionKnow >= 1,
                         IsMoisAcquisitionKnow = model.IsMoisAcquisitionKnow >= 1,
@@ -1172,6 +1171,29 @@ namespace LibraryProjectUWP.Code.Services.Db
                         DeviceName = model.DeviceName,
                         ContactSource = contactSource,
                     };
+
+                    var splitDateAcquisition = StringHelpers.SplitWord(model.DateAcquisition, new string[] { "/" });
+                    if (splitDateAcquisition != null && splitDateAcquisition.Length > 0)
+                    {
+                        if (splitDateAcquisition.Length == 1)
+                        {
+                            viewModel.DateAcquisition = splitDateAcquisition[0];
+                            viewModel.YearAcquisition = splitDateAcquisition[0];
+                        }
+                        else if (splitDateAcquisition.Length == 2)
+                        {
+                            viewModel.DateAcquisition = $"{splitDateAcquisition[0]}/{splitDateAcquisition[1]}";
+                            viewModel.MonthAcquisition = splitDateAcquisition[0];
+                            viewModel.YearAcquisition = splitDateAcquisition[1];
+                        }
+                        else if (splitDateAcquisition.Length == 3)
+                        {
+                            viewModel.DateAcquisition = $"{splitDateAcquisition[0]}/{splitDateAcquisition[1]}/{splitDateAcquisition[1]}";
+                            viewModel.DayAcquisition = splitDateAcquisition[0];
+                            viewModel.MonthAcquisition = splitDateAcquisition[1];
+                            viewModel.YearAcquisition = splitDateAcquisition[2];
+                        }
+                    }
 
                     if (model.TbookEtat != null && model.TbookEtat.Count > 0)
                     {

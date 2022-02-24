@@ -171,8 +171,8 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private DateTimeOffset? _DateAcquisition;
-        public DateTimeOffset? DateAcquisition
+        private string _DateAcquisition;
+        public string DateAcquisition
         {
             get => _DateAcquisition;
             set
@@ -181,6 +181,99 @@ namespace LibraryProjectUWP.ViewModels.Book
                 {
                     _DateAcquisition = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _DayAcquisition;
+        
+        [JsonIgnore]
+        public string DayAcquisition
+        {
+            get => this._DayAcquisition;
+            set
+            {
+                if (this._DayAcquisition != value)
+                {
+                    this._DayAcquisition = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _MonthAcquisition;
+        
+        [JsonIgnore]
+        public string MonthAcquisition
+        {
+            get => this._MonthAcquisition;
+            set
+            {
+                if (this._MonthAcquisition != value)
+                {
+                    this._MonthAcquisition = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _YearAcquisition;
+        
+        [JsonIgnore]
+        public string YearAcquisition
+        {
+            get => this._YearAcquisition;
+            set
+            {
+                if (this._YearAcquisition != value)
+                {
+                    this._YearAcquisition = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _DayRemise;
+        [JsonIgnore]
+        public string DayRemise
+        {
+            get => this._DayRemise;
+            set
+            {
+                if (this._DayRemise != value)
+                {
+                    this._DayRemise = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _MonthRemise;
+        [JsonIgnore]
+        public string MonthRemise
+        {
+            get => this._MonthRemise;
+            set
+            {
+                if (this._MonthRemise != value)
+                {
+                    this._MonthRemise = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _YearRemise;
+        [JsonIgnore]
+        public string YearRemise
+        {
+            get => this._YearRemise;
+            set
+            {
+                if (this._YearRemise != value)
+                {
+                    this._YearRemise = value;
+                    this.OnPropertyChanged();
                 }
             }
         }

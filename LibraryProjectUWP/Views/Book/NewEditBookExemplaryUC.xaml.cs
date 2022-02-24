@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -96,163 +97,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        #region Date Acquisition
-        private void MfiClearRemiseDate_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (ViewModelPage.ViewModel.DateRemiseLivre != null)
-                {
-                    ViewModelPage.ViewModel.DateRemiseLivre = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void MfiClearParutionDate_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (ViewModelPage.ViewModel.DateAcquisition != null)
-                {
-                    ViewModelPage.ViewModel.DateAcquisition = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void TmfiDayKnow_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is ToggleMenuFlyoutItem toggle)
-                {
-                    if (toggle.IsChecked)
-                    {
-                        if (ViewModelPage.ViewModel.IsMoisAcquisitionKnow == false || ViewModelPage.ViewModel.DateAcquisition == null)
-                        {
-                            ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                            ViewModelPage.ViewModel.IsJourAcquisitionVisible = false;
-                            toggle.IsChecked = false;
-                        }
-                        else
-                        {
-                            ViewModelPage.ViewModel.IsJourAcquisitionKnow = true;
-                            ViewModelPage.ViewModel.IsJourAcquisitionVisible = true;
-                        }
-                    }
-                    else
-                    {
-                        ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                        ViewModelPage.ViewModel.IsJourAcquisitionVisible = false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void TmfiMonthKnow_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is ToggleMenuFlyoutItem toggle)
-                {
-                    if (toggle.IsChecked)
-                    {
-                        if (ViewModelPage.ViewModel.DateAcquisition == null)
-                        {
-                            ViewModelPage.ViewModel.IsJourAcquisitionVisible = true;
-                            ViewModelPage.ViewModel.IsMoisAcquisitionVisible = true;
-                            ViewModelPage.ViewModel.IsMoisAcquisitionKnow = false;
-                            ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                        }
-                        else
-                        {
-                            ViewModelPage.ViewModel.IsMoisAcquisitionVisible = true;
-                            ViewModelPage.ViewModel.IsMoisAcquisitionKnow = true;
-                        }
-                    }
-                    else
-                    {
-                        ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                        ViewModelPage.ViewModel.IsJourAcquisitionVisible = false;
-                        ViewModelPage.ViewModel.IsMoisAcquisitionKnow = false;
-                        ViewModelPage.ViewModel.IsMoisAcquisitionVisible = false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void DP_DateAcquisition_SelectedDateChanged(DatePicker sender, DatePickerSelectedValueChangedEventArgs args)
-        {
-            try
-            {
-                if (args.NewDate != null)
-                {
-                    ViewModelPage.ViewModel.IsJourAcquisitionVisible = true;
-                    ViewModelPage.ViewModel.IsMoisAcquisitionVisible = true;
-                    ViewModelPage.ViewModel.IsJourAcquisitionKnow = true;
-                    ViewModelPage.ViewModel.IsMoisAcquisitionKnow = true;
-                }
-                else
-                {
-                    ViewModelPage.ViewModel.IsJourAcquisitionVisible = true;
-                    ViewModelPage.ViewModel.IsMoisAcquisitionVisible = true;
-                    ViewModelPage.ViewModel.IsJourAcquisitionKnow = false;
-                    ViewModelPage.ViewModel.IsMoisAcquisitionKnow = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void DateParution_MenuFlyout_Opening(object sender, object e)
-        {
-            try
-            {
-                if (ViewModelPage.ViewModel.DateAcquisition == null)
-                {
-                    BtnDateAcquisition.Flyout.Hide();
-                    MyTeachingTip.Target = BtnDateAcquisition;
-                    MyTeachingTip.Title = "Date de parution";
-                    MyTeachingTip.Subtitle = "Sélectionnez tout d'abord une date puis cliquez de nouveau sur ce bouton.";
-                    MyTeachingTip.IsOpen = true;
-
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        #endregion
 
         #region Contact Source
         private async Task LoadDataAsync()
@@ -584,37 +428,70 @@ namespace LibraryProjectUWP.Views.Book
 
                 }
 
-                //else if (ViewModelPage.ViewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace())
-                //{
-                //    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                //    ViewModelPage.ResultMessage = $"Le nom de naissance de l'auteur ne peut pas être vide ou ne contenir que des espaces blancs.";
-                //    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                //    ViewModelPage.IsResultMessageOpen = true;
-                //    return false;
-                //}
-                //else if (ViewModelPage.ViewModel.Prenom.IsStringNullOrEmptyOrWhiteSpace())
-                //{
-                //    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                //    ViewModelPage.ResultMessage = $"Le prénom de l'auteur ne peut pas être vide ou ne contenir que des espaces blancs.";
-                //    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                //    ViewModelPage.IsResultMessageOpen = true;
-                //    return false;
-                //}
+                if (ViewModelPage.ViewModel.Etat.Etat.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Vous devez spécifier l'état des livres.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
 
-                //if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(c => c.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
-                //                                                  c.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower()))
-                //{
-                //    var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && _parameters.CurrentViewModel.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && _parameters.CurrentViewModel.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
-                //                                                  _parameters.CurrentViewModel.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && _parameters.CurrentViewModel.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower());
-                //    if (isError)
-                //    {
-                //        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                //        ViewModelPage.ResultMessage = $"Cet auteur existe déjà.";
-                //        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                //        ViewModelPage.IsResultMessageOpen = true;
-                //        return false;
-                //    }
-                //}
+                ViewModelPage.ViewModel.Etat.Observations = ViewModelPage.ViewModel.Observations;
+
+                if (!ViewModelPage.ViewModel.MonthAcquisition.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.MonthAcquisition != DatesHelpers.NoAnswer &&
+                    ViewModelPage.ViewModel.YearAcquisition.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.ViewModel.YearAcquisition == DatesHelpers.NoAnswer)
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Vous devez spécifier l'année d'acquisition pour valider le mois.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
+                else if (!ViewModelPage.ViewModel.DayAcquisition.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.DayAcquisition != DatesHelpers.NoAnswer &&
+                    ViewModelPage.ViewModel.MonthAcquisition.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.ViewModel.MonthAcquisition == DatesHelpers.NoAnswer)
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Vous devez spécifier le mois d'acquisition pour valider le jour.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
+                else
+                {
+                    if (!ViewModelPage.ViewModel.DayAcquisition.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.DayAcquisition != DatesHelpers.NoAnswer &&
+                    !ViewModelPage.ViewModel.MonthAcquisition.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.MonthAcquisition != DatesHelpers.NoAnswer &&
+                    !ViewModelPage.ViewModel.YearAcquisition.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.YearAcquisition != DatesHelpers.NoAnswer)
+                    {
+                        var day = Convert.ToInt32(ViewModelPage.ViewModel.DayAcquisition);
+                        var month = DatesHelpers.ChooseMonth().ToList().IndexOf(ViewModelPage.ViewModel.MonthAcquisition);
+                        var year = Convert.ToInt32(ViewModelPage.ViewModel.YearAcquisition);
+                        var isDateCorrect = DateTime.TryParseExact($"{day:00}/{month:00}/{year:0000}", "dd/MM/yyyy", new CultureInfo("fr-FR"), DateTimeStyles.AssumeLocal, out DateTime dateAcquisition);
+                        if (!isDateCorrect)
+                        {
+                            ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                            ViewModelPage.ResultMessage = $"La date d'acquisition n'est pas valide.";
+                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                            ViewModelPage.IsResultMessageOpen = true;
+                            return false;
+                        }
+                        else
+                        {
+                            ViewModelPage.ViewModel.DateAcquisition = dateAcquisition.ToString("dd/MM/yyyy");
+                        }
+                    }
+                    else if (!ViewModelPage.ViewModel.MonthAcquisition.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.MonthAcquisition != DatesHelpers.NoAnswer &&
+                            !ViewModelPage.ViewModel.YearAcquisition.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.YearAcquisition != DatesHelpers.NoAnswer)
+                    {
+                        var month = DatesHelpers.ChooseMonth().ToList().IndexOf(ViewModelPage.ViewModel.MonthAcquisition);
+                        var year = Convert.ToInt32(ViewModelPage.ViewModel.YearAcquisition);
+                        ViewModelPage.ViewModel.DateAcquisition = $"{month:00}/{year:0000}";
+                    }
+                    else if (!ViewModelPage.ViewModel.YearAcquisition.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.YearAcquisition != DatesHelpers.NoAnswer)
+                    {
+                        ViewModelPage.ViewModel.DateAcquisition = $"{ViewModelPage.ViewModel.YearAcquisition}";
+                    }
+                }
 
                 ViewModelPage.IsResultMessageOpen = false;
                 return true;
@@ -667,7 +544,15 @@ namespace LibraryProjectUWP.Views.Book
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public readonly IEnumerable<string> SourceList = LibraryHelpers.Book.Entry.EntrySourceList;
         public readonly IEnumerable<string> EtatList = LibraryHelpers.Book.EtatModelList;
+        public NewEditBookExemplaryUCVM()
+        {
+            chooseYear.Add(DatesHelpers.NoAnswer);
+            chooseYear.AddRange(DatesHelpers.ChooseYear());
+        }
 
+        public IEnumerable<string> chooseDays = DatesHelpers.ChooseDays();
+        public IEnumerable<string> chooseMonths = DatesHelpers.ChooseMonth();
+        public List<string> chooseYear = new List<string>();
         public Guid Guid { get; set; } = Guid.NewGuid();
 
         private string _Header;
