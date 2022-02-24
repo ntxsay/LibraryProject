@@ -1575,10 +1575,9 @@ namespace LibraryProjectUWP.Views.Book
                             ParentPage = this,
                             BookId = viewModel.Id,
                             BookTitle = viewModel.MainTitle,
-                            
                         });
 
-                        //userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
+                        userControl.CancelModificationRequested += BookExemplaryListUC_CancelModificationRequested;
                         //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
 
                         this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
@@ -1590,6 +1589,21 @@ namespace LibraryProjectUWP.Views.Book
                     }
                     this.ViewModelPage.IsSplitViewOpen = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void BookExemplaryListUC_CancelModificationRequested(BookExemplaryListUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= BookExemplaryListUC_CancelModificationRequested;
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -3852,20 +3866,6 @@ namespace LibraryProjectUWP.Views.Book
                 if (_IsSplitViewOpen != value)
                 {
                     this._IsSplitViewOpen = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private UserControl _SplitViewContent;
-        public UserControl SplitViewContent
-        {
-            get => this._SplitViewContent;
-            set
-            {
-                if (_SplitViewContent != value)
-                {
-                    this._SplitViewContent = value;
                     this.OnPropertyChanged();
                 }
             }

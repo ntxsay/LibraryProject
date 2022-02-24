@@ -71,7 +71,7 @@ namespace LibraryProjectUWP.Views.Book
             InitializeSearchingBookExemplaryWorker();
         }
 
-        #region SearchBooks
+        #region SearchExemplary
         CancellationTokenSource cancellationTokenSourceSearchExemplary = new CancellationTokenSource();
         public void InitializeSearchingBookExemplaryWorker()
         {
@@ -161,7 +161,27 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (e.Result is WorkerState<LivreExemplaryVM, LivreExemplaryVM> state)
                     {
-                        ViewModelPage.ViewModelList = new ObservableCollection<LivreExemplaryVM>(state.ResultList);
+                        if (state.ResultList == null || !state.ResultList.Any())
+                        {
+                            return;
+                        }
+
+                        var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NoGroup).OrderBy(o => o.Key).Select(s => s);
+                        if (GroupingItems != null && GroupingItems.Count() > 0)
+                        {
+                            List<LivreExemplaryVMCastVM> LivreExemplaryVMCastVMs = (GroupingItems.Select(groupingItem => new LivreExemplaryVMCastVM()
+                            {
+                                GroupName = groupingItem.Key,
+                                Items = new ObservableCollection<LivreExemplaryVM>(groupingItem),
+                            })).ToList();
+
+                            ViewModelPage.ViewModelListGroup = LivreExemplaryVMCastVMs;
+
+                            //_contactParameters.ParentPage.ViewModelPage.GroupedBy = LivreExemplaryGroupVM.GroupBy.LetterNomNaissance;
+                        }
+                        //var GroupingItems = state.ResultList.Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NoGroup).OrderBy(o => o.Key).Select(s => s);
+                        //ViewModelPage.Collection = new ObservableCollection<IGrouping<string, LivreExemplaryVM>>(GroupingItems);
+                        //ViewModelPage.ViewModelList = new ObservableCollection<LivreExemplaryVM>(state.ResultList);
                     }
                 }
             }
@@ -172,6 +192,52 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        #endregion
+
+        #region Group-Orders
+        private IEnumerable<LivreExemplaryVM> OrderItems(IEnumerable<LivreExemplaryVM> Collection, LivreExemplaryGroupVM.OrderBy OrderBy = LivreExemplaryGroupVM.OrderBy.Croissant, LivreExemplaryGroupVM.SortBy SortBy = LivreExemplaryGroupVM.SortBy.DateAjout)
+        {
+            try
+            {
+                if (Collection == null || Collection.Count() == 0)
+                {
+                    return null;
+                }
+
+                if (SortBy == LivreExemplaryGroupVM.SortBy.DateAcquisition)
+                {
+                    if (OrderBy == LivreExemplaryGroupVM.OrderBy.Croissant)
+                    {
+                        return Collection.Where(w => w != null).OrderBy(o => o.DateAcquisition);
+                    }
+                    else if (OrderBy == LivreExemplaryGroupVM.OrderBy.DCroissant)
+                    {
+                        return Collection.Where(w => w != null).OrderByDescending(o => o.DateAcquisition);
+                    }
+                }
+                else if (SortBy == LivreExemplaryGroupVM.SortBy.DateAjout)
+                {
+                    if (OrderBy == LivreExemplaryGroupVM.OrderBy.Croissant)
+                    {
+                        return Collection.Where(w => w != null).OrderBy(o => o.DateAjout);
+                    }
+                    else if (OrderBy == LivreExemplaryGroupVM.OrderBy.DCroissant)
+                    {
+                        return Collection.Where(w => w != null).OrderByDescending(o => o.DateAjout);
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return Enumerable.Empty<LivreExemplaryVM>();
+            }
+        }
+
 
         #endregion
 
@@ -332,6 +398,20 @@ namespace LibraryProjectUWP.Views.Book
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+        private ObservableCollection<IGrouping<string, LivreExemplaryVM>> _Collection = new ObservableCollection<IGrouping<string, LivreExemplaryVM>>();
+        public ObservableCollection<IGrouping<string, LivreExemplaryVM>> Collection
+        {
+            get => this._Collection;
+            set
+            {
+                if (this._Collection != value)
+                {
+                    this._Collection = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         private string _Header;
         public string Header
         {
@@ -484,6 +564,20 @@ namespace LibraryProjectUWP.Views.Book
                 if (_ViewModelList != value)
                 {
                     this._ViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private IEnumerable<LivreExemplaryVMCastVM> _ViewModelListGroup;
+        public IEnumerable<LivreExemplaryVMCastVM> ViewModelListGroup
+        {
+            get => this._ViewModelListGroup;
+            set
+            {
+                if (this._ViewModelListGroup != value)
+                {
+                    this._ViewModelListGroup = value;
                     this.OnPropertyChanged();
                 }
             }

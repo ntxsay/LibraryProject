@@ -205,6 +205,7 @@
     <Compile Include="ViewModels\Book\LivreClassificationAgeVM.cs" />
     <Compile Include="ViewModels\Book\LivreEtatVM.cs" />
     <Compile Include="ViewModels\Book\LivreDescriptionVM.cs" />
+    <Compile Include="ViewModels\Book\LivreExemplaryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreExemplaryVM.cs" />
     <Compile Include="ViewModels\Book\LivrePublicationVM.cs" />
     <Compile Include="ViewModels\Book\LivreFormatVM.cs" />

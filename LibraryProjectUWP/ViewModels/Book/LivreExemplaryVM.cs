@@ -279,6 +279,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private bool _IsJourAcquisitionKnow;
+        [Obsolete]
         public bool IsJourAcquisitionKnow
         {
             get => _IsJourAcquisitionKnow;
@@ -293,6 +294,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private bool _IsMoisAcquisitionKnow;
+        [Obsolete]
         public bool IsMoisAcquisitionKnow
         {
             get => _IsMoisAcquisitionKnow;
@@ -307,6 +309,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private bool _IsJourAcquisitionVisible = true;
+        [Obsolete]
         public bool IsJourAcquisitionVisible
         {
             get => _IsJourAcquisitionVisible;
@@ -321,6 +324,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private bool _IsMoisAcquisitionVisible = true;
+        [Obsolete]
         public bool IsMoisAcquisitionVisible
         {
             get => _IsMoisAcquisitionVisible;

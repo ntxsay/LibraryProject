@@ -140,10 +140,6 @@ namespace LibraryProjectUWP.ViewModels.Book
                 {
                     this._Collection = value;
                     this.OnPropertyChanged();
-                    //this.OnPropertyChanged(nameof(IsGroupedByNone));
-                    //this.OnPropertyChanged(nameof(IsGroupedByLetter));
-                    //this.OnPropertyChanged(nameof(IsGroupedByDateCreationYear));
-                    //this.OnPropertyChanged(nameof(IsGroupedByDateParutionYear));
                 }
             }
         }
@@ -155,5 +151,4 @@ namespace LibraryProjectUWP.ViewModels.Book
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
 }
