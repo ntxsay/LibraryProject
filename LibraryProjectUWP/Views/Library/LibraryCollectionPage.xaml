@@ -18,6 +18,7 @@
     <Page.Resources>
         <customConverters:ObjectToBooleanConverter x:Key="objectToBooleanConverter" />
         <customConverters:IntToBooleanConverter x:Key="intToBooleanConverter" />
+        <customConverters:IntToInvertVisibilityConverter x:Key="intToInvertVisibilityConverter" />
         <customConverters:CountToEnablingConverter x:Key="CountToEnablingConverter" />
         <customConverters:CountOneToEnablingConverter x:Key="CountOneToEnablingConverter" />
         <customConverters:CountToStringPhrase x:Key="CountToStringPhraseConverter" />
@@ -404,7 +405,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                         <Grid>
                             <MUIXC:ProgressRing IsIndeterminate="{x:Bind ViewModelPage.TaskList.Count, Converter={StaticResource intToBooleanConverter}, Mode=OneWay}" Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" Height="20" Width="20"/>
-                            <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;" Visibility="{x:Bind ViewModelPage.SearchingLibraryIconVisibility, Mode=OneWay}"/>
+                            <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;" Visibility="{x:Bind ViewModelPage.TaskList.Count, Converter={StaticResource intToInvertVisibilityConverter}, Mode=OneWay}"/>
                         </Grid>
                         <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
                             <Run Text="{x:Bind ViewModelPage.TaskList.Count, Mode=OneWay}"/>

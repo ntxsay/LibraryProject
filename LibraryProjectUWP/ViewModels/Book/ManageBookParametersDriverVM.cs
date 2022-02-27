@@ -58,6 +58,7 @@ namespace LibraryProjectUWP.ViewModels.Book
     {
         public long BookId { get; set; }
         public string BookTitle { get; set; }
+        public IEnumerable<LivreExemplaryVM> ViewModelList { get; set; }
         public BookCollectionPage ParentPage { get; set; }
     }
 }

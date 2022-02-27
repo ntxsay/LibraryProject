@@ -129,6 +129,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Code\Converters\IntToVisibilityConverter.cs" />
     <Compile Include="Code\Converters\IntToBooleanConverter.cs" />
     <Compile Include="Code\Converters\CountToEnablingConverter.cs" />
     <Compile Include="Code\Converters\CountToStringPhraseConverter.cs" />
@@ -237,6 +238,7 @@
     <Compile Include="Views\Book\BookBeforeGoBackCD.xaml.cs">
       <DependentUpon>BookBeforeGoBackCD.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\BookCollectionPage_Tasks.cs" />
     <Compile Include="Views\Book\BookExemplaryListUC.xaml.cs">
       <DependentUpon>BookExemplaryListUC.xaml</DependentUpon>
     </Compile>

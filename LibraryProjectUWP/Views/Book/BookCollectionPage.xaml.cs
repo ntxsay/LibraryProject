@@ -132,17 +132,6 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (_parameters.ParentLibrary.Books != null && _parameters.ParentLibrary.Books.Any())
-                {
-                    EsBook esBook = new EsBook();
-                    foreach (var book in _parameters.ParentLibrary.Books)
-                    {
-                        string combinedPath = await esBook.GetBookItemJaquettePathAsync(book);
-                        book.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-                    }
-                }
-
-
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
                 this.GridViewMode(firstLoad);
             }
@@ -336,6 +325,25 @@ namespace LibraryProjectUWP.Views.Book
                         break;
 
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
+
+        #region Taches
+        private void CancelTaskXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is TaskVM taskVM)
+                {
+                    
                 }
             }
             catch (Exception ex)
@@ -1570,25 +1578,49 @@ namespace LibraryProjectUWP.Views.Book
                     }
                     else
                     {
-                        BookExemplaryListUC userControl = new BookExemplaryListUC(new BookExemplaryListParametersDriverVM()
-                        {
-                            ParentPage = this,
-                            BookId = viewModel.Id,
-                            BookTitle = viewModel.MainTitle,
-                        });
-
-                        userControl.CancelModificationRequested += BookExemplaryListUC_CancelModificationRequested;
-                        //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
-
-                        this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                        {
-                            Glyph = userControl.ViewModelPage.Glyph,
-                            Title = userControl.ViewModelPage.Header,
-                            IdItem = userControl.IdItem,
-                        });
+                        InitializeSearchingBookWorker(viewModel);
                     }
                     this.ViewModelPage.IsSplitViewOpen = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void BookExemplaryList(LivreVM viewModel, IEnumerable<LivreExemplaryVM> modelList)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC item);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    BookExemplaryListUC userControl = new BookExemplaryListUC(new BookExemplaryListParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        BookId = viewModel.Id,
+                        BookTitle = viewModel.MainTitle,
+                        ViewModelList = modelList,
+                    });
+
+                    userControl.CancelModificationRequested += BookExemplaryListUC_CancelModificationRequested;
+                    //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -3785,6 +3817,21 @@ namespace LibraryProjectUWP.Views.Book
     public class BookCollectionPageVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public const int SearchBookExemplaryTaskId = 1;
+        private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
+        public ObservableCollection<TaskVM> TaskList
+        {
+            get => this._TaskList;
+            set
+            {
+                if (_TaskList != value)
+                {
+                    this._TaskList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private ObservableCollection<SideBarItemHeaderVM> _ItemsSideBarHeader = new ObservableCollection<SideBarItemHeaderVM>();
         public ObservableCollection<SideBarItemHeaderVM> ItemsSideBarHeader

@@ -122,7 +122,6 @@ namespace LibraryProjectUWP.Views.Library
                     }
                 }
 
-                ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
                 this.GridViewMode(firstLoad);
                 this.InitializeCountBookWorker();
             }
@@ -2365,9 +2364,6 @@ namespace LibraryProjectUWP.Views.Library
                     if (!worker.IsBusy)
                     {
                         cancellationTokenSourceSearchBook = new CancellationTokenSource();
-                        ViewModelPage.IsProgressBarUnderterminate = true;
-                        ViewModelPage.SearchingLibraryIconVisibility = Visibility.Collapsed;
-                        ViewModelPage.SearchingLibraryMessage = LibraryCollectionPageVM.taskOperationRunning;
 
                         if (!ViewModelPage.TaskList.Any(a => a.Id == LibraryCollectionPageVM.SearchBookTaskId))
                         {
@@ -2407,30 +2403,54 @@ namespace LibraryProjectUWP.Views.Library
                 var worker = sender as BackgroundWorker;
                 if (e.Argument is BibliothequeVM viewModel)
                 {
-                    Task<IList<LivreVM>> task = DbServices.Book.MultipleVmWithIdLibraryAsync(viewModel.Id, cancellationTokenSourceSearchBook.Token);                    
-                    task.Wait();
-
-                    if (worker.CancellationPending || cancellationTokenSourceSearchBook.IsCancellationRequested)
+                    using (Task<IList<LivreVM>> task = DbServices.Book.MultipleVmWithIdLibraryAsync(viewModel.Id, cancellationTokenSourceSearchBook.Token))
                     {
-                        if (!cancellationTokenSourceSearchBook.IsCancellationRequested)
+                        task.Wait();
+
+                        if (worker.CancellationPending || cancellationTokenSourceSearchBook.IsCancellationRequested)
                         {
-                            cancellationTokenSourceSearchBook.Cancel();
+                            if (!cancellationTokenSourceSearchBook.IsCancellationRequested)
+                            {
+                                cancellationTokenSourceSearchBook.Cancel();
+                            }
+
+                            e.Cancel = true;
+                            return;
                         }
 
-                        e.Cancel = true;
-                        task.Dispose();
-                        return;
-                    }
+                        var result = task.Result;
 
-                    var result = task.Result;
-                    var state = new WorkerState<LivreVM, LivreVM>()
-                    {
-                        Id = viewModel.Id,
-                        ResultList = result,
-                    };
+                        EsBook esBook = new EsBook();
+                        foreach (var book in result)
+                        {
+                            using (var taskJaquettes = esBook.GetBookItemJaquettePathAsync(book))
+                            {
+                                taskJaquettes.Wait();
 
-                    e.Result = state;
-                    task.Dispose();
+                                if (worker.CancellationPending || cancellationTokenSourceSearchBook.IsCancellationRequested)
+                                {
+                                    if (!cancellationTokenSourceSearchBook.IsCancellationRequested)
+                                    {
+                                        cancellationTokenSourceSearchBook.Cancel();
+                                    }
+
+                                    e.Cancel = true;
+                                    return;
+                                }
+
+                                string combinedPath = taskJaquettes.Result;
+                                book.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                            }
+                        }
+
+                        var state = new WorkerState<LivreVM, LivreVM>()
+                        {
+                            Id = viewModel.Id,
+                            ResultList = result,
+                        };
+
+                        e.Result = state;
+                    }                    
                 }
             }
             catch (Exception ex)
@@ -2445,9 +2465,6 @@ namespace LibraryProjectUWP.Views.Library
         {
             try
             {
-                ViewModelPage.IsProgressBarUnderterminate = false;
-                ViewModelPage.SearchingLibraryIconVisibility = Visibility.Visible;
-                ViewModelPage.SearchingLibraryMessage = LibraryCollectionPageVM.taskOperationStopped;
                 var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == LibraryCollectionPageVM.SearchBookTaskId);
                 if (item != null)
                 {
@@ -2514,9 +2531,6 @@ namespace LibraryProjectUWP.Views.Library
                 {
                     if (!workerCountBooks.IsBusy)
                     {
-                        ViewModelPage.IsProgressBarUnderterminate = true;
-                        ViewModelPage.SearchingLibraryIconVisibility = Visibility.Collapsed;
-                        ViewModelPage.SearchingLibraryMessage = LibraryCollectionPageVM.taskOperationRunning;
                         if (!ViewModelPage.TaskList.Any(a => a.Id == LibraryCollectionPageVM.CountBookTaskId))
                         {
                             ViewModelPage.TaskList.Add(new TaskVM()
@@ -2605,9 +2619,6 @@ namespace LibraryProjectUWP.Views.Library
                     }
                 }
 
-                ViewModelPage.IsProgressBarUnderterminate = false;
-                ViewModelPage.SearchingLibraryIconVisibility = Visibility.Visible;
-                ViewModelPage.SearchingLibraryMessage = LibraryCollectionPageVM.taskOperationStopped;
                 var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == LibraryCollectionPageVM.CountBookTaskId);
                 if (item != null)
                 {
@@ -2729,8 +2740,6 @@ namespace LibraryProjectUWP.Views.Library
 
         public const int CountBookTaskId = 1;
         public const int SearchBookTaskId = 2;
-        public const string taskOperationRunning = "Des tâches sont en cours d'exécution";
-        public const string taskOperationStopped = "Pas de tâches en cours d'exécution";
         private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
         public ObservableCollection<TaskVM> TaskList
         {
@@ -2843,62 +2852,6 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
         
-        private Visibility _SearchingLibraryVisibility = Visibility.Visible;
-        public Visibility SearchingLibraryVisibility
-        {
-            get => this._SearchingLibraryVisibility;
-            set
-            {
-                if (_SearchingLibraryVisibility != value)
-                {
-                    this._SearchingLibraryVisibility = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private Visibility _SearchingLibraryIconVisibility = Visibility.Collapsed;
-        public Visibility SearchingLibraryIconVisibility
-        {
-            get => this._SearchingLibraryIconVisibility;
-            set
-            {
-                if (_SearchingLibraryIconVisibility != value)
-                {
-                    this._SearchingLibraryIconVisibility = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsProgressBarUnderterminate = false;
-        public bool IsProgressBarUnderterminate
-        {
-            get => this._IsProgressBarUnderterminate;
-            set
-            {
-                if (_IsProgressBarUnderterminate != value)
-                {
-                    this._IsProgressBarUnderterminate = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _SearchingLibraryMessage = taskOperationStopped;
-        public string SearchingLibraryMessage
-        {
-            get => this._SearchingLibraryMessage;
-            set
-            {
-                if (_SearchingLibraryMessage != value)
-                {
-                    this._SearchingLibraryMessage = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
         private bool _IsSplitViewOpen;
         public bool IsSplitViewOpen
         {
@@ -2911,9 +2864,7 @@ namespace LibraryProjectUWP.Views.Library
                     this.OnPropertyChanged();
                 }
             }
-        }
-
-        
+        }        
 
         public const double MinSplitViewWidth = 400;
 

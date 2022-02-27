@@ -36,7 +36,6 @@ namespace LibraryProjectUWP.Views.Book
 {
     public sealed partial class BookExemplaryListUC : PivotItem
     {
-        private BackgroundWorker worker;
         public readonly BookExemplaryListParametersDriverVM _parameters;
         public readonly Guid IdItem = Guid.NewGuid();
 
@@ -63,40 +62,34 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
             _parameters = parameters;
             ViewModelPage.Header = $"Exemplaires d'un livre";
-            InitializeSearchingBookExemplaryWorker();
+            InitializeData();
+            //InitializeSearchingBookExemplaryWorker();
         }
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
         }
 
-        #region SearchExemplary
-        CancellationTokenSource cancellationTokenSourceSearchExemplary = new CancellationTokenSource();
-        public void InitializeSearchingBookExemplaryWorker()
+        private void InitializeData()
         {
             try
             {
-                if (worker == null)
+                if (_parameters.ViewModelList == null || !_parameters.ViewModelList.Any())
                 {
-                    worker = new BackgroundWorker()
-                    {
-                        WorkerReportsProgress = false,
-                        WorkerSupportsCancellation = true,
-                    };
-
-                    //worker.ProgressChanged += Worker_ProgressChanged;
-                    worker.DoWork += Worker_DoWork;
-                    worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+                    return;
                 }
+                ViewModelPage.ViewModelList = new ObservableCollection<LivreExemplaryVM>(_parameters.ViewModelList);
 
-                if (worker != null)
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NoGroup).OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
-                    if (!worker.IsBusy)
+                    List<LivreExemplaryVMCastVM> LivreExemplaryVMCastVMs = (GroupingItems.Select(groupingItem => new LivreExemplaryVMCastVM()
                     {
-                        cancellationTokenSourceSearchExemplary = new CancellationTokenSource();
+                        GroupName = groupingItem.Key,
+                        Items = new ObservableCollection<LivreExemplaryVM>(groupingItem),
+                    })).ToList();
 
-                        worker.RunWorkerAsync();
-                    }
+                    ViewModelPage.ViewModelListGroup = LivreExemplaryVMCastVMs;
                 }
             }
             catch (Exception)
@@ -106,93 +99,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            try
-            {
-                var worker = sender as BackgroundWorker;
-                Task<IList<LivreExemplaryVM>> task = DbServices.Book.GetBookExemplaryVMAsync(_parameters.BookId, cancellationTokenSourceSearchExemplary.Token);
-                task.Wait();
-
-                if (worker.CancellationPending || cancellationTokenSourceSearchExemplary.IsCancellationRequested)
-                {
-                    if (!cancellationTokenSourceSearchExemplary.IsCancellationRequested)
-                    {
-                        cancellationTokenSourceSearchExemplary.Cancel();
-                    }
-
-                    e.Cancel = true;
-                    task.Dispose();
-                    return;
-                }
-
-                var result = task.Result;
-                var state = new WorkerState<LivreExemplaryVM, LivreExemplaryVM>()
-                {
-                    ResultList = result,
-                };
-
-                e.Result = state;
-                task.Dispose();
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            try
-            {
-                // Si erreur
-                if (e.Error != null)
-                {
-
-                }
-                else if (e.Cancelled)
-                {
-                    // Support de l'annulation a été désactivée
-                }
-                else
-                {
-                    if (e.Result is WorkerState<LivreExemplaryVM, LivreExemplaryVM> state)
-                    {
-                        if (state.ResultList == null || !state.ResultList.Any())
-                        {
-                            return;
-                        }
-                        ViewModelPage.ViewModelList = new ObservableCollection<LivreExemplaryVM>(state.ResultList);
-
-                        var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NoGroup).OrderBy(o => o.Key).Select(s => s);
-                        if (GroupingItems != null && GroupingItems.Count() > 0)
-                        {
-                            List<LivreExemplaryVMCastVM> LivreExemplaryVMCastVMs = (GroupingItems.Select(groupingItem => new LivreExemplaryVMCastVM()
-                            {
-                                GroupName = groupingItem.Key,
-                                Items = new ObservableCollection<LivreExemplaryVM>(groupingItem),
-                            })).ToList();
-
-                            ViewModelPage.ViewModelListGroup = LivreExemplaryVMCastVMs;
-
-                            //_contactParameters.ParentPage.ViewModelPage.GroupedBy = LivreExemplaryGroupVM.GroupBy.LetterNomNaissance;
-                        }
-                        //var GroupingItems = state.ResultList.Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NoGroup).OrderBy(o => o.Key).Select(s => s);
-                        //ViewModelPage.Collection = new ObservableCollection<IGrouping<string, LivreExemplaryVM>>(GroupingItems);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        #endregion
 
         #region Group-Orders
         private IEnumerable<LivreExemplaryVM> OrderItems(IEnumerable<LivreExemplaryVM> Collection, LivreExemplaryGroupVM.OrderBy OrderBy = LivreExemplaryGroupVM.OrderBy.Croissant, LivreExemplaryGroupVM.SortBy SortBy = LivreExemplaryGroupVM.SortBy.DateAjout)

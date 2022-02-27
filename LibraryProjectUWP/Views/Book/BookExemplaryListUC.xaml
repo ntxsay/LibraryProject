@@ -87,7 +87,7 @@
                         <TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Right" Text="{x:Bind DateAcquisition, Mode=OneWay}" FontSize="12"/>
                         <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" FontSize="12">
                                 <Run Text="Etat"/>
-                                <Run Text="{x:Bind Etat.Etat}"/>
+                                <Run Text="{x:Bind Etat.Etat}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                                 <Run Text="en provenance de"/>
                                 <Run Text="{x:Bind ContactSource.SocietyName}"/>
                                 <Run Text="{x:Bind ContactSource.NomNaissance}"/>
@@ -182,6 +182,11 @@
                     <ListView.GroupStyle>
                         <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
                     </ListView.GroupStyle>
+                    <ListView.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Supprimer"/>
+                        </MenuFlyout>
+                    </ListView.ContextFlyout>
                 </ListView>
             </SemanticZoom.ZoomedInView>
             <SemanticZoom.ZoomedOutView>

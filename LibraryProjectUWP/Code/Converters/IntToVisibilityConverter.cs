@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
 namespace LibraryProjectUWP.Code.Converters
 {
-    public class IntToBooleanConverter : IValueConverter
+    public class IntToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
@@ -15,14 +16,14 @@ namespace LibraryProjectUWP.Code.Converters
             {
                 if (value is int counter)
                 {
-                    return counter > 0;
+                    return counter > 0 ? Visibility.Visible : Visibility.Collapsed;
                 }
 
-                return false;
+                return Visibility.Collapsed;
             }
             catch (Exception)
             {
-                return false;
+                return Visibility.Collapsed;
             }
         }
 
@@ -32,7 +33,7 @@ namespace LibraryProjectUWP.Code.Converters
         }
     }
 
-    public class IntToInvertBooleanConverter : IValueConverter
+    public class IntToInvertVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
@@ -40,14 +41,14 @@ namespace LibraryProjectUWP.Code.Converters
             {
                 if (value is int counter)
                 {
-                    return !(counter > 0);
+                    return counter > 0 ? Visibility.Collapsed : Visibility.Visible;
                 }
 
-                return false;
+                return Visibility.Collapsed;
             }
             catch (Exception)
             {
-                return false;
+                return Visibility.Collapsed;
             }
         }
 

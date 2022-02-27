@@ -246,7 +246,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     item.IdContactSourceNavigation = await context.Tcontact.SingleOrDefaultAsync(s => s.Id == item.IdContactSource);
                                 }
 
-                                if (item.TbookEtat == null)
+                                if (item.TbookEtat == null || !item.TbookEtat.Any())
                                 {
                                     item.TbookEtat = await context.TbookEtat.Where(s => s.IdBookExemplary == item.Id).ToListAsync(cancellationToken);
                                 }
@@ -1195,7 +1195,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         var collection = model.TbookEtat.Select(s => ViewModelConverter(s)).Where(w => w != null).ToList();
                         viewModel.Etats = new ObservableCollection<LivreEtatVM>(collection);
-                        var etat = model.TbookEtat.SingleOrDefault(s => s.IdBookExemplary == viewModel.Id);
+                        var etat = model.TbookEtat.FirstOrDefault(s => s.IdBookExemplary == viewModel.Id);
                         if (etat != null)
                         {
                             viewModel.Etat = ViewModelConverter(etat);
