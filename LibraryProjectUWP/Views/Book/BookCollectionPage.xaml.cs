@@ -144,7 +144,6 @@ namespace LibraryProjectUWP.Views.Book
 
         private void InitializePages()
         {
-            Button btn = new Button();
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {

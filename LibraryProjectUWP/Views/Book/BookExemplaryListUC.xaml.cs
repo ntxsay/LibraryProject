@@ -80,7 +80,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 ViewModelPage.ViewModelList = new ObservableCollection<LivreExemplaryVM>(_parameters.ViewModelList);
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NoGroup).OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.OrderByDescending(q => q.DateAjout).GroupBy(s => s.DateAjout.ToString("dddd dd MMMM yyyy")).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     List<LivreExemplaryVMCastVM> LivreExemplaryVMCastVMs = (GroupingItems.Select(groupingItem => new LivreExemplaryVMCastVM()

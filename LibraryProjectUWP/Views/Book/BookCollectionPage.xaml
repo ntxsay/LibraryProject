@@ -552,13 +552,13 @@
                         </Flyout>
                     </Button.Flyout>
                 </Button>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
                     <Run Text="Nombre de livre :" />
                     <Run Text="{x:Bind _parameters.ParentLibrary.Books.Count, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
                     <Run Text="Elements sélectionnés :" />
                     <Run Text="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay}" />

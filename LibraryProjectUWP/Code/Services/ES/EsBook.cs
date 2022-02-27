@@ -255,7 +255,7 @@ namespace LibraryProjectUWP.Code.Services.ES
         {
             try
             {
-                var folder = await _EsGeneral.CreateFolderInLocalFolderAppAsync(EsGeneral.DefaultPath.Books, CreationCollisionOption.OpenIfExists);
+                var folder = await _EsGeneral.CreateFolderInLocalFolderAppAsync(EsGeneral.DefaultPathName.Books, CreationCollisionOption.OpenIfExists);
                 return folder;
             }
             catch (Exception)

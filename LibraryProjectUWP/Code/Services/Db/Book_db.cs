@@ -608,28 +608,50 @@ namespace LibraryProjectUWP.Code.Services.Db
                             nullablePrice = null;
                         }
 
-                        if (!viewModel.IsExemplarySeparated || viewModel.NbExemplaire == 1)
+                        string group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
+                        while (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == true)
+                        {
+                            group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
+                            if (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == false)
+                            {
+                                break;
+                            }
+                        }
+#warning Changer le type NoExemplary en integer
+                        var minNoExemplary = await context.TbookExemplary.Select(s => Convert.ToInt32(s.NoExemplary))?.ToListAsync();
+                        var MinNoExemplary = minNoExemplary?.Max() ?? 1;
+                        var MaxNoExemplary = MinNoExemplary + viewModel.NbExemplaire;
+                        
+                        List<TbookExemplary> recordCollection = new List<TbookExemplary>();
+                        for (int i = MinNoExemplary; i <= MaxNoExemplary; i++)
                         {
                             var record = new TbookExemplary()
                             {
                                 IdBook = idBook,
+                                IdContactSource = viewModel.IdContactSource,
                                 DateAjout = viewModel.DateAjout.ToString(),
                                 DateEdition = viewModel.DateEdition?.ToString(),
                                 DateAcquisition = viewModel.DateAcquisition,
-                                IsJourAcquisitionKnow = viewModel.IsJourAcquisitionKnow ? 1 : 0,
-                                IsMoisAcquisitionKnow = viewModel.IsMoisAcquisitionKnow ? 1 : 0,
                                 DateRemise = viewModel.DateRemiseLivre?.ToString(),
                                 TypeAcquisition = viewModel.Source,
                                 Observations = viewModel.Observations,
-                                Quantity = viewModel.NbExemplaire,
-                                NoGroup = null,
-                                NoExemplary = viewModel.NoExemplaire,
+                                NoExemplary = i.ToString("00"),
+                                Quantity = 1,
+                                NoGroup = group,
                                 Price = nullablePrice,
                                 DeviceName = viewModel.DeviceName
                             };
-                            await context.TbookExemplary.AddAsync(record);
-                            await context.SaveChangesAsync();
 
+
+                            recordCollection.Add(record);
+                        }
+
+                        await context.TbookExemplary.AddRangeAsync(recordCollection);
+                        await context.SaveChangesAsync();
+
+                        List<TbookEtat> etatCollection = new List<TbookEtat>();
+                        foreach (var record in recordCollection)
+                        {
                             var recordEtat = new TbookEtat()
                             {
                                 IdBookExemplary = record.Id,
@@ -639,79 +661,18 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 TypeVerification = (byte)viewModel.Etat.TypeVerification,
                             };
 
-                            await context.TbookEtat.AddAsync(recordEtat);
-                            await context.SaveChangesAsync();
-
-                            return new OperationStateVM<TbookExemplary>()
-                            {
-                                IsSuccess = true,
-                                Id = record.Id,
-                                Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés avec succès."
-                            };
+                            etatCollection.Add(recordEtat);
                         }
-                        else
+
+                        await context.TbookEtat.AddRangeAsync(etatCollection);
+                        await context.SaveChangesAsync();
+
+                        return new OperationStateVM<TbookExemplary>(recordCollection)
                         {
-                            string group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
-                            while (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == true)
-                            {
-                                group = $"{DateTime.UtcNow.Day}-{IdHelpers.GenerateMalaxedGUID(5)}-{DateTime.UtcNow.Year:00}";
-                                if (await context.TbookExemplary.AnyAsync(a => a.NoGroup == group) == false)
-                                {
-                                    break;
-                                }
-                            }
-
-                            List<TbookExemplary> recordCollection = new List<TbookExemplary>();
-                            for (int i = 0; i < viewModel.NbExemplaire; i++)
-                            {
-                                var record = new TbookExemplary()
-                                {
-                                    IdBook = idBook,
-                                    DateAjout = viewModel.DateAjout.ToString(),
-                                    DateEdition = viewModel.DateEdition?.ToString(),
-                                    DateAcquisition = viewModel.DateAcquisition,
-                                    IsJourAcquisitionKnow = viewModel.IsJourAcquisitionKnow ? 1 : 0,
-                                    IsMoisAcquisitionKnow = viewModel.IsMoisAcquisitionKnow ? 1 : 0,
-                                    DateRemise = viewModel.DateRemiseLivre?.ToString(),
-                                    TypeAcquisition = viewModel.Source,
-                                    Observations = viewModel.Observations,
-                                    NoExemplary = (i + 1).ToString("00"),
-                                    Quantity = 1,
-                                    NoGroup = group,
-                                    Price = nullablePrice,
-                                    DeviceName = viewModel.DeviceName
-                                };
-                                recordCollection.Add(record);
-                            }
-
-                            await context.TbookExemplary.AddRangeAsync(recordCollection);
-                            await context.SaveChangesAsync();
-
-                            List<TbookEtat> etatCollection = new List<TbookEtat>();
-                            foreach (var record in recordCollection)
-                            {
-                                var recordEtat = new TbookEtat()
-                                {
-                                    IdBookExemplary = record.Id,
-                                    DateAjout = viewModel.DateAjout.ToString(),
-                                    Etat = viewModel.Etat.Etat,
-                                    Observations = viewModel.Observations,
-                                    TypeVerification = (byte)viewModel.Etat.TypeVerification,
-                                };
-
-                                etatCollection.Add(recordEtat);
-                            }
-
-                            await context.TbookEtat.AddRangeAsync(etatCollection);
-                            await context.SaveChangesAsync();
-
-                            return new OperationStateVM<TbookExemplary>(recordCollection)
-                            {
-                                IsSuccess = true,
-                                //Id = record.Id,
-                                Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés distinctement avec succès."
-                            };
-                        }
+                            IsSuccess = true,
+                            //Id = record.Id,
+                            Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés distinctement avec succès."
+                        };
                     }
                         
                 }
