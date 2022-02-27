@@ -1156,10 +1156,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                         DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
                         DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
                         DateRemiseLivre = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemise),
-                        IsJourAcquisitionKnow = model.IsJourAcquisitionKnow >= 1,
-                        IsMoisAcquisitionKnow = model.IsMoisAcquisitionKnow >= 1,
-                        IsJourAcquisitionVisible = model.IsJourAcquisitionKnow >= 1,
-                        IsMoisAcquisitionVisible = model.IsMoisAcquisitionKnow >= 1,
                         NbExemplaire = (int)(model.Quantity < int.MinValue || model.Quantity > int.MaxValue ? 0 : model.Quantity),
                         Source = model.TypeAcquisition,
                         NoExemplaire = model.NoExemplary,
@@ -1199,6 +1195,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         var collection = model.TbookEtat.Select(s => ViewModelConverter(s)).Where(w => w != null).ToList();
                         viewModel.Etats = new ObservableCollection<LivreEtatVM>(collection);
+                        var etat = model.TbookEtat.SingleOrDefault(s => s.IdBookExemplary == viewModel.Id);
+                        if (etat != null)
+                        {
+                            viewModel.Etat = ViewModelConverter(etat);
+                        }
                     }
 
                     return viewModel;

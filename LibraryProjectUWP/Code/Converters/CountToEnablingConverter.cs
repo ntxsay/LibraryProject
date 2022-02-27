@@ -7,6 +7,7 @@ using Windows.UI.Xaml.Data;
 
 namespace LibraryProjectUWP.Code.Converters
 {
+    [Obsolete("Utiliser IntToBooleanConverter")]
     public class CountToEnablingConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)

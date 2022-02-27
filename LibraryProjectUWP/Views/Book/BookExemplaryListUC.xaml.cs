@@ -63,12 +63,11 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
             _parameters = parameters;
             ViewModelPage.Header = $"Exemplaires d'un livre";
-            
+            InitializeSearchingBookExemplaryWorker();
         }
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
-            InitializeSearchingBookExemplaryWorker();
         }
 
         #region SearchExemplary
@@ -165,6 +164,7 @@ namespace LibraryProjectUWP.Views.Book
                         {
                             return;
                         }
+                        ViewModelPage.ViewModelList = new ObservableCollection<LivreExemplaryVM>(state.ResultList);
 
                         var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NoGroup).OrderBy(o => o.Key).Select(s => s);
                         if (GroupingItems != null && GroupingItems.Count() > 0)
@@ -181,7 +181,6 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         //var GroupingItems = state.ResultList.Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NoGroup).OrderBy(o => o.Key).Select(s => s);
                         //ViewModelPage.Collection = new ObservableCollection<IGrouping<string, LivreExemplaryVM>>(GroupingItems);
-                        //ViewModelPage.ViewModelList = new ObservableCollection<LivreExemplaryVM>(state.ResultList);
                     }
                 }
             }
@@ -454,22 +453,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private string _ArgName;
-        public string ArgName
-        {
-            get => this._ArgName;
-            set
-            {
-                if (this._ArgName != value)
-                {
-                    this._ArgName = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        
-
+       
         private Brush _ResultMessageForeGround;
         public Brush ResultMessageForeGround
         {
