@@ -39,7 +39,7 @@
             <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
             <MTUUConverters:BoolToObjectConverter x:Key="invertBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
             <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModelPage.ViewModelListGroup, Mode=OneWay}" IsSourceGrouped="True" ItemsPath="Items"/>
-
+            <!--Source="{x:Bind ViewModelPage.ViewModelListGroup, Mode=OneWay}"-->
 
             <XamlUICommand x:Name="CancelModificationXUiCommand" 
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
@@ -62,7 +62,7 @@
                 <Setter Property="VerticalAlignment" Value="Top" />
             </Style>
             <DataTemplate x:Key="ZoomedInTemplate" x:DataType="booktVm:LivreExemplaryVM">
-                <Grid ColumnSpacing="2" HorizontalAlignment="Stretch">
+                <Grid ColumnSpacing="2" HorizontalAlignment="Stretch" Padding="0 10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
@@ -85,12 +85,13 @@
                                 <Run Text="{x:Bind Source}" FontWeight="SemiBold"/>
                         </TextBlock>
                         <TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Right" Text="{x:Bind DateAcquisition, Mode=OneWay}" FontSize="12"/>
-                        <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" FontSize="12">
-                                <Run Text="Etat"/>
+                        <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" FontSize="12" TextWrapping="Wrap">
+                                <Run Text="Etat du livre"/>
                                 <Run Text="{x:Bind Etat.Etat}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                                 <Run Text="en provenance de"/>
-                                <Run Text="{x:Bind ContactSource.SocietyName}"/>
-                                <Run Text="{x:Bind ContactSource.NomNaissance}"/>
+                                <Run Text="{x:Bind ContactSource.SocietyName}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="{x:Bind ContactSource.NomNaissance}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="{x:Bind ContactSource.Prenom}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                         </TextBlock>
                         <TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Left" FontSize="12">
                                 <Run Text="Prix :"/>
@@ -109,46 +110,6 @@
             <DataTemplate x:Key="ZoomedOutTemplate" x:DataType="wuxdata:ICollectionViewGroup">
                 <TextBlock Text="{x:Bind ((booktVm:LivreExemplaryVMCastVM)Group).GroupName}" TextWrapping="Wrap" FontSize="18"/>
             </DataTemplate>
-            
-            <DataTemplate x:Key="itemTemplate" x:DataType="booktVm:LivreExemplaryVM">
-                <Grid ColumnSpacing="2" HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" VerticalAlignment="Center">
-                        <Ellipse Height="40" Width="40" Fill="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"/>
-                        <TextBlock Text="{x:Bind NoExemplaire, Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center"/>
-                    </Grid>
-                    <Grid Grid.Column="1" ColumnSpacing="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Left" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}">
-                                <Run Text="N°"/>
-                                <Run Text="{x:Bind NoExemplaire}" FontWeight="SemiBold"/>
-                        </TextBlock>
-                        <TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Right" Text="{x:Bind DateAcquisition, Mode=OneWay}" FontSize="12"/>
-                        <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" FontSize="12">
-                                <Run Text="Source :"/>
-                                <Run Text="{x:Bind ContactSource.SocietyName}"/>
-                                <Run Text="{x:Bind ContactSource.NomNaissance}"/>
-                        </TextBlock>
-                        <TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Left" FontSize="12">
-                                <Run Text="Prix :"/>
-                                <Run Text="{x:Bind Price}"/>
-                                <Run Text="{x:Bind DeviceName}"/>
-                        </TextBlock>
-                    </Grid>
-                </Grid>
-            </DataTemplate>
-
         </ResourceDictionary>
     </PivotItem.Resources>
     <PivotItem.Header>
@@ -167,18 +128,32 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap">
+        <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 10" TextWrapping="Wrap">
             <Run Text="Vous naviguez parmi les exemplaires du livre «" />
-            <Run Text="{x:Bind _parameters.BookTitle}" FontWeight="Bold" />
+            <Run Text="{x:Bind _parameters.ParentBook.MainTitle}" FontWeight="Bold" />
             <Run Text="»" />
         </TextBlock>
-        <SemanticZoom Grid.Row="1">
+        <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Right" Background="Transparent">
+            <AppBarButton x:Name="ABBAddSousCategorie" Icon="Add" Label="Exemplaire"  MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource CreateItemXUiCommand}"/>
+            <AppBarSeparator/>
+            <AppBarButton x:Name="ABBRenameCategorie" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource UpdateItemXUiCommand}"/>
+            <AppBarButton Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DeleteItemXUiCommand}"/>
+            <!--<CommandBar.SecondaryCommands>
+                <AppBarButton Label="Exporter au format JSON" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportTreeToJsonXamlUICommand}">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE74E;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>-->
+        </CommandBar>
+        <SemanticZoom Grid.Row="2">
             <SemanticZoom.ZoomedInView>
-                <ListView ItemsSource="{x:Bind cvsGroups.View}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
+                <ListView ItemsSource="{x:Bind cvsGroups.View, Mode=OneWay}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
                     <ListView.GroupStyle>
                         <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
                     </ListView.GroupStyle>
@@ -190,74 +165,11 @@
                 </ListView>
             </SemanticZoom.ZoomedInView>
             <SemanticZoom.ZoomedOutView>
-                <ListView ItemsSource="{x:Bind cvsGroups.View.CollectionGroups}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
+                <ListView ItemsSource="{x:Bind cvsGroups.View.CollectionGroups, Mode=OneWay}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
             </SemanticZoom.ZoomedOutView>
         </SemanticZoom>
-
-        <!--<ListView Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.Collection, Mode=OneWay}"  SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemExpanded}">
-                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.HeaderTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Key}" Margin="10,0"
-                               Foreground="Black" FontWeight="Bold" />
-                        </DataTemplate>
-                    </GroupStyle.HeaderTemplate>
-                </GroupStyle>
-            </ListView.GroupStyle>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid ColumnSpacing="2" HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0" VerticalAlignment="Center">
-                            <Ellipse Height="40" Width="40" Fill="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"/>
-                            <TextBlock Text="{Binding NoExemplaire, Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center"/>
-                        </Grid>
-                        <Grid Grid.Column="1" ColumnSpacing="8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Left" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}">
-                                <Run Text="N°"/>
-                                <Run Text="{Binding NoExemplaire}" FontWeight="SemiBold"/>
-                            </TextBlock>
-                            <TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Right" Text="{Binding DateAcquisition, Mode=OneWay}" FontSize="12"/>
-                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" FontSize="12">
-                                <Run Text="Source :"/>
-                                --><!--<Run Text="{x:Bind ContactSource.SocietyName}"/>
-                                <Run Text="{x:Bind ContactSource.NomNaissance}"/>--><!--
-                            </TextBlock>
-                            <TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Left" FontSize="12">
-                                <Run Text="Prix :"/>
-                                <Run Text="{Binding Price}"/>
-                                <Run Text="{Binding DeviceName}"/>
-                            </TextBlock>
-                        </Grid>
-                    </Grid>
-                </DataTemplate>
-
-            </ListView.ItemTemplate>
-        </ListView>-->
-        <!--<MUIXC:TreeView x:Name="TreeCategorie" Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.ViewModelList, Mode=OneWay}" CanDrag="False" CanDragItems="False" CanReorderItems="False" AllowDrop="False"
-                                                    ItemTemplateSelector="{StaticResource exemplaryTemplateSelector}" SelectionMode="Multiple">
-        </MUIXC:TreeView>-->
-        <TextBlock x:Name="TbxErrorMessage" Grid.Row="2" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
-        <Grid Grid.Row="3">
+        <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
+        <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>

@@ -83,7 +83,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     Run runName = new Run()
                     {
-                        Text = " " + _parameters?.Parent?.MainTitle,
+                        Text = " " + _parameters?.ParentBook?.MainTitle,
                         FontWeight = FontWeights.Medium,
                     };
                     TbcInfos.Inlines.Add(runName);
@@ -248,6 +248,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         //
                         ViewModelPage.ViewModel.ContactSource = viewModel;
+                        ViewModelPage.ViewModel.IdContactSource = viewModel.Id;
                     }
                     else
                     {
@@ -553,7 +554,7 @@ namespace LibraryProjectUWP.Views.Book
         public IEnumerable<string> chooseDays = DatesHelpers.ChooseDays();
         public IEnumerable<string> chooseMonths = DatesHelpers.ChooseMonth();
         public List<string> chooseYear = new List<string>();
-        public Guid Guid { get; set; } = Guid.NewGuid();
+        public Guid? Guid { get; set; }
 
         private string _Header;
         public string Header

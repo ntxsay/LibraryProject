@@ -1465,6 +1465,23 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                if (args.Parameter is LivreVM viewModel)
+                {
+                    NewBookExemplary(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void NewBookExemplary(LivreVM viewModel, Guid? guid = null)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
                 var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookExemplaryUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
                 if (checkedItem != null)
                 {
@@ -1476,8 +1493,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         EditMode = Code.EditMode.Create,
-                        //ViewModelList = _parameters.ParentLibrary.Books,
-                        Parent = args.Parameter as LivreVM,
+                        ParentBook = viewModel,
                         CurrentViewModel = new LivreExemplaryVM()
                         {
                             Etat = new LivreEtatVM()
@@ -1486,6 +1502,11 @@ namespace LibraryProjectUWP.Views.Book
                             }
                         }
                     });
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
 
                     userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
@@ -1506,6 +1527,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+
         private async void NewEditBookExemplaryUC_Create_CreateItemRequested(NewEditBookExemplaryUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1515,16 +1537,30 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     LivreExemplaryVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                    var creationResult = await DbServices.Book.CreateExemplaryAsync(sender._parameters.Parent.Id, newViewModel);
+                    var creationResult = await DbServices.Book.CreateExemplaryAsync(sender._parameters.ParentBook.Id, newViewModel);
                     if (creationResult.IsSuccess)
                     {
-                        newViewModel.Id = creationResult.Id;
-                        this.RefreshItemsGrouping();
-
-                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
+                        
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            this.InitializeSearchingBookWorker(sender._parameters.ParentBook);
+                            NewEditBookExemplaryUC_Create_CancelModificationRequested(sender, e);
+                            //var bookExemplariesList = GetBookExemplariesSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            //if (bookExemplariesList != null)
+                            //{
+                            //    var getModelList = bookExemplariesList._parameters.ViewModelList.ToList();
+                            //    getModelList.Add(newViewModel);
+                            //    bookExemplariesList._parameters.ViewModelList = getModelList;
+                            //    //bookExemplariesList._parameters.ViewModelList.Publication.Collections.Add(newViewModel);
+                            //    NewEditBookExemplaryUC_Create_CancelModificationRequested(sender, e);
+                            //    //InitializeSearchingBookWorker(bookExemplariesList._parameters.);
+                            //}
+                        }
                     }
                     else
                     {
@@ -1570,16 +1606,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC item);
-                    if (checkedItem != null)
-                    {
-                        this.PivotRightSideBar.SelectedItem = checkedItem;
-                    }
-                    else
-                    {
-                        InitializeSearchingBookWorker(viewModel);
-                    }
-                    this.ViewModelPage.IsSplitViewOpen = true;
+                    InitializeSearchingBookWorker(viewModel);
                 }
             }
             catch (Exception ex)
@@ -1598,19 +1625,18 @@ namespace LibraryProjectUWP.Views.Book
                 if (checkedItem != null)
                 {
                     this.PivotRightSideBar.SelectedItem = checkedItem;
+                    (checkedItem as BookExemplaryListUC).InitializeData();
                 }
                 else
                 {
                     BookExemplaryListUC userControl = new BookExemplaryListUC(new BookExemplaryListParametersDriverVM()
                     {
                         ParentPage = this,
-                        BookId = viewModel.Id,
-                        BookTitle = viewModel.MainTitle,
+                        ParentBook = viewModel,
                         ViewModelList = modelList,
                     });
 
                     userControl.CancelModificationRequested += BookExemplaryListUC_CancelModificationRequested;
-                    //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
@@ -1921,7 +1947,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         newViewModel.Id = creationResult.Id;
                         //ViewModelPage.ContactViewModelList.Add(newViewModel);
-                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
@@ -2210,7 +2236,7 @@ namespace LibraryProjectUWP.Views.Book
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
-                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
@@ -2388,7 +2414,7 @@ namespace LibraryProjectUWP.Views.Book
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
-                        sender.ViewModelPage.ResultMessageTitle = "Succeès";
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
@@ -3538,6 +3564,30 @@ namespace LibraryProjectUWP.Views.Book
                     if (itemPivot != null)
                     {
                         return itemPivot as CategoriesListUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        private BookExemplaryListUC GetBookExemplariesSideBarByGuid(Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC item && item.ViewModelPage.Guid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as BookExemplaryListUC;
                     }
                 }
 

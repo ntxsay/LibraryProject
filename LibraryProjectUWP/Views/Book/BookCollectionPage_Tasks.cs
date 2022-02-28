@@ -20,7 +20,7 @@ namespace LibraryProjectUWP.Views.Book
         private BackgroundWorker workerSearchExemplariesBook;
         #region SearchBooks
         CancellationTokenSource cancellationTokenSourceSearchBook = new CancellationTokenSource();
-        private void InitializeSearchingBookWorker(LivreVM viewModel)
+        public void InitializeSearchingBookWorker(LivreVM viewModel)
         {
             try
             {

@@ -35,7 +35,7 @@ namespace LibraryProjectUWP.ViewModels.Book
     {
         public IEnumerable<LivreExemplaryVM> ExemplaryViewModelList { get; set; }
         public LivreExemplaryVM CurrentViewModel { get; set; }
-        public LivreVM Parent { get; set; }
+        public LivreVM ParentBook { get; set; }
         public EditMode EditMode { get; set; }
         public BookCollectionPage ParentPage { get; set; }
     }
@@ -56,8 +56,11 @@ namespace LibraryProjectUWP.ViewModels.Book
 
     public class BookExemplaryListParametersDriverVM
     {
+        [Obsolete]
         public long BookId { get; set; }
+        [Obsolete]
         public string BookTitle { get; set; }
+        public LivreVM ParentBook { get; set; }
         public IEnumerable<LivreExemplaryVM> ViewModelList { get; set; }
         public BookCollectionPage ParentPage { get; set; }
     }

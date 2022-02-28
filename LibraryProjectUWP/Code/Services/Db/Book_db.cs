@@ -618,7 +618,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             }
                         }
 #warning Changer le type NoExemplary en integer
-                        var minNoExemplary = await context.TbookExemplary.Select(s => Convert.ToInt32(s.NoExemplary))?.ToListAsync();
+                        var minNoExemplary = await context.TbookExemplary.Where(w => w.IdBook == bookRecord.Id).Select(s => Convert.ToInt32(s.NoExemplary))?.ToListAsync();
                         var MinNoExemplary = minNoExemplary?.Max() ?? 1;
                         var MaxNoExemplary = MinNoExemplary + viewModel.NbExemplaire;
                         

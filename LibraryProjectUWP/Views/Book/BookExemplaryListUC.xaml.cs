@@ -70,7 +70,7 @@ namespace LibraryProjectUWP.Views.Book
         {
         }
 
-        private void InitializeData()
+        public void InitializeData()
         {
             try
             {
@@ -83,19 +83,23 @@ namespace LibraryProjectUWP.Views.Book
                 var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.OrderByDescending(q => q.DateAjout).GroupBy(s => s.DateAjout.ToString("dddd dd MMMM yyyy")).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
-                    List<LivreExemplaryVMCastVM> LivreExemplaryVMCastVMs = (GroupingItems.Select(groupingItem => new LivreExemplaryVMCastVM()
+                    List<LivreExemplaryVMCastVM> LivreExemplaryVMCastVMs = GroupingItems.Select(groupingItem => new LivreExemplaryVMCastVM()
                     {
                         GroupName = groupingItem.Key,
                         Items = new ObservableCollection<LivreExemplaryVM>(groupingItem),
-                    })).ToList();
+                    }).ToList();
 
-                    ViewModelPage.ViewModelListGroup = LivreExemplaryVMCastVMs;
+                    ViewModelPage.ViewModelListGroup = new ObservableCollection<LivreExemplaryVMCastVM>(LivreExemplaryVMCastVMs);
+                   
+                    //cvsGroups.Source = ViewModelPage.ViewModelListGroup;
+                    //this.Bindings.Update();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
 
@@ -156,13 +160,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                bool isValided = IsModelValided();
-                if (!isValided)
-                {
-                    return;
-                }
-
-                CreateItemRequested?.Invoke(this, args);
+                _parameters.ParentPage.NewBookExemplary(_parameters.ParentBook, ViewModelPage.Guid);
             }
             catch (Exception ex)
             {
@@ -302,6 +300,8 @@ namespace LibraryProjectUWP.Views.Book
     public class BookExemplaryListUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public Guid Guid { get; private set; } = Guid.NewGuid();
 
         private ObservableCollection<IGrouping<string, LivreExemplaryVM>> _Collection = new ObservableCollection<IGrouping<string, LivreExemplaryVM>>();
         public ObservableCollection<IGrouping<string, LivreExemplaryVM>> Collection
@@ -459,8 +459,8 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private IEnumerable<LivreExemplaryVMCastVM> _ViewModelListGroup;
-        public IEnumerable<LivreExemplaryVMCastVM> ViewModelListGroup
+        private ObservableCollection<LivreExemplaryVMCastVM> _ViewModelListGroup = new ObservableCollection<LivreExemplaryVMCastVM>();
+        public ObservableCollection<LivreExemplaryVMCastVM> ViewModelListGroup
         {
             get => this._ViewModelListGroup;
             set

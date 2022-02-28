@@ -42,10 +42,42 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
     }
 
-    public class LivreExemplaryVMCastVM
+    public class LivreExemplaryVMCastVM : INotifyPropertyChanged
     {
-        public string GroupName { get; set; }
-        public ObservableCollection<LivreExemplaryVM> Items { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        private string _GroupName;
+        public string GroupName
+        {
+            get => _GroupName;
+            set
+            {
+                if (_GroupName != value)
+                {
+                    _GroupName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<LivreExemplaryVM> _Items = new ObservableCollection<LivreExemplaryVM>();
+        public ObservableCollection<LivreExemplaryVM> Items
+        {
+            get => _Items;
+            set
+            {
+                if (_Items != value)
+                {
+                    _Items = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
 }
