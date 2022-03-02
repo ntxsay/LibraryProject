@@ -25,13 +25,17 @@ namespace LibraryProjectUWP.Models.Local
         public string DateEdition { get; set; }
         public string MainTitle { get; set; }
         public long CountOpening { get; set; }
-        public long? MinAge { get; set; }
-        public long? MaxAge { get; set; }
         public string DateParution { get; set; }
         public string Resume { get; set; }
         public string Notes { get; set; }
+        public long TypeClassification { get; set; }
+        public long ApartirDe { get; set; }
+        public long Jusqua { get; set; }
+        public long DeTelAge { get; set; }
+        public long AtelAge { get; set; }
         public string Langue { get; set; }
         public string Pays { get; set; }
+        public string PhysicalLocation { get; set; }
 
         public virtual TbookFormat TbookFormat { get; set; }
         public virtual TbookIdentification TbookIdentification { get; set; }

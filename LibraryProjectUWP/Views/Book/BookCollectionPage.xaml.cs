@@ -67,6 +67,7 @@ namespace LibraryProjectUWP.Views.Book
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             await InitializeDataAsync(true);
+            InitializeCompleteInfoBookWorker();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -3378,15 +3379,24 @@ namespace LibraryProjectUWP.Views.Book
                     viewModel.AuteursStringList = StringHelpers.JoinStringArray(viewModel.Auteurs?.Select(s => $"{s.NomNaissance} {s.Prenom}")?.ToArray() ?? Array.Empty<string>(), ", ", out _);
                 }
 
-                if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
+                if (viewModel.Publication != null)
                 {
-                    viewModel.Publication.EditeursStringList = StringHelpers.JoinStringArray(viewModel.Publication.Editeurs?.Select(s => s.SocietyName)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
+                    {
+                        viewModel.Publication.EditeursStringList = StringHelpers.JoinStringArray(viewModel.Publication.Editeurs?.Select(s => s.SocietyName)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    }
+
+                    if (viewModel.Publication.Collections != null && viewModel.Publication.Collections.Any())
+                    {
+                        viewModel.Publication.CollectionsStringList = StringHelpers.JoinStringArray(viewModel.Publication.Collections?.Select(s => s.Name)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    }
                 }
 
-                if (viewModel.Publication.Collections != null && viewModel.Publication.Collections.Any())
+                if (viewModel.Format != null)
                 {
-                    viewModel.Publication.CollectionsStringList = StringHelpers.JoinStringArray(viewModel.Publication.Collections?.Select(s => s.Name)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    viewModel.Format.Dimensions = LibraryHelpers.Book.GetDimensionsInCm(viewModel.Format.Hauteur, viewModel.Format.Largeur, viewModel.Format.Epaisseur);
                 }
+                viewModel.ClassificationAge.GetClassificationAge();
             }
             catch (Exception ex)
             {
@@ -3869,6 +3879,7 @@ namespace LibraryProjectUWP.Views.Book
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         public const int SearchBookExemplaryTaskId = 1;
+        public const int CompleteInfoBookExemplaryTaskId = 1;
         private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
         public ObservableCollection<TaskVM> TaskList
         {

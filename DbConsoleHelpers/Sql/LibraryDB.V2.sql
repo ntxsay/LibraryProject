@@ -102,15 +102,18 @@ CREATE TABLE IF NOT EXISTS "TBook" (
     "DateEdition" TEXT NULL,
     "MainTitle" TEXT NOT NULL,
     "CountOpening" INTEGER NOT NULL DEFAULT 0,
-    "MinAge" INTEGER NULL DEFAULT 0,
-    "MaxAge" INTEGER NULL DEFAULT 0,
     "DateParution" TEXT NULL,
     "Resume" TEXT NULL,
     "Notes" TEXT NULL,
-    --"Price" REAL NOT NULL DEFAULT 0,
-	--"DeviceName" TEXT NOT NULL,
+    "TypeClassification" INTEGER  NOT NULL DEFAULT 0,
+    "ApartirDe" INTEGER  NOT NULL DEFAULT 0,
+    "Jusqua" INTEGER  NOT NULL DEFAULT 0,
+    "DeTelAge" INTEGER  NOT NULL DEFAULT 0,
+    "ATelAge" INTEGER  NOT NULL DEFAULT 0,
 	"Langue" TEXT NULL,
 	"Pays" TEXT NULL,
+    "PhysicalLocation" TEXT NULL,
+
     PRIMARY KEY("Id" AUTOINCREMENT)
 );
 

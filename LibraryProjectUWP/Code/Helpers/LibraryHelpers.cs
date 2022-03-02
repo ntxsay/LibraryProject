@@ -35,6 +35,18 @@ namespace LibraryProjectUWP.Code.Helpers
     {
         public struct Book
         {
+            public static string GetDimensionsInCm(double longueur, double largeur, double epaisseur)
+            {
+                try
+                {
+                    return $"L={longueur} cm x l={largeur} cm x E={epaisseur} cm";
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
             public struct Entry
             {
                 public const string Achat = "Achat";

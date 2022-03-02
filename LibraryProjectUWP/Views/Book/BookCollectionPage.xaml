@@ -18,6 +18,7 @@
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls" Margin="0 38 0 0" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Page.Resources>
+        <customConverters:ClassificationAgeToStringConverter x:Key="classificationAgeToStringConverter" />
         <customConverters:IntToBooleanConverter x:Key="intToBooleanConverter" />
         <customConverters:IntToInvertVisibilityConverter x:Key="intToInvertVisibilityConverter" />
         <customConverters:SelectedPageColorConverter x:Key="selectedPageColorConverter" />
@@ -288,11 +289,15 @@
                     <MTUUControls:DataGridTextColumn Header="Autre(s) titre(s)" Binding="{Binding TitresOeuvreStringList,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Auteur(s)" Binding="{Binding AuteursStringList,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Maison(s) d'édition" Binding="{Binding Publication.EditeursStringList,  Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Date de parution" Binding="{Binding Publication.DateParution,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Collection(s)" Binding="{Binding Publication.CollectionsStringList,  Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="Cotation" Binding="{Binding Identification.Cotation, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Classification âge" Binding="{Binding ClassificationAge.StringClassification, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Format" Binding="{Binding Format.Format, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Dimensions" Binding="{Binding Format.Dimensions,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Pages" Binding="{Binding Format.NbOfPages,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Langue" Binding="{Binding Publication.Langue,  Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Nombre d'exemplaires" Binding="{Binding NbExemplaires, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Cotation" Binding="{Binding Identification.Cotation, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="ISBN" Binding="{Binding Identification.ISBN, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="ISBN-10" Binding="{Binding Identification.ISBN10, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="ISBN13" Binding="{Binding Identification.ISBN13, Mode=OneWay}" Width="Auto"/>

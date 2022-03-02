@@ -2420,28 +2420,28 @@ namespace LibraryProjectUWP.Views.Library
 
                         var result = task.Result;
 
-                        EsBook esBook = new EsBook();
-                        foreach (var book in result)
-                        {
-                            using (var taskJaquettes = esBook.GetBookItemJaquettePathAsync(book))
-                            {
-                                taskJaquettes.Wait();
+                        //EsBook esBook = new EsBook();
+                        //foreach (var book in result)
+                        //{
+                        //    using (var taskJaquettes = esBook.GetBookItemJaquettePathAsync(book))
+                        //    {
+                        //        taskJaquettes.Wait();
 
-                                if (worker.CancellationPending || cancellationTokenSourceSearchBook.IsCancellationRequested)
-                                {
-                                    if (!cancellationTokenSourceSearchBook.IsCancellationRequested)
-                                    {
-                                        cancellationTokenSourceSearchBook.Cancel();
-                                    }
+                        //        if (worker.CancellationPending || cancellationTokenSourceSearchBook.IsCancellationRequested)
+                        //        {
+                        //            if (!cancellationTokenSourceSearchBook.IsCancellationRequested)
+                        //            {
+                        //                cancellationTokenSourceSearchBook.Cancel();
+                        //            }
 
-                                    e.Cancel = true;
-                                    return;
-                                }
+                        //            e.Cancel = true;
+                        //            return;
+                        //        }
 
-                                string combinedPath = taskJaquettes.Result;
-                                book.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-                            }
-                        }
+                        //        string combinedPath = taskJaquettes.Result;
+                        //        book.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                        //    }
+                        //}
 
                         var state = new WorkerState<LivreVM, LivreVM>()
                         {

@@ -71,4 +71,12 @@ namespace LibraryProjectUWP.Code
         Don,
         Autre,
     }
+
+    public enum ClassificationAgeType : byte
+    {
+        ToutPublic,
+        ApartirDe,
+        Jusqua,
+        DeTantATant,
+    }
 }

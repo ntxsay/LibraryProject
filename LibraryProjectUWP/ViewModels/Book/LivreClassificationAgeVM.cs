@@ -1,5 +1,5 @@
 ﻿using LibraryProjectUWP.ViewModels.Collection;
-using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Code;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,33 +22,142 @@ namespace LibraryProjectUWP.ViewModels.Book
         [JsonIgnore]
         public LivreVM Parent { get; set; }
 
-        private byte _MinAge;
-        public byte MinAge
+        private ClassificationAgeType _TypeClassification = ClassificationAgeType.ToutPublic;
+        public ClassificationAgeType TypeClassification
         {
-            get => _MinAge;
+            get => _TypeClassification;
             set
             {
-                if (_MinAge != value)
+                if (_TypeClassification != value)
                 {
-                    _MinAge = value;
+                    _TypeClassification = value;
                     OnPropertyChanged();
                 }
             }
         }
 
-        private byte _MaxAge;
-        public byte MaxAge
+        private byte _ApartirDe;
+        /// <summary>
+        /// A partir de tel age
+        /// </summary>
+        public byte ApartirDe
         {
-            get => _MaxAge;
+            get => _ApartirDe;
             set
             {
-                if (_MaxAge != value)
+                if (_ApartirDe != value)
                 {
-                    _MaxAge = value;
+                    _ApartirDe = value;
                     OnPropertyChanged();
                 }
             }
         }
+
+        private byte _Jusqua;
+        /// <summary>
+        /// Jusqu'à tel age
+        /// </summary>
+        public byte Jusqua
+        {
+            get => _Jusqua;
+            set
+            {
+                if (_Jusqua != value)
+                {
+                    _Jusqua = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private byte _DeTelAge;
+        /// <summary>
+        /// De tel age ... suite
+        /// </summary>
+        public byte DeTelAge
+        {
+            get => _DeTelAge;
+            set
+            {
+                if (_DeTelAge != value)
+                {
+                    _DeTelAge = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private byte _ATelAge;
+        /// <summary>
+        /// ... à tel age
+        /// </summary>
+        public byte ATelAge
+        {
+            get => _ATelAge;
+            set
+            {
+                if (_ATelAge != value)
+                {
+                    _ATelAge = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _StringClassification;
+        public string StringClassification
+        {
+            get => _StringClassification;
+            set
+            {
+                if (_StringClassification != value)
+                {
+                    _StringClassification = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string GetClassificationAge()
+        {
+            try
+            {
+                string result = string.Empty;
+                switch (this.TypeClassification)
+                {
+                    case ClassificationAgeType.ToutPublic:
+                        result =  "Tout public";
+                        break;
+                    case ClassificationAgeType.ApartirDe:
+                        result = $"A partir de {this.ApartirDe} ans";
+                        break;
+                    case ClassificationAgeType.Jusqua:
+                        result = $"Jusqu'à {this.Jusqua} ans";
+                        break;
+                    case ClassificationAgeType.DeTantATant:
+                        if (this.DeTelAge == this.ATelAge)
+                        {
+                            result =  $"{this.DeTelAge} ans uniquement";
+                        }
+                        else
+                        {
+                            result = $"De {this.DeTelAge} à {this.ATelAge} ans";
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                this.StringClassification = result;
+                return result;
+            }
+            catch (Exception)
+            {
+                this.StringClassification = string.Empty;
+                return string.Empty;
+            }
+        }
+
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

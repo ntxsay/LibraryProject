@@ -225,6 +225,23 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static async Task<long> CountExemplaryInBookAsync(long idBook, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TbookExemplary.LongCountAsync(w => w.IdBook == idBook, cancellationToken);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return 0;
+                }
+            }
+
             public static async Task<IList<TbookExemplary>> GetBookExemplaryAsync(long idBook, CancellationToken cancellationToken = default)
             {
                 try
@@ -428,8 +445,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                             CountOpening = viewModel.CountOpening,
                             Resume = viewModel.Description?.Resume,
                             Notes = viewModel.Description?.Notes,
-                            MinAge = viewModel.ClassificationAge?.MinAge,
-                            MaxAge = viewModel.ClassificationAge?.MaxAge,
+                            TypeClassification = (byte)(viewModel.ClassificationAge?.TypeClassification ?? 0),
+                            ApartirDe = viewModel.ClassificationAge?.ApartirDe ?? 0,
+                            DeTelAge = viewModel.ClassificationAge?.DeTelAge ?? 0,
+                            AtelAge = viewModel.ClassificationAge?.ATelAge ?? 0,
+                            Jusqua = viewModel.ClassificationAge?.Jusqua ?? 0,
                             Pays = viewModel.Publication?.Pays,
                             Langue = viewModel.Publication?.Langue,
                         };
@@ -472,6 +492,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 Format = viewModel.Format.Format,
                                 NbOfPages = viewModel.Format.NbOfPages,
                                 Epaisseur = viewModel.Format.Epaisseur,
+                                Weight = viewModel.Format.Poids,
                                 Hauteur = viewModel.Format.Hauteur,
                                 Largeur = viewModel.Format.Largeur,
                             };
@@ -740,8 +761,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                         record.CountOpening = viewModel.CountOpening;
                         record.Resume = viewModel.Description.Resume;
                         record.Notes = viewModel.Description.Notes;
-                        record.MinAge = viewModel.ClassificationAge?.MinAge;
-                        record.MaxAge = viewModel.ClassificationAge?.MaxAge;
+                        record.TypeClassification = (byte)(viewModel.ClassificationAge?.TypeClassification ?? 0);
+                        record.ApartirDe = viewModel.ClassificationAge?.ApartirDe ?? 0;
+                        record.DeTelAge = viewModel.ClassificationAge?.DeTelAge ?? 0;
+                        record.AtelAge = viewModel.ClassificationAge?.ATelAge ?? 0;
+                        record.Jusqua = viewModel.ClassificationAge?.Jusqua ?? 0;
                         record.Langue = viewModel.Publication?.Langue;
                         record.Pays = viewModel.Publication?.Pays;
 
@@ -878,6 +902,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             recordFormat.Largeur = viewModel.Format.Largeur;
                             recordFormat.Epaisseur = viewModel.Format.Epaisseur;
                             recordFormat.Hauteur = viewModel.Format.Hauteur;
+                            recordFormat.Weight = viewModel.Format.Poids;
                             _ = context.TbookFormat.Update(recordFormat);
                         }
 
@@ -1176,10 +1201,15 @@ namespace LibraryProjectUWP.Code.Services.Db
                         },
                         ClassificationAge = new LivreClassificationAgeVM()
                         {
-                            MinAge = (byte)(model.MinAge < byte.MinValue || model.MinAge > byte.MaxValue ? 0 : model.MinAge),
-                            MaxAge = (byte)(model.MaxAge < byte.MinValue || model.MaxAge > byte.MaxValue ? 0 : model.MaxAge),
+                            TypeClassification = (ClassificationAgeType)model.TypeClassification,
+                            ApartirDe = (byte)(model.ApartirDe < byte.MinValue || model.ApartirDe > byte.MaxValue ? 0 : model.ApartirDe),
+                            DeTelAge = (byte)(model.DeTelAge < byte.MinValue || model.DeTelAge > byte.MaxValue ? 0 : model.DeTelAge),
+                            ATelAge = (byte)(model.AtelAge < byte.MinValue || model.AtelAge > byte.MaxValue ? 0 : model.AtelAge),
+                            Jusqua = (byte)(model.Jusqua < byte.MinValue || model.Jusqua > byte.MaxValue ? 0 : model.Jusqua)
                         },
                     };
+
+                    viewModel.ClassificationAge.GetClassificationAge();
 
                     if (model.TbookIdentification != null)
                     {
@@ -1206,8 +1236,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                             Hauteur = model.TbookFormat.Hauteur ?? 0,
                             Epaisseur = model.TbookFormat?.Epaisseur ?? 0,
                             Largeur = model.TbookFormat?.Largeur ?? 0,
-                            //Poids = Ajouter dans la base de donnée ?
+                            Poids = model.TbookFormat?.Weight ?? 0
                         };
+
+                        if (viewModel.Format != null)
+                        {
+                            viewModel.Format.Dimensions = LibraryHelpers.Book.GetDimensionsInCm(viewModel.Format.Hauteur, viewModel.Format.Largeur, viewModel.Format.Epaisseur);
+                        }
                     }
 
                     return await ViewModelConverterConnectorAsync(model, viewModel);
@@ -1371,8 +1406,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                             viewModel.ClassificationAge = new LivreClassificationAgeVM();
                         }
 
-                        viewModel.ClassificationAge.MinAge = viewModelToCopy.ClassificationAge.MinAge;
-                        viewModel.ClassificationAge.MaxAge = viewModelToCopy.ClassificationAge.MaxAge;
+                        viewModel.ClassificationAge.TypeClassification = viewModelToCopy.ClassificationAge.TypeClassification;
+                        viewModel.ClassificationAge.ApartirDe = viewModelToCopy.ClassificationAge.ApartirDe;
+                        viewModel.ClassificationAge.Jusqua = viewModelToCopy.ClassificationAge.Jusqua;
+                        viewModel.ClassificationAge.DeTelAge = viewModelToCopy.ClassificationAge.DeTelAge;
+                        viewModel.ClassificationAge.ATelAge = viewModelToCopy.ClassificationAge.ATelAge;
                     }
 
                     if (viewModelToCopy.Publication != null)
@@ -1432,8 +1470,10 @@ namespace LibraryProjectUWP.Code.Services.Db
                         viewModel.Format.Format = viewModelToCopy.Format.Format;
                         viewModel.Format.NbOfPages = viewModelToCopy.Format.NbOfPages;
                         viewModel.Format.Epaisseur = viewModelToCopy.Format.Epaisseur;
+                        viewModel.Format.Poids = viewModelToCopy.Format.Poids;
                         viewModel.Format.Hauteur = viewModelToCopy.Format.Hauteur;
                         viewModel.Format.Largeur = viewModelToCopy.Format.Largeur;
+                        viewModel.Format.Dimensions = viewModelToCopy.Format.Dimensions;
                         viewModel.Format.Id = viewModelToCopy.Format.Id;
                     }
 

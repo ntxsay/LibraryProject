@@ -100,6 +100,34 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        private double _Poids;
+        public double Poids
+        {
+            get => _Poids;
+            set
+            {
+                if (_Poids != value)
+                {
+                    _Poids = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _Dimensions;
+        [JsonIgnore]
+        public string Dimensions
+        {
+            get => _Dimensions;
+            set
+            {
+                if (_Dimensions != value)
+                {
+                    _Dimensions = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

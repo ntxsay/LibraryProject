@@ -32,6 +32,7 @@
                     <SolidColorBrush x:Key="ListViewBg" Color="{ThemeResource SystemRevealChromeBlackLowColor}"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+            <customConverters:ClassificationAgeToBooleanConverter x:Key="classificationAgeToBooleanConverter" />
             <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
             <customConverters:SizeDiviserConverter x:Key="sizeDiviverConverter"/>
             <customConverters:NullableBooleanToVisibility x:Key="NullableBoolToVisibilityConverterVOD" />
@@ -308,13 +309,13 @@
                                         <Setter Property="BorderThickness" Value="0" />
                                     </Style>
                                 </Grid.Resources>
-                                <ComboBox Grid.Column="0" ItemsSource="{x:Bind ViewModelPage.chooseDays}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.DayParution, Mode=TwoWay}" PlaceholderText="JJ" Style="{StaticResource comboxDate}">
+                                <ComboBox Grid.Column="0" ItemsSource="{x:Bind ViewModelPage.chooseDays}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.DayParution, Mode=TwoWay}" PlaceholderText="Jour" Style="{StaticResource comboxDate}">
 
                                 </ComboBox>
-                                <ComboBox Grid.Column="1" ItemsSource="{x:Bind ViewModelPage.chooseMonths}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.MonthParution, Mode=TwoWay}" PlaceholderText="MM" Style="{StaticResource comboxDate}">
+                                <ComboBox Grid.Column="1" ItemsSource="{x:Bind ViewModelPage.chooseMonths}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.MonthParution, Mode=TwoWay}" PlaceholderText="Mois" Style="{StaticResource comboxDate}">
 
                                 </ComboBox>
-                                <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModelPage.chooseYear}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.YearParution, Mode=TwoWay}" PlaceholderText="AAAA" Style="{StaticResource comboxDate}">
+                                <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModelPage.chooseYear}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.YearParution, Mode=TwoWay}" PlaceholderText="Année" Style="{StaticResource comboxDate}">
 
                                 </ComboBox>
                             </Grid>
@@ -442,7 +443,7 @@
                                 <TextBlock Text="Epaisseur du livre (en cm)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </MUIXC:NumberBox.Header>
                         </MUIXC:NumberBox>
-                        <MUIXC:NumberBox Value="{x:Bind ViewModelPage.ViewModel.Format.Epaisseur, Mode=TwoWay}" Minimum="-1" PlaceholderText="Poids du livre" SpinButtonPlacementMode="Inline">
+                        <MUIXC:NumberBox Value="{x:Bind ViewModelPage.ViewModel.Format.Poids, Mode=TwoWay}" Minimum="-1" PlaceholderText="Poids du livre" SpinButtonPlacementMode="Inline">
                             <MUIXC:NumberBox.Header>
                                 <TextBlock Text="Poids du livre (en kg)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </MUIXC:NumberBox.Header>
@@ -484,30 +485,31 @@
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                 </Style>
                             </MUIXC:RadioButtons.Resources>
-                            <RadioButton>
+                            <RadioButton IsChecked="{x:Bind ViewModelPage.ViewModel.ClassificationAge.TypeClassification, Converter={StaticResource classificationAgeToBooleanConverter}, ConverterParameter='tout-public', Mode=TwoWay}">
                                 <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                                     <TextBlock Text="Tout public" />
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton>
+                            <RadioButton IsChecked="{x:Bind ViewModelPage.ViewModel.ClassificationAge.TypeClassification, Converter={StaticResource classificationAgeToBooleanConverter}, ConverterParameter='a-partir-de', Mode=TwoWay}">
                                 <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
                                     <TextBlock Text="A partir de" VerticalAlignment="Center"/>
-                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}"/>
+                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}" Value="{x:Bind ViewModelPage.ViewModel.ClassificationAge.ApartirDe, Mode=TwoWay}"/>
                                     <TextBlock Text="ans" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton>
+                            <RadioButton IsChecked="{x:Bind ViewModelPage.ViewModel.ClassificationAge.TypeClassification, Converter={StaticResource classificationAgeToBooleanConverter}, ConverterParameter='de-tant-a-tant', Mode=TwoWay}">
                                 <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                                     <TextBlock Text="De" VerticalAlignment="Center"/>
-                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}"/>
-                                    <TextBlock Text="ans à" VerticalAlignment="Center"/>
-                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}"/>
+                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}" Value="{x:Bind ViewModelPage.ViewModel.ClassificationAge.DeTelAge, Mode=TwoWay}"/>
+                                    <TextBlock Text="à" VerticalAlignment="Center"/>
+                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}" Value="{x:Bind ViewModelPage.ViewModel.ClassificationAge.ATelAge, Mode=TwoWay}"/>
+                                    <TextBlock Text="ans" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton>
+                            <RadioButton IsChecked="{x:Bind ViewModelPage.ViewModel.ClassificationAge.TypeClassification, Converter={StaticResource classificationAgeToBooleanConverter}, ConverterParameter='jusqua', Mode=TwoWay}">
                                 <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" >
                                     <TextBlock Text="Jusqu'à" VerticalAlignment="Center"/>
-                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}"/>
+                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}" Value="{x:Bind ViewModelPage.ViewModel.ClassificationAge.Jusqua, Mode=TwoWay}"/>
                                     <TextBlock Text="ans" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>

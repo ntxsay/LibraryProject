@@ -335,6 +335,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     //
                 }
+                sender.IsSuggestionListOpen = false;
             }
             catch (Exception ex)
             {
@@ -509,6 +510,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     //
                 }
+                sender.IsSuggestionListOpen = false;
             }
             catch (Exception ex)
             {
@@ -661,6 +663,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     //
                 }
+                sender.IsSuggestionListOpen = false;
             }
             catch (Exception ex)
             {
@@ -868,24 +871,49 @@ namespace LibraryProjectUWP.Views.Book
                     return false;
                 }
 
-                if (ViewModelPage.ViewModel.ClassificationAge.MinAge > ViewModelPage.ViewModel.ClassificationAge.MaxAge)
+                if (ViewModelPage.ViewModel.ClassificationAge.TypeClassification == ClassificationAgeType.ToutPublic)
                 {
-                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"L'âge minimum ne peut pas être supérieur à l'âge maximum.";
-                    ViewModelPage.CurrentPipsPagerIndex = 0;
-                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                    ViewModelPage.IsResultMessageOpen = true;
-                    return false;
+                    ViewModelPage.ViewModel.ClassificationAge.ApartirDe = 0;
+                    ViewModelPage.ViewModel.ClassificationAge.Jusqua = 0;
+                    ViewModelPage.ViewModel.ClassificationAge.DeTelAge = 0;
+                    ViewModelPage.ViewModel.ClassificationAge.ATelAge = 0;
                 }
-
-                if (ViewModelPage.ViewModel.ClassificationAge.MaxAge < ViewModelPage.ViewModel.ClassificationAge.MinAge)
+                else if (ViewModelPage.ViewModel.ClassificationAge.TypeClassification == ClassificationAgeType.ApartirDe)
                 {
-                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"L'âge maximum ne peut pas être inférieur à l'âge maximum.";
-                    ViewModelPage.CurrentPipsPagerIndex = 0;
-                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                    ViewModelPage.IsResultMessageOpen = true;
-                    return false;
+                    ViewModelPage.ViewModel.ClassificationAge.Jusqua = 0;
+                    ViewModelPage.ViewModel.ClassificationAge.DeTelAge = 0;
+                    ViewModelPage.ViewModel.ClassificationAge.ATelAge = 0;
+                }
+                else if (ViewModelPage.ViewModel.ClassificationAge.TypeClassification == ClassificationAgeType.Jusqua)
+                {
+                    if (ViewModelPage.ViewModel.ClassificationAge.Jusqua < 1)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"L'âge ne peut pas être inférieur à 1.";
+                        ViewModelPage.CurrentPipsPagerIndex = 2;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return false;
+                    }
+
+                    ViewModelPage.ViewModel.ClassificationAge.ApartirDe = 0;
+                    ViewModelPage.ViewModel.ClassificationAge.DeTelAge = 0;
+                    ViewModelPage.ViewModel.ClassificationAge.ATelAge = 0;
+                }
+                else if (ViewModelPage.ViewModel.ClassificationAge.TypeClassification == ClassificationAgeType.DeTantATant)
+                {
+                    if (ViewModelPage.ViewModel.ClassificationAge.ATelAge < ViewModelPage.ViewModel.ClassificationAge.DeTelAge)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"L'âge maximal ne peut pas être inférieur à l'âge minimale.";
+                        ViewModelPage.CurrentPipsPagerIndex = 2;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return false;
+                    }
+
+                    ViewModelPage.ViewModel.ClassificationAge.ApartirDe = 0;
+                    ViewModelPage.ViewModel.ClassificationAge.Jusqua = 0;
                 }
 
                 if (!ViewModelPage.ViewModel.Publication.MonthParution.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.Publication.MonthParution != DatesHelpers.NoAnswer &&

@@ -185,15 +185,15 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private ObservableCollection<LivreExemplaryVM> _Exemplaires = new ObservableCollection<LivreExemplaryVM>();
-        public ObservableCollection<LivreExemplaryVM> Exemplaires
+        private long _NbExemplaires;
+        public long NbExemplaires
         {
-            get => _Exemplaires;
+            get => _NbExemplaires;
             set
             {
-                if (_Exemplaires != value)
+                if (_NbExemplaires != value)
                 {
-                    _Exemplaires = value;
+                    _NbExemplaires = value;
                     OnPropertyChanged();
                 }
             }
@@ -202,6 +202,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         public PretLivreVM Pret { get; set; }
         public LivreDescriptionVM Description { get; set; } = new LivreDescriptionVM();
         public LivreClassificationAgeVM ClassificationAge { get; set; } = new LivreClassificationAgeVM();
+        
         public LivreIdentificationVM Identification { get; set; } = new LivreIdentificationVM();
         public LivreFormatVM Format { get; set; } = new LivreFormatVM();
         public LivrePublicationVM Publication { get; set; } = new LivrePublicationVM();

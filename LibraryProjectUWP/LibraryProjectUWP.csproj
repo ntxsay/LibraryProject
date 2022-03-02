@@ -129,6 +129,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Code\Converters\ClassificationAgeToBooleanConverter.cs" />
     <Compile Include="Code\Converters\IntToVisibilityConverter.cs" />
     <Compile Include="Code\Converters\IntToBooleanConverter.cs" />
     <Compile Include="Code\Converters\CountToEnablingConverter.cs" />

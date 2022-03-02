@@ -59,15 +59,13 @@ namespace DbConsoleHelpers.Models.Local
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.AtelAge).HasColumnName("ATelAge");
+
                 entity.Property(e => e.DateAjout).IsRequired();
 
                 entity.Property(e => e.Guid).IsRequired();
 
                 entity.Property(e => e.MainTitle).IsRequired();
-
-                entity.Property(e => e.MaxAge).HasDefaultValueSql("0");
-
-                entity.Property(e => e.MinAge).HasDefaultValueSql("0");
             });
 
             modelBuilder.Entity<TbookAuthorConnector>(entity =>

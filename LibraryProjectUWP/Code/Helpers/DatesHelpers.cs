@@ -123,7 +123,7 @@ namespace LibraryProjectUWP.Code.Helpers
             #endregion
 
             #region String
-            public static string StringDateToStringDate(string value, char separator, out string day, out string month, out string year)
+            public static string StringDateToStringDate(string value, char separator, out string day, out string month, out string year, bool isMonthString = true)
             {
                 try
                 {
@@ -140,14 +140,14 @@ namespace LibraryProjectUWP.Code.Helpers
                         else if (splitString.Length == 2)
                         {
                             day = null;
-                            month = splitString[0];
+                            month = !isMonthString ? splitString[0] : ChooseMonth().ToList()[Convert.ToInt32(splitString[0])];
                             year = splitString[1];
                             return $"{splitString[0]}/{splitString[1]}";
                         }
                         else if (splitString.Length == 3)
                         {
                             day = splitString[0];
-                            month = splitString[1];
+                            month = !isMonthString ? splitString[1] : ChooseMonth().ToList()[Convert.ToInt32(splitString[1])];
                             year = splitString[2];
                             return $"{splitString[0]}/{splitString[1]}/{splitString[2]}";
                         }
