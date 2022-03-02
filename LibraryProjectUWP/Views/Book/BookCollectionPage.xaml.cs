@@ -1460,23 +1460,6 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Book Exemplary
-        private void AddBookExemplaryXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (args.Parameter is LivreVM viewModel)
-                {
-                    NewBookExemplary(viewModel);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         public void NewBookExemplary(LivreVM viewModel, Guid? guid = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1526,7 +1509,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
 
         private async void NewEditBookExemplaryUC_Create_CreateItemRequested(NewEditBookExemplaryUC sender, ExecuteRequestedEventArgs e)
         {
@@ -1606,7 +1588,22 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    InitializeSearchingBookWorker(viewModel);
+                    if (PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC) is BookExemplaryListUC checkedItem)
+                    {
+                        if (checkedItem._parameters.ParentBook.Id == viewModel.Id)
+                        {
+                            InitializeSearchingBookWorker(viewModel);
+                        }
+                        else
+                        {
+                            BookExemplaryListUC_CancelModificationRequested(checkedItem, args);
+                            InitializeSearchingBookWorker(viewModel);
+                        }
+                    }
+                    else
+                    {
+                        InitializeSearchingBookWorker(viewModel);
+                    }
                 }
             }
             catch (Exception ex)
@@ -1621,11 +1618,15 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC item);
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC);
                 if (checkedItem != null)
                 {
                     this.PivotRightSideBar.SelectedItem = checkedItem;
-                    (checkedItem as BookExemplaryListUC).InitializeData();
+                    if (checkedItem is BookExemplaryListUC item)
+                    {
+                        item._parameters.ViewModelList = modelList;
+                        item.InitializeData();
+                    }
                 }
                 else
                 {

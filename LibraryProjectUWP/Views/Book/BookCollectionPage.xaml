@@ -71,11 +71,6 @@
                        Description="Ajoute un nouveau livre" 
                        Label="Ajouter un livre">
         </XamlUICommand>
-        <XamlUICommand x:Name="AddBookExemplaryXUiCmd" 
-                       ExecuteRequested="AddBookExemplaryXUiCmd_ExecuteRequested"
-                       Description="Ajoute un nouvel exemplaire de ce livre" 
-                       Label="Ajouter un exemplaire">
-        </XamlUICommand>
         <XamlUICommand x:Name="BookExemplaryListXUiCmd" 
                        ExecuteRequested="BookExemplaryListXUiCmd_ExecuteRequested"
                        Description="Affiche la liste des exemplaires de ce livre" 
@@ -211,21 +206,11 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutSubItem Text="Exemplaires">
-                                    <MenuFlyoutSubItem.Icon>
+                                <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{x:Bind }">
+                                    <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE71B;"/>
-                                    </MenuFlyoutSubItem.Icon>
-                                    <MenuFlyoutItem Text="Ajouter un exemplaire" Command="{StaticResource AddBookExemplaryXUiCmd}" CommandParameter="{x:Bind }">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE710;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Afficher les exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{x:Bind }">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE7BC;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                </MenuFlyoutSubItem>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Text="Catégories" Tag="{x:Bind Mode=OneWay}">
                                     <MenuFlyoutItem.Icon>
@@ -337,21 +322,11 @@
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutSubItem Text="Exemplaires">
-                                        <MenuFlyoutSubItem.Icon>
+                                    <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{Binding }">
+                                        <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE71B;"/>
-                                        </MenuFlyoutSubItem.Icon>
-                                        <MenuFlyoutItem Text="Ajouter un exemplaire" Command="{StaticResource AddBookExemplaryXUiCmd}" CommandParameter="{Binding }">
-                                            <MenuFlyoutItem.Icon>
-                                                <FontIcon Glyph="&#xE710;"/>
-                                            </MenuFlyoutItem.Icon>
-                                        </MenuFlyoutItem>
-                                        <MenuFlyoutItem Text="Afficher les exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{Binding }">
-                                            <MenuFlyoutItem.Icon>
-                                                <FontIcon Glyph="&#xE7BC;"/>
-                                            </MenuFlyoutItem.Icon>
-                                        </MenuFlyoutItem>
-                                    </MenuFlyoutSubItem>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
                                     <MenuFlyoutSeparator />
                                     <MenuFlyoutSubItem Text="Catégories" Tag="{x:Bind Mode=OneWay}">
                                         <MenuFlyoutSubItem.Icon>

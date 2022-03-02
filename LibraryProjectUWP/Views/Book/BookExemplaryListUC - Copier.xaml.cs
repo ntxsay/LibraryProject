@@ -38,13 +38,7 @@ namespace LibraryProjectUWP.Views.Book
     {
         public readonly BookExemplaryListParametersDriverVM _parameters;
         public readonly Guid IdItem = Guid.NewGuid();
-        private CollectionViewSource CollectionViewSource { get; set; } = new CollectionViewSource()
-        {
-            IsSourceGrouped = true,
-            ItemsPath = new PropertyPath("Items")
-        };
-
-
+        private CollectionViewSource CollectionViewSource { get; set; }
         public BookExemplaryListUCVM ViewModelPage { get; set; } = new BookExemplaryListUCVM();
 
 
@@ -69,6 +63,7 @@ namespace LibraryProjectUWP.Views.Book
             _parameters = parameters;
             ViewModelPage.Header = $"Exemplaires d'un livre";
             InitializeData();
+            //InitializeSearchingBookExemplaryWorker();
         }
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
@@ -83,26 +78,26 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     return;
                 }
+                ViewModelPage.ViewModelList = new ObservableCollection<LivreExemplaryVM>(_parameters.ViewModelList);
 
-                var GroupingItems = this.OrderItems(_parameters.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.OrderByDescending(q => q.DateAjout).GroupBy(s => s.DateAjout.ToString("dddd dd MMMM yyyy")).Select(s => s);
+                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.OrderByDescending(q => q.DateAjout).GroupBy(s => s.DateAjout.ToString("dddd dd MMMM yyyy")).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
-                    if (this.CollectionViewSource.View == null)
-                    {
-                        this.CollectionViewSource.Source = ViewModelPage.ViewModelListGroup;
-                    }
-
                     List<LivreExemplaryVMCastVM> LivreExemplaryVMCastVMs = GroupingItems.Select(groupingItem => new LivreExemplaryVMCastVM()
                     {
                         GroupName = groupingItem.Key,
                         Items = new ObservableCollection<LivreExemplaryVM>(groupingItem),
                     }).ToList();
 
-                    ViewModelPage.ViewModelListGroup.Clear();
-                    foreach (var item in LivreExemplaryVMCastVMs)
+                    ViewModelPage.ViewModelListGroup = new ObservableCollection<LivreExemplaryVMCastVM>(LivreExemplaryVMCastVMs);
+                    this.CollectionViewSource = new CollectionViewSource()
                     {
-                        ViewModelPage.ViewModelListGroup.Add(item);
-                    }
+                        IsSourceGrouped = true,
+                        ItemsPath = new PropertyPath("Items")
+                    };
+
+                    this.CollectionViewSource.Source = ViewModelPage.ViewModelListGroup;
+                    //this.Bindings.Update();
                 }
             }
             catch (Exception ex)
@@ -313,6 +308,20 @@ namespace LibraryProjectUWP.Views.Book
 
         public Guid Guid { get; private set; } = Guid.NewGuid();
 
+        private ObservableCollection<IGrouping<string, LivreExemplaryVM>> _Collection = new ObservableCollection<IGrouping<string, LivreExemplaryVM>>();
+        public ObservableCollection<IGrouping<string, LivreExemplaryVM>> Collection
+        {
+            get => this._Collection;
+            set
+            {
+                if (this._Collection != value)
+                {
+                    this._Collection = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         private string _Header;
         public string Header
         {
@@ -370,6 +379,90 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+
+        private BibliothequeVM _ParentLibrary;
+        public BibliothequeVM ParentLibrary
+        {
+            get => this._ParentLibrary;
+            set
+            {
+                if (this._ParentLibrary != value)
+                {
+                    this._ParentLibrary = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _SelectedSCategorieName;
+        public string SelectedSCategorieName
+        {
+            get => _SelectedSCategorieName;
+            set
+            {
+                if (_SelectedSCategorieName != value)
+                {
+                    _SelectedSCategorieName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _SelectedCategorieName;
+        public string SelectedCategorieName
+        {
+            get => _SelectedCategorieName;
+            set
+            {
+                if (_SelectedCategorieName != value)
+                {
+                    _SelectedCategorieName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _SelectedSubCategorieName;
+        public string SelectedSubCategorieName
+        {
+            get => _SelectedSubCategorieName;
+            set
+            {
+                if (_SelectedSubCategorieName != value)
+                {
+                    _SelectedSubCategorieName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private CollectionVM _SelectedViewModel;
+        public CollectionVM SelectedViewModel
+        {
+            get => _SelectedViewModel;
+            set
+            {
+                if (_SelectedViewModel != value)
+                {
+                    _SelectedViewModel = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<LivreExemplaryVM> _ViewModelList = new ObservableCollection<LivreExemplaryVM>();
+        public ObservableCollection<LivreExemplaryVM> ViewModelList
+        {
+            get => this._ViewModelList;
+            set
+            {
+                if (_ViewModelList != value)
+                {
+                    this._ViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private ObservableCollection<LivreExemplaryVMCastVM> _ViewModelListGroup = new ObservableCollection<LivreExemplaryVMCastVM>();
         public ObservableCollection<LivreExemplaryVMCastVM> ViewModelListGroup

@@ -618,8 +618,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                             }
                         }
 #warning Changer le type NoExemplary en integer
-                        var minNoExemplary = await context.TbookExemplary.Where(w => w.IdBook == bookRecord.Id).Select(s => Convert.ToInt32(s.NoExemplary))?.ToListAsync();
-                        var MinNoExemplary = minNoExemplary?.Max() ?? 1;
+                        var minNoExemplary = await context.TbookExemplary.Where(w => w.IdBook == bookRecord.Id)?.Select(s => Convert.ToInt32(s.NoExemplary))?.ToListAsync() ?? null;
+                        var MinNoExemplary = minNoExemplary == null || minNoExemplary.Count == 0 ? 1 : minNoExemplary.Max();
                         var MaxNoExemplary = MinNoExemplary + viewModel.NbExemplaire;
                         
                         List<TbookExemplary> recordCollection = new List<TbookExemplary>();
@@ -1145,7 +1145,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         }
                         else if (splitDateAcquisition.Length == 3)
                         {
-                            viewModel.DateAcquisition = $"{splitDateAcquisition[0]}/{splitDateAcquisition[1]}/{splitDateAcquisition[1]}";
+                            viewModel.DateAcquisition = $"{splitDateAcquisition[0]}/{splitDateAcquisition[1]}/{splitDateAcquisition[2]}";
                             viewModel.DayAcquisition = splitDateAcquisition[0];
                             viewModel.MonthAcquisition = splitDateAcquisition[1];
                             viewModel.YearAcquisition = splitDateAcquisition[2];

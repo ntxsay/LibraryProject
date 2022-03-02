@@ -137,14 +137,14 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (e.Result is Tuple<LivreVM, WorkerState<LivreExemplaryVM, LivreExemplaryVM>> state)
                     {
-                        if (state.Item2.ResultList == null || !state.Item2.ResultList.Any())
-                        {
-                            new ToastContentBuilder()
-                        .AddText($"Exemplaires de {state.Item1.MainTitle}")
-                        .AddText($"Il n'y a pas d'exemplaires à afficher pour ce livre en ce moment.")
-                        .Show();
-                            return;
-                        }
+                        //if (state.Item2.ResultList == null || !state.Item2.ResultList.Any())
+                        //{
+                        //    new ToastContentBuilder()
+                        //.AddText($"Exemplaires de {state.Item1.MainTitle}")
+                        //.AddText($"Il n'y a pas d'exemplaires à afficher pour ce livre en ce moment.")
+                        //.Show();
+                        //    return;
+                        //}
                         
                         BookExemplaryList(state.Item1, state.Item2.ResultList);
                     }
