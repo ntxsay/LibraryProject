@@ -283,6 +283,22 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        private void MFI_DeleteContactSource_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ViewModelPage.ViewModel.ContactSource = null;
+                ViewModelPage.ViewModel.IdContactSource = null;
+                ASB_SearchContact.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         #endregion
 
         private void CmbxTypeAcquisition_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -537,7 +553,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        
     }
 
     public class NewEditBookExemplaryUCVM : INotifyPropertyChanged

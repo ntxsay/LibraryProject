@@ -123,6 +123,50 @@ namespace LibraryProjectUWP.Code.Helpers
             #endregion
 
             #region String
+            public static string StringDateToStringDate(string value, char separator, out string day, out string month, out string year)
+            {
+                try
+                {
+                    var splitString = StringHelpers.SplitWord(value, new string[] { separator.ToString() });
+                    if (splitString != null && splitString.Length > 0)
+                    {
+                        if (splitString.Length == 1)
+                        {
+                            day = null;
+                            month = null;
+                            year = splitString[0];
+                            return splitString[0];
+                        }
+                        else if (splitString.Length == 2)
+                        {
+                            day = null;
+                            month = splitString[0];
+                            year = splitString[1];
+                            return $"{splitString[0]}/{splitString[1]}";
+                        }
+                        else if (splitString.Length == 3)
+                        {
+                            day = splitString[0];
+                            month = splitString[1];
+                            year = splitString[2];
+                            return $"{splitString[0]}/{splitString[1]}/{splitString[2]}";
+                        }
+                    }
+
+                    day = null;
+                    month = null;
+                    year = null;
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    day = null;
+                    month = null;
+                    year = null;
+                    return null;
+                }
+            }
             /// <summary>
             /// Convertit un objet <see cref="DateTimeOffset" en chaîne de caractères./>
             /// </summary>

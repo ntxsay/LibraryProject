@@ -170,12 +170,12 @@ CREATE TABLE IF NOT EXISTS "TBookExemplary" (
 	"Id" INTEGER NOT NULL UNIQUE,
 	"IdBook" INTEGER NOT NULL,
 	"IdContactSource" INTEGER NULL,
-    "NoGroup" TEXT NULL, -- Si separé
-    "NoExemplary" TEXT NULL,
-    "Quantity" INTEGER NOT NULL DEFAULT 0,
+    "NoGroup" TEXT NULL,
+    "NoExemplary" INTEGER NOT NULL DEFAULT 0,
+    --"Quantity" INTEGER NOT NULL DEFAULT 0,
     "DateAjout" TEXT NOT NULL,
     "DateEdition" TEXT NULL,
-    "TypeAcquisition" TEXT NOT NULL, --Donné, Acheté, preté, 
+    "TypeAcquisition" TEXT NOT NULL, --Donné, Acheté, preté, Autre 
     "Price" REAL NULL,
 	"DeviceName" TEXT NULL,
     "DateAcquisition" TEXT NULL, --Date emprunt, Achat, Donation

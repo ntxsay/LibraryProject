@@ -295,19 +295,26 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            <Grid Grid.Row="1" ColumnSpacing="2">
+                            <Grid Grid.Row="1" ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <ComboBox Grid.Column="0" ItemsSource="{x:Bind ViewModelPage.chooseDays}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.DayParution, Mode=TwoWay}" PlaceholderText="JJ" Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center">
+                                <Grid.Resources>
+                                    <Style TargetType="ComboBox" x:Key="comboxDate">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                        <Setter Property="BorderThickness" Value="0" />
+                                    </Style>
+                                </Grid.Resources>
+                                <ComboBox Grid.Column="0" ItemsSource="{x:Bind ViewModelPage.chooseDays}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.DayParution, Mode=TwoWay}" PlaceholderText="JJ" Style="{StaticResource comboxDate}">
 
                                 </ComboBox>
-                                <ComboBox Grid.Column="1" ItemsSource="{x:Bind ViewModelPage.chooseMonths}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.MonthParution, Mode=TwoWay}" PlaceholderText="MM" Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center">
+                                <ComboBox Grid.Column="1" ItemsSource="{x:Bind ViewModelPage.chooseMonths}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.MonthParution, Mode=TwoWay}" PlaceholderText="MM" Style="{StaticResource comboxDate}">
 
                                 </ComboBox>
-                                <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModelPage.chooseYear}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.YearParution, Mode=TwoWay}" PlaceholderText="AAAA" Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center">
+                                <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModelPage.chooseYear}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.YearParution, Mode=TwoWay}" PlaceholderText="AAAA" Style="{StaticResource comboxDate}">
 
                                 </ComboBox>
                             </Grid>
@@ -371,44 +378,6 @@
                                 </TextBox.Header>
                             </TextBox>
                         </StackPanel>
-                        <Grid Visibility="Collapsed">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <DatePicker Grid.Column="0" x:Name="DP_DateParution" DayFormat="{}{dayofweek.abbreviated} {day.integer}" SelectedDate="{x:Bind ViewModelPage.ViewModel.Publication.DateParution, Mode=TwoWay}" ToolTipService.ToolTip="Date de parution"
-                                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" RequestedTheme="Default" DayVisible="{x:Bind ViewModelPage.ViewModel.Publication.IsJourParutionVisible, Mode=OneWay}" MonthVisible="{x:Bind ViewModelPage.ViewModel.Publication.IsMoisParutionVisible, Mode=OneWay}"
-                                         SelectedDateChanged="DP_DateParution_SelectedDateChanged" Visibility="Collapsed">
-                                <DatePicker.Header>
-                                    <TextBlock Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                                </DatePicker.Header>
-                            </DatePicker>
-                            <StackPanel Orientation="Horizontal">
-
-                            </StackPanel>
-                            <Button x:Name="BtnDateParution" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="1" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
-                                        VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0 25 0 0">
-                                <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
-                                    <Border.BorderBrush>
-                                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                            <GradientStop Color="Yellow" Offset="0.0" />
-                                            <GradientStop Color="Red" Offset="0.25" />
-                                            <GradientStop Color="Blue" Offset="0.75" />
-                                            <GradientStop Color="LimeGreen" Offset="1.0" />
-                                        </LinearGradientBrush>
-                                    </Border.BorderBrush>
-                                    <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
-                                </Border>
-                                <Button.Flyout>
-                                    <MenuFlyout Placement="BottomEdgeAlignedLeft" Opening="DateParution_MenuFlyout_Opening" Opened="MenuFlyout_Opened">
-                                        <MenuFlyoutItem x:Name="MfiClearParutionDate" Text="Effacer la date" Click="MfiClearParutionDate_Click"/>
-                                        <MenuFlyoutSeparator />
-                                        <ToggleMenuFlyoutItem x:Name="TmfiDayKnow" Text="Le jour est connu" Click="TmfiDayKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.Publication.IsJourParutionKnow, Mode=OneWay}"/>
-                                        <ToggleMenuFlyoutItem x:Name="TmfiMonthKnow" Text="Le mois est connu" Click="TmfiMonthKnow_Click" IsChecked="{x:Bind ViewModelPage.ViewModel.Publication.IsMoisParutionKnow, Mode=OneWay}"/>
-                                    </MenuFlyout>
-                                </Button.Flyout>
-                            </Button>
-                        </Grid>
                         <Grid Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -473,34 +442,11 @@
                                 <TextBlock Text="Epaisseur du livre (en cm)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </MUIXC:NumberBox.Header>
                         </MUIXC:NumberBox>
-
-                        <!---->
-
-                        <!--<Grid Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Text="Prix" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            <Grid Grid.Row="1" ColumnSpacing="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <MUIXC:NumberBox x:Name="numberBoxPrice" HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Entrez le prix du livre" SpinButtonPlacementMode="Compact" Minimum="0" Value="{x:Bind ViewModelPage.ViewModel.Publication.Price, Mode=TwoWay}">
-                                </MUIXC:NumberBox>
-                                <ComboBox x:Name="ComboBoxPrice" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModelPage.ViewModel.Publication.MoneyList}"
-                                          SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.DeviceName, Mode=TwoWay}">
-                                </ComboBox>
-                            </Grid>
-
-                        </Grid>
-                        <ComboBox ItemsSource="{x:Bind ViewModelPage.languagesList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.Langue, Mode=TwoWay}" PlaceholderText="Sélectionnez un pays" HorizontalAlignment="Stretch">
-                            <ComboBox.Header>
-                                <TextBlock Text="Pays" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            </ComboBox.Header>
-                        </ComboBox>-->
-
+                        <MUIXC:NumberBox Value="{x:Bind ViewModelPage.ViewModel.Format.Epaisseur, Mode=TwoWay}" Minimum="-1" PlaceholderText="Poids du livre" SpinButtonPlacementMode="Inline">
+                            <MUIXC:NumberBox.Header>
+                                <TextBlock Text="Poids du livre (en kg)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </MUIXC:NumberBox.Header>
+                        </MUIXC:NumberBox>
                     </StackPanel>
                     
                 </ScrollViewer>
@@ -524,37 +470,48 @@
                                 <TextBlock Text="Notes" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </TextBox.Header>
                         </TextBox>
-                        <Grid Style="{StaticResource WrapGridChildStyle}" RowSpacing="8">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Text="Classification de l'âge de lecture" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            <Grid Grid.Row="1" ColumnSpacing="40">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                                    <TextBlock VerticalAlignment="Center">
-                                    <Run Text="Min :" />
-                                    </TextBlock>
-                                    <MUIXC:NumberBox Grid.Column="1" HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.ClassificationAge.MinAge, Mode=TwoWay}" PlaceholderText="Min"
-                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="30" FontSize="14">
-                                    </MUIXC:NumberBox>
+                        <MUIXC:RadioButtons>
+                            <MUIXC:RadioButtons.Header>
+                                <TextBlock Grid.Row="0" Text="Classification de l'âge de lecture" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                            </MUIXC:RadioButtons.Header>
+                            <MUIXC:RadioButtons.Resources>
+                                <Style TargetType="MUIXC:NumberBox" x:Key="numberBoxStyle">
+                                    <Setter Property="SpinButtonPlacementMode" Value="Hidden" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Width" Value="35" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                </Style>
+                            </MUIXC:RadioButtons.Resources>
+                            <RadioButton>
+                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                    <TextBlock Text="Tout public" />
                                 </StackPanel>
-                                <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalTextAlignment="Center" Text="-"/>
-                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                                    <TextBlock VerticalAlignment="Center" HorizontalTextAlignment="Right">
-                                    <Run Text="Max :" />
-                                    </TextBlock>
-                                    <MUIXC:NumberBox HorizontalAlignment="Stretch" Value="{x:Bind ViewModelPage.ViewModel.ClassificationAge.MaxAge, Mode=TwoWay}" PlaceholderText="Max"
-                                            SpinButtonPlacementMode="Compact" Minimum="0" Maximum="30" FontSize="14">
-                                    </MUIXC:NumberBox>
+                            </RadioButton>
+                            <RadioButton>
+                                <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                                    <TextBlock Text="A partir de" VerticalAlignment="Center"/>
+                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}"/>
+                                    <TextBlock Text="ans" VerticalAlignment="Center"/>
                                 </StackPanel>
-                            </Grid>
-                        </Grid>
+                            </RadioButton>
+                            <RadioButton>
+                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                    <TextBlock Text="De" VerticalAlignment="Center"/>
+                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}"/>
+                                    <TextBlock Text="ans à" VerticalAlignment="Center"/>
+                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton>
+                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" >
+                                    <TextBlock Text="Jusqu'à" VerticalAlignment="Center"/>
+                                    <MUIXC:NumberBox Minimum="0" Maximum="100" Style="{StaticResource numberBoxStyle}"/>
+                                    <TextBlock Text="ans" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                        </MUIXC:RadioButtons>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>

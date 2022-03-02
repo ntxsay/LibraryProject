@@ -59,8 +59,8 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private string _NoExemplaire;
-        public string NoExemplaire
+        private int _NoExemplaire;
+        public int NoExemplaire
         {
             get => _NoExemplaire;
             set
@@ -74,6 +74,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private bool _IsExemplarySeparated;
+        [Obsolete]
         public bool IsExemplarySeparated
         {
             get => _IsExemplarySeparated;

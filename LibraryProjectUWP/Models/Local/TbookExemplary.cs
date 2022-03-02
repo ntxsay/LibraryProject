@@ -19,8 +19,7 @@ namespace LibraryProjectUWP.Models.Local
         public long IdBook { get; set; }
         public long? IdContactSource { get; set; }
         public string NoGroup { get; set; }
-        public string NoExemplary { get; set; }
-        public long Quantity { get; set; }
+        public long NoExemplary { get; set; }
         public string DateAjout { get; set; }
         public string DateEdition { get; set; }
         public string TypeAcquisition { get; set; }
@@ -28,8 +27,6 @@ namespace LibraryProjectUWP.Models.Local
         public string DeviceName { get; set; }
         public string DateAcquisition { get; set; }
         public string DateRemise { get; set; }
-        public long IsJourAcquisitionKnow { get; set; }
-        public long IsMoisAcquisitionKnow { get; set; }
         public long IsVisible { get; set; }
         public string Observations { get; set; }
 

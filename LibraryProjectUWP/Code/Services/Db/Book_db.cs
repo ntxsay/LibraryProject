@@ -424,8 +424,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                             DateAjout = viewModel.DateAjout.ToString(),
                             DateEdition = viewModel.DateEdition?.ToString(),
                             DateParution = viewModel.Publication.DateParution?.ToString(),
-                            IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0,
-                            IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0,
                             MainTitle = viewModel.MainTitle,
                             CountOpening = viewModel.CountOpening,
                             Resume = viewModel.Description?.Resume,
@@ -434,8 +432,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                             MaxAge = viewModel.ClassificationAge?.MaxAge,
                             Pays = viewModel.Publication?.Pays,
                             Langue = viewModel.Publication?.Langue,
-                            Price = viewModel.Publication?.Price ?? 0,
-                            DeviceName = viewModel.Publication?.DeviceName ?? "€"
                         };
 
                         await context.Tbook.AddAsync(record);
@@ -617,7 +613,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 break;
                             }
                         }
-#warning Changer le type NoExemplary en integer
                         var minNoExemplary = await context.TbookExemplary.Where(w => w.IdBook == bookRecord.Id)?.Select(s => Convert.ToInt32(s.NoExemplary))?.ToListAsync() ?? null;
                         var MinNoExemplary = minNoExemplary == null || minNoExemplary.Count == 0 ? 1 : minNoExemplary.Max();
                         var MaxNoExemplary = MinNoExemplary + viewModel.NbExemplaire;
@@ -635,8 +630,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 DateRemise = viewModel.DateRemiseLivre?.ToString(),
                                 TypeAcquisition = viewModel.Source,
                                 Observations = viewModel.Observations,
-                                NoExemplary = i.ToString("00"),
-                                Quantity = 1,
+                                NoExemplary = i,
                                 NoGroup = group,
                                 Price = nullablePrice,
                                 DeviceName = viewModel.DeviceName
@@ -742,8 +736,6 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         record.DateEdition = DateTime.UtcNow.ToString();
                         record.DateParution = viewModel.Publication.DateParution?.ToString();
-                        record.IsJourParutionKnow = viewModel.Publication.IsJourParutionKnow ? 1 : 0;
-                        record.IsMoisParutionKnow = viewModel.Publication.IsMoisParutionKnow ? 1 : 0;
                         record.MainTitle = viewModel.MainTitle;
                         record.CountOpening = viewModel.CountOpening;
                         record.Resume = viewModel.Description.Resume;
@@ -752,8 +744,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                         record.MaxAge = viewModel.ClassificationAge?.MaxAge;
                         record.Langue = viewModel.Publication?.Langue;
                         record.Pays = viewModel.Publication?.Pays;
-                        record.Price = viewModel.Publication?.Price ?? 0;
-                        record.DeviceName = viewModel.Publication?.DeviceName;
 
                         context.Tbook.Update(record);
 
@@ -1117,11 +1107,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                         DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
                         DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
                         DateRemiseLivre = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemise),
-                        NbExemplaire = (int)(model.Quantity < int.MinValue || model.Quantity > int.MaxValue ? 0 : model.Quantity),
                         Source = model.TypeAcquisition,
-                        NoExemplaire = model.NoExemplary,
+                        NoExemplaire = (int)(model.NoExemplary < int.MinValue || model.NoExemplary > int.MaxValue ? 0 : model.NoExemplary),
                         NoGroup = model.NoGroup,
-                        IsExemplarySeparated = !model.NoGroup.IsStringNullOrEmptyOrWhiteSpace(),
                         Observations = model.Observations,
                         Price = model.Price ?? 0,
                         IsPriceUnavailable = model.Price == null,
@@ -1129,28 +1117,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                         ContactSource = contactSource,
                     };
 
-                    var splitDateAcquisition = StringHelpers.SplitWord(model.DateAcquisition, new string[] { "/" });
-                    if (splitDateAcquisition != null && splitDateAcquisition.Length > 0)
-                    {
-                        if (splitDateAcquisition.Length == 1)
-                        {
-                            viewModel.DateAcquisition = splitDateAcquisition[0];
-                            viewModel.YearAcquisition = splitDateAcquisition[0];
-                        }
-                        else if (splitDateAcquisition.Length == 2)
-                        {
-                            viewModel.DateAcquisition = $"{splitDateAcquisition[0]}/{splitDateAcquisition[1]}";
-                            viewModel.MonthAcquisition = splitDateAcquisition[0];
-                            viewModel.YearAcquisition = splitDateAcquisition[1];
-                        }
-                        else if (splitDateAcquisition.Length == 3)
-                        {
-                            viewModel.DateAcquisition = $"{splitDateAcquisition[0]}/{splitDateAcquisition[1]}/{splitDateAcquisition[2]}";
-                            viewModel.DayAcquisition = splitDateAcquisition[0];
-                            viewModel.MonthAcquisition = splitDateAcquisition[1];
-                            viewModel.YearAcquisition = splitDateAcquisition[2];
-                        }
-                    }
+                    string dateAcquisition = DatesHelpers.Converter.StringDateToStringDate(model.DateAcquisition, '/', out string dayAcquisition, out string monthAquisition, out string yearAcquisition);
+                    viewModel.DateAcquisition = dateAcquisition;
+                    viewModel.DayAcquisition = dayAcquisition;
+                    viewModel.MonthAcquisition = monthAquisition;
+                    viewModel.YearAcquisition = yearAcquisition;
 
                     if (model.TbookEtat != null && model.TbookEtat.Count > 0)
                     {
@@ -1277,13 +1248,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         Pays = model.Pays,
                         Langue = model.Langue,
-                        Price = model.Price,
-                        DeviceName = model.DeviceName,
-                        DateParution = DatesHelpers.Converter.GetNullableDateFromString(model.DateParution),
-                        IsJourParutionKnow = model.IsJourParutionKnow >= 1,
-                        IsMoisParutionKnow = model.IsMoisParutionKnow >= 1,
-                        IsJourParutionVisible = model.IsJourParutionKnow >= 1,
-                        IsMoisParutionVisible = model.IsMoisParutionKnow >= 1,
                         Collections = collections != null && collections.Any() ? new ObservableCollection<CollectionVM>(collections) : new ObservableCollection<CollectionVM>(),
                         Editeurs = editors != null && editors.Any() ? new ObservableCollection<ContactVM>(editors) : new ObservableCollection<ContactVM>(),
                     };
@@ -1299,6 +1263,12 @@ namespace LibraryProjectUWP.Code.Services.Db
                         {
                             viewModel.Publication.EditeursStringList = StringHelpers.JoinStringArray(viewModel.Publication.Editeurs?.Select(s => s.SocietyName)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
                         }
+
+                        var dateParution = DatesHelpers.Converter.StringDateToStringDate(model.DateParution, '/', out string dayParution, out string monthParution, out string yearParution);
+                        viewModel.Publication.DateParution = dateParution;
+                        viewModel.Publication.DayParution = dayParution;
+                        viewModel.Publication.MonthParution = monthParution;
+                        viewModel.Publication.YearParution = yearParution;
                     }
 
                     return viewModel;
@@ -1414,13 +1384,10 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         viewModel.Publication.Pays = viewModelToCopy.Publication.Pays;
                         viewModel.Publication.Langue = viewModelToCopy.Publication.Langue;
-                        viewModel.Publication.Price = viewModelToCopy.Publication.Price;
-                        viewModel.Publication.DeviceName = viewModelToCopy.Publication.DeviceName;
                         viewModel.Publication.DateParution = viewModelToCopy.Publication.DateParution;
-                        viewModel.Publication.IsJourParutionKnow = viewModelToCopy.Publication.IsJourParutionKnow;
-                        viewModel.Publication.IsMoisParutionKnow = viewModelToCopy.Publication.IsMoisParutionKnow;
-                        viewModel.Publication.IsJourParutionVisible = viewModelToCopy.Publication.IsJourParutionVisible;
-                        viewModel.Publication.IsMoisParutionVisible = viewModelToCopy.Publication.IsMoisParutionVisible;
+                        viewModel.Publication.DayParution = viewModelToCopy.Publication.DayParution;
+                        viewModel.Publication.MonthParution = viewModelToCopy.Publication.MonthParution;
+                        viewModel.Publication.YearParution = viewModelToCopy.Publication.YearParution;
 
                         if (viewModelToCopy.Publication.Editeurs != null && viewModelToCopy.Publication.Editeurs.Any())
                         {

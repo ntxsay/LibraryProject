@@ -61,8 +61,6 @@ namespace DbConsoleHelpers.Models.Local
 
                 entity.Property(e => e.DateAjout).IsRequired();
 
-                entity.Property(e => e.DeviceName).IsRequired();
-
                 entity.Property(e => e.Guid).IsRequired();
 
                 entity.Property(e => e.MainTitle).IsRequired();

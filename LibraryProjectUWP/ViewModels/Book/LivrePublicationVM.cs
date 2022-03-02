@@ -65,8 +65,8 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private DateTimeOffset? _DateParution;
-        public DateTimeOffset? DateParution
+        private string _DateParution;
+        public string DateParution
         {
             get => _DateParution;
             set
@@ -74,62 +74,6 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_DateParution != value)
                 {
                     _DateParution = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsJourParutionKnow;
-        public bool IsJourParutionKnow
-        {
-            get => _IsJourParutionKnow;
-            set
-            {
-                if (_IsJourParutionKnow != value)
-                {
-                    _IsJourParutionKnow = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsMoisParutionKnow;
-        public bool IsMoisParutionKnow
-        {
-            get => _IsMoisParutionKnow;
-            set
-            {
-                if (_IsMoisParutionKnow != value)
-                {
-                    _IsMoisParutionKnow = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsJourParutionVisible = true;
-        public bool IsJourParutionVisible
-        {
-            get => _IsJourParutionVisible;
-            set
-            {
-                if (_IsJourParutionVisible != value)
-                {
-                    _IsJourParutionVisible = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsMoisParutionVisible = true;
-        public bool IsMoisParutionVisible
-        {
-            get => _IsMoisParutionVisible;
-            set
-            {
-                if (_IsMoisParutionVisible != value)
-                {
-                    _IsMoisParutionVisible = value;
                     OnPropertyChanged();
                 }
             }
@@ -225,6 +169,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         public readonly IEnumerable<string> MoneyList = Code.Helpers.CultureHelpers.Money.MoneyList();
 
         private double _Price;
+        [Obsolete]
         public double Price
         {
             get => _Price;
@@ -239,6 +184,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private string _DeviceName;
+        [Obsolete]
         public string DeviceName
         {
             get => _DeviceName;

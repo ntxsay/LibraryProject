@@ -27,13 +27,9 @@ namespace LibraryProjectUWP.Models.Local
         public long CountOpening { get; set; }
         public long? MinAge { get; set; }
         public long? MaxAge { get; set; }
-        public long IsJourParutionKnow { get; set; }
-        public long IsMoisParutionKnow { get; set; }
         public string DateParution { get; set; }
         public string Resume { get; set; }
         public string Notes { get; set; }
-        public double Price { get; set; }
-        public string DeviceName { get; set; }
         public string Langue { get; set; }
         public string Pays { get; set; }
 

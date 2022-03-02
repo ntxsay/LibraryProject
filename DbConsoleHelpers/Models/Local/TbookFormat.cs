@@ -15,6 +15,7 @@ namespace DbConsoleHelpers.Models.Local
         public double? Largeur { get; set; }
         public double? Hauteur { get; set; }
         public double? Epaisseur { get; set; }
+        public double? Weight { get; set; }
 
         public virtual Tbook IdNavigation { get; set; }
     }
