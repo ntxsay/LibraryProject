@@ -177,7 +177,8 @@ namespace LibraryProjectUWP
                 }
                 else if (itemTag == ViewModelPage.AboutMenuItem.Tag)
                 {
-                    await AboutDialogNavigationAsync();
+                    OpenAboutPage();
+                    //await AboutDialogNavigationAsync();
                 }
                 else if (itemTag == ViewModelPage.LibraryCollectionMenuItem.Tag)
                 {
@@ -438,6 +439,21 @@ namespace LibraryProjectUWP
                 }
 
                 return NavigateToView("ManageContainerPage", manageBookParameters);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return false;
+            }
+        }
+
+        private bool OpenAboutPage()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.ChangeAppTitle(ViewModelPage.MainTitleBar);
+                return NavigateToView("About.AboutPage", null);
             }
             catch (Exception ex)
             {

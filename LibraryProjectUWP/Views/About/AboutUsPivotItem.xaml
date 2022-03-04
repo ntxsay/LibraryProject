@@ -1,0 +1,99 @@
+﻿<PivotItem
+    x:Class="LibraryProjectUWP.Views.About.AboutUsPivotItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views.About"
+    xmlns:icons="using:LibraryProjectUWP.Views.Icons"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" Header="A propos de l'application">
+    <PivotItem.Resources>
+        <ThemeShadow x:Name="BackgroundShadow"/>
+    </PivotItem.Resources>
+    <Grid Padding="15 0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition  MaxWidth="500"/>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0"  RowSpacing="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" >
+                <Button CornerRadius="30"  Height="128" Width="130" Padding="8 0" HorizontalContentAlignment="Center">
+                    <Viewbox Height="120">
+                        <icons:LibraryShortLogo />
+                    </Viewbox>
+                </Button>
+                <TextBlock VerticalAlignment="Center">
+                    <Run Text="ROSTALOTHEQUE" FontSize="40" FontWeight="SemiBold"/>
+                    <LineBreak />
+                    <Run Text="Version :"/>
+                    <Run Text="{x:Bind MajorV}"/><Run Text="."/><Run Text="{x:Bind MinorV}"/><Run Text="."/><Run Text="{x:Bind RevisionV}"/>
+                    <Run Text="build"/>
+                    <Run Text="{x:Bind BuildV}"/>
+                    <Run Text="(MIDORI)"/>
+                </TextBlock>
+            </StackPanel>
+
+            <RichTextBlock Grid.Row="1" FontSize="14" Padding="5" TextAlignment="Justify">
+                <Paragraph>
+                    Ce projet vous permet de créer des bibliothèques et d'y créer des livres.
+                    <LineBreak /> Deux modes d’affichages sont possibles, le mode d’affichage grille qui vous permet d’afficher les bibliothèques et les livres sous forme de miniature et le mode d’affichage liste qui vous permet d’afficher immédiatement plus de détails concernant la bibliothèque ou ses livres.
+                </Paragraph>
+                <Paragraph>
+                    <LineBreak />
+                    Remarque : Ce projet peut contenir des erreurs de français, de frappe, c'est une version d'aperçu, elle n'est pas tout à fait stable.
+                </Paragraph>
+            </RichTextBlock>
+
+            <TextBlock Grid.Row="2" Text="A propos de ntxsay" FontWeight="SemiBold" FontSize="16"/>
+            <ScrollViewer Grid.Row="3" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" Padding="10 0">
+                <RichTextBlock FontSize="14" Padding="5" TextAlignment="Justify" >
+                    <Paragraph>
+                        Découvert en 2014, j’ai eu un premier aperçu de la programmation informatique via le Visual Basic pour Application disponible dans les logiciels de la suite Microsoft Office tel que Microsoft Excel, PowerPoint, etc.
+                        <LineBreak />
+                    </Paragraph>
+                    <Paragraph>
+                        Je l’utilisai principalement sur PowerPoint car je simulai une interface utilisateur comme voulant dépasser les limites habituelles de ce logiciel.
+                        <LineBreak />
+                    </Paragraph>
+                    <Paragraph>
+                        Ce n’était pas évident mais je tenais bon grâce aux petits résultats qui s’affichait de plus en plus à moi jusqu’au jour où j’ai été confronté aux limitations du VBA.
+                        <LineBreak />
+                    </Paragraph>
+                    <Paragraph>
+                        De là j’eu connaissance du Visual Basic .NET, de WinForms et de Visual Studio Express. Il m’a quand même fallu un temps d’adaptation pour pouvoir être à l’aise avec ce langage dans un autre contexte puis j’ai abandonné le Visual Basic en 2016 au profit du C# qui visiblement est devenu très populaire.
+                        <LineBreak />
+                    </Paragraph>
+                    <Paragraph>
+                        A partir du C#, j’ai continué avec WPF, les applications console, ASP.NET WebForm, ASP.NET MVC, ASP.NET Core. Depuis la fin de l’année 2020, je me suis lancé dans l’univers UWP avec un projet interne intitulé « Project LNA » puis vers la fin de l’année 2021 je me suis lancé dans ce projet dont l'idée originale provient d'une connaissance.
+                        <LineBreak />
+                    </Paragraph>
+                    <Paragraph>
+                        Il est donc un concentré de tout ce que j’aime, l’informatique de manière générale, la programmation C# et l’univers Microsoft, je suis hélas encore un débutant dans mon art mais je vous remercie de me soutenir et j’espère que vous apprécierez ce projet et que la Rostalothèque vous séduira :-).
+                        <LineBreak />
+                    </Paragraph>
+                </RichTextBlock>
+            </ScrollViewer>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Image Source="ms-appx:///Assets/Img/ntxsay-logo-mgte.png" Stretch="Uniform"  MaxWidth="500" MaxHeight="500" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            <StackPanel Grid.Row="1">
+                <HyperlinkButton HorizontalAlignment="Center" NavigateUri="https://www.instagram.com/ntxsay/">
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                        <Image Source="ms-appx:///Assets/Img/Instagram_icon.png" Stretch="Uniform"  Width="32" Height="32" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <TextBlock Text="ntxsay" FontSize="24"/>
+                    </StackPanel>
+                </HyperlinkButton>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</PivotItem>
