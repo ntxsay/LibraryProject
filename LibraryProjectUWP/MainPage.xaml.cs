@@ -34,6 +34,7 @@ using Windows.UI.Xaml.Navigation;
 using LibraryProjectUWP.Views.UserControls.TitleBar;
 using LibraryProjectUWP.Views.Library;
 using LibraryProjectUWP.Views.Book;
+using LibraryProjectUWP.Views.Icons;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -200,9 +201,9 @@ namespace LibraryProjectUWP
         }
 
 
-        private void PrincipalNaviguation_BackRequested(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewBackRequestedEventArgs args)
+        private async void PrincipalNaviguation_BackRequested(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewBackRequestedEventArgs args)
         {
-            this.GoToBack();
+            await this.GoToBack();
         }
 
         public bool NavigateToView(string clickedView, object parameters)
@@ -263,6 +264,8 @@ namespace LibraryProjectUWP
                         {
                             return;
                         }
+
+                        this.ChangeAppTitle(ViewModelPage.MainTitleBar);
                     }
                     this.MainFrameContainer.GoBack();
                 }
@@ -345,6 +348,7 @@ namespace LibraryProjectUWP
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                this.ChangeAppTitle(ViewModelPage.MainTitleBar);
                 return NavigateToView("Library.LibraryCollectionPage", null);
             }
             catch (Exception ex)
@@ -531,6 +535,17 @@ namespace LibraryProjectUWP
                     OnPropertyChanged();
                 }
             }
+        }
+
+        public Viewbox MainTitleBar
+        {
+            get => new Viewbox()
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Height = 16,
+                Margin = new Thickness(0, 12, 0, 0),
+                Child = new LibraryLongLogo(),
+            };
         }
 
 

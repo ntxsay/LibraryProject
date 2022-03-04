@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:LibraryProjectUWP"
+    xmlns:icons="using:LibraryProjectUWP.Views.Icons"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
@@ -18,6 +19,11 @@
     <Grid>
         <MUIXC:NavigationView x:Name="PrincipalNaviguation" PaneDisplayMode="LeftMinimal" IsTitleBarAutoPaddingEnabled="False" IsSettingsVisible="False" IsBackEnabled="True" IsBackButtonVisible="{x:Bind ViewModelPage.IsBackArrowVisible, Mode=OneWay}"
                               ItemInvoked="PrincipalNaviguation_ItemInvoked" BackRequested="PrincipalNaviguation_BackRequested">
+            <MUIXC:NavigationView.PaneHeader>
+                <Viewbox Height="16" Margin="0 0 0 0" HorizontalAlignment="Left">
+                    <icons:LibraryLongLogo />
+                </Viewbox>
+            </MUIXC:NavigationView.PaneHeader>
             <MUIXC:NavigationView.MenuItems>
                 <MUIXC:NavigationViewItem Content="Rechercher">
                     <MUIXC:NavigationViewItem.Icon>
@@ -72,6 +78,9 @@
                     <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
                 </Grid.ColumnDefinitions>
                 <Grid x:Name="AppTitleContainer" Grid.Column="1" Visibility="{x:Bind PrincipalNaviguation.IsPaneOpen, Mode=OneWay, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+                    <!--<Viewbox Height="16" Margin="0 12 0 0" HorizontalAlignment="Left">
+                        <icons:LibraryLongLogo />
+                    </Viewbox>-->
                 </Grid>
             </Grid>
             <Grid Grid.Column="1" Background="Transparent"/>

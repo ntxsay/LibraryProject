@@ -270,6 +270,12 @@
     <Compile Include="Views\Contact\NewEditContactUC.xaml.cs">
       <DependentUpon>NewEditContactUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Icons\LibraryShortLogo.xaml.cs">
+      <DependentUpon>LibraryShortLogo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Icons\LibraryLongLogo.xaml.cs">
+      <DependentUpon>LibraryLongLogo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Library\LibraryCollectionPage.xaml.cs">
       <DependentUpon>LibraryCollectionPage.xaml</DependentUpon>
     </Compile>
@@ -291,7 +297,6 @@
     <Compile Include="Views\NewElementCD.xaml.cs">
       <DependentUpon>NewElementCD.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Settings\Class1.cs" />
     <Compile Include="Views\Settings\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
@@ -425,6 +430,14 @@
     <Page Include="Views\Contact\NewEditContactUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Icons\LibraryShortLogo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Icons\LibraryLongLogo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Library\LibraryCollectionPage.xaml">
       <SubType>Designer</SubType>
