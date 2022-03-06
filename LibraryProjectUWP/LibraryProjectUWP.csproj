@@ -211,6 +211,7 @@
     <Compile Include="ViewModels\Book\LivreDescriptionVM.cs" />
     <Compile Include="ViewModels\Book\LivreExemplaryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreExemplaryVM.cs" />
+    <Compile Include="ViewModels\Book\LivrePretVM.cs" />
     <Compile Include="ViewModels\Book\LivrePublicationVM.cs" />
     <Compile Include="ViewModels\Book\LivreFormatVM.cs" />
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
@@ -253,6 +254,9 @@
     <Compile Include="Views\Book\ImportBookFromExcelUC.xaml.cs">
       <DependentUpon>ImportBookFromExcelUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\NewEditBookPretUC.xaml.cs">
+      <DependentUpon>NewEditBookPretUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\NewEditBookExemplaryUC.xaml.cs">
       <DependentUpon>NewEditBookExemplaryUC.xaml</DependentUpon>
     </Compile>
@@ -294,9 +298,6 @@
     </Compile>
     <Compile Include="Views\Categories\NewEditCategoryUC.xaml.cs">
       <DependentUpon>NewEditCategoryUC.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Library\Manage\NewLibraryCD.xaml.cs">
-      <DependentUpon>NewLibraryCD.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ManageContainerPage.xaml.cs">
       <DependentUpon>ManageContainerPage.xaml</DependentUpon>
@@ -416,6 +417,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\Book\NewEditBookPretUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Book\NewEditBookExemplaryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -469,10 +474,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Categories\NewEditCategoryUC.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Library\Manage\NewLibraryCD.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

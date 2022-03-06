@@ -1672,6 +1672,57 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        #region Book Pret
+        private void NewBookPretXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookPretUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    NewEditBookPretUC userControl = new NewEditBookPretUC(new ManageBookPretParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        EditMode = Code.EditMode.Create,
+                        ParentBook = args.Parameter as LivreVM,
+                        CurrentViewModel = new LivrePretVM()
+                        {
+                            EtatAvantPret = new LivreEtatVM()
+                            {
+                                TypeVerification = Code.BookTypeVerification.AvantPret,
+                            },
+                            EtatApresPret = new LivreEtatVM()
+                            {
+                                TypeVerification = Code.BookTypeVerification.ApresPret,
+                            },
+                        }
+                    });
+
+
+                    //userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
+                    //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+        #endregion
         private async void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -3963,7 +4014,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        
     }
 
     public class BookCollectionPageVM : INotifyPropertyChanged

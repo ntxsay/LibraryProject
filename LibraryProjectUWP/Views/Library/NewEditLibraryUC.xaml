@@ -54,10 +54,20 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.Value, Mode=TwoWay}" PlaceholderText="{x:Bind ViewModelPage.NamePlaceHolderText, Mode=OneWay}"/>
             <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.Description, Mode=TwoWay}" MinHeight="100" PlaceholderText="{x:Bind ViewModelPage.DescriptionPlaceHolderText, Mode=OneWay}"
                  TextWrapping="Wrap" AcceptsReturn="True"/>
+            <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="10">
+                <CheckBox VerticalContentAlignment="Bottom" HorizontalAlignment="Stretch">
+                    <TextBlock  TextWrapping="Wrap" VerticalAlignment="Center"  HorizontalAlignment="Stretch">
+                            <Run Text="Activer l'affichage d'une boite de confirmation avant de quitter la bibliothèque lorsqu'elle contient un nombre important de livres." />
+                            <LineBreak /><LineBreak /><Run Text="Cette boîte a pour but de vous prévenir d'une sortie accidentelle de la bibliothèque." />
+                    </TextBlock>
+                </CheckBox>
+
+            </StackPanel>
         </Grid>
         <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="2" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
                        IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}" Margin="0 10 0 5">

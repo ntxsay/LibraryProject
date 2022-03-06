@@ -77,6 +77,10 @@
                        Description="Affiche la liste des exemplaires de ce livre" 
                        Label="Afficher les exemplaires">
         </XamlUICommand>
+        <XamlUICommand x:Name="NewBookPretXUiCmd" 
+                       ExecuteRequested="NewBookPretXUiCmd_ExecuteRequested"
+                       Description="">
+        </XamlUICommand>
         <XamlUICommand x:Name="NewContactXamlUICommand" 
                        ExecuteRequested="NewContactXamlUICommand_ExecuteRequested"
                        Description="Ajoute un nouvel adhérant" 
@@ -207,7 +211,7 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Prêter ce livre"  CommandParameter="{x:Bind }">
+                                <MenuFlyoutItem Text="Prêter ce livre" Command="{StaticResource NewBookPretXUiCmd}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE748;"/>
                                     </MenuFlyoutItem.Icon>

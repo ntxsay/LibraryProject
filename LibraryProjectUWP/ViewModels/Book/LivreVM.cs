@@ -184,7 +184,6 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        public PretLivreVM Pret { get; set; }
         public LivreDescriptionVM Description { get; set; } = new LivreDescriptionVM();
         public LivreClassificationAgeVM ClassificationAge { get; set; } = new LivreClassificationAgeVM();
         
@@ -211,14 +210,5 @@ namespace LibraryProjectUWP.ViewModels.Book
         public string ObservationAp { get; set; }
     }
 
-    public class PretLivreVM
-    {
-        public int Id { get; set; }
-        public LivreVM Livre { get; set; }
-        public ContactVM Emprunteur { get; set; }
-        public DateTimeOffset DatePret { get; set; }
-        public DateTimeOffset? DateRemise { get; set; }
-        public string ObservationAv { get; set; }
-        public string ObservationAp { get; set; }
-    }
+    
 }
