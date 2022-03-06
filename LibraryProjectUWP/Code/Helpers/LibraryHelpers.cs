@@ -39,11 +39,15 @@ namespace LibraryProjectUWP.Code.Helpers
             {
                 try
                 {
+                    if (longueur <= 0 || largeur <= 0 || epaisseur <= 0)
+                    {
+                        return string.Empty;
+                    }
                     return $"{longueur} cm × {largeur} cm × {epaisseur} cm";
                 }
                 catch (Exception)
                 {
-                    return null;
+                    return string.Empty;
                 }
             }
 

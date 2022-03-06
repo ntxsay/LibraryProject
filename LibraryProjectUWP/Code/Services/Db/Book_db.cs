@@ -1190,8 +1190,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Id = model.Id,
                         IdLibrary = await GetLibraryIdAsync(model.Id),
                         Guid = isGuidCorrect ? guid : Guid.Empty,
-                        DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
-                        DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
+                        DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout).ToLocalTime(),
+                        DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition)?.ToLocalTime(),
                         MainTitle = model.MainTitle,
                         CountOpening = model.CountOpening,
                         Description = new LivreDescriptionVM()

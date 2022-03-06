@@ -103,15 +103,15 @@
         </XamlUICommand>
         <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ThumbnailSimpleDataTemplate">
             <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
+                <ToolTipService.ToolTip>
+                    <ToolTip>
+                        <TextBlock MaxWidth="300" MaxHeight="500" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <Run Text="{x:Bind Name, Mode=OneWay}" FontWeight="Medium" FontSize="16"/>
+                            <LineBreak /><Run Text="{x:Bind Description, Mode=OneWay}" FontSize="14"/>
+                        </TextBlock>
+                    </ToolTip>
+                </ToolTipService.ToolTip>
                 <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" Height="282" Width="180" Tag="{x:Bind Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" PointerPressed="ViewboxSimpleThumnailDatatemplate_PointerPressed">
-                    <ToolTipService.ToolTip>
-                        <ToolTip>
-                            <TextBlock>
-                                <Run Text="Ouvrir la bibliothèque de" />
-                                <Run Text="{x:Bind Name}" FontWeight="Medium"/>
-                            </TextBlock>
-                        </ToolTip>
-                    </ToolTipService.ToolTip>
                     <Border Height="301" Width="192" Background="WhiteSmoke" BorderThickness="0" CornerRadius="8">
                         <Grid Height="301" Width="192">
                             <Image Source="{x:Bind JaquettePath, Mode=OneWay}" Tag="{x:Bind JaquettePath, Mode=OneWay}" Stretch="UniformToFill" Loaded="Image_Loaded"/>

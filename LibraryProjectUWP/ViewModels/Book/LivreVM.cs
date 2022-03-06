@@ -111,21 +111,6 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private DateTimeOffset? _DateAjoutUser = DateTime.UtcNow;
-        [Obsolete]
-        public DateTimeOffset? DateAjoutUser
-        {
-            get => _DateAjoutUser;
-            set
-            {
-                if (_DateAjoutUser != value)
-                {
-                    _DateAjoutUser = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         private DateTime? _DateEdition;
         public DateTime? DateEdition
         {

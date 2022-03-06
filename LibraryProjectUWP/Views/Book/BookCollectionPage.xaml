@@ -154,15 +154,15 @@
         <ThemeShadow x:Name="BackgroundGridShadow"/>
         <DataTemplate x:DataType="booktVm:LivreVM" x:Key="ThumbnailSimpleDataTemplate">
             <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
+                <ToolTipService.ToolTip>
+                    <ToolTip>
+                        <TextBlock MaxWidth="300" MaxHeight="500" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" IsTextSelectionEnabled="True">
+                            <Run Text="{x:Bind MainTitle, Mode=OneWay}" FontWeight="Medium" FontSize="16"/>
+                            <LineBreak /><Run Text="{x:Bind Description.Resume, Mode=OneWay}" FontSize="14"/>
+                        </TextBlock>
+                    </ToolTip>
+                </ToolTipService.ToolTip>
                 <Viewbox x:Name="ViewboxSimpleThumnailDatatemplate" Height="282" Width="180" Tag="{x:Bind}" MTUUi:FrameworkElementExtensions.Cursor="Hand" PointerPressed="ViewboxSimpleThumnailDatatemplate_PointerPressed">
-                    <ToolTipService.ToolTip>
-                        <ToolTip>
-                            <TextBlock>
-                                <Run Text="Ouvrir le livre" />
-                                <Run Text="{x:Bind MainTitle}" FontWeight="Medium"/>
-                            </TextBlock>
-                        </ToolTip>
-                    </ToolTipService.ToolTip>
                     <Border Height="301" Width="192" Background="WhiteSmoke" BorderThickness="0" CornerRadius="8">
                         <Grid Height="301" Width="192">
                             <Image Source="{x:Bind JaquettePath, Mode=OneWay}" Tag="{x:Bind JaquettePath, Mode=OneWay}" Stretch="UniformToFill" Loaded="Image_Loaded_1"/>
@@ -185,7 +185,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="22"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{x:Bind MainTitle, Mode=OneWay}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="{x:Bind MainTitle, Mode=OneWay}" TextWrapping="WrapWholeWords" FontSize="16" VerticalAlignment="Center" MaxLines="2"/>
                     <Button x:Name="BtnActions" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="1" ToolTipService.ToolTip="Plus d'informations" MTUUi:FrameworkElementExtensions.Cursor="Hand" 
                             Padding="0" Width="22" HorizontalAlignment="Right">
                         <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
@@ -207,15 +207,14 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{x:Bind }">
+                                <MenuFlyoutItem Text="Prêter ce livre"  CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE71B;"/>
+                                        <FontIcon Glyph="&#xE748;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Catégories" Tag="{x:Bind Mode=OneWay}">
+                                <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE81E;"/>
+                                        <FontIcon Glyph="&#xF5ED;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
@@ -306,7 +305,7 @@
                     <MTUUControls:DataGridTemplateColumn Header="Date d'ajout" Tag="First_ascent">
                         <MTUUControls:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding DateAjoutUser, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:dd/MM/yyy}'}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <TextBlock Text="{Binding DateAjout, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:dd/MM/yyy}'}" VerticalAlignment="Center" Margin="8,0,0,0"/>
                             </DataTemplate>
                         </MTUUControls:DataGridTemplateColumn.CellTemplate>
                         <MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
