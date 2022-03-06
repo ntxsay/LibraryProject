@@ -232,7 +232,7 @@ namespace LibraryProjectUWP.Views.Library.Manage
             }
         }
 
-        private string _Glyph = "\uE81E";
+        private string _Glyph = "\uE8F1";
         public string Glyph
         {
             get => _Glyph;

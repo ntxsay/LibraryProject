@@ -148,9 +148,9 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (this.LBX_TitresOeuvre.SelectedIndex > -1)
+                if (args.Parameter is string viewModel && ViewModelPage.ViewModel.TitresOeuvre.Contains(viewModel))
                 {
-                    ViewModelPage.ViewModel.TitresOeuvre.RemoveAt(this.LBX_TitresOeuvre.SelectedIndex);
+                    ViewModelPage.ViewModel.TitresOeuvre.Remove(viewModel);
                 }
             }
             catch (Exception ex)
@@ -355,9 +355,9 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (this.LBX_Author.SelectedIndex > -1)
+                if (args.Parameter is ContactVM viewModel && ViewModelPage.ViewModel.Auteurs.Contains(viewModel))
                 {
-                    ViewModelPage.ViewModel.Auteurs.RemoveAt(this.LBX_Author.SelectedIndex);
+                    ViewModelPage.ViewModel.Auteurs.Remove(viewModel);
                 }
             }
             catch (Exception ex)
@@ -394,9 +394,9 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (this.ListViewCollection.SelectedIndex > -1)
+                if (args.Parameter is CollectionVM viewModel && ViewModelPage.ViewModel.Publication.Collections.Contains(viewModel))
                 {
-                    ViewModelPage.ViewModel.Publication.Collections.RemoveAt(this.ListViewCollection.SelectedIndex);
+                    ViewModelPage.ViewModel.Publication.Collections.Remove(viewModel);
                 }
             }
             catch (Exception ex)
@@ -547,9 +547,9 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (this.ListViewEditeur.SelectedIndex > -1)
+                if (args.Parameter is ContactVM viewModel && ViewModelPage.ViewModel.Auteurs.Contains(viewModel))
                 {
-                    ViewModelPage.ViewModel.Publication.Editeurs.RemoveAt(this.ListViewEditeur.SelectedIndex);
+                    ViewModelPage.ViewModel.Publication.Editeurs.Remove(viewModel);
                 }
             }
             catch (Exception ex)

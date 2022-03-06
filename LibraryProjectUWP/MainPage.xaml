@@ -69,7 +69,7 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Grid x:Name="AppTitleBar" Background="Transparent" Margin="40 0 0 0">
+            <Grid x:Name="AppTitleBar" Background="Transparent" Margin="0 0 0 0">
                 <!-- Width of the padding columns is set in LayoutMetricsChanged handler. -->
                 <!-- Using padding columns instead of Margin ensures that the background paints the area under the caption control buttons (for transparent buttons). -->
                 <Grid.ColumnDefinitions>

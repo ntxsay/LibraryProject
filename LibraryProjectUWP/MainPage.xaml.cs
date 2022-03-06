@@ -238,6 +238,15 @@ namespace LibraryProjectUWP
                 this.ViewModelPage.IsBackArrowVisible = this.MainFrameContainer.CanGoBack
                     ? Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible.Visible
                     : Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible.Collapsed;
+
+                if (this.MainFrameContainer.CanGoBack)
+                {
+                    AppTitleBar.Margin = new Thickness(40, 0, 0, 0);
+                }
+                else
+                {
+                    AppTitleBar.Margin = new Thickness(0, 0, 0, 0);
+                }
             }
             catch (Exception ex)
             {

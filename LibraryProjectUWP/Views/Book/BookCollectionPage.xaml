@@ -293,7 +293,7 @@
                     <MTUUControls:DataGridTextColumn Header="Collection(s)" Binding="{Binding Publication.CollectionsStringList,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Classification âge" Binding="{Binding ClassificationAge.StringClassification, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Format" Binding="{Binding Format.Format, Mode=OneWay}" Width="Auto"/>
-                    <MTUUControls:DataGridTextColumn Header="Dimensions" Binding="{Binding Format.Dimensions,  Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Dimensions (L × l × E)" Binding="{Binding Format.Dimensions,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Pages" Binding="{Binding Format.NbOfPages,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Langue" Binding="{Binding Publication.Langue,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Nombre d'exemplaires" Binding="{Binding NbExemplaires, Mode=OneWay}" Width="Auto"/>

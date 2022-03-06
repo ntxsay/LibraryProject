@@ -39,7 +39,7 @@ namespace LibraryProjectUWP.Code.Helpers
             {
                 try
                 {
-                    return $"L={longueur} cm x l={largeur} cm x E={epaisseur} cm";
+                    return $"{longueur} cm × {largeur} cm × {epaisseur} cm";
                 }
                 catch (Exception)
                 {

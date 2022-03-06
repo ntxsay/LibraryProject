@@ -1275,7 +1275,7 @@ namespace LibraryProjectUWP.Views.Book
                     if (updateResult.IsSuccess)
                     {
                         sender._parameters.CurrentViewModel.Copy(updatedViewModel);
-
+                        CompleteBookInfos(sender._parameters.CurrentViewModel);
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = updateResult.Message;
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
