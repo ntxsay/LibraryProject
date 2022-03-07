@@ -45,6 +45,20 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        private TimeSpan? _TimePret;
+        public TimeSpan? TimePret
+        {
+            get => _TimePret;
+            set
+            {
+                if (_TimePret != value)
+                {
+                    _TimePret = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private DateTimeOffset? _DateRemise;
         public DateTimeOffset? DateRemise
         {
@@ -54,6 +68,20 @@ namespace LibraryProjectUWP.ViewModels.Book
                 if (_DateRemise != value)
                 {
                     _DateRemise = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private TimeSpan? _TimeRemise;
+        public TimeSpan? TimeRemise
+        {
+            get => _TimeRemise;
+            set
+            {
+                if (_TimeRemise != value)
+                {
+                    _TimeRemise = value;
                     OnPropertyChanged();
                 }
             }

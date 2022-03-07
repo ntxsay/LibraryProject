@@ -159,6 +159,7 @@
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
     <Compile Include="Code\Helpers\VisualViewHelpers.cs" />
+    <Compile Include="Code\Services\Db\BookExemplary_db.cs" />
     <Compile Include="Code\Services\Db\Contact_db.cs" />
     <Compile Include="Code\Services\Db\Book_db.cs" />
     <Compile Include="Code\Services\Db\Collections_db.cs" />

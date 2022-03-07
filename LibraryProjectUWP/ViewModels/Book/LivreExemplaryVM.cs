@@ -73,21 +73,6 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private bool _IsExemplarySeparated;
-        [Obsolete]
-        public bool IsExemplarySeparated
-        {
-            get => _IsExemplarySeparated;
-            set
-            {
-                if (_IsExemplarySeparated != value)
-                {
-                    _IsExemplarySeparated = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         private int _NbExemplaire = 1;
         public int NbExemplaire
         {
@@ -278,68 +263,6 @@ namespace LibraryProjectUWP.ViewModels.Book
                 }
             }
         }
-
-        private bool _IsJourAcquisitionKnow;
-        [Obsolete]
-        public bool IsJourAcquisitionKnow
-        {
-            get => _IsJourAcquisitionKnow;
-            set
-            {
-                if (_IsJourAcquisitionKnow != value)
-                {
-                    _IsJourAcquisitionKnow = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsMoisAcquisitionKnow;
-        [Obsolete]
-        public bool IsMoisAcquisitionKnow
-        {
-            get => _IsMoisAcquisitionKnow;
-            set
-            {
-                if (_IsMoisAcquisitionKnow != value)
-                {
-                    _IsMoisAcquisitionKnow = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsJourAcquisitionVisible = true;
-        [Obsolete]
-        public bool IsJourAcquisitionVisible
-        {
-            get => _IsJourAcquisitionVisible;
-            set
-            {
-                if (_IsJourAcquisitionVisible != value)
-                {
-                    _IsJourAcquisitionVisible = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private bool _IsMoisAcquisitionVisible = true;
-        [Obsolete]
-        public bool IsMoisAcquisitionVisible
-        {
-            get => _IsMoisAcquisitionVisible;
-            set
-            {
-                if (_IsMoisAcquisitionVisible != value)
-                {
-                    _IsMoisAcquisitionVisible = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        
 
 
         [JsonIgnore]

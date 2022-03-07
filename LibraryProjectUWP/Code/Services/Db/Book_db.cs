@@ -20,7 +20,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 {
     internal partial class DbServices
     {
-        public struct Book
+        public partial struct Book
         {
             static string NameEmptyMessage = "Le nom du livre doit être renseigné avant l'enregistrement.";
             static readonly string NameAlreadyExistMessage = "Ce livre existe déjà.";

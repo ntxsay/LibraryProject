@@ -1673,48 +1673,53 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Book Pret
-        private void NewBookPretXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void NewBookPretXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookPretUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
-                if (checkedItem != null)
+                if (args.Parameter is LivreVM viewModel)
                 {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
-                }
-                else
-                {
-                    NewEditBookPretUC userControl = new NewEditBookPretUC(new ManageBookPretParametersDriverVM()
+                    var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookPretUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                    if (checkedItem != null)
                     {
-                        ParentPage = this,
-                        EditMode = Code.EditMode.Create,
-                        ParentBook = args.Parameter as LivreVM,
-                        CurrentViewModel = new LivrePretVM()
+                        this.PivotRightSideBar.SelectedItem = checkedItem;
+                    }
+                    else
+                    {
+                        NewEditBookPretUC userControl = new NewEditBookPretUC(new ManageBookPretParametersDriverVM()
                         {
-                            EtatAvantPret = new LivreEtatVM()
+                            ParentPage = this,
+                            EditMode = Code.EditMode.Create,
+                            ParentBook = viewModel,
+                            AvailableExemplariesViewModelList = await DbServices.BookExemplary.GetAvailableBookExemplaryVMAsync(viewModel.Id),
+                            CurrentViewModel = new LivrePretVM()
                             {
-                                TypeVerification = Code.BookTypeVerification.AvantPret,
-                            },
-                            EtatApresPret = new LivreEtatVM()
-                            {
-                                TypeVerification = Code.BookTypeVerification.ApresPret,
-                            },
-                        }
-                    });
+                                EtatAvantPret = new LivreEtatVM()
+                                {
+                                    TypeVerification = Code.BookTypeVerification.AvantPret,
+                                },
+                                EtatApresPret = new LivreEtatVM()
+                                {
+                                    TypeVerification = Code.BookTypeVerification.ApresPret,
+                                },
+                            }
+                        });
 
 
-                    //userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
-                    //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
+                        //userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
+                        //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
 
-                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                    {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
-                    });
+                        this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                        {
+                            Glyph = userControl.ViewModelPage.Glyph,
+                            Title = userControl.ViewModelPage.Header,
+                            IdItem = userControl.IdItem,
+                        });
+                    }
+                    this.ViewModelPage.IsSplitViewOpen = true;
                 }
-                this.ViewModelPage.IsSplitViewOpen = true;
+                
             }
             catch (Exception ex)
             {

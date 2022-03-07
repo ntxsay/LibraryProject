@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
    xmlns:contactVm="using:LibraryProjectUWP.ViewModels.Contact"
+    xmlns:bookVm="using:LibraryProjectUWP.ViewModels.Book"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
@@ -68,6 +69,47 @@
         <dTemplateSelectors:ContactTypeDataTemplateSelector x:Key="contactTypeTemplateSelector"
         PersonTemplate="{StaticResource PersonTemplate}"
         EnterpriseTemplate="{StaticResource EnterpriseTemplate}" />
+        <DataTemplate x:Key="exemplaryItemDataTemplate" x:DataType="bookVm:LivreExemplaryVM">
+            <Grid ColumnSpacing="2" HorizontalAlignment="Stretch" Padding="0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" VerticalAlignment="Center">
+                    <Ellipse Height="40" Width="40" Fill="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"/>
+                    <TextBlock Text="{x:Bind NoExemplaire, Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center"/>
+                </Grid>
+                <Grid Grid.Column="1" ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Left" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}">
+                                <Run Text="{x:Bind Source}" FontWeight="SemiBold"/>
+                    </TextBlock>
+                    <!--<TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Right" Text="{x:Bind DateAcquisition, Mode=OneWay}" FontSize="12"/>-->
+                    <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" FontSize="12" TextWrapping="Wrap">
+                                <Run Text="Etat du livre"/>
+                                <Run Text="{x:Bind Etat.Etat}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="en provenance de"/>
+                                <Run Text="{x:Bind ContactSource.SocietyName}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="{x:Bind ContactSource.NomNaissance}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="{x:Bind ContactSource.Prenom}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                    </TextBlock>
+                    <!--<TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Left" FontSize="12">
+                                <Run Text="Prix :"/>
+                                <Run Text="{x:Bind Price}"/>
+                                <Run Text="{x:Bind DeviceName}"/>
+                    </TextBlock>-->
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
         <Style x:Key="TimePickerStyle1" TargetType="TimePicker">
             <Setter Property="IsTabStop" Value="False"/>
             <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
@@ -238,7 +280,8 @@
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
             <StackPanel Orientation="Vertical" Spacing="16" Margin="0 8 0 0" VerticalAlignment="Top">
-                <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" >
+                <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind _parameters.AvailableExemplariesViewModelList}"
+                          ItemTemplate="{StaticResource exemplaryItemDataTemplate}">
                     <ComboBox.Header>
                         <TextBlock Text="Exemplaires disponible" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </ComboBox.Header>
@@ -260,7 +303,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <AutoSuggestBox x:Name="ASB_SearchContact" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    PlaceholderText="Rechercher un auteur" IsSuggestionListOpen="False" ItemTemplateSelector="{StaticResource contactTypeTemplateSelector}"
+                    PlaceholderText="Rechercher un contact" IsSuggestionListOpen="False" ItemTemplateSelector="{StaticResource contactTypeTemplateSelector}"
                                     TextChanged="ASB_SearchContact_TextChanged" SuggestionChosen="ASB_SearchContact_SuggestionChosen" QuerySubmitted="ASB_SearchContact_QuerySubmitted">
                                 <AutoSuggestBox.QueryIcon>
                                     <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
@@ -274,7 +317,6 @@
                         <Grid Grid.Row="1">
                             <TextBlock TextWrapping="Wrap">
                                 <Run Text="L'emprunteur est :" />
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.Emprunteur.TitreCivilite, Mode=OneWay}" FontWeight="Medium" />
                                 <Run Text="{x:Bind ViewModelPage.ViewModel.Emprunteur.NomNaissance, Mode=OneWay}" FontWeight="Medium" />
                                 <Run Text="{x:Bind ViewModelPage.ViewModel.Emprunteur.Prenom, Mode=OneWay}" FontWeight="Medium" />
                             </TextBlock>
@@ -292,8 +334,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <CalendarDatePicker Grid.Column="0" HorizontalAlignment="Stretch"/>
-                        <TimePicker Grid.Column="1" />
+                        <CalendarDatePicker Grid.Column="0" HorizontalAlignment="Stretch" FirstDayOfWeek="Sunday"  Date="{x:Bind ViewModelPage.ViewModel.DatePret, Mode=TwoWay}"/>
+                        <TimePicker Grid.Column="1" SelectedTime="{x:Bind ViewModelPage.ViewModel.TimePret, Mode=TwoWay}"/>
                     </Grid>
                 </Grid>
                 <ComboBox ItemsSource="{x:Bind ViewModelPage.EtatList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.EtatAvantPret.Etat, Mode=TwoWay}" PlaceholderText="Etat du livre" HorizontalAlignment="Stretch">
@@ -318,8 +360,8 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <CalendarDatePicker Grid.Column="0" HorizontalAlignment="Stretch"/>
-                        <TimePicker Style="{StaticResource TimePickerStyle1}" Grid.Column="1"  CornerRadius="4" ClockIdentifier="24HourClock"/>
+                        <CalendarDatePicker Grid.Column="0" HorizontalAlignment="Stretch" Date="{x:Bind ViewModelPage.ViewModel.DateRemise, Mode=TwoWay}"/>
+                        <TimePicker Style="{StaticResource TimePickerStyle1}" Grid.Column="1" CornerRadius="4" ClockIdentifier="24HourClock" SelectedTime="{x:Bind ViewModelPage.ViewModel.TimeRemise, Mode=TwoWay}"/>
                         <Button Grid.Column="2" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" CornerRadius="22" MTUUi:FrameworkElementExtensions.Cursor="Hand" Height="28" Width="28" Padding="0">
                             <Button.Flyout>
                                 <MenuFlyout>
@@ -356,8 +398,8 @@
             <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
                 <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
-                        <TextBlock Text="Créer" />
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE73E;"/>
+                        <TextBlock Text="Accorder le prêt" />
                     </StackPanel>
                 </Button>
                 <Button Command="{StaticResource UpdateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">

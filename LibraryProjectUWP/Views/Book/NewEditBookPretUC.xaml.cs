@@ -104,7 +104,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var itemList = await DbServices.Contact.AllVMAsync();
+                IList<ContactVM> itemList = await DbServices.Contact.AllVMAsync();
                 ViewModelPage.ContactViewModelList = itemList?.ToList() ?? new List<ContactVM>(); ;
             }
             catch (Exception ex)
@@ -301,45 +301,6 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
-        private void CmbxTypeAcquisition_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                if (sender is ComboBox combobox && combobox.SelectedItem is string type)
-                {
-                    if (type == LibraryHelpers.Book.Entry.Achat)
-                    {
-                        ViewModelPage.PretVisibility = Visibility.Collapsed;
-                        ViewModelPage.PriceVisibility = Visibility.Visible;
-                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
-                    }
-                    else if (type == LibraryHelpers.Book.Entry.Don)
-                    {
-                        ViewModelPage.PretVisibility = Visibility.Collapsed;
-                        ViewModelPage.PriceVisibility = Visibility.Collapsed;
-                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
-                    }
-                    else if (type == LibraryHelpers.Book.Entry.Pret)
-                    {
-                        ViewModelPage.PretVisibility = Visibility.Visible;
-                        ViewModelPage.PriceVisibility = Visibility.Visible;
-                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
-                    }
-                    else if (type == LibraryHelpers.Book.Entry.Autre)
-                    {
-                        ViewModelPage.PretVisibility = Visibility.Collapsed;
-                        ViewModelPage.PriceVisibility = Visibility.Collapsed;
-                        ViewModelPage.ContactSourceVisibility = Visibility.Visible;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
