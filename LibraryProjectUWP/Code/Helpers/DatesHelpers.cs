@@ -1,12 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.Code.Helpers
 {
+    public enum DateCompare : byte
+    {
+        /// <summary>
+        /// La date comparée est suprérieur à la date Model.
+        /// La date1 est plus grande que la date2
+        /// </summary>
+        DateSuperieur,
+        /// <summary>
+        /// La date comparée est égale à la date Model.
+        /// La date1 est égale à la date2
+        /// </summary>
+        DateEgal,
+        /// <summary>
+        /// La date comparée est inférieur à la date Model.
+        /// La date1 est plus petite que la date2
+        /// </summary>
+        DateInferieur,
+        /// <summary>
+        /// Inconnue
+        /// </summary>
+        Unknow
+    }
+
+
+    public enum DateRemainsModele
+    {
+        /// <summary>
+        /// Il vous reste ...
+        /// </summary>
+        Modele1,
+        /// <summary>
+        /// Tant de jours restant ...
+        /// </summary>
+        Modele2
+    }
+
+    public static class DateTimeHelpersExtensions
+    {
+        public static DateCompare CompareDate(this DateTime Date1, DateTime Date2)
+        {
+            return DatesHelpers.Analysis.CompareDate(Date1, Date2);
+        }
+
+    }
     internal class DatesHelpers
     {
         public const string NoAnswer = "N/A";
@@ -515,5 +561,488 @@ namespace LibraryProjectUWP.Code.Helpers
 
             #endregion
         }
+
+        internal struct Analysis
+        {
+            /// <summary>
+            /// Obtient l'interval entre deux dates
+            /// </summary>
+            /// <param name="dateTime1">Généralement la plus petite date ou la date de départ</param>
+            /// <param name="dateTime2">Généralement la plus grande date ou la date de fin</param>
+            /// <returns>Un objet <see cref="TimeSpan"/></returns>
+            public static TimeSpan GetInterval(DateTime dateTime1, DateTime dateTime2)
+            {
+                try
+                {
+                    TimeSpan interval = dateTime2.Subtract(dateTime1);
+                    return interval;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return TimeSpan.Zero;
+                }
+            }
+
+            /// <summary>
+            /// Obtient une valeur qui teste si la date actuelle est supérieure ou égale à la date fourni
+            /// </summary>
+            /// <param name="currentDate">Date actuelle</param>
+            /// <param name="compareDate">date fourni</param>
+            /// <returns>un objet <see cref="bool"/></returns>
+            public static bool GreaterThanOrEqual(DateTime currentDate, DateTime compareDate) => currentDate >= compareDate;
+
+            /// <summary>
+            /// Obtient une valeur qui teste si la date actuelle est supérieure à la date fourni
+            /// </summary>
+            /// <param name="currentDate">Date actuelle</param>
+            /// <param name="compareDate">date fourni</param>
+            /// <returns>un objet <see cref="bool"/></returns>
+            public static bool GreaterThan(DateTime currentDate, DateTime compareDate) => currentDate > compareDate;
+
+            /// <summary>
+            /// Obtient une valeur qui teste si la date actuelle est inférieure ou égale à la date fourni
+            /// </summary>
+            /// <param name="currentDate">Date actuelle</param>
+            /// <param name="compareDate">date fourni</param>
+            /// <returns>un objet <see cref="bool"/></returns>
+            public static bool LessThanOrEqual(DateTime currentDate, DateTime compareDate) => currentDate <= compareDate;
+
+            /// <summary>
+            /// Obtient une valeur qui teste si la date actuelle est inférieure à la date fourni
+            /// </summary>
+            /// <param name="currentDate">Date actuelle</param>
+            /// <param name="compareDate">date fourni</param>
+            /// <returns>un objet <see cref="bool"/></returns>
+            public static bool LessThan(DateTime currentDate, DateTime compareDate) => currentDate < compareDate;
+
+
+            /// <summary>
+            /// Compare la <paramref name="Date1"/> la par rapport à la <paramref name="Date2"/>
+            /// </summary>
+            /// <param name="Date1">Date 1</param>
+            /// <param name="Date2">Date 2</param>
+            /// <returns></returns>
+            public static DateCompare CompareDate(DateTime Date1, DateTime Date2)
+            {
+                try
+                {
+                    int? result = null;
+                    result = DateTime.Compare(Date1, Date2);
+
+
+                    if (result < 0) //t1 est antérieur à t2
+                    {
+                        return DateCompare.DateInferieur;
+                    }
+                    else if (result == 0) //t1 est identique à t2 
+                    {
+                        return DateCompare.DateEgal;
+                    }
+                    else if (result > 0) //t1 est ultérieur à t2
+                    {
+                        return DateCompare.DateSuperieur;
+                    }
+                    return DateCompare.Unknow;
+                }
+                catch (Exception)
+                {
+                    return DateCompare.Unknow;
+                }
+            }
+
+            public static System.TimeSpan? GetDateAndTimeRemains(DateTime DateDebut, DateTime DateFin)
+            {
+                try
+                {
+                    if (DateDebut == null || DateFin == null)
+                    {
+                        return null;
+                    }
+
+                    System.TimeSpan diff = DateFin.Subtract(DateDebut);
+                    if (diff != null)
+                    {
+                        return diff;
+                    }
+
+                    return null;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+
+
+            public static string GetDateAndTimeRemainsPrefixe(string Prefixe, DateTime DateDebut, DateTime DateFin)
+            {
+                try
+                {
+                    if (DateDebut == null || DateFin == null)
+                    {
+                        return null;
+                    }
+
+                    if (StringHelpers.IsStringNullOrEmptyOrWhiteSpace(Prefixe))
+                    {
+                        return null;
+                    }
+
+                    System.TimeSpan GetDifference = DateFin.Subtract(DateDebut);
+
+                    if (GetDifference == null)
+                    {
+                        return null;
+                    }
+
+                    if (GetDifference.Days > 0)
+                    {
+                        string text = $"{Prefixe} {GetDifference.Days} {((GetDifference.Days > 1) ? "jours" : "jour")}";
+                        if (GetDifference.Hours > 0)
+                        {
+                            text += $" et {GetDifference.Hours} {((GetDifference.Hours > 1) ? "heures" : "heure")}";
+                        }
+                        return text;
+                    }
+                    else if (GetDifference.Days == 0)
+                    {
+                        string text = null;
+                        if (GetDifference.Hours > 0)
+                        {
+                            text = $"{Prefixe} {GetDifference.Hours} {((GetDifference.Hours > 1) ? "heures" : "heure")}";
+                            if (GetDifference.Minutes > 0)
+                            {
+                                text += $" et {GetDifference.Minutes} {((GetDifference.Minutes > 1) ? "minutes" : "minute")}";
+                            }
+                        }
+                        else if (GetDifference.Hours == 0)
+                        {
+                            if (GetDifference.Minutes > 0)
+                            {
+                                text = $"{Prefixe} {GetDifference.Minutes} {((GetDifference.Minutes > 1) ? "minutes" : "minute")}";
+                                if (GetDifference.Seconds > 0)
+                                {
+                                    text += $" et {GetDifference.Seconds} {((GetDifference.Seconds > 1) ? "secondes" : "seconde")}";
+                                }
+                            }
+                            else if (GetDifference.Minutes == 0)
+                            {
+                                if (GetDifference.Seconds > 0)
+                                {
+                                    text = $"{Prefixe} {GetDifference.Seconds} {((GetDifference.Seconds > 1) ? "secondes" : "seconde")}";
+                                }
+                            }
+                        }
+                        return text;
+                    }
+
+                    return null;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            public static string GetDateAndTimeRemainsSufixe(string Sufixe, DateTime DateDebut, DateTime DateFin)
+            {
+                try
+                {
+                    if (DateDebut == null || DateFin == null)
+                    {
+                        return null;
+                    }
+
+                    if (StringHelpers.IsStringNullOrEmptyOrWhiteSpace(Sufixe))
+                    {
+                        return null;
+                    }
+
+                    System.TimeSpan GetDifference = DateFin.Subtract(DateDebut);
+
+                    if (GetDifference == null)
+                    {
+                        return null;
+                    }
+
+                    if (GetDifference.Days > 0)
+                    {
+                        string text = $"{GetDifference.Days} {((GetDifference.Days > 1) ? "jours" : "jour")} {Sufixe}";
+                        if (GetDifference.Hours > 0)
+                        {
+                            text += $" et {GetDifference.Hours} {((GetDifference.Hours > 1) ? "heures" : "heure")}";
+                        }
+                        return text;
+                    }
+                    else if (GetDifference.Days == 0)
+                    {
+                        string text = null;
+                        if (GetDifference.Hours > 0)
+                        {
+                            text = $"{GetDifference.Hours} {((GetDifference.Hours > 1) ? "heures" : "heure")} {Sufixe}";
+                            if (GetDifference.Minutes > 0)
+                            {
+                                text += $" et {GetDifference.Minutes} {((GetDifference.Minutes > 1) ? "minutes" : "minute")}";
+                            }
+                        }
+                        else if (GetDifference.Hours == 0)
+                        {
+                            if (GetDifference.Minutes > 0)
+                            {
+                                text = $"{GetDifference.Minutes} {((GetDifference.Minutes > 1) ? "minutes" : "minute")} {Sufixe}";
+                                if (GetDifference.Seconds > 0)
+                                {
+                                    text += $" et {GetDifference.Seconds} {((GetDifference.Seconds > 1) ? "secondes" : "seconde")}";
+                                }
+                            }
+                            else if (GetDifference.Minutes == 0)
+                            {
+                                if (GetDifference.Seconds > 0)
+                                {
+                                    text = $"{GetDifference.Seconds} {((GetDifference.Seconds > 1) ? "secondes" : "seconde")} {Sufixe}";
+                                }
+                            }
+                        }
+                        return text;
+                    }
+
+                    return null;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// Obtient le nombre de jour, d'heure, de minute et de seconde entre la date actuelle (<paramref name="ActualDate"/>) et une date de fin (<paramref name="DateFin"/>) [inférieur à <paramref name="ActualDate"/>] avec un préfixe
+            /// </summary>
+            /// <param name="Prefixe">préfixe</param>
+            /// <param name="ActualDate">Date actuelle</param>
+            /// <param name="DateFin">Date de fin</param>
+            /// <returns></returns>
+            public static string GetDateAndTimeElapsedPrefixe(string Prefixe, DateTime ActualDate, DateTime DateFin)
+            {
+                try
+                {
+                    if (ActualDate == null || DateFin == null)
+                    {
+                        return null;
+                    }
+
+                    if (StringHelpers.IsStringNullOrEmptyOrWhiteSpace(Prefixe))
+                    {
+                        return null;
+                    }
+
+                    System.TimeSpan GetDifference = DateTime.UtcNow.Subtract((DateTime)DateFin);
+
+                    if (GetDifference != null)
+                    {
+                        if (GetDifference.Days < 0 || GetDifference.Hours < 0 || GetDifference.Minutes < 0 || GetDifference.Seconds < 0 || GetDifference.Milliseconds < 0)
+                        {
+                            return null;
+                        }
+
+                        if (GetDifference == null)
+                        {
+                            return null;
+                        }
+
+                        if (GetDifference.Days > 0)
+                        {
+                            string text = $"{Prefixe} {GetDifference.Days} {((GetDifference.Days > 1) ? "jours" : "jour")}";
+                            if (GetDifference.Hours > 0)
+                            {
+                                text += $" et {GetDifference.Hours} {((GetDifference.Hours > 1) ? "heures" : "heure")}";
+                            }
+                            return text;
+                        }
+                        else if (GetDifference.Days == 0)
+                        {
+                            string text = null;
+                            if (GetDifference.Hours > 0)
+                            {
+                                text = $"{Prefixe} {GetDifference.Hours} {((GetDifference.Hours > 1) ? "heures" : "heure")}";
+                                if (GetDifference.Minutes > 0)
+                                {
+                                    text += $" et {GetDifference.Minutes} {((GetDifference.Minutes > 1) ? "minutes" : "minute")}";
+                                }
+                            }
+                            else if (GetDifference.Hours == 0)
+                            {
+                                if (GetDifference.Minutes > 0)
+                                {
+                                    text = $"{Prefixe} {GetDifference.Minutes} {((GetDifference.Minutes > 1) ? "minutes" : "minute")}";
+                                    if (GetDifference.Seconds > 0)
+                                    {
+                                        text += $" et {GetDifference.Seconds} {((GetDifference.Seconds > 1) ? "secondes" : "seconde")}";
+                                    }
+                                }
+                                else if (GetDifference.Minutes == 0)
+                                {
+                                    if (GetDifference.Seconds > 0)
+                                    {
+                                        text = $"{Prefixe} {GetDifference.Seconds} {((GetDifference.Seconds > 1) ? "secondes" : "seconde")}";
+                                    }
+                                }
+                            }
+                            return text;
+                        }
+                    }
+                    return null;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return null;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            public static double? DivideTime(TimeSpan dividend, TimeSpan divisor)
+            {
+                try
+                {
+                    return (double)dividend.Ticks / (double)divisor.Ticks;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            public static double? DivideRestTime(TimeSpan dividend, TimeSpan divisor)
+            {
+                try
+                {
+                    return (double)dividend.Ticks % (double)divisor.Ticks;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            public static double? GetDateTimeRemainsPurcent(DateTime DateDebut, DateTime DateFin)
+            {
+                try
+                {
+                    if (DateDebut == null || DateFin == null)
+                    {
+                        return null;
+                    }
+
+                    TimeSpan timeDebut = new TimeSpan(DateDebut.Day, DateDebut.Hour, DateDebut.Minute, DateDebut.Second, DateDebut.Millisecond);
+                    TimeSpan timeFin = new TimeSpan(DateFin.Day, DateFin.Hour, DateFin.Minute, DateFin.Second, DateFin.Millisecond);
+
+
+                    if (timeDebut == null || timeFin == null)
+                    {
+                        return null;
+                    }
+                    double? result = DivideTime(timeFin, timeDebut);
+
+                    if (result == null)
+                    {
+                        return null;
+                    }
+
+                    return result * 100;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            public static string GetDateTimeRemainsPurcentString(DateTime DateDebut, DateTime DateFin)
+            {
+                try
+                {
+                    if (DateDebut == null || DateFin == null)
+                    {
+                        return null;
+                    }
+
+                    TimeSpan timeDebut = new TimeSpan(DateDebut.Day, DateDebut.Hour, DateDebut.Minute, DateDebut.Second, DateDebut.Millisecond);
+                    TimeSpan timeFin = new TimeSpan(DateFin.Day, DateFin.Hour, DateFin.Minute, DateFin.Second, DateFin.Millisecond);
+
+
+                    if (timeDebut == null || timeFin == null)
+                    {
+                        return null;
+                    }
+                    double? result = DivideTime(timeFin, timeDebut);
+                    return result?.ToString("P", new CultureInfo("fr-FR", false).NumberFormat);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+
+            public static string GetDateTimeRemainsPurcentResteString(DateTime DateDebut, DateTime DateFin)
+            {
+                try
+                {
+                    if (DateDebut == null || DateFin == null)
+                    {
+                        return null;
+                    }
+
+                    TimeSpan timeDebut = new TimeSpan(DateDebut.Day, DateDebut.Hour, DateDebut.Minute, DateDebut.Second, DateDebut.Millisecond);
+                    TimeSpan timeFin = new TimeSpan(DateFin.Day, DateFin.Hour, DateFin.Minute, DateFin.Second, DateFin.Millisecond);
+
+
+                    if (timeDebut == null || timeFin == null)
+                    {
+                        return null;
+                    }
+                    double? result = 100.0d - DivideTime(timeFin, timeDebut);
+                    return result?.ToString("P", new CultureInfo("fr-FR", false).NumberFormat);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            public static string PurcentDate(DateTime DateDebut, DateTime DateFin, out string Exceeded)
+            {
+                try
+                {
+                    if (DateDebut == null || DateFin == null)
+                    {
+                        Exceeded = null;
+                        return null;
+                    }
+                    System.TimeSpan GetDifference = DateFin.Subtract(DateDebut);
+                    if (GetDifference == null)
+                    {
+                        Exceeded = null;
+                        return null;
+                    }
+                    Thread.Sleep(500);
+
+                    System.TimeSpan GetDifference2 = DateTime.UtcNow.Subtract(DateDebut);
+                    //var percentage = GetDifference2.TotalSeconds * 100/ GetDifference.TotalSeconds;
+                    var percentage = GetDifference2.TotalSeconds / GetDifference.TotalSeconds;
+                    Exceeded = (percentage > 1.0000d) ? (percentage - 1.0000d).ToString("P", new CultureInfo("fr-FR", false).NumberFormat) : "0";
+                    return percentage.ToString("P", new CultureInfo("fr-FR", false).NumberFormat);
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+        }
+
     }
 }

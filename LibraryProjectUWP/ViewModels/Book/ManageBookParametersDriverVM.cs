@@ -49,6 +49,13 @@ namespace LibraryProjectUWP.ViewModels.Book
         public BookCollectionPage ParentPage { get; set; }
     }
 
+    public class BookPretListParametersDriverVM
+    {
+        public LivreVM ParentBook { get; set; }
+        public IEnumerable<LivrePretVM> ViewModelList { get; set; }
+        public BookCollectionPage ParentPage { get; set; }
+    }
+
     [Obsolete("N'est pas utilisé donc sera supprimé par la suite")]
     public class BookListParametersDriverVM
     {

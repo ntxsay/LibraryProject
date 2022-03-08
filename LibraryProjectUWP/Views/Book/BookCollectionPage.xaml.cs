@@ -1673,53 +1673,157 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Book Pret
-        private async void NewBookPretXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void NewBookPretXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookPretUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
-                    if (checkedItem != null)
+                    if (PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC) is BookPretListUC checkedItem)
                     {
-                        this.PivotRightSideBar.SelectedItem = checkedItem;
+                        if (checkedItem._parameters.ParentBook.Id == viewModel.Id)
+                        {
+                            InitializeSearchingBookPretsWorker(viewModel);
+                        }
+                        else
+                        {
+                            BookPretListUC_CancelModificationRequested(checkedItem, args);
+                            InitializeSearchingBookPretsWorker(viewModel);
+                        }
                     }
                     else
                     {
-                        NewEditBookPretUC userControl = new NewEditBookPretUC(new ManageBookPretParametersDriverVM()
-                        {
-                            ParentPage = this,
-                            EditMode = Code.EditMode.Create,
-                            ParentBook = viewModel,
-                            AvailableExemplariesViewModelList = await DbServices.BookExemplary.GetAvailableBookExemplaryVMAsync(viewModel.Id),
-                            CurrentViewModel = new LivrePretVM()
-                            {
-                                EtatAvantPret = new LivreEtatVM()
-                                {
-                                    TypeVerification = Code.BookTypeVerification.AvantPret,
-                                },
-                                EtatApresPret = new LivreEtatVM()
-                                {
-                                    TypeVerification = Code.BookTypeVerification.ApresPret,
-                                },
-                            }
-                        });
-
-
-                        //userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
-                        //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
-
-                        this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                        {
-                            Glyph = userControl.ViewModelPage.Glyph,
-                            Title = userControl.ViewModelPage.Header,
-                            IdItem = userControl.IdItem,
-                        });
+                        InitializeSearchingBookPretsWorker(viewModel);
                     }
-                    this.ViewModelPage.IsSplitViewOpen = true;
                 }
-                
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public async Task NewBookPret(LivreVM viewModel, Guid? guid = null)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookPretUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    NewEditBookPretUC userControl = new NewEditBookPretUC(new ManageBookPretParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        EditMode = Code.EditMode.Create,
+                        ParentBook = viewModel,
+                        AvailableExemplariesViewModelList = await DbServices.BookExemplary.GetAvailableBookExemplaryVMAsync(viewModel.Id),
+                        CurrentViewModel = new LivrePretVM()
+                        {
+                            EtatAvantPret = new LivreEtatVM()
+                            {
+                                TypeVerification = Code.BookTypeVerification.AvantPret,
+                            },
+                            EtatApresPret = new LivreEtatVM()
+                            {
+                                TypeVerification = Code.BookTypeVerification.ApresPret,
+                            },
+                        }
+                    });
+
+                    if (guid != null)
+                    {
+                        userControl.ViewModelPage.Guid = guid;
+                    }
+
+                    userControl.CancelModificationRequested += NewEditBookPretUC_CancelModificationRequested;
+                    //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewEditBookPretUC_CancelModificationRequested(NewEditBookPretUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= NewEditBookPretUC_CancelModificationRequested;
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void BookPretList(LivreVM viewModel, IEnumerable<LivrePretVM> modelList)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                    if (checkedItem is BookPretListUC item)
+                    {
+                        item._parameters.ViewModelList = modelList;
+                        item.InitializeData();
+                    }
+                }
+                else
+                {
+                    BookPretListUC userControl = new BookPretListUC(new BookPretListParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        ParentBook = viewModel,
+                        ViewModelList = modelList,
+                    });
+
+                    userControl.CancelModificationRequested += BookPretListUC_CancelModificationRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void BookPretListUC_CancelModificationRequested(BookPretListUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= BookPretListUC_CancelModificationRequested;
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -3759,6 +3863,30 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private BookPretListUC GetBookPretListSideBarByGuid(Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC item && item.ViewModelPage.Guid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as BookPretListUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
         private NewEditBookUC GetBookSideBarByGuid(Guid guid)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -4026,7 +4154,8 @@ namespace LibraryProjectUWP.Views.Book
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         public const int SearchBookExemplaryTaskId = 1;
-        public const int CompleteInfoBookExemplaryTaskId = 1;
+        public const int SearchBookPretTaskId = 3;
+        public const int CompleteInfoBookExemplaryTaskId = 2;
         private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
         public ObservableCollection<TaskVM> TaskList
         {

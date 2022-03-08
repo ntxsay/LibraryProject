@@ -79,4 +79,11 @@ namespace LibraryProjectUWP.Code
         Jusqua,
         DeTantATant,
     }
+
+    public enum BookPretFrom : byte
+    {
+        Emprunteur,
+        Book,
+        BookExemplaire,
+    }
 }

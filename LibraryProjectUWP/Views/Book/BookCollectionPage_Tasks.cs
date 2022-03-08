@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.Code.Helpers;
+﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
@@ -19,8 +20,10 @@ namespace LibraryProjectUWP.Views.Book
 {
     public sealed partial class BookCollectionPage : Page
     {
+        private BackgroundWorker workerSearchPretsBook;
         private BackgroundWorker workerSearchExemplariesBook;
         private BackgroundWorker workerCompleteInfoBook;
+        CancellationTokenSource cancellationTokenSourceSearchPretsBook = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceSearchBook = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceCompleteInfoBook = new CancellationTokenSource();
 
@@ -334,5 +337,150 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         #endregion
+
+        #region SearchPretsBooks
+        public void InitializeSearchingBookPretsWorker(LivreVM viewModel)
+        {
+            try
+            {
+                if (workerSearchPretsBook == null)
+                {
+                    workerSearchPretsBook = new BackgroundWorker()
+                    {
+                        WorkerReportsProgress = false,
+                        WorkerSupportsCancellation = true,
+                    };
+
+                    //workerSearchPretsBook.ProgressChanged += workerSearchExemplariesBook_ProgressChanged;
+                    workerSearchPretsBook.DoWork += WorkerSearchPretsBook_DoWork;
+                    workerSearchPretsBook.RunWorkerCompleted += WorkerSearchPretsBookBook_RunWorkerCompleted;
+                }
+
+                if (workerSearchPretsBook != null)
+                {
+                    if (!workerSearchPretsBook.IsBusy)
+                    {
+                        cancellationTokenSourceSearchPretsBook = new CancellationTokenSource();
+
+                        if (!ViewModelPage.TaskList.Any(a => a.Id == BookCollectionPageVM.SearchBookPretTaskId))
+                        {
+                            ViewModelPage.TaskList.Add(new TaskVM()
+                            {
+                                Id = BookCollectionPageVM.SearchBookPretTaskId,
+                                Description = $"Récupération des exemplaires du livre {viewModel.MainTitle}"
+                            });
+                        }
+
+                        workerSearchPretsBook.RunWorkerAsync(viewModel);
+                        new ToastContentBuilder()
+                        .AddText($"Exemplaires de {viewModel.MainTitle}")
+                        .AddText($"Nous sommes en train de récupérer les exemplaire du livre {viewModel.MainTitle}, nous vous prions de patienter quelques instants.")
+                        .Show();
+                    }
+                    else
+                    {
+                        new ToastContentBuilder()
+                        .AddText($"Exemplaires de {viewModel.MainTitle}")
+                        .AddText($"Nous sommes toujours en train de récupérer les exemplaire du livre {viewModel.MainTitle}, nous vous prions de patienter quelques instants.")
+                        .Show();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void WorkerSearchPretsBook_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                var worker = sender as BackgroundWorker;
+                if (e.Argument is LivreVM viewModel)
+                {
+                    using (Task<IList<LivrePretVM>> task = DbServices.BookPret.GetBookPretVMAsync(viewModel.Id, BookPretFrom.Book, cancellationTokenSourceSearchBook.Token))
+                    {
+                        task.Wait();
+
+                        if (worker.CancellationPending || cancellationTokenSourceSearchPretsBook.IsCancellationRequested)
+                        {
+                            if (!cancellationTokenSourceSearchPretsBook.IsCancellationRequested)
+                            {
+                                cancellationTokenSourceSearchPretsBook.Cancel();
+                            }
+
+                            e.Cancel = true;
+                            return;
+                        }
+
+                        var result = task.Result;
+                        var state = new WorkerState<LivrePretVM, LivrePretVM>()
+                        {
+                            ResultList = result,
+                        };
+
+                        e.Result = new Tuple<LivreVM, WorkerState<LivrePretVM, LivrePretVM>>(viewModel, state);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void WorkerSearchPretsBookBook_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            try
+            {
+                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == BookCollectionPageVM.SearchBookPretTaskId);
+                if (item != null)
+                {
+                    ViewModelPage.TaskList.Remove(item);
+                }
+
+                // Si erreur
+                if (e.Error != null)
+                {
+
+                }
+                else if (e.Cancelled)
+                {
+                    // Support de l'annulation a été désactivée
+                }
+                else
+                {
+                    if (e.Result is Tuple<LivreVM, WorkerState<LivrePretVM, LivrePretVM>> state)
+                    {
+                        //if (state.Item2.ResultList == null || !state.Item2.ResultList.Any())
+                        //{
+                        //    new ToastContentBuilder()
+                        //.AddText($"Exemplaires de {state.Item1.MainTitle}")
+                        //.AddText($"Il n'y a pas d'exemplaires à afficher pour ce livre en ce moment.")
+                        //.Show();
+                        //    return;
+                        //}
+
+                        BookPretList(state.Item1, state.Item2.ResultList);
+                    }
+                }
+
+                workerSearchPretsBook.Dispose();
+                workerSearchPretsBook = null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #endregion
+
     }
 }

@@ -159,6 +159,8 @@
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
     <Compile Include="Code\Helpers\VisualViewHelpers.cs" />
+    <Compile Include="Code\Services\Db\BookEtat_db.cs" />
+    <Compile Include="Code\Services\Db\BookPret_db.cs" />
     <Compile Include="Code\Services\Db\BookExemplary_db.cs" />
     <Compile Include="Code\Services\Db\Contact_db.cs" />
     <Compile Include="Code\Services\Db\Book_db.cs" />
@@ -212,6 +214,7 @@
     <Compile Include="ViewModels\Book\LivreDescriptionVM.cs" />
     <Compile Include="ViewModels\Book\LivreExemplaryGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivreExemplaryVM.cs" />
+    <Compile Include="ViewModels\Book\LivrePretGroupVM.cs" />
     <Compile Include="ViewModels\Book\LivrePretVM.cs" />
     <Compile Include="ViewModels\Book\LivrePublicationVM.cs" />
     <Compile Include="ViewModels\Book\LivreFormatVM.cs" />
@@ -249,6 +252,9 @@
       <DependentUpon>BookBeforeGoBackCD.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\BookCollectionPage_Tasks.cs" />
+    <Compile Include="Views\Book\BookPretListUC.xaml.cs">
+      <DependentUpon>BookPretListUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\BookExemplaryListUC.xaml.cs">
       <DependentUpon>BookExemplaryListUC.xaml</DependentUpon>
     </Compile>
@@ -409,6 +415,10 @@
     <Page Include="Views\Book\BookBeforeGoBackCD.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\BookPretListUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Book\BookExemplaryListUC.xaml">
       <Generator>MSBuild:Compile</Generator>

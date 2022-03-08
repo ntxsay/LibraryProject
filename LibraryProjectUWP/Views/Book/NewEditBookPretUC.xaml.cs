@@ -355,7 +355,23 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                
+                if (ViewModelPage.ViewModel.TimePret != null && ViewModelPage.ViewModel.DatePret != null)
+                {
+                    var date = new DateTimeOffset(new DateTime(ViewModelPage.ViewModel.DatePret.Year, ViewModelPage.ViewModel.DatePret.Month,
+                                                    ViewModelPage.ViewModel.DatePret.Month, ViewModelPage.ViewModel.DatePret.Day,
+                                                    ViewModelPage.ViewModel.TimePret.Value.Hours, ViewModelPage.ViewModel.TimePret.Value.Minutes, ViewModelPage.ViewModel.TimePret.Value.Seconds));
+                    
+                    ViewModelPage.ViewModel.DatePret = date.ToUniversalTime();
+                }
+
+                if (ViewModelPage.ViewModel.TimeRemise.HasValue && ViewModelPage.ViewModel.DateRemise.HasValue)
+                {
+                    var date = new DateTimeOffset(new DateTime(ViewModelPage.ViewModel.DateRemise.Value.Year, ViewModelPage.ViewModel.DateRemise.Value.Month,
+                                                    ViewModelPage.ViewModel.DateRemise.Value.Month, ViewModelPage.ViewModel.DateRemise.Value.Day,
+                                                    ViewModelPage.ViewModel.TimeRemise.Value.Hours, ViewModelPage.ViewModel.TimeRemise.Value.Minutes, ViewModelPage.ViewModel.TimeRemise.Value.Seconds));
+
+                    ViewModelPage.ViewModel.DateRemise = date.ToUniversalTime();
+                }
 
                 ViewModelPage.IsResultMessageOpen = false;
                 return true;
@@ -593,5 +609,4 @@ namespace LibraryProjectUWP.Views.Book
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
 }

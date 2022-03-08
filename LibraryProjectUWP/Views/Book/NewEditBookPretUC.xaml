@@ -19,6 +19,7 @@
     d:DesignHeight="800"
     d:DesignWidth="510" Loaded="PivotItem_Loaded" Unloaded="UserControl_Unloaded">
     <PivotItem.Resources>
+        <customConverters:DateTimeToStringDisplay x:Key="dateTimeToStringDisplay"/>
         <customConverters:NameToColorConverter x:Key="NameToColorConverter"/>
         <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
         <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
@@ -70,7 +71,7 @@
         PersonTemplate="{StaticResource PersonTemplate}"
         EnterpriseTemplate="{StaticResource EnterpriseTemplate}" />
         <DataTemplate x:Key="exemplaryItemDataTemplate" x:DataType="bookVm:LivreExemplaryVM">
-            <Grid ColumnSpacing="2" HorizontalAlignment="Stretch" Padding="0 0">
+            <Grid ColumnSpacing="8" HorizontalAlignment="Stretch" Padding="0 0" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -79,33 +80,17 @@
                     <Ellipse Height="40" Width="40" Fill="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"/>
                     <TextBlock Text="{x:Bind NoExemplaire, Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center"/>
                 </Grid>
-                <Grid Grid.Column="1" ColumnSpacing="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Left" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}">
-                                <Run Text="{x:Bind Source}" FontWeight="SemiBold"/>
-                    </TextBlock>
-                    <!--<TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Right" Text="{x:Bind DateAcquisition, Mode=OneWay}" FontSize="12"/>-->
-                    <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" FontSize="12" TextWrapping="Wrap">
+                <Grid Grid.Column="1" ColumnSpacing="8" VerticalAlignment="Center">
+                    <TextBlock HorizontalAlignment="Left" FontSize="12" TextWrapping="Wrap">
                                 <Run Text="Etat du livre"/>
                                 <Run Text="{x:Bind Etat.Etat}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
-                                <Run Text="en provenance de"/>
+                                <Run Text="au"/>
+                                <Run Text="{x:Bind Etat.DateVerification, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='dddd dd MMMM yyyy'}"/>
+                                <LineBreak /><Run Text="En provenance de"/>
                                 <Run Text="{x:Bind ContactSource.SocietyName}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                                 <Run Text="{x:Bind ContactSource.NomNaissance}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                                 <Run Text="{x:Bind ContactSource.Prenom}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                     </TextBlock>
-                    <!--<TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Left" FontSize="12">
-                                <Run Text="Prix :"/>
-                                <Run Text="{x:Bind Price}"/>
-                                <Run Text="{x:Bind DeviceName}"/>
-                    </TextBlock>-->
                 </Grid>
             </Grid>
         </DataTemplate>
