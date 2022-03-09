@@ -40,7 +40,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         List<TbookPret> collection = await context.TbookPret.ToListAsync();
                         foreach (TbookPret item in collection)
                         {
-                            await CompleteModelInfos(context, item);
+                            await CompleteModelInfos(item);
                         }
 
                         if (collection == null || !collection.Any()) return Enumerable.Empty<TbookPret>().ToList();
@@ -184,12 +184,12 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 break;
 
                             case BookPretFrom.Book:
-                                var exemplaries = await BookExemplary.GetBookExemplaryAsync(idItem, cancellationToken);
-                                if (exemplaries != null && !exemplaries.Any())
+                                var exemplaries = await BookExemplary.AllIdInBookAsync(idItem);
+                                if (exemplaries != null && exemplaries.Any())
                                 {
-                                    foreach(var item in exemplaries)
+                                    foreach(var idExemplary in exemplaries)
                                     {
-                                        var items = await context.TbookPret.Where(w => w.IdBookExemplary == item.Id).ToListAsync(cancellationToken);
+                                        var items = await context.TbookPret.Where(w => w.IdBookExemplary == idExemplary).ToListAsync(cancellationToken);
                                         if (items != null && items.Any())
                                         {
                                             preCollection.AddRange(items);
@@ -209,7 +209,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 {
                                     return preCollection;
                                 }
-                                await CompleteModelInfos(context, item);
+                                await CompleteModelInfos(item);
                             }
                         }
                         return preCollection;
@@ -274,7 +274,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
                         var s = await context.TbookPret.SingleOrDefaultAsync(d => d.Id == id);
-                        await CompleteModelInfos(context, s);
+                        await CompleteModelInfos(s);
                         if (s == null) return null;
 
                         return s;
@@ -327,11 +327,35 @@ namespace LibraryProjectUWP.Code.Services.Db
                             };
                         }
 
+                        var recordEtatAvantPret = new TbookEtat()
+                        {
+                            IdBookExemplary = viewModel.Emprunteur.Id,
+                            DateAjout = viewModel.EtatAvantPret.DateAjout.ToUniversalTime().ToString(),
+                            Etat = viewModel.EtatAvantPret.Etat,
+                            Observations = viewModel.EtatAvantPret.Observations,
+                            TypeVerification = (byte)viewModel.EtatAvantPret.TypeVerification,
+                        };
+
+                        await context.TbookEtat.AddAsync(recordEtatAvantPret);
+                        await context.SaveChangesAsync();
+
+                        var record = new TbookPret()
+                        {
+                            IdBookExemplary = viewModel.IdBookExemplary,
+                            DatePret = viewModel.DatePret.ToUniversalTime().ToString(),
+                            IdContact = viewModel.Emprunteur.Id,
+                            IdEtatBefore = recordEtatAvantPret.Id,
+                            DateRemise = viewModel.DateRemise.HasValue ? viewModel.DateRemise.Value.ToUniversalTime().ToString() : null,
+                        };
+
+                        await context.TbookPret.AddAsync(record);
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
                             //Id = record.Id,
-                            //Message = $"{viewModel.NbExemplaire} exemplaire(s) ont été enregistrés distinctement avec succès."
+                            Message = $"Le prêt a été accordé avec succès."
                         };
                     }
                         
@@ -340,82 +364,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     MethodBase m = MethodBase.GetCurrentMethod();
                     Logs.Log(ex, m);
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = false,
-                        Message = $"Exception : {ex.Message}",
-                    };
-                }
-            }
-
-
-            /// <summary>
-            /// Met à jour un élément existant dans la base de données
-            /// </summary>
-            /// <typeparam name="T">Type d'entrée (Modèle de vue)</typeparam>
-            /// <param name="viewModel">Modèle de vue</param>
-            /// <returns></returns>
-            public static async Task<OperationStateVM> UpdateAsync(LivreExemplaryVM viewModel)
-            {
-                try
-                {
-
-                    if (viewModel == null)
-                    {
-                        return new OperationStateVM()
-                        {
-                            IsSuccess = false,
-                            Message = DbServices.ViewModelNullOrEmptyMessage,
-                        };
-                    }
-
-                    
-                    using (LibraryDbContext context = new LibraryDbContext())
-                    {
-                        var record = await context.TbookExemplary.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
-                        if (record == null)
-                        {
-                            return new OperationStateVM()
-                            {
-                                IsSuccess = false,
-                                Message = DbServices.RecordNotExistMessage,
-                            };
-                        }
-
-                        double? nullablePrice;
-                        if (viewModel.IsPriceUnavailable == false)
-                        {
-                            nullablePrice = viewModel.Price;
-                        }
-                        else
-                        {
-                            nullablePrice = null;
-                        }
-
-                        record.DateEdition = DateTime.UtcNow.ToString();
-                        record.IdContactSource = viewModel.IdContactSource;
-                        record.DateAcquisition = viewModel.DateAcquisition;
-                        record.DateRemise = viewModel.DateRemiseLivre?.ToString();
-                        record.TypeAcquisition = viewModel.Source;
-                        record.Observations = viewModel.Observations;
-                        record.Price = nullablePrice;
-                        record.DeviceName = viewModel.DeviceName;
-
-                        context.TbookExemplary.Update(record);
-                        await context.SaveChangesAsync();
-
-                        return new OperationStateVM()
-                        {
-                            IsSuccess = true,
-                            Id = record.Id,
-                        };
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Logs.Log(ex, m);
-
                     return new OperationStateVM()
                     {
                         IsSuccess = false,
@@ -482,7 +430,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
 
             #region Helpers
-            private static async Task CompleteModelInfos(LibraryDbContext _context, TbookPret model)
+            private static async Task CompleteModelInfos(TbookPret model)
             {
                 try
                 {
@@ -491,7 +439,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         return;
                     }
 
-                    using (LibraryDbContext context = _context ?? new LibraryDbContext())
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
                         model.IdBookExemplaryNavigation = await context.TbookExemplary.SingleOrDefaultAsync(s => s.Id == model.IdBookExemplary);
                         model.IdContactNavigation = await context.Tcontact.SingleOrDefaultAsync(s => s.Id == model.IdContact);
@@ -522,15 +470,22 @@ namespace LibraryProjectUWP.Code.Services.Db
                         emprunteur = await Contact.ViewModelConverterAsync(model.IdContactNavigation);
                     }
 
+                    LivreExemplaryVM exemplary = null;
+                    if (model.IdBookExemplaryNavigation != null)
+                    {
+                        exemplary = await BookExemplary.ViewModelConverterAsync(model.IdBookExemplaryNavigation);
+                    }
+
                     var viewModel = new LivrePretVM()
                     {
                         Id = model.Id,
                         IdBookExemplary = model.IdBookExemplary,
+                        Exemplary = exemplary,
                         //IdBook = model.IdBook,
                         IdEmprunteur = model.IdContact,
                         Emprunteur = emprunteur,
-                        DatePret = DatesHelpers.Converter.GetDateFromString(model.DateRemise),
-                        DateRemise = DatesHelpers.Converter.GetDateFromString(model.DateRemise),
+                        DatePret = DatesHelpers.Converter.GetDateFromString(model.DatePret),
+                        DateRemise = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemise),
                     };
 
                     if (model.IdEtatBeforeNavigation != null)
@@ -547,8 +502,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return null;
                 }
             }
-
-            
 
             public static LivreExemplaryVM DeepCopy(LivreExemplaryVM viewModelToCopy)
             {

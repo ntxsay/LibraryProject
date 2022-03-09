@@ -61,7 +61,7 @@
                 <Setter Property="Margin" Value="4 0" />
                 <Setter Property="VerticalAlignment" Value="Top" />
             </Style>
-            <DataTemplate x:Key="ZoomedInTemplate" x:DataType="booktVm:LivreExemplaryVM">
+            <DataTemplate x:Key="ZoomedInTemplate" x:DataType="booktVm:LivrePretVM">
                 <Grid ColumnSpacing="2" HorizontalAlignment="Stretch" Padding="0 10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -69,7 +69,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" VerticalAlignment="Center">
                         <Ellipse Height="40" Width="40" Fill="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"/>
-                        <TextBlock Text="{x:Bind NoExemplaire, Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center"/>
+                        <TextBlock Text="{x:Bind Exemplary.NoExemplaire, Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center"/>
                     </Grid>
                     <Grid Grid.Column="1" ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
@@ -82,33 +82,33 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Left" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}">
-                                <Run Text="{x:Bind Source}" FontWeight="SemiBold"/>
+                                <Run Text="{x:Bind Emprunteur.SocietyName}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="{x:Bind Emprunteur.NomNaissance}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="{x:Bind Emprunteur.Prenom}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                         </TextBlock>
-                        <TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Right" Text="{x:Bind DateAcquisition, Mode=OneWay}" FontSize="12"/>
+                        <!--<TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1" HorizontalAlignment="Right" Text="{x:Bind DateAcquisition, Mode=OneWay}" FontSize="12"/>-->
                         <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" FontSize="12" TextWrapping="Wrap">
-                                <Run Text="Etat du livre"/>
-                                <Run Text="{x:Bind Etat.Etat}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
-                                <Run Text="en provenance de"/>
-                                <Run Text="{x:Bind ContactSource.SocietyName}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
-                                <Run Text="{x:Bind ContactSource.NomNaissance}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
-                                <Run Text="{x:Bind ContactSource.Prenom}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="Etat du livre avant prêt"/>
+                                <Run Text="{x:Bind EtatAvantPret.Etat}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="Retour prévu le"/>
+                                <Run Text="{x:Bind DateRemise.Value.ToString(), Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                         </TextBlock>
-                        <TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Left" FontSize="12">
+                        <!--<TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Left" FontSize="12">
                                 <Run Text="Prix :"/>
                                 <Run Text="{x:Bind Price}"/>
                                 <Run Text="{x:Bind DeviceName}"/>
-                        </TextBlock>
+                        </TextBlock>-->
                     </Grid>
                 </Grid>
             </DataTemplate>
-            <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="booktVm:LivreExemplaryVMCastVM">
+            <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="booktVm:LivrePretVMCastVM">
                 <Border Background="{ThemeResource SystemControlAcrylicElementBrush}" HorizontalAlignment="Stretch" MinWidth="350" Margin="0 10 0 0" Padding="5 0" CornerRadius="4">
                     <TextBlock Text="{Binding GroupName}" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="18"
                            VerticalAlignment="Center"/>
                 </Border>
             </DataTemplate>
             <DataTemplate x:Key="ZoomedOutTemplate" x:DataType="wuxdata:ICollectionViewGroup">
-                <TextBlock Text="{x:Bind ((booktVm:LivreExemplaryVMCastVM)Group).GroupName}" TextWrapping="Wrap" FontSize="18"/>
+                <TextBlock Text="{x:Bind ((booktVm:LivrePretVMCastVM)Group).GroupName}" TextWrapping="Wrap" FontSize="18"/>
             </DataTemplate>
         </ResourceDictionary>
     </PivotItem.Resources>

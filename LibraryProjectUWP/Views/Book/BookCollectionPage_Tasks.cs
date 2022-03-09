@@ -51,11 +51,11 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         cancellationTokenSourceCompleteInfoBook = new CancellationTokenSource();
 
-                        if (!ViewModelPage.TaskList.Any(a => a.Id == BookCollectionPageVM.CompleteInfoBookExemplaryTaskId))
+                        if (!ViewModelPage.TaskList.Any(a => a.Id == EnumTaskId.CompleteInfoBook))
                         {
                             ViewModelPage.TaskList.Add(new TaskVM()
                             {
-                                Id = BookCollectionPageVM.SearchBookExemplaryTaskId,
+                                Id = EnumTaskId.CompleteInfoBook,
                                 Description = $"Finalisation de la structure des livres"
                             });
                         }
@@ -109,8 +109,7 @@ namespace LibraryProjectUWP.Views.Book
 
                         foreach (IGrouping<string, LivreVM> iGroupingBook in ViewModelPage.GroupedRelatedViewModel.Collection)
                         {
-                            LivreVM iBook = iGroupingBook as LivreVM;
-                            if (iBook != null && iBook.Id == book.Id)
+                            if (iGroupingBook is LivreVM iBook && iBook.Id == book.Id)
                             {
                                 iBook.NbExemplaires = result;
                                 iBook.JaquettePath = jaquetteFile;
@@ -119,35 +118,6 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     }
                 }
-
-                
-
-                //if (e.Argument is LivreVM viewModel)
-                //{
-                //    using (Task<IList<LivreExemplaryVM>> task = DbServices.Book.GetBookExemplaryVMAsync(viewModel.Id, cancellationTokenSourceSearchBook.Token))
-                //    {
-                //        task.Wait();
-
-                //        if (worker.CancellationPending || cancellationTokenSourceSearchBook.IsCancellationRequested)
-                //        {
-                //            if (!cancellationTokenSourceSearchBook.IsCancellationRequested)
-                //            {
-                //                cancellationTokenSourceSearchBook.Cancel();
-                //            }
-
-                //            e.Cancel = true;
-                //            return;
-                //        }
-
-                //        var result = task.Result;
-                //        var state = new WorkerState<LivreExemplaryVM, LivreExemplaryVM>()
-                //        {
-                //            ResultList = result,
-                //        };
-
-                //        e.Result = new Tuple<LivreVM, WorkerState<LivreExemplaryVM, LivreExemplaryVM>>(viewModel, state);
-                //    }
-                //}
             }
             catch (Exception ex)
             {
@@ -157,11 +127,11 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void WorkerCompleteInfoBook_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private async void WorkerCompleteInfoBook_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             try
             {
-                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == BookCollectionPageVM.CompleteInfoBookExemplaryTaskId);
+                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == EnumTaskId.CompleteInfoBook);
                 if (item != null)
                 {
                     ViewModelPage.TaskList.Remove(item);
@@ -180,9 +150,14 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     
                 }
+                ViewModelPage.BackgroundImagePath = await esBook.GetBookCollectionBackgroundImagePathAsync();
+                await InitializeBackgroundImagesync();
 
                 workerCompleteInfoBook.Dispose();
                 workerCompleteInfoBook = null;
+
+                await InitializeDataAsync(true);
+
             }
             catch (Exception ex)
             {
@@ -218,11 +193,11 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         cancellationTokenSourceSearchBook = new CancellationTokenSource();
 
-                        if (!ViewModelPage.TaskList.Any(a => a.Id == BookCollectionPageVM.SearchBookExemplaryTaskId))
+                        if (!ViewModelPage.TaskList.Any(a => a.Id == EnumTaskId.SearchBookExemplary))
                         {
                             ViewModelPage.TaskList.Add(new TaskVM()
                             {
-                                Id = BookCollectionPageVM.SearchBookExemplaryTaskId,
+                                Id = EnumTaskId.SearchBookExemplary,
                                 Description = $"Récupération des exemplaires du livre {viewModel.MainTitle}"
                             });
                         }
@@ -293,7 +268,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == BookCollectionPageVM.SearchBookExemplaryTaskId);
+                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == EnumTaskId.SearchBookExemplary);
                 if (item != null)
                 {
                     ViewModelPage.TaskList.Remove(item);
@@ -362,11 +337,11 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         cancellationTokenSourceSearchPretsBook = new CancellationTokenSource();
 
-                        if (!ViewModelPage.TaskList.Any(a => a.Id == BookCollectionPageVM.SearchBookPretTaskId))
+                        if (!ViewModelPage.TaskList.Any(a => a.Id == EnumTaskId.SearchBookPret))
                         {
                             ViewModelPage.TaskList.Add(new TaskVM()
                             {
-                                Id = BookCollectionPageVM.SearchBookPretTaskId,
+                                Id = EnumTaskId.SearchBookPret,
                                 Description = $"Récupération des exemplaires du livre {viewModel.MainTitle}"
                             });
                         }
@@ -437,7 +412,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == BookCollectionPageVM.SearchBookPretTaskId);
+                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == EnumTaskId.SearchBookPret);
                 if (item != null)
                 {
                     ViewModelPage.TaskList.Remove(item);

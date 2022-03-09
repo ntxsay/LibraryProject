@@ -355,7 +355,25 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (ViewModelPage.ViewModel.TimePret != null && ViewModelPage.ViewModel.DatePret != null)
+                if (ViewModelPage.ViewModel.Exemplary == null)
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Vous devez sélectionner un exemplaire";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
+
+                if (ViewModelPage.ViewModel.EtatAvantPret.Etat.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"L'état du livre avant le prêt n'est pas renseigné.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
+
+                if (ViewModelPage.ViewModel.TimePret != null)
                 {
                     var date = new DateTimeOffset(new DateTime(ViewModelPage.ViewModel.DatePret.Year, ViewModelPage.ViewModel.DatePret.Month,
                                                     ViewModelPage.ViewModel.DatePret.Month, ViewModelPage.ViewModel.DatePret.Day,
@@ -370,9 +388,11 @@ namespace LibraryProjectUWP.Views.Book
                                                     ViewModelPage.ViewModel.DateRemise.Value.Month, ViewModelPage.ViewModel.DateRemise.Value.Day,
                                                     ViewModelPage.ViewModel.TimeRemise.Value.Hours, ViewModelPage.ViewModel.TimeRemise.Value.Minutes, ViewModelPage.ViewModel.TimeRemise.Value.Seconds));
 
-                    ViewModelPage.ViewModel.DateRemise = date.ToUniversalTime();
+                    ViewModelPage.ViewModel.DateRemise = date;
                 }
 
+                ViewModelPage.ViewModel.NoExemplary = ViewModelPage.ViewModel.Exemplary.NoExemplaire;
+                ViewModelPage.ViewModel.IdBookExemplary = ViewModelPage.ViewModel.Exemplary.Id;
                 ViewModelPage.IsResultMessageOpen = false;
                 return true;
             }

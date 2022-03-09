@@ -86,4 +86,13 @@ namespace LibraryProjectUWP.Code
         Book,
         BookExemplaire,
     }
+
+    public enum EnumTaskId : byte
+    {
+        SearchBooks,
+        CountBooks,
+        SearchBookExemplary,
+        SearchBookPret,
+        CompleteInfoBook,
+    }
 }

@@ -266,7 +266,7 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
             <StackPanel Orientation="Vertical" Spacing="16" Margin="0 8 0 0" VerticalAlignment="Top">
                 <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind _parameters.AvailableExemplariesViewModelList}"
-                          ItemTemplate="{StaticResource exemplaryItemDataTemplate}">
+                          ItemTemplate="{StaticResource exemplaryItemDataTemplate}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Exemplary, Mode=TwoWay}">
                     <ComboBox.Header>
                         <TextBlock Text="Exemplaires disponible" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </ComboBox.Header>

@@ -84,7 +84,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(_parameters.ViewModelList)?.OrderByDescending(q => q.DatePret).GroupBy(s => s.DatePret.ToString("dddd dd MMMM yyyy")).Select(s => s);
+                var GroupingItems = this.OrderItems(_parameters.ViewModelList)?.OrderByDescending(q => q.DateRemise).GroupBy(s => s.PretStatus()).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     if (this.CollectionViewSource.View == null)

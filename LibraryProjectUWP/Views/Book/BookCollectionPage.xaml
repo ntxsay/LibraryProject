@@ -208,7 +208,7 @@
                         </Border>
                         <Button.Flyout>
                             <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                <MenuFlyoutItem Text="changer de couverture" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
+                                <MenuFlyoutItem Text="Première de couverture" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xEB9F;"/>
                                     </MenuFlyoutItem.Icon>

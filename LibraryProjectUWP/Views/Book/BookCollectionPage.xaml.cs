@@ -59,14 +59,12 @@ namespace LibraryProjectUWP.Views.Book
             {
                 _parameters = parameters;
                 ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
-                ViewModelPage.BackgroundImagePath = await esBook.GetBookCollectionBackgroundImagePathAsync();
             }
         }
 
         #region Loading
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            await InitializeDataAsync(true);
             InitializeCompleteInfoBookWorker();
         }
 
@@ -563,35 +561,6 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Item MenuFlyout
-        private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (args.Parameter is LivreVM viewModel)
-                {
-                    EsBook esBook = new EsBook();
-                    var result = await esBook.ChangeBookItemJaquetteAsync(viewModel);
-                    if (!result.IsSuccess)
-                    {
-                        return;
-                    }
-
-                    viewModel.JaquettePath = result.Result?.ToString() ?? "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-                    var image = GetSelectedThumbnailImage(viewModel);
-                    if (image != null)
-                    {
-                        var bitmapImage = await Files.BitmapImageFromFileAsync(viewModel.JaquettePath);
-                        image.Source = bitmapImage;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
 
         private async void ExportThisBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -1097,6 +1066,83 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        #endregion
+
+        #region Médias
+        private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is LivreVM viewModel)
+                {
+                    EsBook esBook = new EsBook();
+                    var result = await esBook.ChangeBookItemJaquetteAsync(viewModel);
+                    if (!result.IsSuccess)
+                    {
+                        return;
+                    }
+
+                    viewModel.JaquettePath = result.Result?.ToString() ?? "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                    var image = GetSelectedThumbnailImage(viewModel);
+                    if (image != null)
+                    {
+                        var bitmapImage = await Files.BitmapImageFromFileAsync(viewModel.JaquettePath);
+                        image.Source = bitmapImage;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
+        private async void ChangeBackgroundImageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var result = await esBook.ChangeBookCollectionBackgroundImageAsync();
+                if (!result.IsSuccess)
+                {
+                    return;
+                }
+
+                ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.BookDefaultBackgroundImage;
+                await InitializeBackgroundImagesync();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async Task InitializeBackgroundImagesync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.BackgroundImagePath.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    return;
+                }
+
+                if (ImageBackground != null)
+                {
+                    var bitmapImage = await Files.BitmapImageFromFileAsync(ViewModelPage.BackgroundImagePath);
+                    ImageBackground.Source = bitmapImage;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         #endregion
 
         #region New Book
@@ -1742,7 +1788,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
 
                     userControl.CancelModificationRequested += NewEditBookPretUC_CancelModificationRequested;
-                    //userControl.CreateItemRequested += NewEditBookExemplaryUC_Create_CreateItemRequested;
+                    userControl.CreateItemRequested += NewEditBookPretUC_CreateItemRequested;
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
@@ -1752,6 +1798,59 @@ namespace LibraryProjectUWP.Views.Book
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NewEditBookPretUC_CreateItemRequested(NewEditBookPretUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    LivrePretVM newViewModel = sender.ViewModelPage.ViewModel;
+
+                    var creationResult = await DbServices.BookPret.CreateAsync(sender.ViewModelPage.ViewModel.IdBookExemplary, newViewModel);
+                    if (creationResult.IsSuccess)
+                    {
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+
+                        if (sender.ViewModelPage.Guid != null)
+                        {
+                            this.InitializeSearchingBookPretsWorker(sender._parameters.ParentBook);
+                            NewEditBookPretUC_CancelModificationRequested(sender, e);
+                            //var bookExemplariesList = GetBookExemplariesSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            //if (bookExemplariesList != null)
+                            //{
+                            //    var getModelList = bookExemplariesList._parameters.ViewModelList.ToList();
+                            //    getModelList.Add(newViewModel);
+                            //    bookExemplariesList._parameters.ViewModelList = getModelList;
+                            //    //bookExemplariesList._parameters.ViewModelList.Publication.Collections.Add(newViewModel);
+                            //    NewEditBookExemplaryUC_Create_CancelModificationRequested(sender, e);
+                            //    //InitializeSearchingBookWorker(bookExemplariesList._parameters.);
+                            //}
+                        }
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+
+                sender.ViewModelPage.ViewModel = new LivrePretVM();
             }
             catch (Exception ex)
             {
@@ -1868,30 +1967,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ChangeBackgroundImageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var result = await esBook.ChangeBookCollectionBackgroundImageAsync();
-                if (!result.IsSuccess)
-                {
-                    return;
-                }
-
-                ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.BookDefaultBackgroundImage;
-                if (ImageBackground != null)
-                {
-                    var bitmapImage = await Files.BitmapImageFromFileAsync(ViewModelPage.BackgroundImagePath);
-                    ImageBackground.Source = bitmapImage;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        
 
         public async Task ExportThisBookAsync(LivreVM viewModel)
         {
@@ -4153,9 +4229,6 @@ namespace LibraryProjectUWP.Views.Book
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public const int SearchBookExemplaryTaskId = 1;
-        public const int SearchBookPretTaskId = 3;
-        public const int CompleteInfoBookExemplaryTaskId = 2;
         private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
         public ObservableCollection<TaskVM> TaskList
         {

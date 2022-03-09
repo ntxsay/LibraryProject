@@ -606,7 +606,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            private static async Task<LivreExemplaryVM> ViewModelConverterAsync(TbookExemplary model)
+            public static async Task<LivreExemplaryVM> ViewModelConverterAsync(TbookExemplary model)
             {
                 try
                 {

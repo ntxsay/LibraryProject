@@ -35,6 +35,7 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using LibraryProjectUWP.Code.Extensions;
 using Windows.UI.Core;
+using LibraryProjectUWP.Code;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -2365,11 +2366,11 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         cancellationTokenSourceSearchBook = new CancellationTokenSource();
 
-                        if (!ViewModelPage.TaskList.Any(a => a.Id == LibraryCollectionPageVM.SearchBookTaskId))
+                        if (!ViewModelPage.TaskList.Any(a => a.Id == EnumTaskId.SearchBooks))
                         {
                             ViewModelPage.TaskList.Add(new TaskVM()
                             {
-                                Id = LibraryCollectionPageVM.SearchBookTaskId,
+                                Id = EnumTaskId.SearchBooks,
                                 Description = $"Récupération des livres de la bibliothèque {viewModel.Name}"
                             });
                         }
@@ -2465,7 +2466,7 @@ namespace LibraryProjectUWP.Views.Library
         {
             try
             {
-                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == LibraryCollectionPageVM.SearchBookTaskId);
+                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == EnumTaskId.SearchBooks);
                 if (item != null)
                 {
                     ViewModelPage.TaskList.Remove(item);
@@ -2531,11 +2532,11 @@ namespace LibraryProjectUWP.Views.Library
                 {
                     if (!workerCountBooks.IsBusy)
                     {
-                        if (!ViewModelPage.TaskList.Any(a => a.Id == LibraryCollectionPageVM.CountBookTaskId))
+                        if (!ViewModelPage.TaskList.Any(a => a.Id == EnumTaskId.CountBooks))
                         {
                             ViewModelPage.TaskList.Add(new TaskVM()
                             {
-                                Id = LibraryCollectionPageVM.CountBookTaskId,
+                                Id = EnumTaskId.CountBooks,
                                 Description = "Recherche du nombre de livre par bibliothèque."
                             });
                         }
@@ -2619,7 +2620,7 @@ namespace LibraryProjectUWP.Views.Library
                     }
                 }
 
-                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == LibraryCollectionPageVM.CountBookTaskId);
+                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == EnumTaskId.CountBooks);
                 if (item != null)
                 {
                     ViewModelPage.TaskList.Remove(item);
@@ -2640,7 +2641,7 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (args.Parameter is TaskVM taskVM)
                 {
-                    if (taskVM.Id == LibraryCollectionPageVM.CountBookTaskId)
+                    if (taskVM.Id == EnumTaskId.CountBooks)
                     {
                         s_cts?.Cancel();
                         if (workerCountBooks !=null && workerCountBooks.IsBusy)
@@ -2648,7 +2649,7 @@ namespace LibraryProjectUWP.Views.Library
                             workerCountBooks.CancelAsync();
                         }
                     }
-                    else if (taskVM.Id == LibraryCollectionPageVM.SearchBookTaskId)
+                    else if (taskVM.Id == EnumTaskId.SearchBooks)
                     {
                         cancellationTokenSourceSearchBook?.Cancel();
                         if (worker != null && worker.IsBusy)
@@ -2738,8 +2739,6 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        public const int CountBookTaskId = 1;
-        public const int SearchBookTaskId = 2;
         private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
         public ObservableCollection<TaskVM> TaskList
         {

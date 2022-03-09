@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibraryProjectUWP.Code;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace LibraryProjectUWP.ViewModels.General
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public int Id { get; set; }
+        public EnumTaskId Id { get; set; }
 
         private string _Description;
         public string Description

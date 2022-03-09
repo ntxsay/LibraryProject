@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.Code.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,7 +16,22 @@ namespace LibraryProjectUWP.ViewModels.Book
         public long Id { get; set; }
         public long IdBook { get; set; } = -1;
         public long IdBookExemplary { get; set; }
+        public long NoExemplary { get; set; }
         public LivreVM Livre { get; set; }
+
+        private LivreExemplaryVM _Exemplary;
+        public LivreExemplaryVM Exemplary
+        {
+            get => _Exemplary;
+            set
+            {
+                if (_Exemplary != value)
+                {
+                    _Exemplary = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         private DateTimeOffset _DatePret = DateTime.UtcNow;
         public DateTimeOffset DatePret
@@ -59,7 +75,7 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private DateTimeOffset? _DateRemise;
+        private DateTimeOffset? _DateRemise = null;
         public DateTimeOffset? DateRemise
         {
             get => _DateRemise;
@@ -143,6 +159,38 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+
+        public string PretStatus()
+        {
+            try
+            {
+                if (!DateRemise.HasValue)
+                {
+                    return "Retour indéterminé";
+                }
+                else
+                {
+                    var compare = DateRemise.Value.DateTime.CompareDate(DateTime.Now);
+                    switch (compare)
+                    {
+                        case DateCompare.DateSuperieur:
+                            return "Prêt en cours";
+                        case DateCompare.DateEgal:
+                            return "Prêt en cours";
+                        case DateCompare.DateInferieur:
+                            return "Retour en retard";
+                        case DateCompare.Unknow:
+                            return "Status inconnu";
+                        default:
+                            return "Status inconnu";
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return "Status inconnu";
+            }
+        }
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             // Raise the PropertyChanged event, passing the name of the property whose value has changed.

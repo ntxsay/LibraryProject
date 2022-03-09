@@ -507,33 +507,6 @@ namespace LibraryProjectUWP.Code.Helpers
                 }
             }
 
-            /// <summary>
-            /// Convertit une chaîne de caractères en objet <see cref="DateTime"/>
-            /// </summary>
-            /// <param name="value">Chaîne de caractères à convertir en <see cref="DateTime"/></param>
-            /// <returns></returns>
-            public static DateTime? StringToDateTime(string value)
-            {
-                try
-                {
-                    if (StringHelpers.IsStringNullOrEmptyOrWhiteSpace(value))
-                    {
-                        return null;
-                    }
-
-                    if (DateTime.TryParse(value, out DateTime nValue))
-                    {
-                        return nValue;
-                    }
-
-                    return null;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                    return null;
-                }
-            }
             #endregion
 
             #region DateTime
