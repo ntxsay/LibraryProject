@@ -89,6 +89,20 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        private DateTime? _DateRealRemise = null;
+        public DateTime? DateRealRemise
+        {
+            get => _DateRealRemise;
+            set
+            {
+                if (_DateRealRemise != value)
+                {
+                    _DateRealRemise = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private TimeSpan? _TimeRemise;
         public TimeSpan? TimeRemise
         {
@@ -164,25 +178,33 @@ namespace LibraryProjectUWP.ViewModels.Book
         {
             try
             {
-                if (!DateRemise.HasValue)
+                
+                if (DateRealRemise.HasValue)
                 {
-                    return "Retour indéterminé";
+                    return "Exemplaires retournés";
                 }
                 else
                 {
-                    var compare = DateRemise.Value.DateTime.CompareDate(DateTime.Now);
-                    switch (compare)
+                    if (!DateRemise.HasValue)
                     {
-                        case DateCompare.DateSuperieur:
-                            return "Prêt en cours";
-                        case DateCompare.DateEgal:
-                            return "Prêt en cours";
-                        case DateCompare.DateInferieur:
-                            return "Retour en retard";
-                        case DateCompare.Unknow:
-                            return "Status inconnu";
-                        default:
-                            return "Status inconnu";
+                        return "Durée du prêt indéterminée";
+                    }
+                    else
+                    {
+                        var compare = DateRemise.Value.DateTime.CompareDate(DateTime.Now);
+                        switch (compare)
+                        {
+                            case DateCompare.DateSuperieur:
+                                return "Prêt en cours";
+                            case DateCompare.DateEgal:
+                                return "Prêt en cours";
+                            case DateCompare.DateInferieur:
+                                return "En attente du retour";
+                            case DateCompare.Unknow:
+                                return "Status inconnu";
+                            default:
+                                return "Status inconnu";
+                        }
                     }
                 }
             }
