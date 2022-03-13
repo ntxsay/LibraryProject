@@ -14,9 +14,17 @@ namespace LibraryProjectUWP.Code.Converters
         {
             try
             {
-                if (value is int counter)
+                if (value is int int32)
                 {
-                    return counter > 0 ? Visibility.Visible : Visibility.Collapsed;
+                    return int32 > 0 ? Visibility.Visible : Visibility.Collapsed;
+                }
+                else if (value is long int64)
+                {
+                    return int64 > 0 ? Visibility.Visible : Visibility.Collapsed;
+                }
+                else if (value is short int16)
+                {
+                    return int16 > 0 ? Visibility.Visible : Visibility.Collapsed;
                 }
 
                 return Visibility.Collapsed;

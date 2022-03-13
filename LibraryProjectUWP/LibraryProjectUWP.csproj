@@ -270,6 +270,9 @@
     <Compile Include="Views\Book\BookCollectionPage.xaml.cs">
       <DependentUpon>BookCollectionPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\ReturnBookExemplaryUC.xaml.cs">
+      <DependentUpon>ReturnBookExemplaryUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Categories\CategoriesListUC.xaml.cs">
       <DependentUpon>CategoriesListUC.xaml</DependentUpon>
     </Compile>
@@ -437,6 +440,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Book\BookCollectionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\ReturnBookExemplaryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

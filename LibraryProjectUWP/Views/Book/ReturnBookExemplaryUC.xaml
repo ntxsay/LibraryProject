@@ -1,0 +1,47 @@
+﻿<UserControl
+    x:Class="LibraryProjectUWP.Views.Book.ReturnBookExemplaryUC"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views.Book"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid Width="400" RowSpacing="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="1" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Foreground="{ThemeResource SystemAccentColor}">
+                                    <Run Text="Remettre l'exemplaire N°" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                    <Run Text="{x:Bind ViewModelPage.ViewModel.Exemplary.NoExemplaire, Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+        </TextBlock>
+        <Rectangle Height="1" Grid.Row="1" Fill="{ThemeResource SystemColorControlAccentBrush}"/>
+        <StackPanel Grid.Row="2" Orientation="Vertical">
+            <ComboBox ItemsSource="{x:Bind ViewModelPage.ViewModel.EtatList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.EtatApresPret.Etat, Mode=TwoWay}" PlaceholderText="Etat du livre" HorizontalAlignment="Stretch">
+                <ComboBox.Header>
+                    <TextBlock Text="Etat du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                </ComboBox.Header>
+            </ComboBox>
+            <TextBox Text="{x:Bind ViewModelPage.ViewModel.EtatApresPret.Observations, Mode=TwoWay}" MinHeight="100" PlaceholderText="Observations" TextWrapping="Wrap" AcceptsReturn="True">
+                <TextBox.Header>
+                    <TextBlock Text="Observations" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                </TextBox.Header>
+            </TextBox>
+        </StackPanel>
+        <Grid Grid.Row="3" Margin="0 10 0 10">
+            <MUIXC:InfoBar IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+                       IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}">
+            </MUIXC:InfoBar>
+        </Grid>
+        <Button Grid.Row="4" Click="Button_Click">
+            <TextBlock Text="Remettre" />
+        </Button>
+    </Grid>
+</UserControl>

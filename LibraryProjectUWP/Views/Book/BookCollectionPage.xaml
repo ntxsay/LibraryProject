@@ -20,6 +20,7 @@
     <Page.Resources>
         <customConverters:ClassificationAgeToStringConverter x:Key="classificationAgeToStringConverter" />
         <customConverters:IntToBooleanConverter x:Key="intToBooleanConverter" />
+        <customConverters:IntToVisibilityConverter x:Key="intToVisibilityConverter" />
         <customConverters:IntToInvertVisibilityConverter x:Key="intToInvertVisibilityConverter" />
         <customConverters:SelectedPageColorConverter x:Key="selectedPageColorConverter" />
         <customConverters:ContactListTostringConverter x:Key="contactListTostringConverter" />
@@ -165,7 +166,7 @@
                     <ToolTip>
                         <TextBlock MaxWidth="400" MaxHeight="500" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" IsTextSelectionEnabled="True">
                             <Run Text="{x:Bind MainTitle, Mode=OneWay}" FontWeight="Medium" FontSize="16"/>
-                            <LineBreak /><Run Text="(" FontSize="14"/><Run Text="{x:Bind NbExemplaires, Mode=OneWay}" FontSize="14"/><Run Text=" exemplaire(s))" FontSize="14"/>
+                            <LineBreak /><Run Text="{x:Bind NbExemplaires, Mode=OneWay}" FontSize="14"/><Run Text=" exemplaire(s)" FontSize="14"/>
                             <LineBreak /><Run Text="{x:Bind Description.Resume, Mode=OneWay}" FontSize="14"/>
                         </TextBlock>
                     </ToolTip>
@@ -174,7 +175,7 @@
                     <Border Height="301" Width="192" Background="WhiteSmoke" BorderThickness="0" CornerRadius="8">
                         <Grid Height="301" Width="192">
                             <Image Source="{x:Bind JaquettePath, Mode=OneWay}" Tag="{x:Bind JaquettePath, Mode=OneWay}" Stretch="UniformToFill" Loaded="Image_Loaded_1"/>
-                            <Grid Height="150" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left">
+                            <Grid Height="150" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left" Visibility="{x:Bind NbExemplaires, Converter={StaticResource intToVisibilityConverter}, Mode=OneWay}">
                                 <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="LightBlue" Points="0,110, 0,70, 70,0, 110,0"/>
                                 <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="BlueViolet" Points="0,110, 0,71, 71,0, 110,0"/>
                                 <TextBlock Text="1 prêt(s)" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Margin="-28,35,0,0" 

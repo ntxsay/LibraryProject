@@ -338,7 +338,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Date de remise" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    <TextBlock Grid.Row="0" Text="Date de retour" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     <Grid Grid.Row="1" ColumnSpacing="4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -358,7 +358,7 @@
                         </Button>
                     </Grid>
                 </Grid>
-                <ComboBox ItemsSource="{x:Bind ViewModelPage.EtatList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.EtatApresPret.Etat, Mode=TwoWay}" PlaceholderText="Etat du livre" HorizontalAlignment="Stretch">
+                <!--<ComboBox ItemsSource="{x:Bind ViewModelPage.EtatList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.EtatApresPret.Etat, Mode=TwoWay}" PlaceholderText="Etat du livre" HorizontalAlignment="Stretch">
                     <ComboBox.Header>
                         <TextBlock Text="Etat du livre (après emprunt)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </ComboBox.Header>
@@ -367,7 +367,7 @@
                     <TextBox.Header>
                         <TextBlock Text="Observations (après emprunt)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </TextBox.Header>
-                </TextBox>
+                </TextBox>-->
             </StackPanel>
         </ScrollViewer>
         <Grid Grid.Row="2" Margin="0 10 0 10">

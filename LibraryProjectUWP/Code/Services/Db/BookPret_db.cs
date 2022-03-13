@@ -301,7 +301,6 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
-
             public static async Task<OperationStateVM> CreateAsync(long idExemplary, LivrePretVM viewModel)
             {
                 try
@@ -371,6 +370,80 @@ namespace LibraryProjectUWP.Code.Services.Db
                     };
                 }
             }
+
+            public static async Task<OperationStateVM> ReturnBookAsync(long idPret, long idExemplary, string etat, string observations)
+            {
+                try
+                {
+                    if (etat.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.ViewModelNullOrEmptyMessage,
+                        };
+                    }
+
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var isBookExemplary = await context.TbookExemplary.AnyAsync(c => c.Id == idExemplary);
+                        if (!isBookExemplary)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordNotExistMessage
+                            };
+                        }
+
+                        var bookRecord = await context.TbookPret.SingleOrDefaultAsync(c => c.Id == idPret);
+                        if (bookRecord == null)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = DbServices.RecordNotExistMessage
+                            };
+                        }
+
+                        var recordEtatApresPret = new TbookEtat()
+                        {
+                            IdBookExemplary = idExemplary,
+                            DateAjout = DateTime.UtcNow.ToString(),
+                            Etat = etat,
+                            Observations = observations,
+                            TypeVerification = (byte)BookTypeVerification.ApresPret,
+                        };
+
+                        await context.TbookEtat.AddAsync(recordEtatApresPret);
+                        await context.SaveChangesAsync();
+
+                        bookRecord.IdEtatAfter = recordEtatApresPret.Id;
+                        
+                        context.TbookPret.Update(bookRecord);
+                        await context.SaveChangesAsync();
+
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = true,
+                            //Id = record.Id,
+                            Message = $"L'exemplaire a été restitué avec succès."
+                        };
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Exception : {ex.Message}",
+                    };
+                }
+            }
+
 
             /// <summary>
             /// Supprime un élément de la base de données

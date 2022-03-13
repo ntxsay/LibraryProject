@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace LibraryProjectUWP.ViewModels.Book
 {
@@ -19,6 +20,9 @@ namespace LibraryProjectUWP.ViewModels.Book
         public long NoExemplary { get; set; }
         public LivreVM Livre { get; set; }
 
+        [JsonIgnore]
+        public readonly IEnumerable<string> EtatList = LibraryHelpers.Book.EtatModelList;
+        
         private LivreExemplaryVM _Exemplary;
         public LivreExemplaryVM Exemplary
         {
