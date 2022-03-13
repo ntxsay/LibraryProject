@@ -280,6 +280,7 @@ CREATE TABLE IF NOT EXISTS "TBookPret" (
 	"IdEtatAfter" INTEGER NULL,
     "DatePret" TEXT NOT NULL,
     "DateRemise" TEXT NULL,
+    "DateRemiseUser" TEXT NULL, --new
     "Observation" TEXT NULL,
 
 	PRIMARY KEY("Id" AUTOINCREMENT)
