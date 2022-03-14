@@ -52,13 +52,21 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
         }
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             if (e.Parameter is LibraryToBookNavigationDriverVM parameters)
             {
                 _parameters = parameters;
                 ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
+                if (e.NavigationMode == NavigationMode.Back && parameters.ParentLibrary != null && parameters.ParentLibrary.CountBooks == 0)
+                {
+                    InitializeSearchingBookWorker(parameters.ParentLibrary);
+                }
+            }
+            else
+            {
+                var dd = ViewModelPage;
             }
         }
 
@@ -132,7 +140,14 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
-                this.GridViewMode(firstLoad);
+                if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                {
+                    this.GridViewMode(firstLoad);
+                }
+                else if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                {
+                    this.DataGridViewMode(firstLoad);
+                }
             }
             catch (Exception ex)
             {
@@ -323,25 +338,6 @@ namespace LibraryProjectUWP.Views.Book
                         break;
 
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        #endregion
-
-        #region Taches
-        private void CancelTaskXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (args.Parameter is TaskVM taskVM)
-                {
-                    
                 }
             }
             catch (Exception ex)

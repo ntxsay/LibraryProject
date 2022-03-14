@@ -16,6 +16,7 @@ namespace LibraryProjectUWP.Code.Services.ES
     internal class EsLibrary
     {
         internal const string LibraryDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+        internal const string JaquetteBaseFileName = "Library_Jaquette";
         readonly EsGeneral _EsGeneral = new EsGeneral();
 
         public async Task<OperationStateVM> ChangeLibraryItemJaquetteAsync(BibliothequeVM viewModel)
@@ -52,15 +53,14 @@ namespace LibraryProjectUWP.Code.Services.ES
                     };
                 }
 
-                string baseFile = "Library_Jaquette";
 
-                var deleteResult = await _EsGeneral.RemoveFileAsync(baseFile, folderItem, EsGeneral.SearchOptions.StartWith);
+                var deleteResult = await _EsGeneral.RemoveFileAsync(JaquetteBaseFileName, folderItem, EsGeneral.SearchOptions.StartWith);
                 if (!deleteResult.IsSuccess)
                 {
                     return deleteResult;
                 }
 
-                var newCopyFile = await storageFile.CopyAsync(folderItem, baseFile + System.IO.Path.GetExtension(storageFile.Path), NameCollisionOption.ReplaceExisting);
+                var newCopyFile = await storageFile.CopyAsync(folderItem, JaquetteBaseFileName + System.IO.Path.GetExtension(storageFile.Path), NameCollisionOption.ReplaceExisting);
                 if (newCopyFile == null)
                 {
                     return new OperationStateVM()
@@ -165,7 +165,7 @@ namespace LibraryProjectUWP.Code.Services.ES
         {
             try
             {
-                var folder = await _EsGeneral.CreateFolderInLocalFolderAppAsync(EsGeneral.DefaultPath.Libraries, CreationCollisionOption.OpenIfExists);
+                var folder = await _EsGeneral.CreateFolderInLocalFolderAppAsync(EsGeneral.DefaultPathName.Libraries, CreationCollisionOption.OpenIfExists);
                 return folder;
             }
             catch (Exception)
@@ -182,7 +182,7 @@ namespace LibraryProjectUWP.Code.Services.ES
         {
             try
             {
-                var folder = await _EsGeneral.CreateFolderInLocalFolderAppAsync(EsGeneral.DefaultPath.Books, CreationCollisionOption.OpenIfExists);
+                var folder = await _EsGeneral.CreateFolderInLocalFolderAppAsync(EsGeneral.DefaultPathName.Books, CreationCollisionOption.OpenIfExists);
                 return folder;
             }
             catch (Exception)
@@ -191,6 +191,40 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
-        
+
+        public async Task<StorageFile> GetLibrarySettingsFile(BibliothequeVM viewModel)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModel == null)
+                {
+                    return null;
+                }
+
+                var folderItem = await this.GetLibraryItemFolderAsync(viewModel.Guid);
+                if (folderItem == null)
+                {
+                    return null;
+                }
+
+                var storageItem = await folderItem.TryGetItemAsync($"settings.json");
+                if (storageItem == null || !storageItem.IsOfType(StorageItemTypes.File))
+                {
+                    var file = await folderItem.GetFileAsync($"settings.json");
+                    return file;
+                }
+
+                
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
     }
 }
