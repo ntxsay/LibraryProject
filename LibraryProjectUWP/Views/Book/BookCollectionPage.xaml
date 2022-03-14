@@ -216,7 +216,7 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Prêter ce livre" Command="{StaticResource NewBookPretXUiCmd}" CommandParameter="{x:Bind }">
+                                <MenuFlyoutItem Text="Emprunts" Command="{StaticResource NewBookPretXUiCmd}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE748;"/>
                                     </MenuFlyoutItem.Icon>
@@ -329,23 +329,22 @@
                         <Setter Property="MTUUControls:DataGridRow.ContextFlyout">
                             <Setter.Value>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem Text="Modifier la couverture" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{Binding }">
+                                    <MenuFlyoutItem Text="Première de couverture" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{Binding }">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xEB9F;"/>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{Binding }">
+                                    <MenuFlyoutItem Text="Emprunts" Command="{StaticResource NewBookPretXUiCmd}" CommandParameter="{Binding }">
                                         <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE71B;"/>
+                                            <FontIcon Glyph="&#xE748;"/>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutSeparator />
-                                    <MenuFlyoutSubItem Text="Catégories" Tag="{x:Bind Mode=OneWay}">
-                                        <MenuFlyoutSubItem.Icon>
-                                            <FontIcon Glyph="&#xE81E;"/>
-                                        </MenuFlyoutSubItem.Icon>
-                                    </MenuFlyoutSubItem>
+                                    <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{Binding }">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xF5ED;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
                                     <MenuFlyoutSeparator />
                                     <MenuFlyoutItem Text="Ouvrir ce livre">
                                         <MenuFlyoutItem.Icon>

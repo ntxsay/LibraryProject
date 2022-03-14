@@ -175,7 +175,7 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
 
-        #region SearchBooks
+        #region SearchBookExemplaries
         public void InitializeSearchingBookWorker(LivreVM viewModel)
         {
             try
@@ -611,6 +611,9 @@ namespace LibraryProjectUWP.Views.Book
                         this.InitializeCompleteInfoBookWorker();
                     }
                 }
+
+                workerSearchBooks.Dispose();
+                workerSearchBooks = null;
             }
             catch (Exception ex)
             {
@@ -737,6 +740,9 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     ViewModelPage.TaskList.Remove(item);
                 }
+
+                workerCountBooks.Dispose();
+                workerCountBooks = null;
             }
             catch (Exception ex)
             {

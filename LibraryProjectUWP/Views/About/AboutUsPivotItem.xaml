@@ -29,7 +29,7 @@
                     </Viewbox>
                 </Button>
                 <TextBlock VerticalAlignment="Center">
-                    <Run Text="ROSTALOTHEQUE" FontSize="40" FontWeight="SemiBold"/>
+                    <Run Text="ROSTALOTHÈQUE" FontSize="40" FontWeight="SemiBold"/>
                     <LineBreak />
                     <Run Text="Version :"/>
                     <Run Text="{x:Bind MajorV}"/><Run Text="."/><Run Text="{x:Bind MinorV}"/><Run Text="."/><Run Text="{x:Bind RevisionV}"/>

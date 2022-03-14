@@ -59,14 +59,24 @@
             <TextBox Grid.Row="0" Text="{x:Bind ViewModelPage.Value, Mode=TwoWay}" PlaceholderText="{x:Bind ViewModelPage.NamePlaceHolderText, Mode=OneWay}"/>
             <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.Description, Mode=TwoWay}" MinHeight="100" PlaceholderText="{x:Bind ViewModelPage.DescriptionPlaceHolderText, Mode=OneWay}"
                  TextWrapping="Wrap" AcceptsReturn="True"/>
-            <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="10">
-                <CheckBox VerticalContentAlignment="Bottom" HorizontalAlignment="Stretch">
-                    <TextBlock  TextWrapping="Wrap" VerticalAlignment="Center"  HorizontalAlignment="Stretch">
-                            <Run Text="Activer l'affichage d'une boite de confirmation avant de quitter la bibliothèque lorsqu'elle contient un nombre important de livres." />
-                            <LineBreak /><LineBreak /><Run Text="Cette boîte a pour but de vous prévenir d'une sortie accidentelle de la bibliothèque." />
-                    </TextBlock>
-                </CheckBox>
-
+            <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="10" Padding="0 30 0 0">
+                <Rectangle Height="1" Grid.Row="1" Fill="{ThemeResource SystemColorControlAccentBrush}" Margin="20 0 20 20"/>
+                <MUIXC:ToggleSplitButton x:Name="myListButton" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                    <TextBlock Text="Afficher une boite de dialogue avant de quitter la bibliothèque" TextWrapping="Wrap"/>
+                    <MUIXC:ToggleSplitButton.Flyout>
+                        <Flyout Placement="Bottom">
+                            <MUIXC:NumberBox x:Name="nbbDialog" Minimum="10" Maximum="1000" Value="100" SpinButtonPlacementMode="Inline">
+                                <MUIXC:NumberBox.Header>
+                                    <TextBlock Grid.Row="0" Foreground="{ThemeResource SystemAccentColor}" TextWrapping="Wrap">
+                                    <Run Text="Afficher la boite de dialogue à partir de"/>
+                                    <Run Text="{x:Bind nbbDialog.Value, Mode=OneWay}" FontWeight="SemiBold"/>
+                                    <Run Text="livre(s)"/>
+                                    </TextBlock>
+                                </MUIXC:NumberBox.Header>
+                            </MUIXC:NumberBox>
+                        </Flyout>
+                    </MUIXC:ToggleSplitButton.Flyout>
+                </MUIXC:ToggleSplitButton>
             </StackPanel>
         </Grid>
         <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="2" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
