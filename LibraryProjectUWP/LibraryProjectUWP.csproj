@@ -251,6 +251,7 @@
     <Compile Include="Views\Book\BookBeforeGoBackCD.xaml.cs">
       <DependentUpon>BookBeforeGoBackCD.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\BookCollectionPage_Collection.cs" />
     <Compile Include="Views\Book\BookCollectionPage_Tasks.cs" />
     <Compile Include="Views\Book\BookPretListUC.xaml.cs">
       <DependentUpon>BookPretListUC.xaml</DependentUpon>

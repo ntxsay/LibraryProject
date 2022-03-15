@@ -90,6 +90,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -99,7 +100,28 @@
             <Run Text="{x:Bind ViewModelPage.ParentLibrary.Name, Mode=OneWay}" FontWeight="Bold" />
             <Run Text="»" />
         </TextBlock>
-        <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Right" Background="Transparent">
+        <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Collapsed" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" HorizontalContentAlignment="Left">
+            <AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                <AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
+                </AppBarButton.Icon>
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Afficher tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" >
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Afficher la collection « jjjh »" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarSeparator/>
             <AppBarButton Label="Ajouter" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource CreateItemXUiCommand}"/>
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBRenameCategorie" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" 
@@ -115,15 +137,25 @@
                 </AppBarButton>
             </CommandBar.SecondaryCommands>
         </CommandBar>
-        <ListView x:Name="MyListView" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.CollectionViewModelList, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
+        <AutoSuggestBox Grid.Row="2" PlaceholderText="Rechercher une collection">
+            <AutoSuggestBox.ItemTemplate>
+                <DataTemplate x:DataType="collectionVm:CollectionVM">
+                    <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
+                </DataTemplate>
+            </AutoSuggestBox.ItemTemplate>
+            <AutoSuggestBox.QueryIcon>
+                <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
+            </AutoSuggestBox.QueryIcon>
+        </AutoSuggestBox>
+        <ListView x:Name="MyListView" Grid.Row="3" ItemsSource="{x:Bind ViewModelPage.CollectionViewModelList, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
                   SelectedItem="{x:Bind ViewModelPage.SelectedViewModel, Mode=TwoWay}" SelectionChanged="ListView_SelectionChanged"
                   SelectionMode="Extended">
             
         </ListView>
-        <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="3" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+        <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="4" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
                        IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}" Margin="0 10 0 5">
         </MUIXC:InfoBar>
-        <Grid Grid.Row="4">
+        <Grid Grid.Row="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>

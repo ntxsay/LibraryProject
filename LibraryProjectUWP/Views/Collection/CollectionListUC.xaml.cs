@@ -15,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -35,7 +36,7 @@ namespace LibraryProjectUWP.Views.Collection
 {
     public sealed partial class CollectionListUC : PivotItem
     {
-        public readonly CollectionListParametersDriverVM _parameters;
+        public CollectionListParametersDriverVM _parameters;
         public readonly Guid IdItem = Guid.NewGuid();
 
         public CollectionListUCVM ViewModelPage { get; set; } = new CollectionListUCVM();
@@ -89,6 +90,9 @@ namespace LibraryProjectUWP.Views.Collection
                 {
                     CancelModificationRequested = null;
                 }
+
+                ViewModelPage = null;
+                _parameters = null;
             }
             catch (Exception)
             {
@@ -105,30 +109,12 @@ namespace LibraryProjectUWP.Views.Collection
 
         private async void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            try
-            {
-                await _parameters.ParentPage.NewCollectionAsync(String.Empty, ViewModelPage.Guid, typeof(CollectionListUC));
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
+            await _parameters.ParentPage.NewCollectionAsync(String.Empty, ViewModelPage.Guid, typeof(CollectionListUC));
         }
 
-        private void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            try
-            {
-                
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
+            await _parameters.ParentPage.EditCollection(ViewModelPage.SelectedViewModel, ViewModelPage.Guid, typeof(CollectionListUC));
         }
 
 
@@ -174,9 +160,29 @@ namespace LibraryProjectUWP.Views.Collection
             {
                 if (this.ViewModelPage.SelectedViewModels.Count > 1)
                 {
+                    var textblock = new TextBlock()
+                    {
+                        TextWrapping = TextWrapping.Wrap,
+                    };
+                    Run run1 = new Run()
+                    {
+                        Text = $"Êtes-vous sûr de vouloir supprimer les collections sélectionnées ?",
+                        //FontWeight = FontWeights.Medium,
+                    };
+                    
+                    Run run2 = new Run()
+                    {
+                        Text = $"Veuillez noter que cette action entraînera la suppression de ces collections dans les livres concernés.",
+                        Foreground = new SolidColorBrush(Colors.OrangeRed),
+                    };
+                    textblock.Inlines.Add(run1);
+                    textblock.Inlines.Add(new LineBreak());
+                    textblock.Inlines.Add(new LineBreak());
+                    textblock.Inlines.Add(run2);
+
                     TtipDeleteCollection.Target = ABBDelete;
                     TtipDeleteCollection.Title = "Supprimer des collections";
-                    TtipDeleteCollection.Subtitle = $"Êtes-vous sûr de vouloir supprimer les collections sélectionnées ?\nVeuillez noter que cette action entraînera la décatégorisation des livres concernés par ces collections.";
+                    TtipDeleteCollection.Content = textblock;
                     TtipDeleteCollection.IsOpen = true;
                 }
                 else if (this.ViewModelPage.SelectedViewModels.Count == 1)
@@ -242,6 +248,10 @@ namespace LibraryProjectUWP.Views.Collection
                 {
                     var cast = listView.SelectedItems.Cast<CollectionVM>();
                     this.ViewModelPage.SelectedViewModels = new ObservableCollection<CollectionVM>(cast);
+                    if (listView.SelectedItems.Count > 1 && TtipDeleteCollection.IsOpen)
+                    {
+                        TtipDeleteCollection.IsOpen = false;
+                    }
                 }
             }
             catch (Exception ex)
@@ -251,15 +261,52 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
+        private async void BtnDeleteConfirmation_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                foreach (var id in ViewModelPage.SelectedViewModels.Select(s => s.Id))
+                {
+                    var result = await DbServices.Collection.DeleteAsync(id);
+                    if (result.IsSuccess)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Succès";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        var item = ViewModelPage.CollectionViewModelList.SingleOrDefault(s => s.Id == id);
+                        if (item != null)
+                        {
+                            ViewModelPage.CollectionViewModelList.Remove(item);
+                        }
+
+                        Thread.Sleep(500);
+                    }
+                    else
+                    {
+                        //Erreur
+                        ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        ViewModelPage.ResultMessage += "\n" + result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        continue;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
         private void ExportAllCollectionToJsonXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
         }
 
-        private void BtnDeleteConfirmation_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void BtnDeleteCancel_Click(object sender, RoutedEventArgs e)
         {

@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Collection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,11 @@ namespace LibraryProjectUWP.Code.Helpers
         public static void Copy(this LivreVM source, LivreVM viewModelToCopy)
         {
             DbServices.Book.DeepCopy(source, viewModelToCopy);
+        }
+
+        public static void Copy(this CollectionVM source, CollectionVM viewModelToCopy)
+        {
+            DbServices.Collection.DeepCopy(source, viewModelToCopy);
         }
 
         public static string FirstCharToLowerOrUpperCase(this string Value, StringHelpers.UpperLowerMode upperLowerMode)
