@@ -62,6 +62,10 @@
                        ExecuteRequested="ExportAllCollectionToJsonXUiCmd_ExecuteRequested"
                        Description="Exporte toutes les collections au format JSON">
             </XamlUICommand>
+            <XamlUICommand x:Name="NavigateInThisItemXUiCmd" 
+                       ExecuteRequested="NavigateInThisItemXUiCmd_ExecuteRequested"
+                       Description="Supprime l'item">
+            </XamlUICommand>
             <Style TargetType="Grid" x:Key="WrapGridChildStyle">
                 <Setter Property="Margin" Value="4 0" />
                 <Setter Property="VerticalAlignment" Value="Top" />

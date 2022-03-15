@@ -312,6 +312,11 @@ namespace LibraryProjectUWP.Views.Collection
         {
             TtipDeleteCollection.IsOpen = false;
         }
+
+        private void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
     }
 
     public class CollectionListUCVM : INotifyPropertyChanged
