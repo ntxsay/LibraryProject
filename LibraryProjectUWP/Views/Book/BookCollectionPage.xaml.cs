@@ -2408,7 +2408,7 @@ namespace LibraryProjectUWP.Views.Book
             await NewCollectionAsync(string.Empty);
         }
 
-        internal async Task NewCollectionAsync(string partName, Guid? guid = null)
+        internal async Task NewCollectionAsync(string partName, Guid? guid = null, Type ownerType = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -2423,6 +2423,7 @@ namespace LibraryProjectUWP.Views.Book
                     var itemList = await DbServices.Collection.AllVMAsync();
                     NewEditCollectionUC userControl = new NewEditCollectionUC(new ManageCollectionParametersDriverVM()
                     {
+                        ParentSideBarItemType = ownerType,
                         EditMode = Code.EditMode.Create,
                         ViewModelList = itemList,
                         //ParentLibrary = _parameters.ParentLibrary,
@@ -2477,12 +2478,23 @@ namespace LibraryProjectUWP.Views.Book
 
                         if (sender.ViewModelPage.Guid != null)
                         {
-                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.Guid);
-                            if (bookManager != null)
+                            if (sender._parameters.ParentSideBarItemType == typeof(NewEditBookUC))
                             {
-                                bookManager.ViewModelPage.ViewModel.Publication.Collections.Add(newViewModel);
-                                NewEditCollectionUC_Create_CancelModificationRequested(sender, e);
+                                NewEditBookUC bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                                if (bookManager != null)
+                                {
+                                    bookManager.ViewModelPage.ViewModel.Publication.Collections.Add(newViewModel);
+                                }
                             }
+                            else if (sender._parameters.ParentSideBarItemType == typeof(CollectionListUC))
+                            {
+                                CollectionListUC bookManager = GetCollectionListSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                                if (bookManager != null)
+                                {
+                                    bookManager.ViewModelPage.CollectionViewModelList.Add(newViewModel);
+                                }
+                            }
+                            NewEditCollectionUC_Create_CancelModificationRequested(sender, e);
                         }
                     }
                     else
@@ -2537,6 +2549,7 @@ namespace LibraryProjectUWP.Views.Book
                     IList<CollectionVM> itemList = await DbServices.Collection.MultipleVmInLibraryAsync(_parameters.ParentLibrary.Id, Code.CollectionTypeEnum.Collection);
                     CollectionListUC userControl = new CollectionListUC(new CollectionListParametersDriverVM()
                     {
+                        ParentPage = this,
                         ParentLibrary = _parameters.ParentLibrary,
                         ViewModelList = itemList?.ToList(), //ViewModelPage.ContactViewModelList,
                     });
@@ -3971,6 +3984,30 @@ namespace LibraryProjectUWP.Views.Book
                     if (itemPivot != null)
                     {
                         return itemPivot as NewEditBookUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        private CollectionListUC GetCollectionListSideBarByGuid(Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is CollectionListUC item && item.ViewModelPage.Guid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as CollectionListUC;
                     }
                 }
 

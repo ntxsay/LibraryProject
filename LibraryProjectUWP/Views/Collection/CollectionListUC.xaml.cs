@@ -5,6 +5,7 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Collection;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +18,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -41,12 +43,6 @@ namespace LibraryProjectUWP.Views.Collection
 
         public delegate void CancelModificationEventHandler(CollectionListUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
-
-        public delegate void UpdateItemEventHandler(CollectionListUC sender, ExecuteRequestedEventArgs e);
-        public event UpdateItemEventHandler UpdateItemRequested;
-
-        public delegate void CreateItemEventHandler(CollectionListUC sender, ExecuteRequestedEventArgs e);
-        public event CreateItemEventHandler CreateItemRequested;
 
 
         public CollectionListUC()
@@ -85,23 +81,33 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (CancelModificationRequested != null)
+                {
+                    CancelModificationRequested = null;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
-                bool isValided = IsModelValided();
-                if (!isValided)
-                {
-                    return;
-                }
-
-                CreateItemRequested?.Invoke(this, args);
+                await _parameters.ParentPage.NewCollectionAsync(String.Empty, ViewModelPage.Guid, typeof(CollectionListUC));
             }
             catch (Exception ex)
             {
@@ -115,13 +121,7 @@ namespace LibraryProjectUWP.Views.Collection
         {
             try
             {
-                bool isValided = IsModelValided();
-                if (!isValided)
-                {
-                    return;
-                }
-
-                UpdateItemRequested?.Invoke(this, args);
+                
             }
             catch (Exception ex)
             {
@@ -166,75 +166,104 @@ namespace LibraryProjectUWP.Views.Collection
 
        
 
-        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (CancelModificationRequested != null)
-                {
-                    CancelModificationRequested = null;
-                }
-
-                if (CreateItemRequested != null)
-                {
-                    CreateItemRequested = null;
-                }
-
-                if (UpdateItemRequested != null)
-                {
-                    UpdateItemRequested = null;
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
 
         private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.ViewModelPage.SelectedViewModels.Count > 1)
+                {
+                    TtipDeleteCollection.Target = ABBDelete;
+                    TtipDeleteCollection.Title = "Supprimer des collections";
+                    TtipDeleteCollection.Subtitle = $"Êtes-vous sûr de vouloir supprimer les collections sélectionnées ?\nVeuillez noter que cette action entraînera la décatégorisation des livres concernés par ces collections.";
+                    TtipDeleteCollection.IsOpen = true;
+                }
+                else if (this.ViewModelPage.SelectedViewModels.Count == 1)
+                {
+                    DependencyObject selectedItem = MyListView.ContainerFromItem(MyListView.SelectedItem);
+                    if (selectedItem is ListViewItem listViewItem)
+                    {
+                        var textblock = new TextBlock()
+                        {
+                            TextWrapping = TextWrapping.Wrap,
+                        };
+                        Run run1 = new Run()
+                        {
+                            Text = $"Êtes-vous sûr de vouloir supprimer la collection « ",
+                            //FontWeight = FontWeights.Medium,
+                        };
+                        Run run2 = new Run()
+                        {
+                            Text = ViewModelPage.SelectedViewModel?.Name,
+                            Foreground = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush,
+                            FontWeight = FontWeights.Medium,
+                        };
+                        Run run3 = new Run()
+                        {
+                            Text = $" » ?",
+                            //FontWeight = FontWeights.Medium,
+                        };
 
-        }
+                        Run run4 = new Run()
+                        {
+                            Text = $"Veuillez noter que cette action entraînera la suppression de cette collection dans les livres concernés.",
+                            Foreground = new SolidColorBrush(Colors.OrangeRed),
+                        };
+                        textblock.Inlines.Add(run1);
+                        textblock.Inlines.Add(run2);
+                        textblock.Inlines.Add(run3);
+                        textblock.Inlines.Add(new LineBreak());
+                        textblock.Inlines.Add(new LineBreak());
+                        textblock.Inlines.Add(run4);
 
-        private void MenuFlyout_Opened(object sender, object e)
-        {
+                        TtipDeleteCollection.Target = listViewItem;
+                        TtipDeleteCollection.Title = "Supprimer une collection";
+                        TtipDeleteCollection.Content = textblock;
+                        TtipDeleteCollection.IsOpen = true;
+                    }
 
-        }
-
-        private void ASB_SearchEditor_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchEditor_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchEditor_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchCollection_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchCollection_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchCollection_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-
+                        
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is ListView listView)
+                {
+                    var cast = listView.SelectedItems.Cast<CollectionVM>();
+                    this.ViewModelPage.SelectedViewModels = new ObservableCollection<CollectionVM>(cast);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
 
+        private void ExportAllCollectionToJsonXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
+        private void BtnDeleteConfirmation_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnDeleteCancel_Click(object sender, RoutedEventArgs e)
+        {
+            TtipDeleteCollection.IsOpen = false;
         }
     }
 
@@ -242,6 +271,8 @@ namespace LibraryProjectUWP.Views.Collection
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+        public Guid Guid { get; private set; } = Guid.NewGuid();
+        
         private string _Header;
         public string Header
         {
@@ -284,22 +315,6 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
-        private string _ArgName;
-        public string ArgName
-        {
-            get => this._ArgName;
-            set
-            {
-                if (this._ArgName != value)
-                {
-                    this._ArgName = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        
-
         private Brush _ResultMessageForeGround;
         public Brush ResultMessageForeGround
         {
@@ -309,6 +324,48 @@ namespace LibraryProjectUWP.Views.Collection
                 if (this._ResultMessageForeGround != value)
                 {
                     this._ResultMessageForeGround = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private InfoBarSeverity _ResultMessageSeverity = InfoBarSeverity.Informational;
+        public InfoBarSeverity ResultMessageSeverity
+        {
+            get => this._ResultMessageSeverity;
+            set
+            {
+                if (this._ResultMessageSeverity != value)
+                {
+                    this._ResultMessageSeverity = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsResultMessageOpen;
+        public bool IsResultMessageOpen
+        {
+            get => this._IsResultMessageOpen;
+            set
+            {
+                if (this._IsResultMessageOpen != value)
+                {
+                    this._IsResultMessageOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ResultMessageTitle;
+        public string ResultMessageTitle
+        {
+            get => this._ResultMessageTitle;
+            set
+            {
+                if (this._ResultMessageTitle != value)
+                {
+                    this._ResultMessageTitle = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -325,48 +382,6 @@ namespace LibraryProjectUWP.Views.Collection
                 {
                     this._ParentLibrary = value;
                     this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _SelectedSCategorieName;
-        public string SelectedSCategorieName
-        {
-            get => _SelectedSCategorieName;
-            set
-            {
-                if (_SelectedSCategorieName != value)
-                {
-                    _SelectedSCategorieName = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _SelectedCategorieName;
-        public string SelectedCategorieName
-        {
-            get => _SelectedCategorieName;
-            set
-            {
-                if (_SelectedCategorieName != value)
-                {
-                    _SelectedCategorieName = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _SelectedSubCategorieName;
-        public string SelectedSubCategorieName
-        {
-            get => _SelectedSubCategorieName;
-            set
-            {
-                if (_SelectedSubCategorieName != value)
-                {
-                    _SelectedSubCategorieName = value;
-                    OnPropertyChanged();
                 }
             }
         }
@@ -394,6 +409,20 @@ namespace LibraryProjectUWP.Views.Collection
                 if (_CollectionViewModelList != value)
                 {
                     this._CollectionViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<CollectionVM> _SelectedViewModels = new ObservableCollection<CollectionVM>();
+        public ObservableCollection<CollectionVM> SelectedViewModels
+        {
+            get => this._SelectedViewModels;
+            set
+            {
+                if (_SelectedViewModels != value)
+                {
+                    this._SelectedViewModels = value;
                     this.OnPropertyChanged();
                 }
             }

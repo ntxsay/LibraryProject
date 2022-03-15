@@ -501,7 +501,7 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            await _parameters.ParentPage.NewCollectionAsync(sender.Text, ViewModelPage.Guid);
+                            await _parameters.ParentPage.NewCollectionAsync(sender.Text, ViewModelPage.Guid, typeof(NewEditBookUC));
                             sender.Text = String.Empty;
                         }
                     }
