@@ -66,6 +66,10 @@
                        ExecuteRequested="NavigateInThisItemXUiCmd_ExecuteRequested"
                        Description="Supprime l'item">
             </XamlUICommand>
+            <XamlUICommand x:Name="NavigateInAllItemXUiCmd" 
+                       ExecuteRequested="NavigateInAllItemXUiCmd_ExecuteRequested"
+                       Description="Supprime l'item">
+            </XamlUICommand>
             <Style TargetType="Grid" x:Key="WrapGridChildStyle">
                 <Setter Property="Margin" Value="4 0" />
                 <Setter Property="VerticalAlignment" Value="Top" />
@@ -105,22 +109,16 @@
             <Run Text="»" />
         </TextBlock>
         <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Collapsed" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" HorizontalContentAlignment="Left">
-            <AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand">
-                <AppBarButton.Icon>
+            <AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="View">
+                <!--<AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
-                </AppBarButton.Icon>
+                </AppBarButton.Icon>-->
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="Afficher tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" >
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
-                            </MenuFlyoutItem.Icon>
+                        <MenuFlyoutItem Icon="View" Text="Afficher tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInAllItemXUiCmd}">
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="{x:Bind ViewModelPage.SelectedViewModelMessage, Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInThisItemXUiCmd}"
+                        <MenuFlyoutItem Icon="View" Text="{x:Bind ViewModelPage.SelectedViewModelMessage, Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInThisItemXUiCmd}"
                                         IsEnabled="{x:Bind ViewModelPage.SelectedViewModels.Count, Converter={StaticResource intGreaterThanToBooleanConverter}, ConverterParameter='0', Mode=OneWay}">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
-                            </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                     </MenuFlyout>
                 </AppBarButton.Flyout>

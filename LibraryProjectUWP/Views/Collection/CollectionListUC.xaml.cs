@@ -66,7 +66,30 @@ namespace LibraryProjectUWP.Views.Collection
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
-
+            try
+            {
+                if (_parameters.ParentPage.ViewModelPage.SelectedCollections != null && 
+                    _parameters.ParentPage.ViewModelPage.SelectedCollections.Any())
+                {
+                    foreach (var item in MyListView.Items)
+                    {
+                        foreach (var viewModel in _parameters.ParentPage.ViewModelPage.SelectedCollections)
+                        {
+                            if (item is CollectionVM _viewModel && _viewModel.Id == viewModel.Id && !MyListView.SelectedItems.Contains(item))
+                            {
+                                MyListView.SelectedItems.Add(item);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void InitializeActionInfos()
@@ -414,11 +437,26 @@ namespace LibraryProjectUWP.Views.Collection
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.SelectedViewModel != null)
+                if (ViewModelPage.SelectedViewModels != null)
                 {
-                    _parameters.ParentPage.ViewModelPage.SelectedCollection = ViewModelPage.SelectedViewModel;
+                    _parameters.ParentPage.ViewModelPage.SelectedCollections = ViewModelPage.SelectedViewModels;
                     _parameters.ParentPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
                 }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NavigateInAllItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                _parameters.ParentPage.ViewModelPage.SelectedCollections = null;
+                _parameters.ParentPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
             }
             catch (Exception ex)
             {

@@ -26,16 +26,51 @@ namespace LibraryProjectUWP.Views.Book
 {
     public sealed partial class BookCollectionPage : Page
     {
+        public IEnumerable<LivreVM> PrepareBooks(IList<LivreVM> viewModelList)
+        {
+            try
+            {
+                IList<LivreVM> PreSelectedViewModelList = new List<LivreVM>(viewModelList);
+
+                if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any())
+                {
+                    List<LivreVM> vms = new List<LivreVM>();
+                    foreach (LivreVM viewModel in viewModelList)
+                    {
+                        foreach (CollectionVM collectionVM in ViewModelPage.SelectedCollections)
+                        {
+                            if (viewModel.Publication.Collections.Any(s => s.Id == collectionVM.Id))
+                            {
+                                vms.Add(viewModel);
+                                break;
+                            }
+                        }
+                    }
+
+                    PreSelectedViewModelList = new List<LivreVM>(vms);
+                }
+
+                return PreSelectedViewModelList;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return Enumerable.Empty<LivreVM>();
+            }
+        }
+
         public void GroupItemsByNone(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
         {
             try
             {
-                if (viewModelList == null || !viewModelList.Any())
+                var preparedViewModelList = this.PrepareBooks(viewModelList);
+                if (preparedViewModelList == null || !preparedViewModelList.Any())
                 {
                     return;
                 }
 
-                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(viewModelList, goToPage);
+                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(preparedViewModelList.ToList(), goToPage);
 
                 var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
@@ -46,7 +81,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (resetPage)
                 {
-                    this.InitializePages(itemsPage.ToList());
+                    this.InitializePages(preparedViewModelList.ToList());
                 }
             }
             catch (Exception ex)
@@ -60,12 +95,13 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (viewModelList == null || !viewModelList.Any())
+                var preparedViewModelList = this.PrepareBooks(viewModelList);
+                if (preparedViewModelList == null || !preparedViewModelList.Any())
                 {
                     return;
                 }
 
-                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(viewModelList, goToPage);
+                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(preparedViewModelList.ToList(), goToPage);
 
                 var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
@@ -76,7 +112,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (resetPage)
                 {
-                    this.InitializePages(itemsPage.ToList());
+                    this.InitializePages(preparedViewModelList.ToList());
                 }
             }
             catch (Exception ex)
@@ -90,12 +126,13 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (viewModelList == null || !viewModelList.Any())
+                var preparedViewModelList = this.PrepareBooks(viewModelList);
+                if (preparedViewModelList == null || !preparedViewModelList.Any())
                 {
                     return;
                 }
 
-                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(viewModelList, goToPage);
+                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(preparedViewModelList.ToList(), goToPage);
 
                 var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
@@ -106,7 +143,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (resetPage)
                 {
-                    this.InitializePages(itemsPage.ToList());
+                    this.InitializePages(preparedViewModelList.ToList());
                 }
             }
             catch (Exception ex)
@@ -120,12 +157,14 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (viewModelList == null || !viewModelList.Any())
+                var preparedViewModelList = this.PrepareBooks(viewModelList);
+                if (preparedViewModelList == null || !preparedViewModelList.Any())
                 {
                     return;
                 }
 
-                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(viewModelList, goToPage);
+                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(preparedViewModelList.ToList(), goToPage);
+
 
                 var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Publication.YearParution ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
@@ -136,7 +175,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (resetPage)
                 {
-                    this.InitializePages(itemsPage.ToList());
+                    this.InitializePages(preparedViewModelList.ToList());
                 }
             }
             catch (Exception ex)
@@ -287,40 +326,40 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 IEnumerable<LivreVM> itemsPage = Enumerable.Empty<LivreVM>();
-                IList<LivreVM> PreSelectedViewModelList = new List<LivreVM>(viewModelList);
+                //IList<LivreVM> PreSelectedViewModelList = new List<LivreVM>(viewModelList);
 
-                if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any())
-                {
-                    List<LivreVM> vms = new List<LivreVM>();
-                    foreach (LivreVM viewModel in viewModelList)
-                    {
-                        foreach (CollectionVM collectionVM in ViewModelPage.SelectedCollections)
-                        {
-                            if (viewModel.Publication.Collections.Any(s => s.Id == collectionVM.Id))
-                            {
-                                vms.Add(viewModel);
-                                break;
-                            }
-                        }
-                    }
+                //if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any())
+                //{
+                //    List<LivreVM> vms = new List<LivreVM>();
+                //    foreach (LivreVM viewModel in viewModelList)
+                //    {
+                //        foreach (CollectionVM collectionVM in ViewModelPage.SelectedCollections)
+                //        {
+                //            if (viewModel.Publication.Collections.Any(s => s.Id == collectionVM.Id))
+                //            {
+                //                vms.Add(viewModel);
+                //                break;
+                //            }
+                //        }
+                //    }
 
-                    PreSelectedViewModelList = new List<LivreVM>(vms);
-                }
+                //    PreSelectedViewModelList = new List<LivreVM>(vms);
+                //}
 
                 //Si la séquence contient plus d'items que le nombre max éléments par page
-                if (PreSelectedViewModelList.Count > ViewModelPage.MaxItemsPerPage)
+                if (viewModelList.Count > ViewModelPage.MaxItemsPerPage)
                 {
                     //Si la première page (ou moins ^^')
                     if (goToPage <= 1)
                     {
-                        itemsPage = PreSelectedViewModelList.Take(ViewModelPage.MaxItemsPerPage);
+                        itemsPage = viewModelList.Take(ViewModelPage.MaxItemsPerPage);
                     }
                     else //Si plus que la première page
                     {
                         var nbItemsToSkip = ViewModelPage.MaxItemsPerPage * (goToPage - 1);
-                        if (PreSelectedViewModelList.Count >= nbItemsToSkip)
+                        if (viewModelList.Count >= nbItemsToSkip)
                         {
-                            var getRest = PreSelectedViewModelList.Skip(nbItemsToSkip);
+                            var getRest = viewModelList.Skip(nbItemsToSkip);
                             //Si reste de la séquence contient plus d'items que le nombre max éléments par page
                             if (getRest.Count() > ViewModelPage.MaxItemsPerPage)
                             {
@@ -335,7 +374,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else //Si la séquence contient moins ou le même nombre d'items que le nombre max éléments par page
                 {
-                    itemsPage = PreSelectedViewModelList;
+                    itemsPage = viewModelList;
                 }
 
                 return itemsPage;
