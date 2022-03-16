@@ -116,12 +116,12 @@
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Afficher la collection « jjjh »" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                        <MenuFlyoutItem Text="{x:Bind ViewModelPage.SelectedViewModelMessage, Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInThisItemXUiCmd}"
+                                        IsEnabled="{x:Bind ViewModelPage.SelectedViewModels.Count, Converter={StaticResource intGreaterThanToBooleanConverter}, ConverterParameter='0', Mode=OneWay}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
@@ -141,7 +141,9 @@
                 </AppBarButton>
             </CommandBar.SecondaryCommands>
         </CommandBar>
-        <AutoSuggestBox Grid.Row="2" PlaceholderText="Rechercher une collection">
+        <AutoSuggestBox Grid.Row="2" PlaceholderText="Rechercher une collection" TextChanged="ASB_SearchItem_TextChanged"
+                        SuggestionChosen="ASB_SearchItem_SuggestionChosen"
+                        QuerySubmitted="ASB_SearchItem_QuerySubmitted">
             <AutoSuggestBox.ItemTemplate>
                 <DataTemplate x:DataType="collectionVm:CollectionVM">
                     <TextBlock Text="{x:Bind Name, Mode=OneWay}" />

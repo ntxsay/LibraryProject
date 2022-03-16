@@ -59,6 +59,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 _parameters = parameters;
                 ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
+                //_parameters.ParentLibrary.Books = new List<LivreVM>(parameters.ParentLibrary.Books);
                 if (e.NavigationMode == NavigationMode.Back && parameters.ParentLibrary != null && parameters.ParentLibrary.CountBooks == 0)
                 {
                     InitializeSearchingBookWorker(parameters.ParentLibrary);
@@ -83,6 +84,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                 _parameters.ParentLibrary.Books.Clear();
+                //_parameters.ParentLibrary.Books.Clear();
                 _parameters.ParentLibrary.CountBooks = 0;
                 ViewModelPage = null;
                 //_parameters = null;
@@ -156,37 +158,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void InitializePages()
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                ViewModelPage.PagesList.Clear();
-
-                if (_parameters.ParentLibrary.Books != null && _parameters.ParentLibrary.Books.Any())
-                {
-                    int nbPageDefault = _parameters.ParentLibrary.Books.Count() / ViewModelPage.MaxItemsPerPage;
-                    double nbPageExact = _parameters.ParentLibrary.Books.Count() / Convert.ToDouble(ViewModelPage.MaxItemsPerPage);
-                    int nbPageRounded = nbPageExact > nbPageDefault ? nbPageDefault + 1 : nbPageDefault;
-                    ViewModelPage.CountPages = nbPageRounded;
-
-                    for (int i = 0; i < ViewModelPage.CountPages; i++)
-                    {
-                        ViewModelPage.PagesList.Add(new PageSystemVM()
-                        {
-                            CurrentPage = i + 1,
-                            IsPageSelected = i == 0,
-                            BackgroundColor = i == 0 ? Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush : Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush,
-                        });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
 
         private void GridViewItems_Loaded(object sender, RoutedEventArgs e)
         {
@@ -667,7 +638,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
                 }
-                this.RefreshItemsGrouping();
+                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
                 this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                 this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
@@ -689,7 +660,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.DataGridView;
                 }
-                this.RefreshItemsGrouping();
+                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
                 this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                 this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
@@ -700,274 +671,30 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        
+
         #endregion
 
         #region Sort - Group - Order
         private void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            this.GroupItemsByAlphabetic();
+            this.GroupItemsByAlphabetic(_parameters.ParentLibrary.Books);
         }
 
         private void GroupByCreationYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            this.GroupByCreationYear();
+            this.GroupByCreationYear(_parameters.ParentLibrary.Books);
         }
 
         private void GroupByParutionYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            this.GroupByParutionYear();
+            this.GroupByParutionYear(_parameters.ParentLibrary.Books);
         }
 
         private void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            this.GroupItemsByNone();
+            this.GroupItemsByNone(_parameters.ParentLibrary.Books);
         }
-
-        public void GroupItemsByNone(int goToPage = 1)
-        {
-            try
-            {
-                if (_parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
-                {
-                    return;
-                }
-
-                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(goToPage);
-
-                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Any())
-                {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        public void GroupItemsByAlphabetic(int goToPage = 1)
-        {
-            try
-            {
-                if (_parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
-                {
-                    return;
-                }
-
-                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(goToPage);
-
-                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
-                {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public void GroupByCreationYear(int goToPage = 1)
-        {
-            try
-            {
-                if (_parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
-                {
-                    return;
-                }
-
-                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(goToPage);
-
-                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
-                {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public void GroupByParutionYear(int goToPage = 1)
-        {
-            try
-            {
-                if (_parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
-                {
-                    return;
-                }
-
-                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(goToPage);
-
-                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Publication.YearParution ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
-                {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.ParutionYear;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private IEnumerable<LivreVM> OrderItems(IEnumerable<LivreVM> Collection, BookGroupVM.OrderBy OrderBy = BookGroupVM.OrderBy.Croissant, BookGroupVM.SortBy SortBy = BookGroupVM.SortBy.Name)
-        {
-            try
-            {
-                if (Collection == null || !Collection.Any())
-                {
-                    return null;
-                }
-
-                if (SortBy == BookGroupVM.SortBy.Name)
-                {
-                    if (OrderBy == BookGroupVM.OrderBy.Croissant)
-                    {
-                        return Collection.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.MainTitle);
-                    }
-                    else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
-                    {
-                        return Collection.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.MainTitle);
-                    }
-                }
-                else if (SortBy == BookGroupVM.SortBy.DateCreation)
-                {
-                    if (OrderBy == BookGroupVM.OrderBy.Croissant)
-                    {
-                        return Collection.OrderBy(o => o.DateAjout);
-                    }
-                    else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
-                    {
-                        return Collection.OrderByDescending(o => o.DateAjout);
-                    }
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return Enumerable.Empty<LivreVM>();
-            }
-        }
-
-
-        private void OrderByCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
-                this.RefreshItemsGrouping();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void OrderByDCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
-                this.RefreshItemsGrouping();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void SortByNameXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
-                this.RefreshItemsGrouping();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void SortByDateCreationXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
-                this.RefreshItemsGrouping();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public void RefreshItemsGrouping(int goToPage = 1, bool resetPage = true)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                switch (ViewModelPage.GroupedBy)
-                {
-                    case BookGroupVM.GroupBy.None:
-                        this.GroupItemsByNone(goToPage);
-                        break;
-                    case BookGroupVM.GroupBy.Letter:
-                        this.GroupItemsByAlphabetic(goToPage);
-                        break;
-                    case BookGroupVM.GroupBy.CreationYear:
-                        this.GroupByCreationYear(goToPage);
-                        break;
-                    case BookGroupVM.GroupBy.ParutionYear:
-                        this.GroupByParutionYear(goToPage);
-                        break;
-                    default:
-                        this.GroupItemsByNone(goToPage);
-                        break;
-                }
-
-                if (resetPage)
-                {
-                    this.InitializePages();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         #endregion
-
 
         #region SideBar
         private void CmbxSideBarItemTitle_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1078,7 +805,7 @@ namespace LibraryProjectUWP.Views.Book
                         return;
                     }
 
-                    viewModel.JaquettePath = result.Result?.ToString() ?? "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+                    viewModel.JaquettePath = result.Result?.ToString() ?? EsGeneral.BookDefaultJaquette;
                     var image = GetSelectedThumbnailImage(viewModel);
                     if (image != null)
                     {
@@ -1199,7 +926,8 @@ namespace LibraryProjectUWP.Views.Book
                         newViewModel.Id = creationResult.Id;
                         this.CompleteBookInfos(newViewModel);
                         _parameters.ParentLibrary.Books.Add(newViewModel);
-                        this.RefreshItemsGrouping();
+                        _parameters.ParentLibrary.Books.Add(newViewModel);
+                        this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
@@ -1475,7 +1203,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.ImportDataRequested -= ImportBookFromExcelUC_ImportDataRequested;
 
                 this.RemoveItemToSideBar(sender);
-                this.RefreshItemsGrouping();
+                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
             }
             catch (Exception ex)
             {
@@ -3175,7 +2903,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     foreach (var pageVm in ViewModelPage.PagesList)
                     {
-                        var search = GetPaginatedItems(pageVm.CurrentPage);
+                        var search = GetPaginatedItems(_parameters.ParentLibrary.Books, pageVm.CurrentPage);
                         if (search != null && search.Any(f => f.Id == viewModel.Id))
                         {
                             ViewModelPage.SearchedViewModel = viewModel;
@@ -3309,7 +3037,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     foreach (var pageVm in ViewModelPage.PagesList)
                     {
-                        var search = GetPaginatedItems(pageVm.CurrentPage);
+                        var search = GetPaginatedItems(_parameters.ParentLibrary.Books, pageVm.CurrentPage);
                         if (search != null && search.Any(f => f.Id == viewModel.Id))
                         {
                             ViewModelPage.SearchedViewModel = viewModel;
@@ -3411,7 +3139,7 @@ namespace LibraryProjectUWP.Views.Book
                         pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
                     }
                 }
-                this.RefreshItemsGrouping(page, false);
+                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books, page, false);
                 var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
                 if (buttonsPage != null && buttonsPage.Any())
                 {
@@ -3453,7 +3181,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 var selectedPage = ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
-                return GetPaginatedItems(selectedPage);
+                return GetPaginatedItems(_parameters.ParentLibrary.Books, selectedPage);
             }
             catch (Exception ex)
             {
@@ -3462,52 +3190,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private IEnumerable<LivreVM> GetPaginatedItems(int goToPage = 1)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                IEnumerable<LivreVM> itemsPage = Enumerable.Empty<LivreVM>();
-
-                //Si la séquence contient plus d'items que le nombre max éléments par page
-                if (_parameters.ParentLibrary.Books.Count > ViewModelPage.MaxItemsPerPage)
-                {
-                    //Si la première page (ou moins ^^')
-                    if (goToPage <= 1)
-                    {
-                        itemsPage = _parameters.ParentLibrary.Books.Take(ViewModelPage.MaxItemsPerPage);
-                    }
-                    else //Si plus que la première page
-                    {
-                        var nbItemsToSkip = ViewModelPage.MaxItemsPerPage * (goToPage - 1);
-                        if (_parameters.ParentLibrary.Books.Count >= nbItemsToSkip)
-                        {
-                            var getRest = _parameters.ParentLibrary.Books.Skip(nbItemsToSkip);
-                            //Si reste de la séquence contient plus d'items que le nombre max éléments par page
-                            if (getRest.Count() > ViewModelPage.MaxItemsPerPage)
-                            {
-                                itemsPage = getRest.Take(ViewModelPage.MaxItemsPerPage);
-                            }
-                            else
-                            {
-                                itemsPage = getRest;
-                            }
-                        }
-                    }
-                }
-                else //Si la séquence contient moins ou le même nombre d'items que le nombre max éléments par page
-                {
-                    itemsPage = _parameters.ParentLibrary.Books;
-                }
-
-                return itemsPage;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return Enumerable.Empty<LivreVM>();
-            }
-        }
 
         private void CompleteBookInfos(LivreVM viewModel)
         {
@@ -4058,7 +3740,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is Slider slider)
                 {
-                    RefreshItemsGrouping();
+                    RefreshItemsGrouping(_parameters.ParentLibrary.Books);
                 }
             }
             catch (Exception ex)
@@ -4069,328 +3751,5 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-    }
-
-    public class BookCollectionPageVM : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-        private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
-        public ObservableCollection<TaskVM> TaskList
-        {
-            get => this._TaskList;
-            set
-            {
-                if (_TaskList != value)
-                {
-                    this._TaskList = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private ObservableCollection<SideBarItemHeaderVM> _ItemsSideBarHeader = new ObservableCollection<SideBarItemHeaderVM>();
-        public ObservableCollection<SideBarItemHeaderVM> ItemsSideBarHeader
-        {
-            get => this._ItemsSideBarHeader;
-            set
-            {
-                if (_ItemsSideBarHeader != value)
-                {
-                    this._ItemsSideBarHeader = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private BookGroupVM _GroupedRelatedViewModel = new BookGroupVM();
-        public BookGroupVM GroupedRelatedViewModel
-        {
-            get => this._GroupedRelatedViewModel;
-            set
-            {
-                if (this._GroupedRelatedViewModel != value)
-                {
-                    this._GroupedRelatedViewModel = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private BookGroupVM.GroupBy _GroupedBy = BookGroupVM.GroupBy.None;
-        public BookGroupVM.GroupBy GroupedBy
-        {
-            get => this._GroupedBy;
-            set
-            {
-                if (this._GroupedBy != value)
-                {
-                    this._GroupedBy = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private BookGroupVM.SortBy _SortedBy = BookGroupVM.SortBy.Name;
-        public BookGroupVM.SortBy SortedBy
-        {
-            get => this._SortedBy;
-            set
-            {
-                if (this._SortedBy != value)
-                {
-                    this._SortedBy = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private BookGroupVM.OrderBy _OrderedBy = BookGroupVM.OrderBy.Croissant;
-        public BookGroupVM.OrderBy OrderedBy
-        {
-            get => this._OrderedBy;
-            set
-            {
-                if (this._OrderedBy != value)
-                {
-                    this._OrderedBy = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-
-        private bool _IsSplitViewOpen;
-        public bool IsSplitViewOpen
-        {
-            get => this._IsSplitViewOpen;
-            set
-            {
-                if (_IsSplitViewOpen != value)
-                {
-                    this._IsSplitViewOpen = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        public const double MinSplitViewWidth = 400;
-
-        private double _SplitViewWidth = MinSplitViewWidth;
-        public double SplitViewWidth
-        {
-            get => this._SplitViewWidth;
-            set
-            {
-                if (_SplitViewWidth != value)
-                {
-                    this._SplitViewWidth = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private Visibility _SearchingLibraryVisibility = Visibility.Visible;
-        public Visibility SearchingLibraryVisibility
-        {
-            get => this._SearchingLibraryVisibility;
-            set
-            {
-                if (_SearchingLibraryVisibility != value)
-                {
-                    this._SearchingLibraryVisibility = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private int _MaxItemsPerPage = 100;
-        public int MaxItemsPerPage
-        {
-            get => this._MaxItemsPerPage;
-            set
-            {
-                if (_MaxItemsPerPage != value)
-                {
-                    this._MaxItemsPerPage = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private int _SelectedPage;
-        public int SelectedPage
-        {
-            get => this._SelectedPage;
-            set
-            {
-                if (_SelectedPage != value)
-                {
-                    this._SelectedPage = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private int _CountPages;
-        public int CountPages
-        {
-            get => this._CountPages;
-            set
-            {
-                if (_CountPages != value)
-                {
-                    this._CountPages = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private LivreVM _SearchedViewModel = null;
-        public LivreVM SearchedViewModel
-        {
-            get => this._SearchedViewModel;
-            set
-            {
-                if (_SearchedViewModel != value)
-                {
-                    this._SearchedViewModel = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private ObservableCollection<PageSystemVM> _PagesList = new ObservableCollection<PageSystemVM>();
-        public ObservableCollection<PageSystemVM> PagesList
-        {
-            get => this._PagesList;
-            set
-            {
-                if (_PagesList != value)
-                {
-                    this._PagesList = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private int _SelectedPivotIndex;
-        public int SelectedPivotIndex
-        {
-            get => this._SelectedPivotIndex;
-            set
-            {
-                if (_SelectedPivotIndex != value)
-                {
-                    this._SelectedPivotIndex = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private object _SelectedCategorie;
-        public object SelectedCategorie
-        {
-            get => this._SelectedCategorie;
-            set
-            {
-                if (_SelectedCategorie != value)
-                {
-                    this._SelectedCategorie = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private ICollection<LivreVM> _SelectedItems = new List<LivreVM>();
-        public ICollection<LivreVM> SelectedItems
-        {
-            get => this._SelectedItems;
-            set
-            {
-                if (_SelectedItems != value)
-                {
-                    this._SelectedItems = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private List<LivreVM> _ViewModelList;
-        [Obsolete]
-        public List<LivreVM> ViewModelList
-        {
-            get => this._ViewModelList;
-            set
-            {
-                if (_ViewModelList != value)
-                {
-                    this._ViewModelList = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private List<ContactVM> _ContactViewModelList;
-        public List<ContactVM> ContactViewModelList
-        {
-            get => this._ContactViewModelList;
-            set
-            {
-                if (_ContactViewModelList != value)
-                {
-                    this._ContactViewModelList = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private List<ContactVM> _AuthorViewModelList;
-        public List<ContactVM> AuthorViewModelList
-        {
-            get => this._AuthorViewModelList;
-            set
-            {
-                if (_AuthorViewModelList != value)
-                {
-                    this._AuthorViewModelList = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private BibliothequeVM _ParentLibrary;
-        public BibliothequeVM ParentLibrary
-        {
-            get => this._ParentLibrary;
-            set
-            {
-                if (_ParentLibrary != value)
-                {
-                    this._ParentLibrary = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _BackgroundImagePath = EsGeneral.BookDefaultBackgroundImage;
-        public string BackgroundImagePath
-        {
-            get => this._BackgroundImagePath;
-            set
-            {
-                if (this._BackgroundImagePath != value)
-                {
-                    this._BackgroundImagePath = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

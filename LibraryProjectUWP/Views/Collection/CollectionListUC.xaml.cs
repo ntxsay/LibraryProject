@@ -150,7 +150,91 @@ namespace LibraryProjectUWP.Views.Collection
         }
 
 
-       
+        private void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            try
+            {
+                //if (ViewModelPage.SearchedViewModel != null)
+                //{
+                //    ViewModelPage.SearchedViewModel = null;
+                //}
+
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || _parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
+                {
+                    return;
+                }
+
+                var FilteredItems = new List<CollectionVM>();
+                var splitSearchTerm = sender.Text.ToLower().Split(" ");
+
+                foreach (var value in _parameters.ViewModelList)
+                {
+                    if (value.Name.IsStringNullOrEmptyOrWhiteSpace()) continue;
+
+                    var found = splitSearchTerm.All((key) =>
+                    {
+                        return value.Name.ToLower().Contains(key.ToLower());
+                    });
+
+                    if (found)
+                    {
+                        FilteredItems.Add(value);
+                    }
+                }
+                sender.ItemsSource = FilteredItems;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ASB_SearchItem_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            try
+            {
+                if (args.SelectedItem != null && args.SelectedItem is CollectionVM value)
+                {
+                    sender.Text = value.Name;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ASB_SearchItem_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            try
+            {
+                if (args.ChosenSuggestion != null && args.ChosenSuggestion is CollectionVM viewModel)
+                {
+                    foreach (var item in MyListView.Items)
+                    {
+                        if (item is CollectionVM itemViewModel && itemViewModel.Id == viewModel.Id)
+                        {
+                            if (MyListView.SelectedItem != item)
+                            {
+                                MyListView.SelectedItem = item;
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
 
         private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -248,9 +332,21 @@ namespace LibraryProjectUWP.Views.Collection
                 {
                     var cast = listView.SelectedItems.Cast<CollectionVM>();
                     this.ViewModelPage.SelectedViewModels = new ObservableCollection<CollectionVM>(cast);
-                    if (listView.SelectedItems.Count > 1 && TtipDeleteCollection.IsOpen)
+                    if (listView.SelectedItems.Count > 1)
                     {
-                        TtipDeleteCollection.IsOpen = false;
+                        ViewModelPage.SelectedViewModelMessage = $"Afficher « {listView.SelectedItems.Count} collections »";
+                        if (TtipDeleteCollection.IsOpen)
+                        {
+                            TtipDeleteCollection.IsOpen = false;
+                        }
+                    }
+                    else if (listView.SelectedItems.Count == 1)
+                    {
+                        ViewModelPage.SelectedViewModelMessage = $"Afficher « {ViewModelPage.SelectedViewModel?.Name} »";
+                    }
+                    else
+                    {
+                        ViewModelPage.SelectedViewModelMessage = $"Aucune collection n'est à afficher";
                     }
                 }
             }
@@ -315,7 +411,20 @@ namespace LibraryProjectUWP.Views.Collection
 
         private void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.SelectedViewModel != null)
+                {
+                    _parameters.ParentPage.ViewModelPage.SelectedCollection = ViewModelPage.SelectedViewModel;
+                    _parameters.ParentPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
     }
 
@@ -433,6 +542,20 @@ namespace LibraryProjectUWP.Views.Collection
                 if (this._ParentLibrary != value)
                 {
                     this._ParentLibrary = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _SelectedViewModelMessage;
+        public string SelectedViewModelMessage
+        {
+            get => this._SelectedViewModelMessage;
+            set
+            {
+                if (this._SelectedViewModelMessage != value)
+                {
+                    this._SelectedViewModelMessage = value;
                     this.OnPropertyChanged();
                 }
             }
