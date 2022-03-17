@@ -122,6 +122,7 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
         public void GroupByCreationYear(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
         {
             try

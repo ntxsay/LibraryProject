@@ -76,7 +76,7 @@
             </Style>
             <DataTemplate x:Key="CategorieTemplate" x:DataType="viewModels:CategorieLivreVM">
                 <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}"
-            ItemsSource="{x:Bind SubCategorieLivres, Mode=OneWay}" IsExpanded="True">
+            ItemsSource="{x:Bind SubCategorieLivres, Mode=OneWay}" IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}" IsSelected="{x:Bind IsSelected, Mode=TwoWay}">
                     <Grid RowSpacing="2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
@@ -108,7 +108,7 @@
                 </MUIXC:TreeViewItem>
             </DataTemplate>
             <DataTemplate x:Key="SubCategorieTemplate" x:DataType="viewModels:SubCategorieLivreVM">
-                <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
+                <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}" IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}" IsSelected="{x:Bind IsSelected, Mode=TwoWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE81E;"/>
                         <TextBlock Margin="12 0 0 0" FontSize="18">
@@ -157,20 +157,31 @@
         </TextBlock>
 
         <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Right" Background="Transparent">
-            <AppBarButton Label="Catégorie" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewCategorieXamlUICommand}">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xF003;"/>
-                </AppBarButton.Icon>
-            </AppBarButton>
-            <AppBarButton x:Name="ABBAddSousCategorie" Label="Sous-catégorie"  MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewSubCategorieXamlUICommand}">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xF003;"/>
-                </AppBarButton.Icon>
+            <AppBarButton x:Name="AbbAddItem" Label="Ajouter" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Catégorie" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewCategorieXamlUICommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xF003;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Sous-catégorie"  MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource AddNewSubCategorieXamlUICommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xF003;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBRenameCategorie" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource RenameSCategorieXamlUICommand}" CommandParameter="{x:Bind ViewModelPage.SelectedCategorie}"/>
             <AppBarButton Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DeleteItemXUiCommand}"/>
             <CommandBar.SecondaryCommands>
+                <AppBarToggleButton Label="Afficher les cases à cocher" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="ABTBtnDisplayCheckMark_Click">
+                    <AppBarToggleButton.Icon>
+                        <FontIcon Glyph="&#xE9D5;"/>
+                    </AppBarToggleButton.Icon>
+                </AppBarToggleButton>
                 <AppBarButton Label="Exporter au format JSON" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportTreeToJsonXamlUICommand}">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xE74E;"/>
@@ -179,7 +190,7 @@
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
-        <MUIXC:TreeView x:Name="TreeCategorie" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.ParentLibrary.Categories, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedCategorie, Mode=TwoWay}"
+        <MUIXC:TreeView x:Name="TreeCategorie" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.ParentLibrary.Categories, Mode=OneWay}" SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
                                                     ItemTemplateSelector="{StaticResource categorieTemplateSelector}" SelectionMode="Single">
         </MUIXC:TreeView>
         <Grid Grid.Row="3" Margin="0 10 0 10">

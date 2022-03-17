@@ -10,6 +10,7 @@ using LibraryProjectUWP.ViewModels.Categorie;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -19,6 +20,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -50,6 +52,20 @@ namespace LibraryProjectUWP.Views.Categories
         public delegate void CreateItemEventHandler(CategoriesListUC sender, ExecuteRequestedEventArgs e);
         public event CreateItemEventHandler CreateItemRequested;
 
+        private object _SelectedItem;
+        public object SelectedItem
+        {
+            get => _SelectedItem;
+            set
+            {
+                if (_SelectedItem != value)
+                {
+                    _SelectedItem = value;
+                }
+
+                GetSelectedNodes();
+            }
+        }
 
         public CategoriesListUC()
         {
@@ -62,12 +78,38 @@ namespace LibraryProjectUWP.Views.Categories
             _parameters = parameters;
             ViewModelPage.Header = $"Catégories";
             ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
+            ViewModelPage.ParentLibrary.Categories.CollectionChanged += Categories_CollectionChanged;
             InitializeActionInfos();
+        }
+
+        private void Categories_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            
         }
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
+            foreach (var item in ViewModelPage.ParentLibrary.Categories)
+            {
+                item.PropertyChanged += Categorie_PropertyChanged;
+                if (item.SubCategorieLivres != null && item.SubCategorieLivres.Any())
+                {
+                    foreach (var subItem in item.SubCategorieLivres)
+                    {
+                        subItem.PropertyChanged += SubCategorie_PropertyChanged; ;
+                    }
+                }
+            }
+        }
 
+        private void SubCategorie_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            //GetSelectedNodes();
+        }
+
+        private void Categorie_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            //GetSelectedNodes();
         }
 
         private void InitializeActionInfos()
@@ -93,6 +135,23 @@ namespace LibraryProjectUWP.Views.Categories
                     {
                         return viewModel;
                     }
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public CategorieLivreVM GetParentCategorie(Microsoft.UI.Xaml.Controls.TreeViewNode treeViewNode)
+        {
+            try
+            {
+                if (treeViewNode != null && treeViewNode.Parent.Content is CategorieLivreVM viewModel)
+                {
+                    return viewModel;
                 }
                 return null;
             }
@@ -146,8 +205,8 @@ namespace LibraryProjectUWP.Views.Categories
                 }
                 else
                 {
-                    MyTeachingTip.Target = ABBAddSousCategorie;
-                    MyTeachingTip.Title = ABBAddSousCategorie.Label;
+                    MyTeachingTip.Target = AbbAddItem;
+                    MyTeachingTip.Title = "Ajouter une sous-catégorie";
                     MyTeachingTip.Subtitle = "Pour ajouter une sous-catégorie, ajoutez ou cliquez d'abord sur une catégorie dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.\n\nAttention : il n'est pas possible d'ajouter une sous-catégorie à une autre sous-catégorie.";
                     MyTeachingTip.IsOpen = true;
                 }
@@ -215,26 +274,91 @@ namespace LibraryProjectUWP.Views.Categories
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.ParentLibrary != null && TreeCategorie.SelectedItem != null)
+                GetSelectedNodes();
+                //if (ViewModelPage.ParentLibrary != null && TreeCategorie.SelectedItem != null)
+                if (ViewModelPage.ParentLibrary != null && ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
                 {
-                    DependencyObject treeItem = TreeCategorie.ContainerFromItem(TreeCategorie.SelectedItem);
-                    if (treeItem is Microsoft.UI.Xaml.Controls.TreeViewItem treeViewItem)
+                    if (ViewModelPage.SelectedItems.Count == 1)
                     {
-                        if (TreeCategorie.SelectedItem is CategorieLivreVM _viewModelCategorie && _viewModelCategorie == ViewModelPage.SelectedCategorie)
+                        DependencyObject treeItem = TreeCategorie.ContainerFromNode(ViewModelPage.SelectedItems[0]);
+                        if (treeItem is Microsoft.UI.Xaml.Controls.TreeViewItem treeViewItem)
                         {
+                            var content = ViewModelPage.SelectedItems[0].Content;
+                            var textblock = new TextBlock()
+                            {
+                                TextWrapping = TextWrapping.Wrap,
+                            };
+
+                            Run run1 = new Run()
+                            {
+                                Text = $"Êtes-vous sûr de vouloir supprimer « ",
+                                //FontWeight = FontWeights.Medium,
+                            };
+
+                            textblock.Inlines.Add(run1);
+
                             TtipDeleteSCategorie.Target = treeViewItem;
-                            TtipDeleteSCategorie.Title = "Supprimer une catégorie";
-                            TtipDeleteSCategorie.Subtitle = $"Êtes-vous sûr de vouloir supprimer la catégorie \"{_viewModelCategorie.Name}\" ?\nVeuillez noter que cette action entraînera la suppression des sous-catégories ainsi que la décatégorisation des livres concernés par cette catégorie.";
-                            TtipDeleteSCategorie.IsOpen = true;
-                        }
-                        else if (TreeCategorie.SelectedItem is SubCategorieLivreVM _viewModelSubCategorie && _viewModelSubCategorie == ViewModelPage.SelectedCategorie)
-                        {
-                            TtipDeleteSCategorie.Target = treeViewItem;
-                            TtipDeleteSCategorie.Title = "Supprimer une sous-catégorie";
-                            TtipDeleteSCategorie.Subtitle = $"Êtes-vous sûr de vouloir supprimer la sous-catégorie \"{_viewModelSubCategorie.Name}\" ?\nVeuillez noter que cette action entraînera la décatégorisation des livres concernés par la suppression de cette sous-catégorie.";
-                            TtipDeleteSCategorie.IsOpen = true;
+                            TtipDeleteSCategorie.Content = textblock;
+
+                            if (ViewModelPage.SelectedItems[0].Content is CategorieLivreVM _viewModelCategorie)
+                            {
+                                Run runType = new Run()
+                                {
+                                    Text = $"la catégorie « ",
+                                    //FontWeight = FontWeights.Medium,
+                                };
+
+                                Run runName = new Run()
+                                {
+                                    Text = _viewModelCategorie.Name,
+                                    Foreground = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush,
+                                    FontWeight = FontWeights.Medium,
+                                };
+
+                                textblock.Inlines.Add(runType);
+                                textblock.Inlines.Add(runName);
+
+                                TtipDeleteSCategorie.Title = "Supprimer une catégorie";
+                            }
+                            else if (ViewModelPage.SelectedItems[0].Content is SubCategorieLivreVM _viewModelSubCategorie)
+                            {
+                                Run runType = new Run()
+                                {
+                                    Text = $"la sous-catégorie « ",
+                                    //FontWeight = FontWeights.Medium,
+                                };
+
+                                Run runName = new Run()
+                                {
+                                    Text = _viewModelSubCategorie.Name,
+                                    Foreground = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush,
+                                    FontWeight = FontWeights.Medium,
+                                };
+                                textblock.Inlines.Add(runType);
+                                textblock.Inlines.Add(runName);
+
+                                TtipDeleteSCategorie.Title = "Supprimer une sous-catégorie";
+                            }
+                            textblock.Inlines.Add(new LineBreak());
+                            textblock.Inlines.Add(new LineBreak());
+
+                            Run run2 = new Run()
+                            {
+                                Text = $" » ?",
+                                //FontWeight = FontWeights.Medium,
+                            };
+
+                            Run run3 = new Run()
+                            {
+                                Text = $"Veuillez noter que cette action entraînera la suppression de cette collection dans les livres concernés.",
+                                Foreground = new SolidColorBrush(Colors.OrangeRed),
+                            };
+                            textblock.Inlines.Add(run2);
+                            textblock.Inlines.Add(run3);
+
                         }
                     }
+                    
                 }
                 else
                 {
@@ -366,13 +490,23 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-
-       
-
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             try
             {
+                foreach (var item in ViewModelPage.ParentLibrary.Categories)
+                {
+                    item.PropertyChanged -= Categorie_PropertyChanged;
+                    if (item.SubCategorieLivres != null && item.SubCategorieLivres.Any())
+                    {
+                        foreach (var subItem in item.SubCategorieLivres)
+                        {
+                            subItem.PropertyChanged -= SubCategorie_PropertyChanged; ;
+
+                        }
+                    }
+                }
+
                 if (CancelModificationRequested != null)
                 {
                     CancelModificationRequested = null;
@@ -396,40 +530,102 @@ namespace LibraryProjectUWP.Views.Categories
         }
 
         
-
-        private void MenuFlyout_Opened(object sender, object e)
+        private void ABTBtnDisplayCheckMark_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                if (sender is AppBarToggleButton toggleButton)
+                {
+                    if (toggleButton.IsChecked == true)
+                    {
+                        if (TreeCategorie.SelectionMode != Microsoft.UI.Xaml.Controls.TreeViewSelectionMode.Multiple)
+                        {
+                            TreeCategorie.SelectionMode = Microsoft.UI.Xaml.Controls.TreeViewSelectionMode.Multiple;
+                        }
+                    }
+                    else
+                    {
+                        if (TreeCategorie.SelectionMode != Microsoft.UI.Xaml.Controls.TreeViewSelectionMode.Single)
+                        {
+                            TreeCategorie.SelectionMode = Microsoft.UI.Xaml.Controls.TreeViewSelectionMode.Single;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
         }
 
-        private void ASB_SearchEditor_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void GetSelectedNodes()
         {
+            try
+            {
+                List<Microsoft.UI.Xaml.Controls.TreeViewNode> itemsList = new List<Microsoft.UI.Xaml.Controls.TreeViewNode>(TreeCategorie.SelectedNodes);
+                ViewModelPage.SelectedItems = itemsList?.ToList();
 
-        }
+                if (itemsList != null && itemsList.Count > 0)
+                {
+                    List<CategorieLivreVM> categorieViewModelList = new List<CategorieLivreVM>();
+                    List<Microsoft.UI.Xaml.Controls.TreeViewNode> categories = itemsList.Where(w => w.Content is CategorieLivreVM).ToList();//.Select(s => s.Content as CategorieLivreVM).Where(q => q != null).ToList();
+                    List<Microsoft.UI.Xaml.Controls.TreeViewNode> subcategories = itemsList.Where(w => w.Content is SubCategorieLivreVM).ToList();//.Select(s => s.Content as SubCategorieLivreVM).Where(q => q != null).ToList();
+                    if (categories != null && categories.Count > 0)
+                    {
+                        foreach (var categorie in categories.Select(s => s.Content as CategorieLivreVM).Where(q => q != null))
+                        {
+                            if (subcategories.Any())
+                            {
+                                categorie.SubCategorieLivres = new ObservableCollection<SubCategorieLivreVM>(subcategories.Select(s => s.Content as SubCategorieLivreVM).Where(q => q != null && q.IdCategorie == categorie.Id));
+                            }
+                            categorieViewModelList.Add(categorie);
+                        }
+                    }
+                    else if (subcategories != null && subcategories.Count > 0)
+                    {
+                        foreach (var treeViewNode in subcategories)
+                        {
+                            if (!(treeViewNode.Content is SubCategorieLivreVM subViewModel))
+                            {
+                                continue;
+                            }
 
-        private void ASB_SearchEditor_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
+                            var categorie = this.GetParentCategorie(treeViewNode);
+                            if (categorie != null)
+                            {
+                                var viewModel = categorieViewModelList.SingleOrDefault(a => a.Id == categorie.Id);
+                                if (viewModel == null)
+                                {
+                                    if (!categorie.SubCategorieLivres.Any(a => a.Id == subViewModel.Id))
+                                    {
+                                        categorie.SubCategorieLivres.Add(subViewModel);
+                                    }
+                                    categorieViewModelList.Add(categorie);
+                                }
+                                else
+                                {
+                                    if (!viewModel.SubCategorieLivres.Any(a => a.Id == subViewModel.Id))
+                                    {
+                                        viewModel.SubCategorieLivres.Add(subViewModel);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    ViewModelPage.SelectedCategories = categorieViewModelList;
+                }
+                else
+                {
+                    ViewModelPage.SelectedCategories = null;
+                }
 
-        }
+            }
+            catch (Exception)
+            {
 
-        private void ASB_SearchEditor_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchCollection_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchCollection_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-
-        }
-
-        private void ASB_SearchCollection_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-
+                throw;
+            }
         }
     }
 
@@ -533,6 +729,35 @@ namespace LibraryProjectUWP.Views.Categories
                 {
                     this._ParentLibrary = value;
                     this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<Microsoft.UI.Xaml.Controls.TreeViewNode> _SelectedItems;
+        public List<Microsoft.UI.Xaml.Controls.TreeViewNode> SelectedItems
+        {
+            get => _SelectedItems;
+            set
+            {
+                if (_SelectedItems != value)
+                {
+                    _SelectedItems = value;
+                    OnPropertyChanged();
+
+                }
+            }
+        }
+
+        private List<CategorieLivreVM> _SelectedCategories;
+        public List<CategorieLivreVM> SelectedCategories
+        {
+            get => _SelectedCategories;
+            set
+            {
+                if (_SelectedCategories != value)
+                {
+                    _SelectedCategories = value;
+                    OnPropertyChanged();
                 }
             }
         }

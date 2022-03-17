@@ -73,6 +73,35 @@ namespace LibraryProjectUWP.ViewModels
             }
         }
 
+        private bool _IsExpanded = true;
+        public bool IsExpanded
+        {
+            get => _IsExpanded;
+            set
+            {
+                if (_IsExpanded != value)
+                {
+                    _IsExpanded = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsSelected;
+        public bool IsSelected
+        {
+            get => _IsSelected;
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged();
+                }
+            }
+
+        }
+
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             // Raise the PropertyChanged event, passing the name of the property whose value has changed.
@@ -127,6 +156,35 @@ namespace LibraryProjectUWP.ViewModels
                     OnPropertyChanged();
                 }
             }
+        }
+
+        private bool _IsExpanded = true;
+        public bool IsExpanded
+        {
+            get => _IsExpanded;
+            set
+            {
+                if (_IsExpanded != value)
+                {
+                    _IsExpanded = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsSelected;
+        public bool IsSelected
+        {
+            get => _IsSelected;
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged();
+                }
+            }
+
         }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)

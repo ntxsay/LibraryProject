@@ -336,7 +336,7 @@ namespace LibraryProjectUWP.Views.Collection
                         TtipDeleteCollection.IsOpen = true;
                     }
 
-                        
+                       
                 }
             }
             catch (Exception ex)
