@@ -175,7 +175,7 @@
             </AppBarButton>
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBRenameCategorie" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource RenameSCategorieXamlUICommand}" CommandParameter="{x:Bind ViewModelPage.SelectedCategorie}"/>
-            <AppBarButton Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DeleteItemXUiCommand}"/>
+            <AppBarButton x:Name="ABBDelete"  Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DeleteItemXUiCommand}"/>
             <CommandBar.SecondaryCommands>
                 <AppBarToggleButton Label="Afficher les cases à cocher" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="ABTBtnDisplayCheckMark_Click">
                     <AppBarToggleButton.Icon>

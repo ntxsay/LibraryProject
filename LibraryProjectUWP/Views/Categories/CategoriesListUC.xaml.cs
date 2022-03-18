@@ -278,23 +278,23 @@ namespace LibraryProjectUWP.Views.Categories
                 //if (ViewModelPage.ParentLibrary != null && TreeCategorie.SelectedItem != null)
                 if (ViewModelPage.ParentLibrary != null && ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
                 {
+                    var textblock = new TextBlock()
+                    {
+                        TextWrapping = TextWrapping.Wrap,
+                    };                    
+
                     if (ViewModelPage.SelectedItems.Count == 1)
                     {
                         DependencyObject treeItem = TreeCategorie.ContainerFromNode(ViewModelPage.SelectedItems[0]);
                         if (treeItem is Microsoft.UI.Xaml.Controls.TreeViewItem treeViewItem)
                         {
-                            var content = ViewModelPage.SelectedItems[0].Content;
-                            var textblock = new TextBlock()
-                            {
-                                TextWrapping = TextWrapping.Wrap,
-                            };
+                            //var content = ViewModelPage.SelectedItems[0].Content;
 
                             Run run1 = new Run()
                             {
-                                Text = $"Êtes-vous sûr de vouloir supprimer « ",
+                                Text = $"Êtes-vous sûr de vouloir supprimer ",
                                 //FontWeight = FontWeights.Medium,
                             };
-
                             textblock.Inlines.Add(run1);
 
                             TtipDeleteSCategorie.Target = treeViewItem;
@@ -339,8 +339,7 @@ namespace LibraryProjectUWP.Views.Categories
 
                                 TtipDeleteSCategorie.Title = "Supprimer une sous-catégorie";
                             }
-                            textblock.Inlines.Add(new LineBreak());
-                            textblock.Inlines.Add(new LineBreak());
+                            
 
                             Run run2 = new Run()
                             {
@@ -354,9 +353,36 @@ namespace LibraryProjectUWP.Views.Categories
                                 Foreground = new SolidColorBrush(Colors.OrangeRed),
                             };
                             textblock.Inlines.Add(run2);
+                            textblock.Inlines.Add(new LineBreak());
+                            textblock.Inlines.Add(new LineBreak());
                             textblock.Inlines.Add(run3);
+                            TtipDeleteSCategorie.IsOpen = true;
+
 
                         }
+                    }
+                    else if (ViewModelPage.SelectedItems.Count > 1)
+                    {
+                        TtipDeleteSCategorie.Target = ABBDelete;
+                        
+                        Run run1 = new Run()
+                        {
+                            Text = $"Êtes-vous sûr de vouloir supprimer « {ViewModelPage.SelectedItems.Count} éléments » ?",
+                            //FontWeight = FontWeights.Medium,
+                        };
+
+                        Run run2 = new Run()
+                        {
+                            Text = $"Veuillez noter que cette action entraînera la suppression de cette collection dans les livres concernés.",
+                            Foreground = new SolidColorBrush(Colors.OrangeRed),
+                        };
+
+                        textblock.Inlines.Add(run1);
+                        textblock.Inlines.Add(new LineBreak());
+                        textblock.Inlines.Add(new LineBreak());
+                        textblock.Inlines.Add(run2);
+                        TtipDeleteSCategorie.Content = textblock;
+                        TtipDeleteSCategorie.IsOpen = true;
                     }
                     
                 }
