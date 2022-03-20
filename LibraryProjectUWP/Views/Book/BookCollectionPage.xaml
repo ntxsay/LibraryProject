@@ -390,7 +390,8 @@
                         <TextBlock Grid.Column="0" Text="{x:Bind MainTitle}" FontWeight="Medium" HorizontalAlignment="Left"/>
                     </Grid>
                     <TextBlock HorizontalAlignment="Stretch" TextAlignment="Left" Foreground="#616161" FontSize="12">
-                        <Run Text="{x:Bind DateAjout, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='ddd dd MMM yyyy'}" />
+                        <Run Text="{x:Bind NbExemplaires, Mode=OneWay}" />
+                        <Run Text="exemplaire(s)" />
                         <Run Text="&#x000B7;" FontSize="16" FontWeight="Bold"/>
                         <Run Text="0" />
                         <Run Text="prêt(s)" />
