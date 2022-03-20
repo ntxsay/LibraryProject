@@ -131,6 +131,7 @@
     </Compile>
     <Compile Include="Code\AppInfo.cs" />
     <Compile Include="Code\Converters\ClassificationAgeToBooleanConverter.cs" />
+    <Compile Include="Code\Converters\StringConverter.cs" />
     <Compile Include="Code\Converters\IntToVisibilityConverter.cs" />
     <Compile Include="Code\Converters\IntToBooleanConverter.cs" />
     <Compile Include="Code\Converters\CountToEnablingConverter.cs" />

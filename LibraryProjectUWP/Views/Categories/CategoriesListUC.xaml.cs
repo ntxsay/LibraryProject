@@ -175,51 +175,51 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-        private void RenameSCategorieXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void RenameSCategorieXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                GetSelectedNodes();
-
-                if (ViewModelPage.ParentLibrary != null && ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
+                CategorieLivreVM _categorie = null;
+                SubCategorieLivreVM _subCategorie = null;
+                if (ViewModelPage.ParentLibrary != null)
                 {
-                    if (ViewModelPage.SelectedItems.Count == 1)
+                    GetSelectedNodes();
+
+                    if (args.Parameter is CategorieLivreVM categorie)
                     {
-                        if (ViewModelPage.SelectedItems[0].Content is CategorieLivreVM _viewModelCategorie)
+                        _categorie = categorie;
+                    }
+                    else if (args.Parameter is SubCategorieLivreVM subCategorie)
+                    {
+                        _subCategorie = subCategorie;
+                    }
+                    else if (ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
+                    {
+                        if (ViewModelPage.SelectedItems.Count == 1)
                         {
-                            if (_parameters.BookPage != null)
+                            if (ViewModelPage.SelectedItems[0].Content is CategorieLivreVM _viewModelCategorie)
                             {
-                                _parameters.BookPage.EditCategory(ViewModelPage.ParentLibrary, _viewModelCategorie, ViewModelPage.Guid);
+                                _categorie = _viewModelCategorie;
                             }
-                            else if (_parameters.LibraryPage != null)
+                            else if (ViewModelPage.SelectedItems[0].Content is SubCategorieLivreVM _viewModelSubCategorie)
                             {
-                                _parameters.LibraryPage.EditCategory(ViewModelPage.ParentLibrary, _viewModelCategorie, ViewModelPage.Guid);
+                                _subCategorie = _viewModelSubCategorie;
                             }
                         }
-                        else if (ViewModelPage.SelectedItems[0].Content is SubCategorieLivreVM _viewModelSubCategorie)
+                        else
                         {
-                            CategorieLivreVM viewModelParentCategorie = GetParentCategorie(ViewModelPage.SelectedItems[0]);
-                            if (viewModelParentCategorie == null)
-                            {
-                                return;
-                            }
-
-                            if (_parameters.BookPage != null)
-                            {
-                                _parameters.BookPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
-                            }
-                            else if (_parameters.LibraryPage != null)
-                            {
-                                _parameters.LibraryPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
-                            }
+                            MyTeachingTip.Target = ABBRenameCategorie;
+                            MyTeachingTip.Title = "Editer";
+                            MyTeachingTip.Subtitle = "Vous ne pouvez éditer qu'une seule catégorie/sous-catégorie à la fois.";
+                            MyTeachingTip.IsOpen = true;
                         }
                     }
                     else
                     {
                         MyTeachingTip.Target = ABBRenameCategorie;
                         MyTeachingTip.Title = "Editer";
-                        MyTeachingTip.Subtitle = "Vous ne pouvez éditer qu'une seule catégorie/sous-catégorie à la fois.";
+                        MyTeachingTip.Subtitle = "Pour éditer une catégorie ou une sous-catégorie, cliquez d'abord sur la catégorie ou la sous-catégorie que vous souhaitez renommer dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.";
                         MyTeachingTip.IsOpen = true;
                     }
                 }
@@ -229,6 +229,143 @@ namespace LibraryProjectUWP.Views.Categories
                     MyTeachingTip.Title = "Editer";
                     MyTeachingTip.Subtitle = "Pour éditer une catégorie ou une sous-catégorie, cliquez d'abord sur la catégorie ou la sous-catégorie que vous souhaitez renommer dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.";
                     MyTeachingTip.IsOpen = true;
+                }
+
+
+                if (_categorie != null)
+                {
+                    if (_parameters.BookPage != null)
+                    {
+                        _parameters.BookPage.EditCategory(ViewModelPage.ParentLibrary, _categorie, ViewModelPage.Guid);
+                    }
+                    else if (_parameters.LibraryPage != null)
+                    {
+                        _parameters.LibraryPage.EditCategory(ViewModelPage.ParentLibrary, _categorie, ViewModelPage.Guid);
+                    }
+                }
+                else if (_subCategorie != null)
+                {
+                    CategorieLivreVM viewModelParentCategorie = await DbServices.Categorie.SingleVMAsync(_subCategorie.IdCategorie);
+                    if (viewModelParentCategorie == null)
+                    {
+                        return;
+                    }
+
+                    if (_parameters.BookPage != null)
+                    {
+                        _parameters.BookPage.EditSubCategory(viewModelParentCategorie, _subCategorie, ViewModelPage.Guid);
+                    }
+                    else if (_parameters.LibraryPage != null)
+                    {
+                        _parameters.LibraryPage.EditSubCategory(viewModelParentCategorie, _subCategorie, ViewModelPage.Guid);
+                    }
+                    else
+                    {
+                        MyTeachingTip.Target = ABBRenameCategorie;
+                        MyTeachingTip.Title = "Editer";
+                        MyTeachingTip.Subtitle = "Pour éditer une catégorie ou une sous-catégorie, cliquez d'abord sur la catégorie ou la sous-catégorie que vous souhaitez renommer dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.";
+                        MyTeachingTip.IsOpen = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DeleteContextItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.ParentLibrary != null)
+                {
+                    DependencyObject treeItem = TreeCategorie.ContainerFromNode(ViewModelPage.SelectedItems[0]);
+                    if (treeItem is Microsoft.UI.Xaml.Controls.TreeViewItem treeViewItem)
+                    {
+                        var textblock = new TextBlock()
+                        {
+                            TextWrapping = TextWrapping.Wrap,
+                        };
+
+                        Run run1 = new Run()
+                        {
+                            Text = $"Êtes-vous sûr de vouloir supprimer ",
+                            //FontWeight = FontWeights.Medium,
+                        };
+                        textblock.Inlines.Add(run1);
+
+                        TtipDeleteSCategorie.Target = treeViewItem;
+                        TtipDeleteSCategorie.Content = textblock;
+
+                        if (args.Parameter is CategorieLivreVM categorie)
+                        {
+                            Run runType = new Run()
+                            {
+                                Text = $"la catégorie « ",
+                                //FontWeight = FontWeights.Medium,
+                            };
+
+                            Run runName = new Run()
+                            {
+                                Text = categorie.Name,
+                                Foreground = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush,
+                                FontWeight = FontWeights.Medium,
+                            };
+
+                            textblock.Inlines.Add(runType);
+                            textblock.Inlines.Add(runName);
+
+                            TtipDeleteSCategorie.Title = "Supprimer une catégorie";
+
+                            Run run5 = new Run()
+                            {
+                                Text = $"Veuillez noter que cette action entraînera la suppression de cette catégorie ainsi que ses sous-catégorie dans les livres concernés.",
+                                Foreground = new SolidColorBrush(Colors.OrangeRed),
+                            };
+                        }
+                        else if (args.Parameter is SubCategorieLivreVM subCategorie)
+                        {
+                            Run runType = new Run()
+                            {
+                                Text = $"la sous-catégorie « ",
+                                //FontWeight = FontWeights.Medium,
+                            };
+
+                            Run runName = new Run()
+                            {
+                                Text = subCategorie.Name,
+                                Foreground = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush,
+                                FontWeight = FontWeights.Medium,
+                            };
+                            textblock.Inlines.Add(runType);
+                            textblock.Inlines.Add(runName);
+
+                            TtipDeleteSCategorie.Title = "Supprimer une sous-catégorie";
+                        }
+
+
+                        Run run2 = new Run()
+                        {
+                            Text = $" » ?",
+                            //FontWeight = FontWeights.Medium,
+                        };
+
+                        Run run3 = new Run()
+                        {
+                            Text = $"Veuillez noter que cette action entraînera la suppression de cette collection dans les livres concernés.",
+                            Foreground = new SolidColorBrush(Colors.OrangeRed),
+                        };
+                        textblock.Inlines.Add(run2);
+                        textblock.Inlines.Add(new LineBreak());
+                        textblock.Inlines.Add(new LineBreak());
+                        textblock.Inlines.Add(run3);
+                        TtipDeleteSCategorie.IsOpen = true;
+
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -250,7 +387,7 @@ namespace LibraryProjectUWP.Views.Categories
                     var textblock = new TextBlock()
                     {
                         TextWrapping = TextWrapping.Wrap,
-                    };                    
+                    };
 
                     if (ViewModelPage.SelectedItems.Count == 1)
                     {
@@ -308,7 +445,7 @@ namespace LibraryProjectUWP.Views.Categories
 
                                 TtipDeleteSCategorie.Title = "Supprimer une sous-catégorie";
                             }
-                            
+
 
                             Run run2 = new Run()
                             {
@@ -333,7 +470,7 @@ namespace LibraryProjectUWP.Views.Categories
                     else if (ViewModelPage.SelectedItems.Count > 1)
                     {
                         TtipDeleteSCategorie.Target = ABBDelete;
-                        
+
                         Run run1 = new Run()
                         {
                             Text = $"Êtes-vous sûr de vouloir supprimer ces « {ViewModelPage.SelectedItems.Count} élément(s) » ?",
@@ -353,7 +490,7 @@ namespace LibraryProjectUWP.Views.Categories
                         TtipDeleteSCategorie.Content = textblock;
                         TtipDeleteSCategorie.IsOpen = true;
                     }
-                    
+
                 }
                 else
                 {
@@ -369,6 +506,7 @@ namespace LibraryProjectUWP.Views.Categories
                 return;
             }
         }
+
 
         private void BtnDeleteCancel_Click(object sender, RoutedEventArgs e)
         {
@@ -676,6 +814,80 @@ namespace LibraryProjectUWP.Views.Categories
                             flyoutItem.IsEnabled = false;
                         }
                     }
+
+                    if (menuFlyout.Items[1] is MenuFlyoutItem flyoutItemDecategorize)
+                    {
+                        if (flyoutItemDecategorize.Tag is CategorieLivreVM categorie)
+                        {
+                            if (categorie.BooksId != null && categorie.BooksId.Any())
+                            {
+                                flyoutItemDecategorize.Text = $"Décatégoriser {categorie.BooksId.Count} livre(s) dans « {categorie.Name} »";
+                                flyoutItemDecategorize.IsEnabled = true;
+                            }
+                            else
+                            {
+                                flyoutItemDecategorize.Text = $"Aucun livre à décatégoriser dans « {categorie.Name} »";
+                                flyoutItemDecategorize.IsEnabled = false;
+                            }
+                        }
+                        else if (flyoutItemDecategorize.Tag is SubCategorieLivreVM subCategorie)
+                        {
+                            if (subCategorie.BooksId != null && subCategorie.BooksId.Any())
+                            {
+                                flyoutItemDecategorize.Text = $"Décatégoriser {subCategorie.BooksId.Count} livre(s) dans « {subCategorie.Name} »";
+                                flyoutItemDecategorize.IsEnabled = true;
+                            }
+                            else
+                            {
+                                flyoutItemDecategorize.Text = $"Aucun livre à décatégoriser dans « {subCategorie.Name} »";
+                                flyoutItemDecategorize.IsEnabled = false;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void DecategorizeBooksFromSCategorieXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                OperationStateVM result = null;
+                if (args.Parameter is CategorieLivreVM categorieLivreVM)
+                {
+                    result = await DbServices.Categorie.DecategorizeBooksAsync(categorieLivreVM.BooksId);
+                }
+                else if (args.Parameter is SubCategorieLivreVM subCategorieLivreVM)
+                {
+                    result = await DbServices.Categorie.DecategorizeBooksAsync(subCategorieLivreVM.BooksId);
+                }
+
+                if (result != null)
+                {
+                    if (result.IsSuccess)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Succès";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                        ViewModelPage.IsResultMessageOpen = true;
+
+                        await _parameters.BookPage.UpdateLibraryCategoriesAsync();
+                    }
+                    else
+                    {
+                        //Erreur
+                        ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
                 }
             }
             catch (Exception ex)
@@ -914,6 +1126,7 @@ namespace LibraryProjectUWP.Views.Categories
                 return;
             }
         }
+
 
         #endregion
 

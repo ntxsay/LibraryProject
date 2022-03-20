@@ -31,6 +31,7 @@
                     <SolidColorBrush x:Key="ListViewBg" Color="{ThemeResource SystemRevealChromeBlackLowColor}"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+            <customConverters:CreateWordsConverter x:Key="createWordsConverter" />
             <customConverters:IntGreaterThanToBooleanConverter x:Key="intGreaterThanToBooleanConverter" />
             <customConverters:IntEqualToBooleanConverter x:Key="intEqualToBooleanConverter" />
             <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
@@ -64,8 +65,16 @@
                        ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
                        Description="Supprime la catégorie ou la sous-catégorie sélectionnée">
             </XamlUICommand>
+            <XamlUICommand x:Name="DeleteContextItemXUiCommand" 
+                       ExecuteRequested="DeleteContextItemXUiCommand_ExecuteRequested"
+                       Description="Supprime la catégorie ou la sous-catégorie sélectionnée">
+            </XamlUICommand>
             <XamlUICommand x:Name="AddBooksToSCategorieXUiCmd" 
                        ExecuteRequested="AddBooksToSCategorieXUiCmd_ExecuteRequested"
+                       Description="Supprime la catégorie ou la sous-catégorie sélectionnée">
+            </XamlUICommand>
+            <XamlUICommand x:Name="DecategorizeBooksFromSCategorieXUiCmd" 
+                       ExecuteRequested="DecategorizeBooksFromSCategorieXUiCmd_ExecuteRequested"
                        Description="Supprime la catégorie ou la sous-catégorie sélectionnée">
             </XamlUICommand>
             <XamlUICommand x:Name="NavigateInThisItemXUiCmd" 
@@ -108,13 +117,15 @@
                     <MUIXC:TreeViewItem.ContextFlyout>
                         <MenuFlyout Opened="MenuFlyout_Opened">
                             <MenuFlyoutItem Tag="{x:Bind Name, Mode=OneWay}" Icon="Add" Command="{StaticResource AddBooksToSCategorieXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
+                            <MenuFlyoutItem Tag="{x:Bind Mode=OneWay}" Icon="Remove" Command="{StaticResource DecategorizeBooksFromSCategorieXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Editer la catégorie" Icon="Edit"/>
+                            <MenuFlyoutItem Text="{x:Bind Name, Converter={StaticResource createWordsConverter}, ConverterParameter='Editer « {x} »', Mode=OneWay}" Icon="Edit"
+                                            Command="{StaticResource RenameSCategorieXamlUICommand}" CommandParameter="{x:Bind Mode=OneWay}"/>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Ajouter une sous-catégorie" Icon="Add"/>
+                            <MenuFlyoutItem Text="{x:Bind Name, Converter={StaticResource createWordsConverter}, ConverterParameter='Ajouter une sous-catégorie à « {x} »', Mode=OneWay}" Icon="Add"/>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Supprimer la catégorie" Icon="Delete"/>
-
+                            <MenuFlyoutItem Text="{x:Bind Name, Converter={StaticResource createWordsConverter}, ConverterParameter='Supprimer « {x} »', Mode=OneWay}" Icon="Delete"
+                                             Command="{StaticResource DeleteContextItemXUiCommand}" CommandParameter="{x:Bind }"/>
                         </MenuFlyout>
                     </MUIXC:TreeViewItem.ContextFlyout>
                 </MUIXC:TreeViewItem>
@@ -131,10 +142,13 @@
                     <MUIXC:TreeViewItem.ContextFlyout>
                         <MenuFlyout Opened="MenuFlyout_Opened">
                             <MenuFlyoutItem Tag="{x:Bind Name, Mode=OneWay}" Icon="Add" Command="{StaticResource AddBooksToSCategorieXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
+                            <MenuFlyoutItem Tag="{x:Bind Mode=OneWay}" Icon="Remove" Command="{StaticResource DecategorizeBooksFromSCategorieXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Editer {x}" Icon="Edit"/>
+                            <MenuFlyoutItem Text="{x:Bind Name, Converter={StaticResource createWordsConverter}, ConverterParameter='Editer « {x} »', Mode=OneWay}" Icon="Edit"
+                                             Command="{StaticResource RenameSCategorieXamlUICommand}" CommandParameter="{x:Bind Mode=OneWay}"/>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Supprimer " Icon="Delete"/>
+                            <MenuFlyoutItem Text="{x:Bind Name, Converter={StaticResource createWordsConverter}, ConverterParameter='Supprimer « {x} »', Mode=OneWay}" Icon="Delete" 
+                                            Command="{StaticResource DeleteContextItemXUiCommand}" CommandParameter="{x:Bind }"/>
                         </MenuFlyout>
                     </MUIXC:TreeViewItem.ContextFlyout>
                 </MUIXC:TreeViewItem>
@@ -241,7 +255,7 @@
                 </Grid>
                 <ListViewItem.ContextFlyout>
                     <MenuFlyout Opened="MenuFlyout_UnCategorized_Opened">
-                        <MenuFlyoutItem Icon="Add" Click="MenuFlyoutItem_UnCategorizeItems_Click"/>
+                        <MenuFlyoutItem Icon="Remove" Click="MenuFlyoutItem_UnCategorizeItems_Click"/>
                     </MenuFlyout>
                 </ListViewItem.ContextFlyout>
             </ListViewItem>
