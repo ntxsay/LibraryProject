@@ -2279,6 +2279,8 @@ namespace LibraryProjectUWP.Views.Book
                         ParentLibrary = ViewModelPage.ParentLibrary,
                     });
 
+                    userControl.CancelModificationRequested += CategoriesListUC_CancelModificationRequested;
+
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
@@ -2295,6 +2297,21 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void CategoriesListUC_CancelModificationRequested(CategoriesListUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= CategoriesListUC_CancelModificationRequested;
+
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
 
         private async Task AddBookToCategorie(CategoriesListUC categoriesListUC, IEnumerable<long> idBooks, CategorieLivreVM selectedCategorie, SubCategorieLivreVM selectedSubCategorie = null)
         {

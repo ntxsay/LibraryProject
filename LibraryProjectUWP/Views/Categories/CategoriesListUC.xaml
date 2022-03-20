@@ -58,16 +58,12 @@
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
             </XamlUICommand>
-            <XamlUICommand x:Name="CreateItemXUiCommand" 
-                       ExecuteRequested="CreateItemXUiCommand_ExecuteRequested"
-                       Description="Crée un nouvel item">
-            </XamlUICommand>
-            <XamlUICommand x:Name="UpdateItemXUiCommand" 
-                       ExecuteRequested="UpdateItemXUiCommand_ExecuteRequested"
-                       Description="Met à jour l'item">
-            </XamlUICommand>
             <XamlUICommand x:Name="DeleteItemXUiCommand" 
                        ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
+                       Description="Supprime la catégorie ou la sous-catégorie sélectionnée">
+            </XamlUICommand>
+            <XamlUICommand x:Name="AddBooksToSCategorieXUiCmd" 
+                       ExecuteRequested="AddBooksToSCategorieXUiCmd_ExecuteRequested"
                        Description="Supprime la catégorie ou la sous-catégorie sélectionnée">
             </XamlUICommand>
             <Style TargetType="Grid" x:Key="WrapGridChildStyle">
@@ -96,7 +92,9 @@
                         <Rectangle Grid.Row="1" Fill="Black" Height="1" HorizontalAlignment="Stretch"/>
                     </Grid>
                     <MUIXC:TreeViewItem.ContextFlyout>
-                        <MenuFlyout>
+                        <MenuFlyout Opened="MenuFlyout_Opened">
+                            <MenuFlyoutItem Tag="{x:Bind Name, Mode=OneWay}" Icon="Add" Command="{StaticResource AddBooksToSCategorieXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
+                            <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Editer la catégorie" Icon="Edit"/>
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Ajouter une sous-catégorie" Icon="Add"/>
@@ -117,7 +115,9 @@
                         </TextBlock>
                     </StackPanel>
                     <MUIXC:TreeViewItem.ContextFlyout>
-                        <MenuFlyout>
+                        <MenuFlyout Opened="MenuFlyout_Opened">
+                            <MenuFlyoutItem Tag="{x:Bind Name, Mode=OneWay}" Icon="Add" Command="{StaticResource AddBooksToSCategorieXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
+                            <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Editer {x}" Icon="Edit"/>
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Supprimer " Icon="Delete"/>
@@ -138,7 +138,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <userControls:SideBarItemHeader Grid.Column="0" Title="{x:Bind ViewModelPage.Header, Mode=OneWay}" Glyph="{x:Bind ViewModelPage.Glyph, Mode=OneWay}" />
-            <Button Grid.Column="1" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fermer cet onglet">
+            <Button Grid.Column="1" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fermer cet onglet" Command="{StaticResource CancelModificationXUiCommand}">
                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="16"/>
             </Button>
         </Grid>
@@ -204,12 +204,6 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
-                <Button Command="{StaticResource CreateItemXUiCommand}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
-                        <TextBlock Text="Afficher les livres de cette catégorie" />
-                    </StackPanel>
-                </Button>
                 <Button Command="{StaticResource CancelModificationXUiCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;"/>
@@ -233,8 +227,8 @@
                                     PreferredPlacement="Bottom">
             <MUIXC:TeachingTip.HeroContent>
                 <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center" Margin="0 10">
-                    <Button Content="Annuler"></Button>
-                    <Button Content="Supprimer"></Button>
+                    <Button x:Name="BtnDeleteCancel" Content="Annuler" Click="BtnDeleteCancel_Click"></Button>
+                    <Button x:Name="BtnDeleteConfirm" Content="Supprimer" Click="BtnDeleteConfirm_Click"></Button>
                 </StackPanel>
             </MUIXC:TeachingTip.HeroContent>
             <!--<MUIXC:TeachingTip.Content>

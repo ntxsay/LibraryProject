@@ -7,6 +7,7 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Categorie;
+using LibraryProjectUWP.ViewModels.General;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -45,12 +47,6 @@ namespace LibraryProjectUWP.Views.Categories
 
         public delegate void CancelModificationEventHandler(CategoriesListUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
-
-        public delegate void UpdateItemEventHandler(CategoriesListUC sender, ExecuteRequestedEventArgs e);
-        public event UpdateItemEventHandler UpdateItemRequested;
-
-        public delegate void CreateItemEventHandler(CategoriesListUC sender, ExecuteRequestedEventArgs e);
-        public event CreateItemEventHandler CreateItemRequested;
 
         private object _SelectedItem;
         public object SelectedItem
@@ -89,28 +85,9 @@ namespace LibraryProjectUWP.Views.Categories
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
-            foreach (var item in ViewModelPage.ParentLibrary.Categories)
-            {
-                item.PropertyChanged += Categorie_PropertyChanged;
-                if (item.SubCategorieLivres != null && item.SubCategorieLivres.Any())
-                {
-                    foreach (var subItem in item.SubCategorieLivres)
-                    {
-                        subItem.PropertyChanged += SubCategorie_PropertyChanged; ;
-                    }
-                }
-            }
+            
         }
 
-        private void SubCategorie_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            //GetSelectedNodes();
-        }
-
-        private void Categorie_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            //GetSelectedNodes();
-        }
 
         private void InitializeActionInfos()
         {
@@ -367,7 +344,7 @@ namespace LibraryProjectUWP.Views.Categories
                         
                         Run run1 = new Run()
                         {
-                            Text = $"Êtes-vous sûr de vouloir supprimer « {ViewModelPage.SelectedItems.Count} éléments » ?",
+                            Text = $"Êtes-vous sûr de vouloir supprimer ces « {ViewModelPage.SelectedItems.Count} élément(s) » ?",
                             //FontWeight = FontWeights.Medium,
                         };
 
@@ -392,6 +369,98 @@ namespace LibraryProjectUWP.Views.Categories
                     MyTeachingTip.Title = "Renommer";
                     MyTeachingTip.Subtitle = "Pour renommer une catégorie ou une sous-catégorie, cliquez d'abord sur la catégorie ou la sous-catégorie que vous souhaitez renommer dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.";
                     MyTeachingTip.IsOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void BtnDeleteCancel_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                TtipDeleteSCategorie.IsOpen = false;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void BtnDeleteConfirm_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
+                {
+                    foreach (var item in ViewModelPage.SelectedItems)
+                    {
+                        OperationStateVM result = null;
+                        if (item.Content is CategorieLivreVM categorie)
+                        {
+                            result = await DbServices.Categorie.DeleteAsync<CategorieLivreVM>(categorie.Id);
+                            if (result.IsSuccess)
+                            {
+                                ViewModelPage.ResultMessageTitle = "Succès";
+                                ViewModelPage.ResultMessage = result.Message;
+                                ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                                ViewModelPage.IsResultMessageOpen = true;
+                                var itemVm = ViewModelPage.ParentLibrary.Categories.SingleOrDefault(s => s.Id == categorie.Id);
+                                if (itemVm != null)
+                                {
+                                    ViewModelPage.ParentLibrary.Categories.Remove(itemVm);
+                                }
+                                Thread.Sleep(500);
+                            }
+                            else
+                            {
+                                //Erreur
+                                ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                                ViewModelPage.ResultMessage += "\n" + result.Message;
+                                ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                                ViewModelPage.IsResultMessageOpen = true;
+                                continue;
+                            }
+                        }
+                        else if (item.Content is SubCategorieLivreVM subCategorie)
+                        {
+                            result = await DbServices.Categorie.DeleteAsync<SubCategorieLivreVM>(subCategorie.Id);
+                            if (result.IsSuccess)
+                            {
+                                ViewModelPage.ResultMessageTitle = "Succès";
+                                ViewModelPage.ResultMessage = result.Message;
+                                ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                                ViewModelPage.IsResultMessageOpen = true; 
+                                foreach (var cat in ViewModelPage.ParentLibrary.Categories)
+                                {
+                                    var subItemVm = cat.SubCategorieLivres.SingleOrDefault(s => s.Id == subCategorie.Id);
+                                    if (subItemVm != null)
+                                    {
+                                        cat.SubCategorieLivres.Remove(subItemVm);
+                                    }
+                                }
+                                
+                                Thread.Sleep(500);
+                            }
+                            else
+                            {
+                                //Erreur
+                                ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                                ViewModelPage.ResultMessage += "\n" + result.Message;
+                                ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                                ViewModelPage.IsResultMessageOpen = true;
+                                continue;
+                            }
+                        }
+
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -444,45 +513,7 @@ namespace LibraryProjectUWP.Views.Categories
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                bool isValided = IsModelValided();
-                if (!isValided)
-                {
-                    return;
-                }
-
-                CreateItemRequested?.Invoke(this, args);
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                bool isValided = IsModelValided();
-                if (!isValided)
-                {
-                    return;
-                }
-
-                UpdateItemRequested?.Invoke(this, args);
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        
 
 
         private bool IsModelValided()
@@ -520,32 +551,9 @@ namespace LibraryProjectUWP.Views.Categories
         {
             try
             {
-                foreach (var item in ViewModelPage.ParentLibrary.Categories)
-                {
-                    item.PropertyChanged -= Categorie_PropertyChanged;
-                    if (item.SubCategorieLivres != null && item.SubCategorieLivres.Any())
-                    {
-                        foreach (var subItem in item.SubCategorieLivres)
-                        {
-                            subItem.PropertyChanged -= SubCategorie_PropertyChanged; ;
-
-                        }
-                    }
-                }
-
                 if (CancelModificationRequested != null)
                 {
                     CancelModificationRequested = null;
-                }
-
-                if (CreateItemRequested != null)
-                {
-                    CreateItemRequested = null;
-                }
-
-                if (UpdateItemRequested != null)
-                {
-                    UpdateItemRequested = null;
                 }
             }
             catch (Exception)
@@ -651,6 +659,102 @@ namespace LibraryProjectUWP.Views.Categories
             {
 
                 throw;
+            }
+        }
+
+        private void MenuFlyout_Opened(object sender, object e)
+        {
+            try
+            {
+                if (sender is MenuFlyout menuFlyout)
+                {
+                    if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any())
+                    {
+                        if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Ajouter {_parameters.BookPage.ViewModelPage.SelectedItems.Count} livre(s) à « {flyoutItem.Tag} »";
+                            flyoutItem.IsEnabled = true;
+                        }
+                    }
+                    else
+                    {
+                        if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Aucun livre à ajouter à « {flyoutItem.Tag} »";
+                            flyoutItem.IsEnabled = false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void AddBooksToSCategorieXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any())
+                {
+                    if (args.Parameter is CategorieLivreVM categorieLivreVM)
+                    {
+                        var creationResult = await DbServices.Categorie.CreateCategorieConnectorAsync(_parameters.BookPage.ViewModelPage.SelectedItems.Select(s => s.Id), categorieLivreVM, null);
+                        if (creationResult.IsSuccess)
+                        {
+                            ViewModelPage.ResultMessageTitle = "Succès";
+                            ViewModelPage.ResultMessage = creationResult.Message;
+                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                            ViewModelPage.IsResultMessageOpen = true;
+
+                            await _parameters.BookPage.UpdateLibraryCategoriesAsync();
+                        }
+                        else
+                        {
+                            //Erreur
+                            ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                            ViewModelPage.ResultMessage = creationResult.Message;
+                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                            ViewModelPage.IsResultMessageOpen = true;
+                            return;
+                        }
+                    }
+                    else if (args.Parameter is SubCategorieLivreVM subCategorieLivreVM)
+                    {
+                        var parentCategorie = await DbServices.Categorie.GetParentCategorieVMAsync(subCategorieLivreVM.Id);
+                        if (parentCategorie != null)
+                        {
+                            var creationResult = await DbServices.Categorie.CreateCategorieConnectorAsync(_parameters.BookPage.ViewModelPage.SelectedItems.Select(s => s.Id), parentCategorie, subCategorieLivreVM);
+                            if (creationResult.IsSuccess)
+                            {
+                                ViewModelPage.ResultMessageTitle = "Succès";
+                                ViewModelPage.ResultMessage = creationResult.Message;
+                                ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                                ViewModelPage.IsResultMessageOpen = true;
+
+                                await _parameters.BookPage.UpdateLibraryCategoriesAsync();
+                            }
+                            else
+                            {
+                                //Erreur
+                                ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                                ViewModelPage.ResultMessage = creationResult.Message;
+                                ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                                ViewModelPage.IsResultMessageOpen = true;
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
     }

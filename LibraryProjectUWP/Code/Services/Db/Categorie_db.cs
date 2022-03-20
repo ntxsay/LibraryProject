@@ -333,6 +333,31 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 return await Categorie.ViewModelConverterAsync(await Categorie.SingleAsync(id));
             }
+
+            public static async Task<TlibraryCategorie> GetParentCategorieAsync(long idSubcategorie)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var s = await context.TlibrarySubCategorie.SingleOrDefaultAsync(d => d.Id == idSubcategorie);
+                        if (s == null) return null;
+                        s.IdCategorieNavigation = await context.TlibraryCategorie.SingleOrDefaultAsync(q => q.Id == s.IdCategorie);
+                        return s.IdCategorieNavigation;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return null;
+                }
+            }
+
+            public static async Task<CategorieLivreVM> GetParentCategorieVMAsync(long idSubcategorie)
+            {
+                return await ViewModelConverterAsync(await GetParentCategorieAsync(idSubcategorie));
+            }
             #endregion
 
             public static async Task<IList<long>> GetBooksIdInCategorie(long idCategorie)
@@ -607,49 +632,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            /// <summary>
-            /// Supprime un élément de la base de données
-            /// </summary>
-            /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
-            /// <param name="Id"></param>
-            /// <returns></returns>
-            public static async Task<OperationStateVM> DeleteAsync(long Id)
-            {
-                try
-                {
-                    using (LibraryDbContext context = new LibraryDbContext())
-                    {
-                        var record = await context.TlibraryCategorie.SingleOrDefaultAsync(a => a.Id == Id);
-                        if (record == null)
-                        {
-                            return new OperationStateVM()
-                            {
-                                IsSuccess = false,
-                                Message = DbServices.RecordNotExistMessage
-                            };
-                        }
-
-                        context.TlibraryCategorie.Remove(record);
-                        await context.SaveChangesAsync();
-
-                        return new OperationStateVM()
-                        {
-                            IsSuccess = true,
-                        };
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Debug.WriteLine(Logs.GetLog(ex, m));
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = false,
-                        Message = $"Exception : {ex.Message}",
-                    };
-                }
-            }
+            
 
             public static async Task<OperationStateVM> CreateSubCategorieAsync(SubCategorieLivreVM viewModel)
             {
@@ -797,30 +780,87 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
             /// <param name="Id"></param>
             /// <returns></returns>
-            public static async Task<OperationStateVM> DeleteSubCategorieAsync(long Id)
+            public static async Task<OperationStateVM> DeleteAsync<T>(long Id) where T : class
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var record = await context.TlibrarySubCategorie.SingleOrDefaultAsync(a => a.Id == Id);
-                        if (record == null)
+                        if (typeof(T) == typeof(CategorieLivreVM) || typeof(T) == typeof(TlibraryCategorie))
                         {
+                            var record = await context.TlibraryCategorie.SingleOrDefaultAsync(a => a.Id == Id);
+                            if (record == null)
+                            {
+                                return new OperationStateVM()
+                                {
+                                    IsSuccess = false,
+                                    Message = DbServices.RecordNotExistMessage
+                                };
+                            }
+
+                            var connectors = await context.TlibraryBookConnector.Where(a => a.IdCategorie == record.Id).ToListAsync();
+                            if (connectors != null && connectors.Any())
+                            {
+                                foreach (var connector in connectors)
+                                {
+                                    connector.IdCategorie = null;
+                                    connector.IdSubCategorie = null;
+                                }
+
+                                context.TlibraryBookConnector.UpdateRange(connectors);
+                                await context.SaveChangesAsync();
+                            }
+
+                            context.TlibraryCategorie.Remove(record);
+                            await context.SaveChangesAsync();
+                            record = null;
                             return new OperationStateVM()
                             {
-                                IsSuccess = false,
-                                Message = DbServices.RecordNotExistMessage
+                                IsSuccess = true,
+                                Message = "La catégorie a été supprimée avec succès."
+                            };
+                        }
+                        else if (typeof(T) == typeof(SubCategorieLivreVM) || typeof(T) == typeof(TlibrarySubCategorie))
+                        {
+                            var record = await context.TlibrarySubCategorie.SingleOrDefaultAsync(a => a.Id == Id);
+                            if (record == null)
+                            {
+                                return new OperationStateVM()
+                                {
+                                    IsSuccess = false,
+                                    Message = DbServices.RecordNotExistMessage
+                                };
+                            }
+
+                            var connectors = await context.TlibraryBookConnector.Where(a => a.IdSubCategorie == record.Id).ToListAsync();
+                            if (connectors != null && connectors.Any())
+                            {
+                                foreach (var connector in connectors)
+                                {
+                                    connector.IdSubCategorie = null;
+                                }
+
+                                context.TlibraryBookConnector.UpdateRange(connectors);
+                                await context.SaveChangesAsync();
+                            }
+
+                            context.TlibrarySubCategorie.Remove(record);
+                            await context.SaveChangesAsync();
+
+                            record = null;
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = "La sous-catégorie a été supprimée avec succès."
                             };
                         }
 
-                        context.TlibrarySubCategorie.Remove(record);
-                        await context.SaveChangesAsync();
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = "Cet objet n'est pas reconnu."
+                        };
                     }
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                    };
                 }
                 catch (Exception ex)
                 {
