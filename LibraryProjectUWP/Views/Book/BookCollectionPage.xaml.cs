@@ -1692,8 +1692,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        
-
         public async Task ExportThisBookAsync(LivreVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -2360,18 +2358,22 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (_parameters.ParentLibrary != null && _parameters.ParentLibrary.Categories.Any())
+                if (_parameters.ParentLibrary != null)
                 {
-                    _parameters.ParentLibrary.Categories.Clear();
-                    var categorieList = await DbServices.Categorie.MultipleVmAsync(_parameters.ParentLibrary.Id);
-                    if (categorieList != null && categorieList.Any())
+                    _parameters.ParentLibrary.CountUnCategorizedBooks = await DbServices.Categorie.CountUnCategorizedBooks(_parameters.ParentLibrary.Id);
+                    if (_parameters.ParentLibrary.Categories.Any())
                     {
-                        foreach (var category in categorieList)
+                        _parameters.ParentLibrary.Categories.Clear();
+                        var categorieList = await DbServices.Categorie.MultipleVmAsync(_parameters.ParentLibrary.Id);
+                        if (categorieList != null && categorieList.Any())
                         {
-                            _parameters.ParentLibrary.Categories.Add(category);
-                        }
+                            foreach (var category in categorieList)
+                            {
+                                _parameters.ParentLibrary.Categories.Add(category);
+                            }
 
-                        await DbServices.Categorie.AddSubCategoriesToCategoriesVmAsync(_parameters.ParentLibrary.Categories);
+                            await DbServices.Categorie.AddSubCategoriesToCategoriesVmAsync(_parameters.ParentLibrary.Categories);
+                        }
                     }
                 }
             }
@@ -3137,7 +3139,6 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
-
         #region Functions
         public void GotoPage(int page)
         {
@@ -3706,7 +3707,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
         #endregion
-
 
         private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)
         {

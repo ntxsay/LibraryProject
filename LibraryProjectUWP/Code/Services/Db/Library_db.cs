@@ -373,6 +373,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Name = model.Name,
                         Guid = isGuidCorrect ? guid : Guid.Empty,
                         Categories = categoriesList != null && categoriesList.Any() ? new ObservableCollection<CategorieLivreVM>(categoriesList) : new ObservableCollection<CategorieLivreVM>(),
+                        CountUnCategorizedBooks = await Categorie.CountUnCategorizedBooks(model.Id),
                     };
 
                     if (viewModel.Categories.Any())

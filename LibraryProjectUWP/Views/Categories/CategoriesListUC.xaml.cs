@@ -751,6 +751,88 @@ namespace LibraryProjectUWP.Views.Categories
         }
 
         #region Navigation
+        private void MenuFlyout_UnCategorized_Opened(object sender, object e)
+        {
+            try
+            {
+                if (sender is MenuFlyout menuFlyout)
+                {
+                    if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any())
+                    {
+                        if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Décatégoriser {_parameters.BookPage.ViewModelPage.SelectedItems.Count} livre(s)";
+                            flyoutItem.IsEnabled = true;
+                        }
+                    }
+                    else
+                    {
+                        if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Aucun livre à décatégoriser";
+                            flyoutItem.IsEnabled = false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void MenuFlyoutItem_UnCategorizeItems_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any())
+                {
+                    var result = await DbServices.Categorie.DecategorizeBooksAsync(_parameters.BookPage.ViewModelPage.SelectedItems.Select(s => s.Id));
+                    if (result.IsSuccess)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Succès";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                        ViewModelPage.IsResultMessageOpen = true;
+
+                        await _parameters.BookPage.UpdateLibraryCategoriesAsync();
+                    }
+                    else
+                    {
+                        //Erreur
+                        ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NavigateInUncategorizedItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                _parameters.BookPage.ViewModelPage.DisplayUnCategorizedBooks = true;
+                _parameters.BookPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void MenuFlyout_Navigate_Opened(object sender, object e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -804,6 +886,7 @@ namespace LibraryProjectUWP.Views.Categories
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                _parameters.BookPage.ViewModelPage.DisplayUnCategorizedBooks = false;
                 _parameters.BookPage.ViewModelPage.SelectedSCategories = null;
                 _parameters.BookPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
             }
@@ -830,8 +913,11 @@ namespace LibraryProjectUWP.Views.Categories
                 Logs.Log(ex, m);
                 return;
             }
-        } 
+        }
+
         #endregion
+
+        
     }
 
     public class CategoriesListUCVM : INotifyPropertyChanged

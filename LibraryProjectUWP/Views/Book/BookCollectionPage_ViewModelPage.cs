@@ -45,6 +45,20 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
+            private bool _DisplayUnCategorizedBooks = false;
+            public bool DisplayUnCategorizedBooks
+            {
+                get => this._DisplayUnCategorizedBooks;
+                set
+                {
+                    if (_DisplayUnCategorizedBooks != value)
+                    {
+                        this._DisplayUnCategorizedBooks = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
             private IEnumerable<object> _SelectedSCategories = null;
             public IEnumerable<object> SelectedSCategories
             {

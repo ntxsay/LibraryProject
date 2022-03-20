@@ -575,7 +575,6 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <Button x:Name="Btn_SelectAll" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_SelectAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8b3;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Sélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
@@ -583,13 +582,10 @@
                                 <Button x:Name="Btn_UnSelectAll" Grid.Column="1" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_UnSelectAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8e6;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Désélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
                                 </Button>
-                                <Button x:Name="Btn_Collection_Categorie" Grid.Column="2" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_Collection_Categorie_Click">
-                                    <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE81E;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Désélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
-                                </Button>
-                                <Button x:Name="Btn_Edit_Books" Grid.Column="3" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_UnSelectAll_Click">
+                                <Button x:Name="Btn_Edit_Books" Grid.Column="2" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_UnSelectAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE70F;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Désélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
                                 </Button>
-                                <Button x:Name="Btn_DeleteAll" Grid.Column="4" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_DeleteAll_Click">
+                                <Button x:Name="Btn_DeleteAll" Grid.Column="3" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_DeleteAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74D;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Supprimer les fiches fiches sélectionnées" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
                                     <Button.Flyout>
                                         <Flyout>

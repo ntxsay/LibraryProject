@@ -76,6 +76,10 @@
                        ExecuteRequested="NavigateInAllItemXUiCmd_ExecuteRequested"
                        Description="Supprime l'item">
             </XamlUICommand>
+            <XamlUICommand x:Name="NavigateInUncategorizedItemXUiCmd" 
+                       ExecuteRequested="NavigateInUncategorizedItemXUiCmd_ExecuteRequested"
+                       Description="Supprime l'item">
+            </XamlUICommand>
             <Style TargetType="Grid" x:Key="WrapGridChildStyle">
                 <Setter Property="Margin" Value="4 0" />
                 <Setter Property="VerticalAlignment" Value="Top" />
@@ -157,6 +161,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -168,13 +173,13 @@
 
         <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Right" Background="Transparent">
             <AppBarButton Label="Afficher" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="View">
-                <!--<AppBarButton.Icon>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
-                </AppBarButton.Icon>-->
                 <AppBarButton.Flyout>
                     <MenuFlyout Opened="MenuFlyout_Navigate_Opened">
                         <MenuFlyoutItem Icon="View" Text="Afficher tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInAllItemXUiCmd}">
                         </MenuFlyoutItem>
+                        <MenuFlyoutItem Icon="View" Text="Afficher les non catégorisés" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInUncategorizedItemXUiCmd}">
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
                         <MenuFlyoutItem Icon="View" Text="{x:Bind ViewModelPage.SelectedViewModelMessage, Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInThisItemXUiCmd}"
                                         IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource intGreaterThanToBooleanConverter}, ConverterParameter='0', Mode=OneWay}">
                         </MenuFlyoutItem>
@@ -200,7 +205,7 @@
             </AppBarButton>
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBRenameCategorie" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource RenameSCategorieXamlUICommand}"/>
-            <AppBarButton x:Name="ABBDelete"  Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DeleteItemXUiCommand}"/>
+            <AppBarButton x:Name="ABBDelete" Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DeleteItemXUiCommand}"/>
             <CommandBar.SecondaryCommands>
                 <AppBarToggleButton Label="Afficher les cases à cocher" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="ABTBtnDisplayCheckMark_Click">
                     <AppBarToggleButton.Icon>
@@ -214,16 +219,42 @@
                 </AppBarButton>
             </CommandBar.SecondaryCommands>
         </CommandBar>
-
-        <MUIXC:TreeView x:Name="TreeCategorie" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.ParentLibrary.Categories, Mode=OneWay}" SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
+        <ListView Grid.Row="2" SelectionMode="None" IsItemClickEnabled="True" Margin="0 0 0 10">
+            <ListViewItem>
+                <Grid RowSpacing="2" Padding="26 0 0 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0" Glyph="&#xE81E;"/>
+                        <TextBlock Grid.Column="1" FontSize="18">
+                                <Run Text="Non catégorisés"/>
+                                <Run Text="("/><Run Text="{x:Bind ViewModelPage.ParentLibrary.CountUnCategorizedBooks, Mode=OneWay}"/><Run Text=")"/>
+                        </TextBlock>
+                    </Grid>
+                    <Rectangle Grid.Row="1" Fill="Black" Height="1" HorizontalAlignment="Stretch"/>
+                </Grid>
+                <ListViewItem.ContextFlyout>
+                    <MenuFlyout Opened="MenuFlyout_UnCategorized_Opened">
+                        <MenuFlyoutItem Icon="Add" Click="MenuFlyoutItem_UnCategorizeItems_Click"/>
+                    </MenuFlyout>
+                </ListViewItem.ContextFlyout>
+            </ListViewItem>
+        </ListView>
+        <MUIXC:TreeView x:Name="TreeCategorie" Grid.Row="3" ItemsSource="{x:Bind ViewModelPage.ParentLibrary.Categories, Mode=OneWay}" SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
                                                     ItemTemplateSelector="{StaticResource categorieTemplateSelector}" SelectionMode="Single">
         </MUIXC:TreeView>
-        <Grid Grid.Row="3" Margin="0 10 0 10">
+        <Grid Grid.Row="4" Margin="0 10 0 10">
             <MUIXC:InfoBar IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
                        IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}">
             </MUIXC:InfoBar>
         </Grid>
-        <Grid Grid.Row="4">
+        <Grid Grid.Row="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>

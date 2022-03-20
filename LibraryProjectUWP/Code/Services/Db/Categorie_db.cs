@@ -360,6 +360,40 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
+            public static async Task<long> CountUnCategorizedBooks(long idLibrary)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibraryBookConnector.CountAsync(d => d.IdLibrary == idLibrary && d.IdCategorie == null && d.IdSubCategorie == null);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return 0;
+                }
+            }
+
+            public static async Task<IList<long>> GetUnCategorizedBooksId(long idLibrary)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TlibraryBookConnector.Where(d => d.IdLibrary == idLibrary && d.IdCategorie == null && d.IdSubCategorie == null).Select(s => s.IdBook).ToListAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return new List<long>();
+                }
+            }
+
             public static async Task<IList<long>> GetBooksIdInCategorie(long idCategorie)
             {
                 try
@@ -475,6 +509,77 @@ namespace LibraryProjectUWP.Code.Services.Db
                         return new OperationStateVM()
                         {
                             Message = subCategorie == null ? $"Les livres ont été ajoutés à la catégorie : {categorie.Name}." : $"Les livres ont été ajoutés à la sous-catégorie : {subCategorie.Name}",
+                            IsSuccess = true,
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Exception : {ex.Message}",
+                    };
+                }
+            }
+
+            public static async Task<OperationStateVM> DecategorizeBooksAsync(IEnumerable<long> idBooks)
+            {
+                try
+                {
+                    if (idBooks == null || !idBooks.Any())
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.RecordNotExistMessage,
+                        };
+                    }
+
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        List<long> validIdList = new List<long>();
+
+                        foreach (var idBook in idBooks)
+                        {
+                            var isBookExist = await context.Tbook.AnyAsync(a => a.Id == idBook);
+                            if (!isBookExist)
+                            {
+                                continue;
+                            }
+                            validIdList.Add(idBook);
+                        }
+
+                        if (!validIdList.Any())
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage,
+                            };
+                        }
+
+                        foreach (var idBook in validIdList)
+                        {
+                            var bookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(c => c.IdBook == idBook);
+                            if (bookConnector == null)
+                            {
+                                continue;
+                            }
+
+                            bookConnector.IdCategorie = null;
+                            bookConnector.IdSubCategorie = null;
+
+                            context.TlibraryBookConnector.Update(bookConnector);
+                            await context.SaveChangesAsync();
+                        }
+
+
+                        return new OperationStateVM()
+                        {
+                            Message = $"Les livres ont été décatégorisé avec succès.",
                             IsSuccess = true,
                         };
                     }

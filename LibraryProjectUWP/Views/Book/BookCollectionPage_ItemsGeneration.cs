@@ -32,7 +32,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 List<LivreVM> PreSelectedViewModelList = new List<LivreVM>();
 
-                if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any() ||
+                if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any() || ViewModelPage.DisplayUnCategorizedBooks == true ||
                     ViewModelPage.SelectedSCategories != null && ViewModelPage.SelectedSCategories.Any())
                 {
                     List<LivreVM> vms = new List<LivreVM>();
@@ -53,7 +53,7 @@ namespace LibraryProjectUWP.Views.Book
                             }
                         }
 
-                        if (ViewModelPage.SelectedSCategories != null && ViewModelPage.SelectedSCategories.Any())
+                        if (ViewModelPage.DisplayUnCategorizedBooks == false && ViewModelPage.SelectedSCategories != null && ViewModelPage.SelectedSCategories.Any())
                         {
                             foreach (var item in ViewModelPage.SelectedSCategories)
                             {
@@ -79,6 +79,20 @@ namespace LibraryProjectUWP.Views.Book
                                         }
                                         break;
                                     }
+                                }
+                            }
+                        }
+                        else if (ViewModelPage.DisplayUnCategorizedBooks == true)
+                        {
+                            var uncategorizedBooksIdTask = Task.Run(() => DbServices.Categorie.GetUnCategorizedBooksId(_parameters.ParentLibrary.Id));
+                            uncategorizedBooksIdTask.Wait();
+                            var uncategorizedBooksId = uncategorizedBooksIdTask.Result;
+
+                            if (uncategorizedBooksId.Any(f => f == viewModel.Id))
+                            {
+                                if (!vms.Contains(viewModel))
+                                {
+                                    vms.Add(viewModel);
                                 }
                             }
                         }
