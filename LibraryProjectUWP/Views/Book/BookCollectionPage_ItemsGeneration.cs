@@ -30,27 +30,69 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                IList<LivreVM> PreSelectedViewModelList = new List<LivreVM>(viewModelList);
+                List<LivreVM> PreSelectedViewModelList = new List<LivreVM>();
 
-                if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any())
+                if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any() ||
+                    ViewModelPage.SelectedSCategories != null && ViewModelPage.SelectedSCategories.Any())
                 {
                     List<LivreVM> vms = new List<LivreVM>();
                     foreach (LivreVM viewModel in viewModelList)
                     {
-                        foreach (CollectionVM collectionVM in ViewModelPage.SelectedCollections)
+                        if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any())
                         {
-                            if (viewModel.Publication.Collections.Any(s => s.Id == collectionVM.Id))
+                            foreach (CollectionVM collectionVM in ViewModelPage.SelectedCollections)
                             {
-                                vms.Add(viewModel);
-                                break;
+                                if (viewModel.Publication.Collections.Any(s => s.Id == collectionVM.Id))
+                                {
+                                    if (!vms.Contains(viewModel))
+                                    {
+                                        vms.Add(viewModel);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (ViewModelPage.SelectedSCategories != null && ViewModelPage.SelectedSCategories.Any())
+                        {
+                            foreach (var item in ViewModelPage.SelectedSCategories)
+                            {
+                                if (item is CategorieLivreVM categorie)
+                                {
+                                    if (categorie.BooksId.Any(f => f == viewModel.Id))
+                                    {
+                                        if (!vms.Contains(viewModel))
+                                        {
+                                            vms.Add(viewModel);
+                                        }
+                                        break;
+                                    }
+                                }
+                                else if (item is SubCategorieLivreVM subCategorie)
+                                {
+                                    var result = subCategorie.BooksId.Any(a => a == viewModel.Id);
+                                    if (result == true)
+                                    {
+                                        if (!vms.Contains(viewModel))
+                                        {
+                                            vms.Add(viewModel);
+                                        }
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
 
-                    PreSelectedViewModelList = new List<LivreVM>(vms);
+                    PreSelectedViewModelList.AddRange(vms);
                 }
 
-                return PreSelectedViewModelList;
+                if (PreSelectedViewModelList.Count == 0)
+                {
+                    PreSelectedViewModelList.AddRange(viewModelList);
+                }
+
+                return PreSelectedViewModelList.Distinct();
             }
             catch (Exception ex)
             {

@@ -45,6 +45,20 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
+            private IEnumerable<object> _SelectedSCategories = null;
+            public IEnumerable<object> SelectedSCategories
+            {
+                get => this._SelectedSCategories;
+                set
+                {
+                    if (_SelectedSCategories != value)
+                    {
+                        this._SelectedSCategories = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
             private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
             public ObservableCollection<TaskVM> TaskList
             {

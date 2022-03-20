@@ -761,26 +761,27 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Events
+        [Obsolete]
         private async void Btn_Collection_Categorie_Click(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.SelectedItems.Count > 0)
-                {
-                    var pivotItem = GetCategorieListSideBar();
-                    if (pivotItem != null && pivotItem.ViewModelPage.SelectedCategorie != null)
-                    {
-                        if (pivotItem.ViewModelPage.SelectedCategorie is CategorieLivreVM categorie)
-                        {
-                            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), categorie);
-                        }
-                        else if (pivotItem.ViewModelPage.SelectedCategorie is SubCategorieLivreVM subCategorie)
-                        {
-                            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), pivotItem.GetParentCategorie(), subCategorie);
-                        }
-                    }
-                }
+                //if (ViewModelPage.SelectedItems.Count > 0)
+                //{
+                //    var pivotItem = GetCategorieListSideBar();
+                //    if (pivotItem != null && pivotItem.ViewModelPage.SelectedCategorie != null)
+                //    {
+                //        if (pivotItem.ViewModelPage.SelectedCategorie is CategorieLivreVM categorie)
+                //        {
+                //            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), categorie);
+                //        }
+                //        else if (pivotItem.ViewModelPage.SelectedCategorie is SubCategorieLivreVM subCategorie)
+                //        {
+                //            await AddBookToCategorie(pivotItem, ViewModelPage.SelectedItems.Select(s => s.Id), pivotItem.GetParentCategorie(), subCategorie);
+                //        }
+                //    }
+                //}
             }
             catch (Exception ex)
             {

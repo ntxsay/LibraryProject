@@ -102,26 +102,6 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-        public CategorieLivreVM GetParentCategorie()
-        {
-            try
-            {
-                if (TreeCategorie.SelectedItem != null && TreeCategorie.SelectedItem == ViewModelPage.SelectedCategorie)
-                {
-                    if (TreeCategorie.SelectedNode.Parent.Content is CategorieLivreVM viewModel)
-                    {
-                        return viewModel;
-                    }
-                }
-                return null;
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
         public CategorieLivreVM GetParentCategorie(Microsoft.UI.Xaml.Controls.TreeViewNode treeViewNode)
         {
             try
@@ -200,42 +180,54 @@ namespace LibraryProjectUWP.Views.Categories
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.ParentLibrary != null && TreeCategorie.SelectedItem != null)
+                GetSelectedNodes();
+
+                if (ViewModelPage.ParentLibrary != null && ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
                 {
-                    if (TreeCategorie.SelectedItem is CategorieLivreVM _viewModelCategorie && _viewModelCategorie == ViewModelPage.SelectedCategorie)
+                    if (ViewModelPage.SelectedItems.Count == 1)
                     {
-                        if (_parameters.BookPage != null)
+                        if (ViewModelPage.SelectedItems[0].Content is CategorieLivreVM _viewModelCategorie)
                         {
-                            _parameters.BookPage.EditCategory(ViewModelPage.ParentLibrary, _viewModelCategorie, ViewModelPage.Guid);
+                            if (_parameters.BookPage != null)
+                            {
+                                _parameters.BookPage.EditCategory(ViewModelPage.ParentLibrary, _viewModelCategorie, ViewModelPage.Guid);
+                            }
+                            else if (_parameters.LibraryPage != null)
+                            {
+                                _parameters.LibraryPage.EditCategory(ViewModelPage.ParentLibrary, _viewModelCategorie, ViewModelPage.Guid);
+                            }
                         }
-                        else if (_parameters.LibraryPage != null)
+                        else if (ViewModelPage.SelectedItems[0].Content is SubCategorieLivreVM _viewModelSubCategorie)
                         {
-                            _parameters.LibraryPage.EditCategory(ViewModelPage.ParentLibrary, _viewModelCategorie, ViewModelPage.Guid);
+                            CategorieLivreVM viewModelParentCategorie = GetParentCategorie(ViewModelPage.SelectedItems[0]);
+                            if (viewModelParentCategorie == null)
+                            {
+                                return;
+                            }
+
+                            if (_parameters.BookPage != null)
+                            {
+                                _parameters.BookPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
+                            }
+                            else if (_parameters.LibraryPage != null)
+                            {
+                                _parameters.LibraryPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
+                            }
                         }
                     }
-                    else if (TreeCategorie.SelectedItem is SubCategorieLivreVM _viewModelSubCategorie && _viewModelSubCategorie == ViewModelPage.SelectedCategorie)
+                    else
                     {
-                        CategorieLivreVM viewModelParentCategorie = GetParentCategorie();
-                        if (viewModelParentCategorie == null)
-                        {
-                            return;
-                        }
-
-                        if (_parameters.BookPage != null)
-                        {
-                            _parameters.BookPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
-                        }
-                        else if (_parameters.LibraryPage != null)
-                        {
-                            _parameters.LibraryPage.EditSubCategory(viewModelParentCategorie, _viewModelSubCategorie, ViewModelPage.Guid);
-                        }
+                        MyTeachingTip.Target = ABBRenameCategorie;
+                        MyTeachingTip.Title = "Editer";
+                        MyTeachingTip.Subtitle = "Vous ne pouvez éditer qu'une seule catégorie/sous-catégorie à la fois.";
+                        MyTeachingTip.IsOpen = true;
                     }
                 }
                 else
                 {
                     MyTeachingTip.Target = ABBRenameCategorie;
-                    MyTeachingTip.Title = "Renommer";
-                    MyTeachingTip.Subtitle = "Pour renommer une catégorie ou une sous-catégorie, cliquez d'abord sur la catégorie ou la sous-catégorie que vous souhaitez renommer dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.";
+                    MyTeachingTip.Title = "Editer";
+                    MyTeachingTip.Subtitle = "Pour éditer une catégorie ou une sous-catégorie, cliquez d'abord sur la catégorie ou la sous-catégorie que vous souhaitez renommer dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.";
                     MyTeachingTip.IsOpen = true;
                 }
             }
@@ -757,6 +749,89 @@ namespace LibraryProjectUWP.Views.Categories
                 return;
             }
         }
+
+        #region Navigation
+        private void MenuFlyout_Navigate_Opened(object sender, object e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is MenuFlyout menuFlyout)
+                {
+                    this.GetSelectedNodes();
+                    if (ViewModelPage.ParentLibrary != null && ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
+                    {
+                        if (ViewModelPage.SelectedItems.Count > 1)
+                        {
+                            ViewModelPage.SelectedViewModelMessage = $"Afficher « {ViewModelPage.SelectedItems.Count} catégories/sous-catégories »";
+                            if (TtipDeleteSCategorie.IsOpen)
+                            {
+                                TtipDeleteSCategorie.IsOpen = false;
+                            }
+                        }
+                        else if (ViewModelPage.SelectedItems.Count == 1)
+                        {
+                            var content = ViewModelPage.SelectedItems[0].Content;
+                            if (content is CategorieLivreVM categorieLivreVM)
+                            {
+                                ViewModelPage.SelectedViewModelMessage = $"Afficher « {categorieLivreVM.Name} »";
+                            }
+                            else if (content is SubCategorieLivreVM subCategorieLivreVM)
+                            {
+                                ViewModelPage.SelectedViewModelMessage = $"Afficher « {subCategorieLivreVM.Name} »";
+                            }
+                        }
+                        else
+                        {
+                            ViewModelPage.SelectedViewModelMessage = $"Aucune catégorie n'est à afficher";
+                        }
+                    }
+                    else
+                    {
+                        ViewModelPage.SelectedViewModelMessage = $"Aucune catégorie n'est à afficher";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NavigateInAllItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                _parameters.BookPage.ViewModelPage.SelectedSCategories = null;
+                _parameters.BookPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
+                {
+                    _parameters.BookPage.ViewModelPage.SelectedSCategories = ViewModelPage.SelectedItems.Select(s => s.Content).ToList();
+                    _parameters.BookPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        } 
+        #endregion
     }
 
     public class CategoriesListUCVM : INotifyPropertyChanged
@@ -848,6 +923,19 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
+        private string _SelectedViewModelMessage;
+        public string SelectedViewModelMessage
+        {
+            get => this._SelectedViewModelMessage;
+            set
+            {
+                if (this._SelectedViewModelMessage != value)
+                {
+                    this._SelectedViewModelMessage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private BibliothequeVM _ParentLibrary;
         public BibliothequeVM ParentLibrary
@@ -890,118 +978,7 @@ namespace LibraryProjectUWP.Views.Categories
                     OnPropertyChanged();
                 }
             }
-        }
-
-        private CategorieLivreVM _SelectedSCategorie;
-        public CategorieLivreVM SelectedSCategorie
-        {
-            get => _SelectedSCategorie;
-            set
-            {
-                if (_SelectedSCategorie != value)
-                {
-                    _SelectedSCategorie = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private SubCategorieLivreVM _SelectedSSubCategorie;
-        public SubCategorieLivreVM SelectedSSubCategorie
-        {
-            get => _SelectedSSubCategorie;
-            set
-            {
-                if (_SelectedSSubCategorie != value)
-                {
-                    _SelectedSSubCategorie = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _SelectedSCategorieName;
-        public string SelectedSCategorieName
-        {
-            get => _SelectedSCategorieName;
-            set
-            {
-                if (_SelectedSCategorieName != value)
-                {
-                    _SelectedSCategorieName = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _SelectedCategorieName;
-        public string SelectedCategorieName
-        {
-            get => _SelectedCategorieName;
-            set
-            {
-                if (_SelectedCategorieName != value)
-                {
-                    _SelectedCategorieName = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _SelectedSubCategorieName;
-        public string SelectedSubCategorieName
-        {
-            get => _SelectedSubCategorieName;
-            set
-            {
-                if (_SelectedSubCategorieName != value)
-                {
-                    _SelectedSubCategorieName = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private object _SelectedCategorie;
-        public object SelectedCategorie
-        {
-            get => _SelectedCategorie;
-            set
-            {
-                if (_SelectedCategorie != value)
-                {
-                    _SelectedCategorie = value;
-                    OnPropertyChanged();
-                    if (value != null)
-                    {
-                        if (value is CategorieLivreVM categorie)
-                        {
-                            SelectedSCategorie = categorie;
-                            SelectedSSubCategorie = null;
-                            SelectedSCategorieName = categorie.Name;
-                            SelectedCategorieName = categorie.Name;
-                            SelectedSubCategorieName = String.Empty;
-                        }
-                        else if (value is SubCategorieLivreVM subCategorie)
-                        {
-                            SelectedSSubCategorie = subCategorie;
-                            SelectedSCategorie = null;
-                            SelectedSCategorieName = subCategorie.Name;
-                            SelectedCategorieName = String.Empty;
-                            SelectedSubCategorieName = subCategorie.Name;
-                        }
-                    }
-                    else
-                    {
-                        SelectedSCategorie = null;
-                        SelectedSSubCategorie = null;
-                        SelectedSCategorieName = String.Empty;
-                        SelectedCategorieName = String.Empty;
-                        SelectedSubCategorieName = String.Empty;
-                    }
-                }
-            }
-        }
+        }        
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
