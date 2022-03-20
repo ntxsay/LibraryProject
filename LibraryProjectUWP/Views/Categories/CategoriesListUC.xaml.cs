@@ -318,13 +318,24 @@ namespace LibraryProjectUWP.Views.Categories
                             textblock.Inlines.Add(runType);
                             textblock.Inlines.Add(runName);
 
+                            Run run2 = new Run()
+                            {
+                                Text = $" » ?",
+                                //FontWeight = FontWeights.Medium,
+                            };
+                            textblock.Inlines.Add(run2);
+
                             TtipDeleteSCategorie.Title = "Supprimer une catégorie";
 
+                            textblock.Inlines.Add(new LineBreak());
+                            textblock.Inlines.Add(new LineBreak());
+                            
                             Run run5 = new Run()
                             {
-                                Text = $"Veuillez noter que cette action entraînera la suppression de cette catégorie ainsi que ses sous-catégorie dans les livres concernés.",
+                                Text = $"Veuillez noter que cette action entraînera la suppression de cette catégorie, ses sous-catégorie ainsi que la décatégorisations des livres concernés.",
                                 Foreground = new SolidColorBrush(Colors.OrangeRed),
                             };
+                            textblock.Inlines.Add(run5);
                         }
                         else if (args.Parameter is SubCategorieLivreVM subCategorie)
                         {
@@ -343,25 +354,26 @@ namespace LibraryProjectUWP.Views.Categories
                             textblock.Inlines.Add(runType);
                             textblock.Inlines.Add(runName);
 
+                            Run run2 = new Run()
+                            {
+                                Text = $" » ?",
+                                //FontWeight = FontWeights.Medium,
+                            };
+                            textblock.Inlines.Add(run2);
+
                             TtipDeleteSCategorie.Title = "Supprimer une sous-catégorie";
+
+                            textblock.Inlines.Add(new LineBreak());
+                            textblock.Inlines.Add(new LineBreak());
+                            
+                            Run run5 = new Run()
+                            {
+                                Text = $"Veuillez noter que cette action entraînera la suppression de cette sous-catégorie ainsi que la décatégorisations des livres concernés.",
+                                Foreground = new SolidColorBrush(Colors.OrangeRed),
+                            };
+                            textblock.Inlines.Add(run5);
                         }
 
-
-                        Run run2 = new Run()
-                        {
-                            Text = $" » ?",
-                            //FontWeight = FontWeights.Medium,
-                        };
-
-                        Run run3 = new Run()
-                        {
-                            Text = $"Veuillez noter que cette action entraînera la suppression de cette collection dans les livres concernés.",
-                            Foreground = new SolidColorBrush(Colors.OrangeRed),
-                        };
-                        textblock.Inlines.Add(run2);
-                        textblock.Inlines.Add(new LineBreak());
-                        textblock.Inlines.Add(new LineBreak());
-                        textblock.Inlines.Add(run3);
                         TtipDeleteSCategorie.IsOpen = true;
 
                     }
