@@ -84,15 +84,16 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     }
 
-                    PreSelectedViewModelList.AddRange(vms);
+                    if (vms.Count > 0)
+                    {
+                        PreSelectedViewModelList.AddRange(vms);
+                    }
+                    
+                    vms.Clear();
+                    vms = null;
                 }
 
-                if (PreSelectedViewModelList.Count == 0)
-                {
-                    PreSelectedViewModelList.AddRange(viewModelList);
-                }
-
-                return PreSelectedViewModelList.Distinct();
+                return PreSelectedViewModelList == null || PreSelectedViewModelList.Count == 0 ? viewModelList : PreSelectedViewModelList.Distinct();
             }
             catch (Exception ex)
             {
