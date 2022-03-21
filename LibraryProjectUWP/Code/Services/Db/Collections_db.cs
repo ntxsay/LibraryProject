@@ -58,7 +58,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var collection = await AllAsync();
                     if (!collection.Any()) return Enumerable.Empty<CollectionVM>().ToList();
 
-                    var values = collection.Select(s => ViewModelConverterAsync(s)).ToList();
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(d => d.Result).ToList();
                     return values;
                 }
                 catch (Exception ex)
@@ -173,7 +173,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var collection = await MultipleInBookAsync(idBook, collectionType);
                     if (!collection.Any()) return Enumerable.Empty<CollectionVM>().ToList();
 
-                    var values = collection.Select(s => ViewModelConverterAsync(s)).ToList();
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(d => d.Result).ToList();
                     return values;
                 }
                 catch (Exception ex)
@@ -218,7 +218,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var collection = await MultipleInLibraryAsync(idLibrary, collectionType);
                     if (!collection.Any()) return Enumerable.Empty<CollectionVM>().ToList();
 
-                    var values = collection.Select(s => ViewModelConverterAsync(s)).ToList();
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(d => d.Result).ToList();
                     return values;
                 }
                 catch (Exception ex)
@@ -266,9 +266,43 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <returns></returns>
             public static async Task<CollectionVM> SingleVMAsync(long id)
             {
-                return ViewModelConverterAsync(await SingleAsync(id));
+                return await ViewModelConverterAsync(await SingleAsync(id));
             }
             #endregion
+
+            public static async Task<IList<long>> GetBooksIdInCollectionAsync(long idCollection)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TbookCollectionConnector.Where(d => d.IdCollection == idCollection).Select(s => s.IdBook).ToListAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return new List<long>();
+                }
+            }
+
+            public static async Task<long> CountBooksIdInCollectionAsync(long idCollection)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TbookCollectionConnector.CountAsync(d => d.IdCollection == idCollection);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return 0;
+                }
+            }
 
             public static async Task<OperationStateVM> CreateAsync(CollectionVM viewModel, long idLibrary)
             {
@@ -524,7 +558,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <typeparam name="T2">Type sortie</typeparam>
             /// <param name="model">Modèle de base de données</param>
             /// <returns>Un modèle de vue</returns>
-            private static CollectionVM ViewModelConverterAsync(Tcollection model)
+            private static async Task<CollectionVM> ViewModelConverterAsync(Tcollection model)
             {
                 try
                 {
@@ -535,6 +569,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Id = model.Id,
                         Description = model.Description,
                         Name = model.Name,
+                        BooksId = (await GetBooksIdInCollectionAsync(model.Id)).ToList()
                     };
 
                     return viewModel;
@@ -577,6 +612,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     viewModel.IdLibrary = viewModelToCopy.IdLibrary;
                     viewModel.Description = viewModelToCopy.Description;
                     viewModel.Name = viewModelToCopy.Name;
+                    viewModel.BooksId = viewModelToCopy.BooksId;
 
                     return viewModel;
                 }

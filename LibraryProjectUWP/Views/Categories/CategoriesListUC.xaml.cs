@@ -149,23 +149,39 @@ namespace LibraryProjectUWP.Views.Categories
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.ParentLibrary != null && TreeCategorie.SelectedItem != null && TreeCategorie.SelectedItem is CategorieLivreVM categorieParent)
+                CategorieLivreVM _categorie = null;
+
+                if (ViewModelPage.ParentLibrary != null)
                 {
-                    if (_parameters.BookPage != null)
+                    GetSelectedNodes();
+
+                    if (args.Parameter is CategorieLivreVM categorie)
                     {
-                        _parameters.BookPage.AddNewSubCategory(categorieParent, ViewModelPage.Guid);
+                        _categorie = categorie;
                     }
-                    else if (_parameters.LibraryPage != null)
+                    else if (ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Count == 1)
                     {
-                        _parameters.LibraryPage.AddNewSubCategory(categorieParent, ViewModelPage.Guid);
+                        if (ViewModelPage.SelectedItems[0].Content is CategorieLivreVM _viewModelCategorie)
+                        {
+                            _categorie = _viewModelCategorie;
+                        }
                     }
+                }
+
+                if (_categorie == null)
+                {
+                    ForAddSubCategory(AbbAddItem);
                 }
                 else
                 {
-                    MyTeachingTip.Target = AbbAddItem;
-                    MyTeachingTip.Title = "Ajouter une sous-catégorie";
-                    MyTeachingTip.Subtitle = "Pour ajouter une sous-catégorie, ajoutez ou cliquez d'abord sur une catégorie dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.\n\nAttention : il n'est pas possible d'ajouter une sous-catégorie à une autre sous-catégorie.";
-                    MyTeachingTip.IsOpen = true;
+                    if (_parameters.BookPage != null)
+                    {
+                        _parameters.BookPage.AddNewSubCategory(_categorie, ViewModelPage.Guid);
+                    }
+                    else if (_parameters.LibraryPage != null)
+                    {
+                        _parameters.LibraryPage.AddNewSubCategory(_categorie, ViewModelPage.Guid);
+                    }
                 }
             }
             catch (Exception ex)
@@ -1142,7 +1158,21 @@ namespace LibraryProjectUWP.Views.Categories
 
         #endregion
 
-        
+        private void ForAddSubCategory(FrameworkElement element)
+        {
+            try
+            {
+                MyTeachingTip.Target = element;
+                MyTeachingTip.Title = "Ajouter une sous-catégorie";
+                MyTeachingTip.Subtitle = "Pour ajouter une sous-catégorie, ajoutez ou cliquez d'abord sur une catégorie dans l'arborescence à ci-dessous puis cliquez de nouveau sur ce bouton.\n\nAttention : il n'est pas possible d'ajouter une sous-catégorie à une autre sous-catégorie.";
+                MyTeachingTip.IsOpen = true;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 
     public class CategoriesListUCVM : INotifyPropertyChanged

@@ -122,7 +122,8 @@
                             <MenuFlyoutItem Text="{x:Bind Name, Converter={StaticResource createWordsConverter}, ConverterParameter='Editer « {x} »', Mode=OneWay}" Icon="Edit"
                                             Command="{StaticResource RenameSCategorieXamlUICommand}" CommandParameter="{x:Bind Mode=OneWay}"/>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="{x:Bind Name, Converter={StaticResource createWordsConverter}, ConverterParameter='Ajouter une sous-catégorie à « {x} »', Mode=OneWay}" Icon="Add"/>
+                            <MenuFlyoutItem Text="{x:Bind Name, Converter={StaticResource createWordsConverter}, ConverterParameter='Ajouter une sous-catégorie à « {x} »', Mode=OneWay}" Icon="Add"
+                                            Command="{StaticResource AddNewSubCategorieXamlUICommand}" CommandParameter="{x:Bind Mode=OneWay}"/>
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="{x:Bind Name, Converter={StaticResource createWordsConverter}, ConverterParameter='Supprimer « {x} »', Mode=OneWay}" Icon="Delete"
                                              Command="{StaticResource DeleteContextItemXUiCommand}" CommandParameter="{x:Bind }"/>

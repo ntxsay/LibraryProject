@@ -42,7 +42,21 @@ namespace LibraryProjectUWP.ViewModels.Collection
                 }
             }
         }
-       
+
+        private List<long> _BooksId = new List<long>();
+        public List<long> BooksId
+        {
+            get => _BooksId;
+            set
+            {
+                if (_BooksId != value)
+                {
+                    _BooksId = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             // Raise the PropertyChanged event, passing the name of the property whose value has changed.

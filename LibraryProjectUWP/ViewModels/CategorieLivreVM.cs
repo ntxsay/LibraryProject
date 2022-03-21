@@ -142,8 +142,6 @@ namespace LibraryProjectUWP.ViewModels
             }
         }
 
-        public List<LivreVM> Livres { get; set; }
-
         private List<long> _BooksId = new List<long>();
         public List<long> BooksId
         {
