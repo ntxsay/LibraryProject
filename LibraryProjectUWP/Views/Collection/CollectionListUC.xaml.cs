@@ -137,7 +137,23 @@ namespace LibraryProjectUWP.Views.Collection
 
         private async void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await _parameters.ParentPage.EditCollection(ViewModelPage.SelectedViewModel, ViewModelPage.Guid, typeof(CollectionListUC));
+            try
+            {
+                if (args.Parameter is CollectionVM viewModel)
+                {
+                    await _parameters.ParentPage.EditCollection(viewModel, ViewModelPage.Guid, typeof(CollectionListUC));
+                }
+                else
+                {
+                    await _parameters.ParentPage.EditCollection(ViewModelPage.SelectedViewModel, ViewModelPage.Guid, typeof(CollectionListUC));
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
 
@@ -265,36 +281,9 @@ namespace LibraryProjectUWP.Views.Collection
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (this.ViewModelPage.SelectedViewModels.Count > 1)
+                if (args.Parameter is CollectionVM viewModel)
                 {
-                    var textblock = new TextBlock()
-                    {
-                        TextWrapping = TextWrapping.Wrap,
-                    };
-                    Run run1 = new Run()
-                    {
-                        Text = $"Êtes-vous sûr de vouloir supprimer les collections sélectionnées ?",
-                        //FontWeight = FontWeights.Medium,
-                    };
-                    
-                    Run run2 = new Run()
-                    {
-                        Text = $"Veuillez noter que cette action entraînera la suppression de ces collections dans les livres concernés.",
-                        Foreground = new SolidColorBrush(Colors.OrangeRed),
-                    };
-                    textblock.Inlines.Add(run1);
-                    textblock.Inlines.Add(new LineBreak());
-                    textblock.Inlines.Add(new LineBreak());
-                    textblock.Inlines.Add(run2);
-
-                    TtipDeleteCollection.Target = ABBDelete;
-                    TtipDeleteCollection.Title = "Supprimer des collections";
-                    TtipDeleteCollection.Content = textblock;
-                    TtipDeleteCollection.IsOpen = true;
-                }
-                else if (this.ViewModelPage.SelectedViewModels.Count == 1)
-                {
-                    DependencyObject selectedItem = MyListView.ContainerFromItem(MyListView.SelectedItem);
+                    DependencyObject selectedItem = MyListView.ContainerFromItem(viewModel);
                     if (selectedItem is ListViewItem listViewItem)
                     {
                         var textblock = new TextBlock()
@@ -308,7 +297,7 @@ namespace LibraryProjectUWP.Views.Collection
                         };
                         Run run2 = new Run()
                         {
-                            Text = ViewModelPage.SelectedViewModel?.Name,
+                            Text = viewModel.Name,
                             Foreground = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush,
                             FontWeight = FontWeights.Medium,
                         };
@@ -335,8 +324,126 @@ namespace LibraryProjectUWP.Views.Collection
                         TtipDeleteCollection.Content = textblock;
                         TtipDeleteCollection.IsOpen = true;
                     }
+                }
+                else
+                {
+                    if (this.ViewModelPage.SelectedViewModels.Count > 1)
+                    {
+                        var textblock = new TextBlock()
+                        {
+                            TextWrapping = TextWrapping.Wrap,
+                        };
+                        Run run1 = new Run()
+                        {
+                            Text = $"Êtes-vous sûr de vouloir supprimer les collections sélectionnées ?",
+                            //FontWeight = FontWeights.Medium,
+                        };
 
-                       
+                        Run run2 = new Run()
+                        {
+                            Text = $"Veuillez noter que cette action entraînera la suppression de ces collections dans les livres concernés.",
+                            Foreground = new SolidColorBrush(Colors.OrangeRed),
+                        };
+                        textblock.Inlines.Add(run1);
+                        textblock.Inlines.Add(new LineBreak());
+                        textblock.Inlines.Add(new LineBreak());
+                        textblock.Inlines.Add(run2);
+
+                        TtipDeleteCollection.Target = ABBDelete;
+                        TtipDeleteCollection.Title = "Supprimer des collections";
+                        TtipDeleteCollection.Content = textblock;
+                        TtipDeleteCollection.IsOpen = true;
+                    }
+                    else if (this.ViewModelPage.SelectedViewModels.Count == 1)
+                    {
+                        DependencyObject selectedItem = MyListView.ContainerFromItem(MyListView.SelectedItem);
+                        if (selectedItem is ListViewItem listViewItem)
+                        {
+                            var textblock = new TextBlock()
+                            {
+                                TextWrapping = TextWrapping.Wrap,
+                            };
+                            Run run1 = new Run()
+                            {
+                                Text = $"Êtes-vous sûr de vouloir supprimer la collection « ",
+                                //FontWeight = FontWeights.Medium,
+                            };
+                            Run run2 = new Run()
+                            {
+                                Text = ViewModelPage.SelectedViewModel?.Name,
+                                Foreground = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush,
+                                FontWeight = FontWeights.Medium,
+                            };
+                            Run run3 = new Run()
+                            {
+                                Text = $" » ?",
+                                //FontWeight = FontWeights.Medium,
+                            };
+
+                            Run run4 = new Run()
+                            {
+                                Text = $"Veuillez noter que cette action entraînera la suppression de cette collection dans les livres concernés.",
+                                Foreground = new SolidColorBrush(Colors.OrangeRed),
+                            };
+                            textblock.Inlines.Add(run1);
+                            textblock.Inlines.Add(run2);
+                            textblock.Inlines.Add(run3);
+                            textblock.Inlines.Add(new LineBreak());
+                            textblock.Inlines.Add(new LineBreak());
+                            textblock.Inlines.Add(run4);
+
+                            TtipDeleteCollection.Target = listViewItem;
+                            TtipDeleteCollection.Title = "Supprimer une collection";
+                            TtipDeleteCollection.Content = textblock;
+                            TtipDeleteCollection.IsOpen = true;
+                        }
+
+
+                    }
+                    else if (this.ViewModelPage.SelectedViewModels.Count == 1)
+                    {
+                        DependencyObject selectedItem = MyListView.ContainerFromItem(MyListView.SelectedItem);
+                        if (selectedItem is ListViewItem listViewItem)
+                        {
+                            var textblock = new TextBlock()
+                            {
+                                TextWrapping = TextWrapping.Wrap,
+                            };
+                            Run run1 = new Run()
+                            {
+                                Text = $"Êtes-vous sûr de vouloir supprimer la collection « ",
+                                //FontWeight = FontWeights.Medium,
+                            };
+                            Run run2 = new Run()
+                            {
+                                Text = ViewModelPage.SelectedViewModel?.Name,
+                                Foreground = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush,
+                                FontWeight = FontWeights.Medium,
+                            };
+                            Run run3 = new Run()
+                            {
+                                Text = $" » ?",
+                                //FontWeight = FontWeights.Medium,
+                            };
+
+                            Run run4 = new Run()
+                            {
+                                Text = $"Veuillez noter que cette action entraînera la suppression de cette collection dans les livres concernés.",
+                                Foreground = new SolidColorBrush(Colors.OrangeRed),
+                            };
+                            textblock.Inlines.Add(run1);
+                            textblock.Inlines.Add(run2);
+                            textblock.Inlines.Add(run3);
+                            textblock.Inlines.Add(new LineBreak());
+                            textblock.Inlines.Add(new LineBreak());
+                            textblock.Inlines.Add(run4);
+
+                            TtipDeleteCollection.Target = listViewItem;
+                            TtipDeleteCollection.Title = "Supprimer une collection";
+                            TtipDeleteCollection.Content = textblock;
+                            TtipDeleteCollection.IsOpen = true;
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -463,6 +570,66 @@ namespace LibraryProjectUWP.Views.Collection
                 Logs.Log(ex, m);
                 return;
             }
+        }
+
+        private void MenuFlyout_Opened(object sender, object e)
+        {
+            try
+            {
+                if (sender is MenuFlyout menuFlyout)
+                {
+                    if (_parameters.ParentPage.ViewModelPage.SelectedItems != null && _parameters.ParentPage.ViewModelPage.SelectedItems.Any())
+                    {
+                        if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Ajouter {_parameters.ParentPage.ViewModelPage.SelectedItems.Count} livre(s) à « {flyoutItem.Tag} »";
+                            flyoutItem.IsEnabled = true;
+                        }
+                    }
+                    else
+                    {
+                        if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Aucun livre à ajouter à « {flyoutItem.Tag} »";
+                            flyoutItem.IsEnabled = false;
+                        }
+                    }
+
+                    if (menuFlyout.Items[1] is MenuFlyoutItem flyoutItemDecategorize)
+                    {
+                        if (flyoutItemDecategorize.Tag is CollectionVM collectionVM)
+                        {
+                            if (collectionVM.BooksId != null && collectionVM.BooksId.Any())
+                            {
+                                flyoutItemDecategorize.Text = $"Retirer {collectionVM.BooksId.Count} livre(s) de « {collectionVM.Name} »";
+                                flyoutItemDecategorize.IsEnabled = true;
+                            }
+                            else
+                            {
+                                flyoutItemDecategorize.Text = $"Aucun livre à retirer de « {collectionVM.Name} »";
+                                flyoutItemDecategorize.IsEnabled = false;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+
+        }
+
+        private void AddBooksToCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
+        private void DecategorizeBooksFromCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
         }
     }
 
