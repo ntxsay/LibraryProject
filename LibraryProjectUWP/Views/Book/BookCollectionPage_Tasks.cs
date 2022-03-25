@@ -27,6 +27,7 @@ namespace LibraryProjectUWP.Views.Book
         private BackgroundWorker workerSearchPretsBook;
         private BackgroundWorker workerSearchExemplariesBook;
         private BackgroundWorker workerCompleteInfoBook;
+
         CancellationTokenSource cancellationTokenSourceSearchBooks = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceCountBooks = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceSearchPretsBook = new CancellationTokenSource();

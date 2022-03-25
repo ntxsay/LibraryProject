@@ -2312,6 +2312,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        [Obsolete]
         private async Task AddBookToCategorie(CategoriesListUC categoriesListUC, IEnumerable<long> idBooks, CategorieLivreVM selectedCategorie, SubCategorieLivreVM selectedSubCategorie = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();

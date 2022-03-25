@@ -129,16 +129,16 @@ namespace LibraryProjectUWP.ViewModels
             }
         }
 
-        private ObservableCollection<CollectionVM> _CollectionViewModelList = new ObservableCollection<CollectionVM>();
-        public ObservableCollection<CollectionVM> CollectionViewModelList
+        private ObservableCollection<CollectionVM> _Collections = new ObservableCollection<CollectionVM>();
+        public ObservableCollection<CollectionVM> Collections
         {
-            get => this._CollectionViewModelList;
+            get => _Collections;
             set
             {
-                if (_CollectionViewModelList != value)
+                if (_Collections != value)
                 {
-                    this._CollectionViewModelList = value;
-                    this.OnPropertyChanged();
+                    _Collections = value;
+                    OnPropertyChanged();
                 }
             }
         }

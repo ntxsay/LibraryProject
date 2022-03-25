@@ -19,8 +19,6 @@ namespace LibraryProjectUWP.ViewModels.Collection
 
     public class CollectionListParametersDriverVM
     {
-        public IEnumerable<CollectionVM> ViewModelList { get; set; }
-        public CollectionVM CurrentViewModel { get; set; }
         public BibliothequeVM ParentLibrary { get; set; }
         public BookCollectionPage ParentPage { get; set; }
     }

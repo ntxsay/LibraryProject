@@ -83,9 +83,8 @@
                 <Setter Property="Margin" Value="4 0" />
                 <Setter Property="VerticalAlignment" Value="Top" />
             </Style>
-            
             <DataTemplate x:DataType="collectionVm:CollectionVM" x:Key="ItemAutoSuggestCollectionDataTemplate">
-                <ListViewItem>
+                <ListViewItem ContextRequested="ListViewItem_ContextRequested">
                     <TextBlock FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}">
                     <Run Text="{x:Bind Name, Mode=OneWay}"/>
                     <Run Text="("/><Run Text="{x:Bind BooksId.Count, Mode=OneWay}"/><Run Text=")"/>
@@ -179,7 +178,7 @@
                 <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
             </AutoSuggestBox.QueryIcon>
         </AutoSuggestBox>
-        <ListView x:Name="MyListView" Grid.Row="3" ItemsSource="{x:Bind ViewModelPage.CollectionViewModelList, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
+        <ListView x:Name="MyListView" Grid.Row="3" ItemsSource="{x:Bind _parameters.ParentLibrary.Collections, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
                   SelectedItem="{x:Bind ViewModelPage.SelectedViewModel, Mode=TwoWay}" SelectionChanged="ListView_SelectionChanged"
                   SelectionMode="Extended">
         </ListView>

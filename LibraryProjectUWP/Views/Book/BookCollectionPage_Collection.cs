@@ -91,22 +91,7 @@ namespace LibraryProjectUWP.Views.Book
 
                         if (sender.ViewModelPage.Guid != null)
                         {
-                            if (sender._parameters.ParentSideBarItemType == typeof(NewEditBookUC))
-                            {
-                                NewEditBookUC bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.Guid);
-                                if (bookManager != null)
-                                {
-                                    bookManager.ViewModelPage.ViewModel.Publication.Collections.Add(newViewModel);
-                                }
-                            }
-                            else if (sender._parameters.ParentSideBarItemType == typeof(CollectionListUC))
-                            {
-                                CollectionListUC bookManager = GetCollectionListSideBarByGuid((Guid)sender.ViewModelPage.Guid);
-                                if (bookManager != null)
-                                {
-                                    bookManager.ViewModelPage.CollectionViewModelList.Add(newViewModel);
-                                }
-                            }
+                            _parameters.ParentLibrary.Collections.Add(newViewModel);
                             NewEditCollectionUC_Create_CancelModificationRequested(sender, e);
                         }
                     }
@@ -250,12 +235,12 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    IList<CollectionVM> itemList = await DbServices.Collection.MultipleVmInLibraryAsync(_parameters.ParentLibrary.Id, Code.CollectionTypeEnum.Collection);
+                    //IList<CollectionVM> itemList = await DbServices.Collection.MultipleVmInLibraryAsync(_parameters.ParentLibrary.Id, Code.CollectionTypeEnum.Collection);
                     CollectionListUC userControl = new CollectionListUC(new CollectionListParametersDriverVM()
                     {
                         ParentPage = this,
                         ParentLibrary = _parameters.ParentLibrary,
-                        ViewModelList = itemList?.OrderBy(o => o.Name).ToList(), //ViewModelPage.ContactViewModelList,
+                        //ViewModelList = itemList?.OrderBy(o => o.Name).ToList(), //ViewModelPage.ContactViewModelList,
                     });
 
                     userControl.CancelModificationRequested += CollectionListUC_CancelModificationRequested;
@@ -291,5 +276,36 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        public async Task UpdateLibraryCollectionAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (_parameters.ParentLibrary != null)
+                {
+                    //_parameters.ParentLibrary.CountUnCategorizedBooks = await DbServices.Categorie.CountUnCategorizedBooks(_parameters.ParentLibrary.Id);
+                    if (_parameters.ParentLibrary.Collections.Any())
+                    {
+                        _parameters.ParentLibrary.Collections.Clear();
+                        var itemList = await DbServices.Collection.MultipleVmInLibraryAsync(_parameters.ParentLibrary.Id);
+                        if (itemList != null && itemList.Any())
+                        {
+                            foreach (var item in itemList)
+                            {
+                                _parameters.ParentLibrary.Collections.Add(item);
+                            }
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
     }
 }

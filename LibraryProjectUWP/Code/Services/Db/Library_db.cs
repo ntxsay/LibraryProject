@@ -14,6 +14,7 @@ using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
 using Windows.Storage;
+using LibraryProjectUWP.ViewModels.Collection;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
@@ -363,7 +364,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var isGuidCorrect = Guid.TryParse(model.Guid, out Guid guid);
                     if (isGuidCorrect == false) return null;
 
-                    var categoriesList = await Categorie.MultipleVmAsync(model.Id);
+                    IList<CategorieLivreVM> categoriesList = await Categorie.MultipleVmAsync(model.Id);
+                    IOrderedEnumerable<CollectionVM> collectionList = (await Collection.MultipleVmInLibraryAsync(model.Id))?.OrderBy(o => o.Name);
+
                     var viewModel = new BibliothequeVM()
                     {
                         Id = model.Id,
@@ -372,6 +375,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Description = model.Description,
                         Name = model.Name,
                         Guid = isGuidCorrect ? guid : Guid.Empty,
+                        Collections = collectionList != null && collectionList.Any() ? new ObservableCollection<CollectionVM>(collectionList) : new ObservableCollection<CollectionVM>(),
                         Categories = categoriesList != null && categoriesList.Any() ? new ObservableCollection<CategorieLivreVM>(categoriesList) : new ObservableCollection<CategorieLivreVM>(),
                         CountUnCategorizedBooks = await Categorie.CountUnCategorizedBooks(model.Id),
                     };

@@ -942,7 +942,7 @@ namespace LibraryProjectUWP.Views.Categories
                             ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
                             ViewModelPage.IsResultMessageOpen = true;
 
-                            await _parameters.BookPage.UpdateLibraryCategoriesAsync();
+                            await _parameters.BookPage.UpdateLibraryCollectionAsync();
                         }
                         else
                         {

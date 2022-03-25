@@ -57,10 +57,10 @@ namespace LibraryProjectUWP.Views.Collection
             _parameters = parameters;
             ViewModelPage.Header = $"Collections";
             ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
-            if (parameters.ViewModelList != null && parameters.ViewModelList.Any())
-            {
-                ViewModelPage.CollectionViewModelList = new ObservableCollection<CollectionVM>(parameters.ViewModelList);
-            }
+            //if (parameters.ViewModelList != null && parameters.ViewModelList.Any())
+            //{
+            //    ViewModelPage.CollectionViewModelList = new ObservableCollection<CollectionVM>(parameters.ViewModelList);
+            //}
             InitializeActionInfos();
         }
 
@@ -206,7 +206,7 @@ namespace LibraryProjectUWP.Views.Collection
                 var FilteredItems = new List<CollectionVM>();
                 var splitSearchTerm = sender.Text.ToLower().Split(" ");
 
-                foreach (var value in _parameters.ViewModelList)
+                foreach (var value in _parameters.ParentLibrary.Collections)
                 {
                     if (value.Name.IsStringNullOrEmptyOrWhiteSpace()) continue;
 
@@ -501,10 +501,10 @@ namespace LibraryProjectUWP.Views.Collection
                         ViewModelPage.ResultMessage = result.Message;
                         ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
                         ViewModelPage.IsResultMessageOpen = true;
-                        var item = ViewModelPage.CollectionViewModelList.SingleOrDefault(s => s.Id == id);
+                        var item = _parameters.ParentLibrary.Collections.SingleOrDefault(s => s.Id == id);
                         if (item != null)
                         {
-                            ViewModelPage.CollectionViewModelList.Remove(item);
+                            _parameters.ParentLibrary.Collections.Remove(item);
                         }
 
                         Thread.Sleep(500);
@@ -622,15 +622,73 @@ namespace LibraryProjectUWP.Views.Collection
 
         }
 
-        private void AddBooksToCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ListViewItem_ContextRequested(UIElement sender, ContextRequestedEventArgs args)
         {
+            try
+            {
 
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void AddBooksToCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (_parameters.ParentPage.ViewModelPage.SelectedItems != null && _parameters.ParentPage.ViewModelPage.SelectedItems.Any())
+                {
+                    if (args.Parameter is CollectionVM viewModel)
+                    {
+                        var creationResult = await DbServices.Collection.CreateCollectionConnectorAsync(_parameters.ParentPage.ViewModelPage.SelectedItems.Select(s => s.Id), viewModel);
+                        if (creationResult.IsSuccess)
+                        {
+                            ViewModelPage.ResultMessageTitle = "Succès";
+                            ViewModelPage.ResultMessage = creationResult.Message;
+                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                            ViewModelPage.IsResultMessageOpen = true;
+
+                            await _parameters.ParentPage.UpdateLibraryCollectionAsync();
+                        }
+                        else
+                        {
+                            //Erreur
+                            ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                            ViewModelPage.ResultMessage = creationResult.Message;
+                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                            ViewModelPage.IsResultMessageOpen = true;
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void DecategorizeBooksFromCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
+            try
+            {
 
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
+
+        
     }
 
     public class CollectionListUCVM : INotifyPropertyChanged
@@ -781,6 +839,7 @@ namespace LibraryProjectUWP.Views.Collection
         }
 
         private ObservableCollection<CollectionVM> _CollectionViewModelList = new ObservableCollection<CollectionVM>();
+        [Obsolete]
         public ObservableCollection<CollectionVM> CollectionViewModelList
         {
             get => this._CollectionViewModelList;
