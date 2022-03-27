@@ -115,6 +115,20 @@ namespace LibraryProjectUWP.ViewModels
             }
         }
 
+        private long _CountNotInCollectionBooks;
+        public long CountNotInCollectionBooks
+        {
+            get => _CountNotInCollectionBooks;
+            set
+            {
+                if (_CountNotInCollectionBooks != value)
+                {
+                    _CountNotInCollectionBooks = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private ObservableCollection<CategorieLivreVM> _Categories = new ObservableCollection<CategorieLivreVM>();
         public ObservableCollection<CategorieLivreVM> Categories
         {

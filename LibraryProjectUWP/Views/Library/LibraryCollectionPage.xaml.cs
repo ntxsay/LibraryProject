@@ -740,6 +740,7 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         newViewModel.Id = creationResult.Id;
                         ViewModelPage.ViewModelList.Add(newViewModel);
+                        await esLibrary.SaveLibraryViewModelAsync(newViewModel);
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
@@ -790,6 +791,7 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         sender._parameters.CurrentLibrary.Name = newValue;
                         sender._parameters.CurrentLibrary.Description = newDescription;
+                        await esLibrary.SaveLibraryViewModelAsync(sender._parameters.CurrentLibrary);
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = updateResult.Message;

@@ -51,6 +51,46 @@ namespace LibraryProjectUWP.Code.Helpers
             }
         }
 
+        public static T FindVisualChild<T>(DependencyObject elementCible, string childName) where T : DependencyObject
+        {
+            try
+            {
+                var count = VisualTreeHelper.GetChildrenCount(elementCible);
+                if (count == 0) return null;
+
+                for (int i = 0; i < count; i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(elementCible, i);
+                    if (child != null && child is T t)
+                    {
+                        // If the child's name is set for search
+                        if (child is FrameworkElement frameworkElement && frameworkElement.Name == childName)
+                        {
+                            return t;
+                        }
+                        else
+                        {
+                            T childOfChild = FindVisualChild<T>(child, childName);
+                            if (childOfChild != null)
+                                return childOfChild;
+                        }
+                    }
+                    else
+                    {
+                        T childOfChild = FindVisualChild<T>(child, childName);
+                        if (childOfChild != null)
+                            return childOfChild;
+                    }
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         public static IEnumerable<T> FindVisualChilds<T>(DependencyObject elementCible) where T : DependencyObject
         {
             MethodBase m = MethodBase.GetCurrentMethod();

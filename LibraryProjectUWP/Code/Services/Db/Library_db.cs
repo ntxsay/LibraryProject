@@ -378,6 +378,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Collections = collectionList != null && collectionList.Any() ? new ObservableCollection<CollectionVM>(collectionList) : new ObservableCollection<CollectionVM>(),
                         Categories = categoriesList != null && categoriesList.Any() ? new ObservableCollection<CategorieLivreVM>(categoriesList) : new ObservableCollection<CategorieLivreVM>(),
                         CountUnCategorizedBooks = await Categorie.CountUnCategorizedBooks(model.Id),
+                        CountNotInCollectionBooks = await Collection.CountUnCategorizedBooks(model.Id),
                     };
 
                     if (viewModel.Categories.Any())

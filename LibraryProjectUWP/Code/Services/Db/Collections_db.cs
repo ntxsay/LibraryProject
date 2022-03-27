@@ -270,41 +270,51 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
-            //public static async Task<long> CountUnCategorizedBooks(long idLibrary)
-            //{
-            //    try
-            //    {
-            //        using (LibraryDbContext context = new LibraryDbContext())
-            //        {
-            //            return await context.TlibraryBookConnector.CountAsync(d => d.IdLibrary == idLibrary && d.IdCategorie == null && d.IdSubCategorie == null);
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        MethodBase m = MethodBase.GetCurrentMethod();
-            //        Logs.Log(ex, m);
-            //        return 0;
-            //    }
-            //}
+            public static async Task<long> CountUnCategorizedBooks(long idLibrary)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        long countUnCategorized = 0;
+                        var collection = await context.Tcollection.Where(d => d.IdLibrary == idLibrary).ToListAsync();
+                        foreach (var item in collection)
+                        {
+                            if (!await context.TbookCollectionConnector.AnyAsync(w => w.IdCollection == item.Id))
+                            {
+                                countUnCategorized++;
+                            }
+                        }
 
-            //public static async Task<IList<long>> GetUnCategorizedBooksId(long idLibrary)
-            //{
-            //    try
-            //    {
-            //        using (LibraryDbContext context = new LibraryDbContext())
-            //        {
-            //            return await context.TbookCollectionConnector.Where(d => d.id == idLibrary && d.IdCategorie == null && d.IdSubCategorie == null).Select(s => s.IdBook).ToListAsync();
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        MethodBase m = MethodBase.GetCurrentMethod();
-            //        Logs.Log(ex, m);
-            //        return new List<long>();
-            //    }
-            //}
+                        return countUnCategorized;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return 0;
+                }
+            }
 
-            public static async Task<IList<long>> GetBooksIdInCollectionAsync(long idCollection)
+                //public static async Task<IList<long>> GetUnCategorizedBooksId(long idLibrary)
+                //{
+                //    try
+                //    {
+                //        using (LibraryDbContext context = new LibraryDbContext())
+                //        {
+                //            return await context.TbookCollectionConnector.Where(d => d.id == idLibrary && d.IdCategorie == null && d.IdSubCategorie == null).Select(s => s.IdBook).ToListAsync();
+                //        }
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        MethodBase m = MethodBase.GetCurrentMethod();
+                //        Logs.Log(ex, m);
+                //        return new List<long>();
+                //    }
+                //}
+
+                public static async Task<IList<long>> GetBooksIdInCollectionAsync(long idCollection)
             {
                 try
                 {
@@ -427,6 +437,73 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static async Task<OperationStateVM> DecategorizeBooksAsync(IEnumerable<long> idBooks)
+            {
+                try
+                {
+                    if (idBooks == null || !idBooks.Any())
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = DbServices.RecordNotExistMessage,
+                        };
+                    }
+
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        List<long> validIdList = new List<long>();
+
+                        foreach (var idBook in idBooks)
+                        {
+                            var isBookExist = await context.Tbook.AnyAsync(a => a.Id == idBook);
+                            if (!isBookExist)
+                            {
+                                continue;
+                            }
+                            validIdList.Add(idBook);
+                        }
+
+                        if (!validIdList.Any())
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage,
+                            };
+                        }
+
+                        foreach (var idBook in validIdList)
+                        {
+                            var bookConnector = await context.TbookCollectionConnector.SingleOrDefaultAsync(c => c.IdBook == idBook);
+                            if (bookConnector == null)
+                            {
+                                continue;
+                            }
+
+                            context.TbookCollectionConnector.Remove(bookConnector);
+                            await context.SaveChangesAsync();
+                        }
+
+
+                        return new OperationStateVM()
+                        {
+                            Message = $"Les livres ont été décatégorisé avec succès.",
+                            IsSuccess = true,
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Exception : {ex.Message}",
+                    };
+                }
+            }
 
             public static async Task<OperationStateVM> CreateAsync(CollectionVM viewModel, long idLibrary)
             {

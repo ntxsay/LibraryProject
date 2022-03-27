@@ -126,6 +126,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -155,8 +156,15 @@
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBRenameCategorie" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" 
                           Command="{StaticResource UpdateItemXUiCommand}" IsEnabled="{x:Bind ViewModelPage.SelectedViewModels.Count, Converter={StaticResource intEqualToBooleanConverter}, ConverterParameter='1', Mode=OneWay}"/>
-            <AppBarButton x:Name="ABBDelete" Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DeleteItemXUiCommand}"
-                          IsEnabled="{x:Bind ViewModelPage.SelectedViewModels.Count, Converter={StaticResource intGreaterThanToBooleanConverter}, ConverterParameter='0', Mode=OneWay}"/>
+            <AppBarButton x:Name="ABBDelete" Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                <AppBarButton.Flyout>
+                    <MenuFlyout Opened="MenuFlyout_DeleteCmB_Opened">
+                        <MenuFlyoutItem Text="hhshs" IsEnabled="{x:Bind ViewModelPage.SelectedViewModels.Count, Converter={StaticResource intGreaterThanToBooleanConverter}, ConverterParameter='0', Mode=OneWay}"
+                                        Command="{StaticResource DeleteItemXUiCommand}" Icon="Delete"/>
+                        <MenuFlyoutItem Icon="Remove" Click="MenuFlyoutItem_DecategorizeBooksFromCollection_Click"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
             <CommandBar.SecondaryCommands>
                 <AppBarButton Label="Exporter au format JSON" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" 
                               Command="{StaticResource ExportAllCollectionToJsonXUiCmd}">
@@ -178,14 +186,22 @@
                 <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
             </AutoSuggestBox.QueryIcon>
         </AutoSuggestBox>
-        <ListView x:Name="MyListView" Grid.Row="3" ItemsSource="{x:Bind _parameters.ParentLibrary.Collections, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
+        <ListView Grid.Row="3">
+            <ListViewItem ContextRequested="ListViewItem_ContextRequested">
+                <TextBlock FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Run Text="Non catégorisé"/>
+                    <Run Text="("/><Run Text="{x:Bind _parameters.ParentLibrary.CountNotInCollectionBooks, Mode=OneWay}"/><Run Text=")"/>
+                </TextBlock>
+            </ListViewItem>
+        </ListView>
+        <ListView x:Name="MyListView" Grid.Row="4" ItemsSource="{x:Bind _parameters.ParentLibrary.Collections, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
                   SelectedItem="{x:Bind ViewModelPage.SelectedViewModel, Mode=TwoWay}" SelectionChanged="ListView_SelectionChanged"
                   SelectionMode="Extended">
         </ListView>
-        <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="4" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+        <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="5" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
                        IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}" Margin="0 10 0 5">
         </MUIXC:InfoBar>
-        <Grid Grid.Row="5">
+        <Grid Grid.Row="6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>

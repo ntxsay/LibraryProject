@@ -5,6 +5,7 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Collection;
+using LibraryProjectUWP.ViewModels.General;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -674,11 +675,37 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
-        private void DecategorizeBooksFromCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void DecategorizeBooksFromCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
+                OperationStateVM result = null;
+                if (args.Parameter is CollectionVM viewModel)
+                {
+                    result = await DbServices.Collection.DecategorizeBooksAsync(viewModel.BooksId);
+                }
 
+                if (result != null)
+                {
+                    if (result.IsSuccess)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Succès";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                        ViewModelPage.IsResultMessageOpen = true;
+
+                        await _parameters.ParentPage.UpdateLibraryCollectionAsync();
+                    }
+                    else
+                    {
+                        //Erreur
+                        ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -688,7 +715,90 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
-        
+        private void MenuFlyout_DeleteCmB_Opened(object sender, object e)
+        {
+            try
+            {
+                if (sender is MenuFlyout menuFlyout)
+                {
+                    if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItemDelete)
+                    {
+                        if (ViewModelPage.SelectedViewModels.Count > 1)
+                        {
+                            flyoutItemDelete.Text = $"Supprimer « {ViewModelPage.SelectedViewModels.Count} collections »";
+                        }
+                        else if (ViewModelPage.SelectedViewModels.Count == 1)
+                        {
+                            flyoutItemDelete.Text = $"Supprimer « {ViewModelPage.SelectedViewModels[0].Name} »";
+                        }
+                        else
+                        {
+                            flyoutItemDelete.Text = $"Aucune collection n'est à supprimer";
+                        }
+                    }
+
+                    if (_parameters.ParentPage.ViewModelPage.SelectedItems != null && _parameters.ParentPage.ViewModelPage.SelectedItems.Any())
+                    {
+                        if (menuFlyout.Items[1] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Décatégoriser {_parameters.ParentPage.ViewModelPage.SelectedItems.Count} livre(s)";
+                            flyoutItem.IsEnabled = true;
+                        }
+                    }
+                    else
+                    {
+                        if (menuFlyout.Items[1] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Aucun livre à retirer d'une collection";
+                            flyoutItem.IsEnabled = false;
+                        }
+                    }
+
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void MenuFlyoutItem_DecategorizeBooksFromCollection_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_parameters.ParentPage.ViewModelPage.SelectedItems != null && _parameters.ParentPage.ViewModelPage.SelectedItems.Any())
+                {
+                    OperationStateVM result = await DbServices.Collection.DecategorizeBooksAsync(_parameters.ParentPage.ViewModelPage.SelectedItems.Select(s => s.Id));
+                    if (result.IsSuccess)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Succès";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                        ViewModelPage.IsResultMessageOpen = true;
+
+                        await _parameters.ParentPage.UpdateLibraryCollectionAsync();
+                    }
+                    else
+                    {
+                        //Erreur
+                        ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
     }
 
     public class CollectionListUCVM : INotifyPropertyChanged

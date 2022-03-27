@@ -284,7 +284,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (_parameters.ParentLibrary != null)
                 {
-                    //_parameters.ParentLibrary.CountUnCategorizedBooks = await DbServices.Categorie.CountUnCategorizedBooks(_parameters.ParentLibrary.Id);
+                    _parameters.ParentLibrary.CountNotInCollectionBooks = await DbServices.Collection.CountUnCategorizedBooks(_parameters.ParentLibrary.Id);
                     if (_parameters.ParentLibrary.Collections.Any())
                     {
                         _parameters.ParentLibrary.Collections.Clear();

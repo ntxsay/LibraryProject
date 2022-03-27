@@ -214,6 +214,44 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
+        public async Task SaveBookViewModelAsync(LivreVM viewModel)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModel == null)
+                {
+                    Logs.Log(m, "Le modèle de vue est null.");
+                    return;
+                }
+
+                var folderItem = await this.GetBookItemFolderAsync(viewModel.Guid);
+                if (folderItem == null)
+                {
+                    return;
+                }
+
+                var savedFile = await folderItem.CreateFileAsync("model.json", CreationCollisionOption.OpenIfExists);
+                if (savedFile == null)
+                {
+                    Logs.Log(m, "Le fichier n'a pas pû être créé.");
+                    return;
+                }
+
+                bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModel, savedFile);
+                if (isFileSaved == false)
+                {
+                    Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         /// <summary>
         /// Crée le dossier d'un livre dans le dossier "Books" et/ou renvoie l'objet <see cref="StorageFolder"/> 
         /// </summary>
