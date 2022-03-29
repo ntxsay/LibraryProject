@@ -102,6 +102,10 @@ namespace DbConsoleHelpers.Models.Local
                 entity.HasOne(d => d.IdCollectionNavigation)
                     .WithMany(p => p.TbookCollectionConnector)
                     .HasForeignKey(d => d.IdCollection);
+
+                entity.HasOne(d => d.IdLibraryNavigation)
+                    .WithMany(p => p.TbookCollectionConnector)
+                    .HasForeignKey(d => d.IdLibrary);
             });
 
             modelBuilder.Entity<TbookEditeurConnector>(entity =>

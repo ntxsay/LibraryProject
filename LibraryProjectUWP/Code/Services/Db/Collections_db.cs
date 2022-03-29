@@ -276,17 +276,21 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        long countUnCategorized = 0;
-                        var collection = await context.Tcollection.Where(d => d.IdLibrary == idLibrary).ToListAsync();
-                        foreach (var item in collection)
+                        var collections = await context.Tcollection.Where(d => d.IdLibrary == idLibrary).ToListAsync();
+                        if (collections.Count > 0)
                         {
-                            if (!await context.TbookCollectionConnector.AnyAsync(w => w.IdCollection == item.Id))
+                            for (int i = 0; i < collections.Count; i++)
                             {
-                                countUnCategorized++;
+                                if (!await context.TbookCollectionConnector.AnyAsync(w => w.IdCollection == collections[i].Id))
+                                {
+                                    collections.RemoveAt(i);
+                                    i = -1;
+                                    continue;
+                                }
                             }
                         }
-
-                        return countUnCategorized;
+                        
+                        return collections.Distinct().ToList().Count;
                     }
                 }
                 catch (Exception ex)

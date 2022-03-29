@@ -929,10 +929,9 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             /// <summary>
-            /// Supprime un élément de la base de données
+            /// Supprime un livre de la base de données
             /// </summary>
-            /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
-            /// <param name="Id"></param>
+            /// <param name="Id">Identifiant unique du livre</param>
             /// <returns></returns>
             public static async Task<OperationStateVM> DeleteAsync(long Id)
             {
@@ -957,34 +956,69 @@ namespace LibraryProjectUWP.Code.Services.Db
                             //await context.SaveChangesAsync();
                         }
 
+                        //Titles
                         var recordTitles = await context.TbookOtherTitle.Where(a => a.IdBook == record.Id).ToListAsync();
                         if (recordTitles.Any())
                         {
                             context.TbookOtherTitle.RemoveRange(recordTitles);
                         }
 
+                        //Identification
+                        TbookIdentification recordIdentification = await context.TbookIdentification.SingleOrDefaultAsync(a => a.Id == record.Id);
+                        if (recordIdentification != null)
+                        {
+                            context.TbookIdentification.Remove(recordIdentification);
+                        }
+
+                        //Format
+                        TbookFormat recordFormat = await context.TbookFormat.SingleOrDefaultAsync(a => a.Id == record.Id);
+                        if (recordFormat != null)
+                        {
+                            context.TbookFormat.Remove(recordFormat);
+                        }
+
+                        //authors connector
                         var recordAuthors = await context.TbookAuthorConnector.Where(a => a.IdBook == record.Id).ToListAsync();
                         if (recordAuthors.Any())
                         {
                             context.TbookAuthorConnector.RemoveRange(recordAuthors);
                         }
 
+                        //Editor connector
                         var recordEditors = await context.TbookEditeurConnector.Where(a => a.IdBook == record.Id).ToListAsync();
                         if (recordEditors.Any())
                         {
                             context.TbookEditeurConnector.RemoveRange(recordEditors);
                         }
 
+                        //Collection connecto
                         var recordCollection = await context.TbookCollectionConnector.Where(a => a.IdBook == record.Id).ToListAsync();
                         if (recordCollection.Any())
                         {
                             context.TbookCollectionConnector.RemoveRange(recordCollection);
                         }
 
-                        TbookIdentification recordIdentification = await context.TbookIdentification.SingleOrDefaultAsync(a => a.Id == record.Id);
-                        if (recordIdentification != null)
+                        //Exemplaries
+                        var recordExemplary = await context.TbookExemplary.Where(a => a.IdBook == record.Id).ToListAsync();
+                        if (recordExemplary.Any())
                         {
-                            context.TbookIdentification.Remove(recordIdentification);
+                            foreach (var exemplary in recordExemplary)
+                            {
+                                //Pret
+                                var recordPrets = await context.TbookPret.Where(a => a.IdBookExemplary == exemplary.Id).ToListAsync();
+                                if (recordPrets != null)
+                                {
+                                    context.TbookPret.RemoveRange(recordPrets);
+                                }
+
+                                //Etats
+                                var recordEtats = await context.TbookEtat.Where(a => a.IdBookExemplary == exemplary.Id).ToListAsync();
+                                if (recordEtats != null)
+                                {
+                                    context.TbookEtat.RemoveRange(recordEtats);
+                                }
+                            }
+                            context.TbookExemplary.RemoveRange(recordExemplary);
                         }
 
                         context.Tbook.Remove(record);

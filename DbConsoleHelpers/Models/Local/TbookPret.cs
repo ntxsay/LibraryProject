@@ -16,6 +16,7 @@ namespace DbConsoleHelpers.Models.Local
         public long? IdEtatAfter { get; set; }
         public string DatePret { get; set; }
         public string DateRemise { get; set; }
+        public string DateRemiseUser { get; set; }
         public string Observation { get; set; }
 
         public virtual TbookExemplary IdBookExemplaryNavigation { get; set; }

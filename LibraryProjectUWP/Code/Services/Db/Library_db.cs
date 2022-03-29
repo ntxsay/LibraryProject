@@ -15,6 +15,7 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
 using Windows.Storage;
 using LibraryProjectUWP.ViewModels.Collection;
+using LibraryProjectUWP.ViewModels.Book;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
@@ -325,6 +326,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                             };
                         }
 
+
+
                         context.Tlibrary.Remove(record);
                         await context.SaveChangesAsync();
                     }
@@ -392,6 +395,77 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     MethodBase m = MethodBase.GetCurrentMethod();
                     Debug.WriteLine(Logs.GetLog(ex, m));
+                    return null;
+                }
+            }
+
+            public static BibliothequeVM DeepCopy(BibliothequeVM viewModelToCopy)
+            {
+                try
+                {
+                    if (viewModelToCopy == null) return null;
+
+                    BibliothequeVM newViewModel = new BibliothequeVM();
+
+                    return DeepCopy(newViewModel, viewModelToCopy);
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
+            public static BibliothequeVM DeepCopy(BibliothequeVM viewModel, BibliothequeVM viewModelToCopy)
+            {
+                try
+                {
+                    if (viewModel == null) return null;
+                    if (viewModelToCopy == null) return null;
+
+                    viewModel.Id = viewModelToCopy.Id;
+                    viewModel.IsSelected = viewModelToCopy.IsSelected;
+                    viewModel.CountNotInCollectionBooks = viewModelToCopy.CountNotInCollectionBooks;
+                    viewModel.CountBooks = viewModelToCopy.CountBooks;
+                    viewModel.CountUnCategorizedBooks = viewModelToCopy.CountUnCategorizedBooks;
+                    viewModel.Description = viewModelToCopy.Description;
+                    viewModel.Name = viewModelToCopy.Name;
+                    viewModel.JaquettePath = viewModelToCopy.JaquettePath;
+                    viewModel.DateEdition = viewModelToCopy.DateEdition;
+                    viewModel.DateAjout = viewModelToCopy.DateAjout;
+                    viewModel.Guid = viewModelToCopy.Guid;
+
+                    if (viewModelToCopy.Books != null && viewModelToCopy.Books.Any())
+                    {
+                        if (viewModel.Books == null)
+                        {
+                            viewModel.Books = new List<LivreVM>(viewModelToCopy.Books);
+                        }
+                    }
+
+                    if (viewModelToCopy.Collections != null && viewModelToCopy.Collections.Any())
+                    {
+                        if (viewModel.Collections == null)
+                        {
+                            viewModel.Collections = new ObservableCollection<CollectionVM>(viewModelToCopy.Collections);
+                        }
+                    }
+
+                    if (viewModelToCopy.Categories != null && viewModelToCopy.Categories.Any())
+                    {
+                        if (viewModel.Categories == null)
+                        {
+                            viewModel.Categories = new ObservableCollection<CategorieLivreVM>(viewModelToCopy.Categories);
+                        }
+                    }
+
+                    return viewModel;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
                     return null;
                 }
             }

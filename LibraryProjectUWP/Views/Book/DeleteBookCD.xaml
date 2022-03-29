@@ -1,0 +1,37 @@
+﻿<ContentDialog
+    x:Class="LibraryProjectUWP.Views.Book.DeleteBookCD"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views.Book"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="TITLE"
+    Name="_dialog"
+    PrimaryButtonText="Sauvegarder"
+    SecondaryButtonText="Ne pas sauvegarder"
+    CloseButtonText="Annuler">
+    <ContentDialog.TitleTemplate>
+        <DataTemplate>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" FontSize="22"/>
+                <TextBlock Text="{Binding  ElementName=_dialog, Path=Title}"/>
+            </StackPanel>
+        </DataTemplate>
+    </ContentDialog.TitleTemplate>
+    <ContentDialog.CornerRadius>
+        <CornerRadius>8</CornerRadius>
+    </ContentDialog.CornerRadius>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="tbkName" Grid.Row="0" TextWrapping="Wrap">
+            
+        </TextBlock>
+        <TextBlock Grid.Row="1" TextWrapping="Wrap" Foreground="OrangeRed" FontWeight="Medium">
+            <LineBreak /><Run Text="Veuillez noter que cette action est irréverssible. Voulez-vous effectuer une sauvegarde avant suppression ?" />
+        </TextBlock>
+    </Grid>
+</ContentDialog>

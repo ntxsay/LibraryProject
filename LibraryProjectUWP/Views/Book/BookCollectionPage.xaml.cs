@@ -1767,6 +1767,33 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private async void DeleteBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (args.Parameter is LivreVM viewModel)
+                {
+                    var dialog = new DeleteBookCD(new LivreVM[] { viewModel });
+
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #region Contact
         internal async Task NewFreeContactAsync(string prenom, string nomNaissance, Guid? guid = null)
         {
@@ -3010,5 +3037,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+       
     }
 }

@@ -264,6 +264,9 @@
     <Compile Include="Views\Book\BookExemplaryListUC.xaml.cs">
       <DependentUpon>BookExemplaryListUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\DeleteBookCD.xaml.cs">
+      <DependentUpon>DeleteBookCD.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\ImportBookFromExcelUC.xaml.cs">
       <DependentUpon>ImportBookFromExcelUC.xaml</DependentUpon>
     </Compile>
@@ -433,6 +436,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\Book\DeleteBookCD.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Book\ImportBookFromExcelUC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -534,13 +541,13 @@
       <Version>1.11.42</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore">
-      <Version>3.1.21</Version>
+      <Version>3.1.23</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite">
-      <Version>3.1.21</Version>
+      <Version>3.1.23</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
-      <Version>3.1.21</Version>
+      <Version>3.1.23</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -557,7 +564,7 @@
       <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.7.0</Version>
+      <Version>2.7.1</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>

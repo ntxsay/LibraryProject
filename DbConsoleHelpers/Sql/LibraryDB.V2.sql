@@ -250,6 +250,7 @@ CREATE TABLE IF NOT EXISTS "TBookCollectionConnector" (
 	PRIMARY KEY("Id" AUTOINCREMENT)
     FOREIGN KEY("IdCollection") REFERENCES "TCollection"("Id") ON DELETE CASCADE
     FOREIGN KEY("IdBook") REFERENCES "TBook"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdLibrary") REFERENCES "TLibrary"("Id") ON DELETE CASCADE
 );
 
 ----------------------------------------------------------------------------------------------------

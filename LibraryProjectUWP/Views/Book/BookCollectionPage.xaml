@@ -53,8 +53,8 @@
                        Description="Edite les informations de base du livre" 
                        Label="Editer les informations">
         </XamlUICommand>
-        <XamlUICommand x:Name="DeleteLibraryXamlUICommand" 
-                       ExecuteRequested="DeleteLibraryXamlUICommand_ExecuteRequested"
+        <XamlUICommand x:Name="DeleteBookXUiCmd" 
+                       ExecuteRequested="DeleteBookXUiCmd_ExecuteRequested"
                        Description="Supprime définitivement le livre actuel" 
                        Label="Supprimer le livre">
         </XamlUICommand>
@@ -243,7 +243,7 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Supprimer ce livre" Command="{StaticResource DeleteLibraryXamlUICommand}" CommandParameter="{x:Bind }" Foreground="OrangeRed">
+                                <MenuFlyoutItem Text="Supprimer ce livre" Command="{StaticResource DeleteBookXUiCmd}" CommandParameter="{x:Bind }" Foreground="OrangeRed">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE74D;" Foreground="OrangeRed"/>
                                     </MenuFlyoutItem.Icon>
@@ -362,7 +362,7 @@
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Text="Supprimer ce livre" Command="{StaticResource DeleteLibraryXamlUICommand}" CommandParameter="{Binding }" Foreground="OrangeRed">
+                                    <MenuFlyoutItem Text="Supprimer ce livre" Command="{StaticResource DeleteBookXUiCmd}" CommandParameter="{Binding }" Foreground="OrangeRed">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE74D;" Foreground="OrangeRed"/>
                                         </MenuFlyoutItem.Icon>
