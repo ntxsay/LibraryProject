@@ -123,11 +123,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
                 IEnumerable<LivreVM> itemsPage = GetPaginatedItems(preparedViewModelList.ToList(), goToPage);
 
-                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(itemsPage, parentPage.ViewModelPage.OrderedBy, parentPage.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
                 {
                     this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
+                    parentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
                 }
 
                 if (resetPage)
@@ -155,11 +155,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
                 IEnumerable<LivreVM> itemsPage = GetPaginatedItems(preparedViewModelList.ToList(), goToPage);
 
-                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(itemsPage, parentPage.ViewModelPage.OrderedBy, parentPage.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
+                    parentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
                 }
 
                 if (resetPage)
@@ -187,11 +187,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
                 IEnumerable<LivreVM> itemsPage = GetPaginatedItems(preparedViewModelList.ToList(), goToPage);
 
-                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(itemsPage, parentPage.ViewModelPage.OrderedBy, parentPage.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
+                    parentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
                 }
 
                 if (resetPage)
@@ -220,11 +220,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 IEnumerable<LivreVM> itemsPage = GetPaginatedItems(preparedViewModelList.ToList(), goToPage);
 
 
-                var GroupingItems = this.OrderItems(itemsPage, this.ViewModelPage.OrderedBy, this.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Publication.YearParution ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
+                var GroupingItems = this.OrderItems(itemsPage, parentPage.ViewModelPage.OrderedBy, parentPage.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Publication.YearParution ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
                     this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    this.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.ParutionYear;
+                    parentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.ParutionYear;
                 }
 
                 if (resetPage)
@@ -287,7 +287,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                switch (ViewModelPage.GroupedBy)
+                switch (parentPage.ViewModelPage.GroupedBy)
                 {
                     case BookGroupVM.GroupBy.None:
                         this.GroupItemsByNone(viewModelList, goToPage, resetPage);

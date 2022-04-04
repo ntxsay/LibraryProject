@@ -441,7 +441,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             DateAjout = viewModel.DateAjout.ToString(),
                             DateEdition = viewModel.DateEdition?.ToString(),
                             DateParution = viewModel.Publication.DateParution?.ToString(),
-                            MainTitle = viewModel.MainTitle,
+                            MainTitle = viewModel.MainTitle.Trim(),
                             CountOpening = viewModel.CountOpening,
                             Resume = viewModel.Description?.Resume,
                             Notes = viewModel.Description?.Notes,

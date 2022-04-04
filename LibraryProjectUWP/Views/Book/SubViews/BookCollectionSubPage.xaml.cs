@@ -95,11 +95,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (parentPage.ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                if (parentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
                 {
                     this.GridViewMode(firstLoad);
                 }
-                else if (parentPage.ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                else if (parentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
                 {
                     this.DataGridViewMode(firstLoad);
                 }
@@ -371,28 +371,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void SelectAll()
         {
             try
             {
-                if (sender is ListView listView && listView.SelectedItem is LivreVM viewModel)
-                {
-                    //SearchViewModel(viewModel);
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void Btn_SelectAll_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                if (parentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
                 {
                     var gridViewItems = uiServices.GetSelectedGridViewFromPivotTemplate(this.PivotItems, "GridViewItems");
                     if (gridViewItems != null)
@@ -400,7 +383,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         gridViewItems.SelectAll();
                     }
                 }
-                else if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                else if (parentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
                 {
                     var dataGridItems = uiServices.GetSelectedDataGridFromPivotTemplate(this.PivotItems, "DataGridItems");
                     if (dataGridItems != null)
@@ -423,11 +406,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private void Btn_UnSelectAll_Click(object sender, RoutedEventArgs e)
+        public void DeSelectAll()
         {
             try
             {
-                if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+                if (parentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
                 {
                     var gridViewItems = uiServices.GetSelectedGridViewFromPivotTemplate(this.PivotItems, "GridViewItems");
                     if (gridViewItems != null)
@@ -435,7 +418,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         gridViewItems.SelectedItems.Clear();
                     }
                 }
-                else if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                else if (parentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
                 {
                     var dataGridItems = uiServices.GetSelectedDataGridFromPivotTemplate(this.PivotItems, "DataGridItems");
                     if (dataGridItems != null)
@@ -452,7 +435,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
+        public void DeleteAll()
         {
 
         }
@@ -495,7 +478,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    //this.EditBook(viewModel);
+                    parentPage.EditBook(viewModel);
                 }
             }
             catch (Exception ex)
@@ -772,7 +755,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
                     }
                 }
-                parentPage.RefreshItemsGrouping(parentPage._parameters.ParentLibrary.Books, page, false);
+
+                this.RefreshItemsGrouping(parentPage._parameters.ParentLibrary.Books, page, false);
                 var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
                 if (buttonsPage != null && buttonsPage.Any())
                 {
@@ -814,25 +798,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             try
             {
                 IEnumerable<LivreVM> itemsPage = Enumerable.Empty<LivreVM>();
-                //IList<LivreVM> PreSelectedViewModelList = new List<LivreVM>(viewModelList);
-
-                //if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any())
-                //{
-                //    List<LivreVM> vms = new List<LivreVM>();
-                //    foreach (LivreVM viewModel in viewModelList)
-                //    {
-                //        foreach (CollectionVM collectionVM in ViewModelPage.SelectedCollections)
-                //        {
-                //            if (viewModel.Publication.Collections.Any(s => s.Id == collectionVM.Id))
-                //            {
-                //                vms.Add(viewModel);
-                //                break;
-                //            }
-                //        }
-                //    }
-
-                //    PreSelectedViewModelList = new List<LivreVM>(vms);
-                //}
+                
 
                 //Si la séquence contient plus d'items que le nombre max éléments par page
                 if (viewModelList.Count > ViewModelPage.MaxItemsPerPage)
@@ -913,11 +879,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         public void SearchViewModel(LivreVM viewModel)
         {
             if (viewModel == null) return;
-            if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.GridView)
+            if (parentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
             {
                 SearchViewModelGridView(viewModel);
             }
-            else if (ViewModelPage.GroupedRelatedViewModel.DataViewMode == Code.DataViewModeEnum.DataGridView)
+            else if (parentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
             {
                 SearchViewModelDataGridView(viewModel);
             }
