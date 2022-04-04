@@ -421,7 +421,7 @@
                 <SplitView PaneBackground="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" 
                 IsPaneOpen="{x:Bind ViewModelPage.IsSplitViewOpen, Mode=OneWay}" PanePlacement="Right" OpenPaneLength="{x:Bind ViewModelPage.SplitViewWidth, Mode=OneWay}" CompactPaneLength="88" DisplayMode="Inline">
                     <!--Items-->
-                    <Grid>
+                    <!--<Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
@@ -463,7 +463,10 @@
                                 </ItemsControl>
                             </ScrollViewer>
                         </Grid>
-                    </Grid>
+                    </Grid>-->
+                    <Frame x:Name="FrameContainer">
+                        
+                    </Frame>
                     <SplitView.Pane>
                         <Grid RowSpacing="4">
                             <Grid.RowDefinitions>
@@ -684,12 +687,12 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='DataGridView'}" Click="ABTBtn_DataGridViewMode_Click" Unchecked="ABTBtn_DataGridViewMode_Unchecked">
+            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='DataGridView'}" Click="ABTBtn_DataGridViewMode_Click" Unchecked="ABTBtn_DataGridViewMode_Unchecked">
                 <AppBarToggleButton.Icon>
                     <FontIcon Glyph="&#xE8FD;"/>
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
-            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='GridView'}" Click="ABTBtn_GridViewMode_Click" Unchecked="ABTBtn_GridViewMode_Unchecked">
+            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='GridView'}" Click="ABTBtn_GridViewMode_Click" Unchecked="ABTBtn_GridViewMode_Unchecked">
                 <AppBarToggleButton.Icon>
                     <FontIcon Glyph="&#xF0E2;"/>
                 </AppBarToggleButton.Icon>

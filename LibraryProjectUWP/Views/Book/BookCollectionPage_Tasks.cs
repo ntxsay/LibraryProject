@@ -6,6 +6,7 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book.SubViews;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,20 @@ namespace LibraryProjectUWP.Views.Book
         CancellationTokenSource cancellationTokenSourceSearchPretsBook = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceSearchBookExemplaries = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceCompleteInfoBook = new CancellationTokenSource();
+
+        private void OpenBookCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.NavigateToView(typeof(BookCollectionSubPage), this);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
 
         #region Complete Info Book
         public void InitializeCompleteInfoBookWorker()
@@ -163,7 +178,8 @@ namespace LibraryProjectUWP.Views.Book
                 workerCompleteInfoBook.Dispose();
                 workerCompleteInfoBook = null;
 
-                await InitializeDataAsync(true);
+                //await InitializeDataAsync(true);
+                OpenBookCollection();
 
             }
             catch (Exception ex)

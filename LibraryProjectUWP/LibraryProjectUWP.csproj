@@ -183,6 +183,7 @@
     <Compile Include="Code\Services\Excel\ExcelServices.cs" />
     <Compile Include="Code\Services\Logging\Logs.cs" />
     <Compile Include="Code\Services\Tasks\BookBackgroundTask.cs" />
+    <Compile Include="Code\Services\UI\UiServices.cs" />
     <Compile Include="Code\Services\Web\htmlServices.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -282,6 +283,11 @@
     <Compile Include="Views\Book\ReturnBookExemplaryUC.xaml.cs">
       <DependentUpon>ReturnBookExemplaryUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\SubViews\BookCollectionSubPage.xaml.cs">
+      <DependentUpon>BookCollectionSubPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Book\SubViews\BookCollectionSubPage_Generation.cs" />
+    <Compile Include="Views\Book\SubViews\BookCollectionSubPage_ViewModelPage.cs" />
     <Compile Include="Views\Categories\CategoriesListUC.xaml.cs">
       <DependentUpon>CategoriesListUC.xaml</DependentUpon>
     </Compile>
@@ -459,6 +465,10 @@
     <Page Include="Views\Book\ReturnBookExemplaryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\SubViews\BookCollectionSubPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Categories\CategoriesListUC.xaml">
       <Generator>MSBuild:Compile</Generator>

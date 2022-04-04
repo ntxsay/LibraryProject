@@ -1,49 +1,24 @@
-﻿using LibraryProjectUWP.Code;
-using LibraryProjectUWP.Code.Helpers;
-using LibraryProjectUWP.Code.Services.Db;
-using LibraryProjectUWP.Code.Services.ES;
-using LibraryProjectUWP.Code.Services.Logging;
+﻿using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
-using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
-using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
 
-namespace LibraryProjectUWP.Views.Book
+namespace LibraryProjectUWP.Views.Book.SubViews
 {
-    public sealed partial class BookCollectionPage : Page
+    public sealed partial class BookCollectionSubPage
     {
-        public class BookCollectionPageVM : INotifyPropertyChanged
+        public class BookCollectionSubPageVM : INotifyPropertyChanged
         {
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-            private DataViewModeEnum _DataViewMode = DataViewModeEnum.GridView;
-            public DataViewModeEnum DataViewMode
-            {
-                get => this._DataViewMode;
-                set
-                {
-                    if (this._DataViewMode != value)
-                    {
-                        this._DataViewMode = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
 
             private IEnumerable<CollectionVM> _SelectedCollections = null;
             public IEnumerable<CollectionVM> SelectedCollections
@@ -87,33 +62,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
-            private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
-            public ObservableCollection<TaskVM> TaskList
-            {
-                get => this._TaskList;
-                set
-                {
-                    if (_TaskList != value)
-                    {
-                        this._TaskList = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private ObservableCollection<SideBarItemHeaderVM> _ItemsSideBarHeader = new ObservableCollection<SideBarItemHeaderVM>();
-            public ObservableCollection<SideBarItemHeaderVM> ItemsSideBarHeader
-            {
-                get => this._ItemsSideBarHeader;
-                set
-                {
-                    if (_ItemsSideBarHeader != value)
-                    {
-                        this._ItemsSideBarHeader = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
+            
 
             private BookGroupVM _GroupedRelatedViewModel = new BookGroupVM();
             public BookGroupVM GroupedRelatedViewModel
@@ -172,49 +121,6 @@ namespace LibraryProjectUWP.Views.Book
             }
 
 
-            private bool _IsSplitViewOpen;
-            public bool IsSplitViewOpen
-            {
-                get => this._IsSplitViewOpen;
-                set
-                {
-                    if (_IsSplitViewOpen != value)
-                    {
-                        this._IsSplitViewOpen = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            public const double MinSplitViewWidth = 400;
-
-            private double _SplitViewWidth = MinSplitViewWidth;
-            public double SplitViewWidth
-            {
-                get => this._SplitViewWidth;
-                set
-                {
-                    if (_SplitViewWidth != value)
-                    {
-                        this._SplitViewWidth = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private Visibility _SearchingLibraryVisibility = Visibility.Visible;
-            public Visibility SearchingLibraryVisibility
-            {
-                get => this._SearchingLibraryVisibility;
-                set
-                {
-                    if (_SearchingLibraryVisibility != value)
-                    {
-                        this._SearchingLibraryVisibility = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
 
             private int _MaxItemsPerPage = 100;
             public int MaxItemsPerPage
@@ -315,6 +221,7 @@ namespace LibraryProjectUWP.Views.Book
             }
 
             private ICollection<LivreVM> _SelectedItems = new List<LivreVM>();
+            [Obsolete]
             public ICollection<LivreVM> SelectedItems
             {
                 get => this._SelectedItems;
@@ -343,61 +250,6 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
-            private List<ContactVM> _ContactViewModelList;
-            public List<ContactVM> ContactViewModelList
-            {
-                get => this._ContactViewModelList;
-                set
-                {
-                    if (_ContactViewModelList != value)
-                    {
-                        this._ContactViewModelList = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private List<ContactVM> _AuthorViewModelList;
-            public List<ContactVM> AuthorViewModelList
-            {
-                get => this._AuthorViewModelList;
-                set
-                {
-                    if (_AuthorViewModelList != value)
-                    {
-                        this._AuthorViewModelList = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private BibliothequeVM _ParentLibrary;
-            public BibliothequeVM ParentLibrary
-            {
-                get => this._ParentLibrary;
-                set
-                {
-                    if (_ParentLibrary != value)
-                    {
-                        this._ParentLibrary = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private string _BackgroundImagePath = EsGeneral.BookDefaultBackgroundImage;
-            public string BackgroundImagePath
-            {
-                get => this._BackgroundImagePath;
-                set
-                {
-                    if (this._BackgroundImagePath != value)
-                    {
-                        this._BackgroundImagePath = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
 
             public void OnPropertyChanged([CallerMemberName] string propertyName = null)
             {

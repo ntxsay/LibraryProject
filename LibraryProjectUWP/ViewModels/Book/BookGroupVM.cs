@@ -117,6 +117,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private DataViewModeEnum _DataViewMode = DataViewModeEnum.GridView;
+        [Obsolete]
         public DataViewModeEnum DataViewMode
         {
             get => this._DataViewMode;
