@@ -96,27 +96,7 @@
                         <TextBlock Text="Nom de la feuille" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </ComboBox.Header>
                 </ComboBox>
-                <Grid Grid.Row="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <TextBox Grid.Row="0"  PlaceholderText="B2:P12" HorizontalAlignment="Stretch" 
-                             Text="{x:Bind ViewModelPage.TableRange, Mode=TwoWay}">
-                        <TextBox.Header>
-                            <TextBlock Text="Plage de cellule" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </TextBox.Header>
-                    </TextBox>
-                    <CheckBox Grid.Row="1" IsChecked="{x:Bind ViewModelPage.IsTableRangeContainsHeader, Mode=TwoWay}">
-                        <TextBlock Text="Le tableau contient une en-tête" />
-                    </CheckBox>
-                </Grid>
-                <Button Grid.Row="2" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand" HorizontalAlignment="Stretch"
-                        Command="{StaticResource SearchDataInFileXUiCommand}"
-                                        VerticalAlignment="Center" VerticalContentAlignment="Center">
-                    <TextBlock Text="Chercher les données" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                </Button>
-                <TextBlock x:Name="TbcAfterSearching" Grid.Row="3" Margin="0 5 0 15" TextWrapping="Wrap" TextAlignment="Left" HorizontalTextAlignment="Left" HorizontalAlignment="Stretch">
+                <TextBlock x:Name="TbcAfterSearching" Grid.Row="1" Margin="0 5 0 15" TextWrapping="Wrap" TextAlignment="Left" HorizontalTextAlignment="Left" HorizontalAlignment="Stretch">
             
                 </TextBlock>
                 <StackPanel Grid.Row="4" Orientation="Vertical" Spacing="16" Visibility="{x:Bind ViewModelPage.ItemstVisibility, Mode=OneWay}">

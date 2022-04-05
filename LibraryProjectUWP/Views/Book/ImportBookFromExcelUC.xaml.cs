@@ -241,76 +241,81 @@ namespace LibraryProjectUWP.Views.Book
                     return false;
                 }
                 List<LivreVM> list = new List<LivreVM>();
-                for (int i = 0; i < ViewModelPage.DataTable.Rows.Count; i++)
+                var selectedItems = _parameters.ParentPage.ImportBookExcelSubPage.SelectedItems;
+                for (int i = 0; i < selectedItems.Count; i++)
                 {
-                    var viewModel = new LivreVM()
+                    if (selectedItems[i] is object[] row)
                     {
-                        Publication = new LivrePublicationVM(),
-                        MainTitle = ViewModelPage.DataTable.Rows[i].ItemArray[ViewModelPage.SelectedTitle.ColumnIndex].ToString(),
-                    };
-
-                    if (ViewModelPage.SelectedAuteur != null)
-                    {
-                        List<ContactVM> authorViewModelList = new List<ContactVM>();
-                        var authors = ViewModelPage.DataTable.Rows[i].ItemArray[ViewModelPage.SelectedAuteur.ColumnIndex].ToString();
-                        if (!authors.IsStringNullOrEmptyOrWhiteSpace())
+                        var viewModel = new LivreVM()
                         {
-                            var authorsList = StringHelpers.SplitWord(authors, new string[] { "," });
-                            if (authorsList != null && authorsList.Length > 0)
-                            {
-                                foreach (var author in authorsList)
-                                {
-                                    ContactVM authorVm = new ContactVM()
-                                    {
-                                        ContactType = ContactType.Author,
-                                        TitreCivilite = CivilityHelpers.NonSpecifie,
-                                    };
+                            Publication = new LivrePublicationVM(),
+                            MainTitle = row[ViewModelPage.SelectedTitle.ColumnIndex].ToString(),
+                        };
 
-                                    var split = StringHelpers.SplitWord(author, new string[] { " " });
-                                    
-                                    if (split.Length == 1)
-                                    {
-                                        authorVm.Prenom = split[0];
-                                    }
-                                    else if (split.Length >= 2)
-                                    {
-                                        authorVm.Prenom = split[0];
-                                        authorVm.NomNaissance = split[1];
-                                    }
-
-                                    authorViewModelList.Add(authorVm);
-                                }
-                            }
-                            
-                        }
-                        viewModel.Auteurs = new ObservableCollection<ContactVM>(authorViewModelList);
-                    }
-
-                    if (ViewModelPage.SelectedCollection != null)
-                    {
-                        List<CollectionVM> collectionViewModelList = new List<CollectionVM>();
-                        var collections = ViewModelPage.DataTable.Rows[i].ItemArray[ViewModelPage.SelectedCollection.ColumnIndex].ToString();
-                        if (!collections.IsStringNullOrEmptyOrWhiteSpace())
+                        if (ViewModelPage.SelectedAuteur != null)
                         {
-                            var collectionList = StringHelpers.SplitWord(collections, new string[] { "," });
-                            if (collectionList != null && collectionList.Length > 0)
+                            List<ContactVM> authorViewModelList = new List<ContactVM>();
+                            var authors = row[ViewModelPage.SelectedAuteur.ColumnIndex].ToString();
+                            if (!authors.IsStringNullOrEmptyOrWhiteSpace())
                             {
-                                foreach (var collection in collectionList)
+                                var authorsList = StringHelpers.SplitWord(authors, new string[] { "," });
+                                if (authorsList != null && authorsList.Length > 0)
                                 {
-                                    CollectionVM collectionVm = new CollectionVM()
+                                    foreach (var author in authorsList)
                                     {
-                                        IdLibrary = _parameters.ParentPage._parameters.ParentLibrary.Id,
-                                        Name = collection,
-                                    };
-                                    collectionViewModelList.Add(collectionVm);
+                                        ContactVM authorVm = new ContactVM()
+                                        {
+                                            ContactType = ContactType.Author,
+                                            TitreCivilite = CivilityHelpers.NonSpecifie,
+                                        };
+
+                                        var split = StringHelpers.SplitWord(author, new string[] { " " });
+
+                                        if (split.Length == 1)
+                                        {
+                                            authorVm.Prenom = split[0];
+                                        }
+                                        else if (split.Length >= 2)
+                                        {
+                                            authorVm.Prenom = split[0];
+                                            authorVm.NomNaissance = split[1];
+                                        }
+
+                                        authorViewModelList.Add(authorVm);
+                                    }
                                 }
+
                             }
-
+                            viewModel.Auteurs = new ObservableCollection<ContactVM>(authorViewModelList);
                         }
-                        viewModel.Publication.Collections = new ObservableCollection<CollectionVM>(collectionViewModelList);
-                    }
 
-                    list.Add(viewModel);
+                        if (ViewModelPage.SelectedCollection != null)
+                        {
+                            List<CollectionVM> collectionViewModelList = new List<CollectionVM>();
+                            var collections = row[ViewModelPage.SelectedCollection.ColumnIndex].ToString();
+                            if (!collections.IsStringNullOrEmptyOrWhiteSpace())
+                            {
+                                var collectionList = StringHelpers.SplitWord(collections, new string[] { "," });
+                                if (collectionList != null && collectionList.Length > 0)
+                                {
+                                    foreach (var collection in collectionList)
+                                    {
+                                        CollectionVM collectionVm = new CollectionVM()
+                                        {
+                                            IdLibrary = _parameters.ParentPage._parameters.ParentLibrary.Id,
+                                            Name = collection,
+                                        };
+                                        collectionViewModelList.Add(collectionVm);
+                                    }
+                                }
+
+                            }
+                            viewModel.Publication.Collections = new ObservableCollection<CollectionVM>(collectionViewModelList);
+                        }
+
+                        list.Add(viewModel);
+                    }
+                    
                 }
 
                 ViewModelPage.NewViewModel = list;

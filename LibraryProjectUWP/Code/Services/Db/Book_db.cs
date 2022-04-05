@@ -542,6 +542,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     var itemConnector = new TbookCollectionConnector()
                                     {
                                         IdBook = record.Id,
+                                        IdLibrary = idLibrary,
                                         IdCollection = collection.Id,
                                     };
 

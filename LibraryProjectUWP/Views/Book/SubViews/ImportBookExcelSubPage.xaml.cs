@@ -93,7 +93,12 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         {
                             if (dataGrid.SelectedItems[0] is object[] row)
                             {
-                                sideBar.SearchingResult(row);
+                                List<object> list = new List<object>();
+                                for (int i = 1; i < row.Length; i++)
+                                {
+                                    list.Add(row[i]);
+                                }
+                                sideBar.SearchingResult(list.ToArray());
                             }
                         }
                     }
@@ -109,7 +114,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public ICollection<object> SelectedItems { get; set; } = new List<object>();
+        public IList<object> SelectedItems { get; set; } = new List<object>();
         
     }
 }
