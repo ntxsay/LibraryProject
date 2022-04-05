@@ -170,6 +170,77 @@ namespace LibraryProjectUWP.Code.Services.Excel
             }
         }
 
+        public async Task<DataTable> ImportExcelToDatatable(string sheetName, StorageFile file = null)
+        {
+            try
+            {
+                if (sheetName.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    return null;
+                }
+
+                StorageFile excelFile = file ?? _file;
+                using (IRandomAccessStream stream = await excelFile.OpenAsync(FileAccessMode.Read))
+                {
+                    using (XLWorkbook workBook = new XLWorkbook(stream.AsStream()))
+                    {
+                        //Read the first Sheet from Excel file.
+                        IXLWorksheet workSheet = workBook.Worksheet(sheetName);
+
+                        //Create a new DataTable.
+                        DataTable dt = new DataTable();
+
+                        //Loop through the Worksheet rows.
+                        bool firstRow = true;
+                        int countRow = 1;
+                        foreach (var row in workSheet.Rows())
+                        {
+
+                            //Use the first row to add columns to DataTable.
+                            if (firstRow)
+                            {
+                                dt.Columns.Add("#");
+                                foreach (IXLCell cell in row.Cells())
+                                {
+                                    dt.Columns.Add(cell.Address.ColumnLetter);
+                                }
+
+                                firstRow = false;
+                            }
+
+                            //Add rows to DataTable.
+                            dt.Rows.Add();
+
+
+                            int firstColumn = row.RangeAddress.FirstAddress.ColumnNumber;
+                            int lastColumn = row.RangeAddress.LastAddress.ColumnNumber;
+
+                            var cellf = row.Cells();
+                            dt.Rows[dt.Rows.Count - 1][0] = $"{countRow}";
+                            countRow++;
+
+                            int i = 1;
+                            foreach (IXLCell cell in cellf)
+                            {
+                                dt.Rows[dt.Rows.Count - 1][i] = cell.Value.ToString();
+                                i++;
+                            }
+
+                            firstRow = false;
+                        }
+
+                        return dt;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
         public IXLWorksheet ExcelAddValue(IXLWorksheet worksheet, int row, int currentColumnTitle, int currentColumnValue, string title, object value, IXLStyle rangeStyle)
         {
             worksheet.Cell(row, currentColumnTitle).Value = title;

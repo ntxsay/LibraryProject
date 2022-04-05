@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -30,6 +31,20 @@ namespace LibraryProjectUWP.Views.Book
         public class BookCollectionPageVM : INotifyPropertyChanged
         {
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+            private DataTable _DataTable;
+            public DataTable DataTable
+            {
+                get => this._DataTable;
+                set
+                {
+                    if (this._DataTable != value)
+                    {
+                        this._DataTable = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
 
             private DataViewModeEnum _DataViewMode = DataViewModeEnum.GridView;
             public DataViewModeEnum DataViewMode

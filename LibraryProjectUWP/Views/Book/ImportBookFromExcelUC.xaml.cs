@@ -83,6 +83,25 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private async void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is ComboBox comboBox && comboBox.SelectedItem is string workSheetName)
+                {
+                    var rr = await excelServices.ImportExcelToDatatable(workSheetName);
+                    _parameters.ParentPage.ViewModelPage.DataTable = rr;
+                    _parameters.ParentPage.OpenImportBookFromExcel();
+                    SearchingResult();
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         private async void SearchDataInFileXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
@@ -117,27 +136,25 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void SearchingResult()
+        public void SearchingResult(object[] row = null)
         {
             try
             {
                 ViewModelPage.ItemstVisibility = Visibility.Collapsed;
-                if (ViewModelPage.DataTable == null)
+                if (row == null || row.Length == 0)
                 {
                     return;
                 }
 
+                TbcAfterSearching.Inlines.Clear();
+
                 Run lineCount = new Run()
                 {
-                    Text = $"{ViewModelPage.DataTable.Rows.Count} {(ViewModelPage.DataTable.Rows.Count > 1 ? "lignes ont été trouvées" : "ligne a été trouvée")}. ",
+                    Text = $"{_parameters.ParentPage.ImportBookExcelSubPage.SelectedItems.Count} {(_parameters.ParentPage.ImportBookExcelSubPage.SelectedItems.Count > 1 ? "lignes ont été sélectionnées" : "ligne a été sélectionnée")}. ",
                     FontWeight = FontWeights.Medium,
                 };
                 TbcAfterSearching.Inlines.Add(lineCount);
                 
-                if (ViewModelPage.DataTable.Rows.Count == 0)
-                {
-                    return;
-                }
 
                 ViewModelPage.ItemstVisibility = Visibility.Visible;
                 Run runTitle = new Run()
@@ -155,13 +172,13 @@ namespace LibraryProjectUWP.Views.Book
                 ViewModelPage.Formats.Clear();
                 ViewModelPage.NumberOfPages.Clear();
                 ViewModelPage.Collections.Clear();
-                for (int i = 0; i < ViewModelPage.DataTable.Columns.Count; i++)
+                for (int i = 0; i < row.Length; i++)
                 {
                     var item = new BookImportDataTableVM()
                     {
-                        ColumnIndex = i,
-                        ColumnName = ViewModelPage.DataTable.Columns[i].ColumnName,
-                        RowName = ViewModelPage.DataTable.Rows[0].ItemArray[i]?.ToString(),
+                        //ColumnIndex = i,
+                        //ColumnName = ViewModelPage.DataTable.Columns[i].ColumnName,
+                        RowName = row[i]?.ToString(),
                     };
 
                     ViewModelPage.Titles.Add(item);
@@ -334,8 +351,6 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
-
-        
     }
 
     public class ImportBookFromExcelUCVM : INotifyPropertyChanged
@@ -417,6 +432,7 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         private DataTable _DataTable;
+        [Obsolete]
         public DataTable DataTable
         {
             get => this._DataTable;

@@ -55,6 +55,7 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         private BookCollectionSubPage BookCollectionSubPage => FrameContainer.Content as BookCollectionSubPage;
+        public ImportBookExcelSubPage ImportBookExcelSubPage => FrameContainer.Content as ImportBookExcelSubPage;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -2250,6 +2251,30 @@ namespace LibraryProjectUWP.Views.Book
             {
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        public ImportBookFromExcelUC GetImportBookFromExcelUC()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is ImportBookFromExcelUC);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as ImportBookFromExcelUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
             }
         }
 

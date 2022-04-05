@@ -45,8 +45,6 @@
         </Style>
         <DataTemplate x:DataType="bookVm:BookImportDataTableVM" x:Key="itemImportTemplate">
             <TextBlock>
-                <Run Text="{x:Bind ColumnName, Mode=OneWay}" FontWeight="Medium"/>
-                <Run Text=":" FontWeight="Medium"/>
                 <Run Text="{x:Bind RowName, Mode=OneWay}" />
             </TextBlock>
         </DataTemplate>
@@ -93,7 +91,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ComboBox Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.WorkSheetsName, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedWorkSheetName, Mode=TwoWay}" PlaceholderText="Sélectionnez une feuille" HorizontalAlignment="Stretch">
+                <ComboBox Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.WorkSheetsName, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedWorkSheetName, Mode=TwoWay}" PlaceholderText="Sélectionnez une feuille" HorizontalAlignment="Stretch" SelectionChanged="ComboBox_SelectionChanged">
                     <ComboBox.Header>
                         <TextBlock Text="Nom de la feuille" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </ComboBox.Header>

@@ -1,0 +1,45 @@
+﻿<Page
+    x:Class="LibraryProjectUWP.Views.Book.SubViews.ImportBookExcelSubPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views.Book.SubViews"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:generalVm="using:LibraryProjectUWP.ViewModels.General"
+    xmlns:userControls="using:LibraryProjectUWP.Views.UserControls"
+    xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
+    xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
+    xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
+    xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    Loaded="Page_Loaded">
+
+    <Grid>
+        <MTUUControls:DataGrid x:Name="DataGridItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                                           HorizontalScrollBarVisibility="Visible" Loaded="DataGridItems_Loaded"
+                                        VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
+                                        AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
+                                        AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
+                                        MaxColumnWidth="500" FrozenColumnCount="1" GridLinesVisibility="None" HeadersVisibility="Column"
+                                        IsReadOnly="True" BorderThickness="0"
+                                        RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
+                                        RowGroupHeaderPropertyNameAlternative="Range" SelectionChanged="DataGridItems_SelectionChanged">
+            
+            <MTUUControls:DataGrid.RowStyle>
+                <Style TargetType="MTUUControls:DataGridRow">
+                    <Setter Property="MTUUControls:DataGridRow.ContextFlyout">
+                        <Setter.Value>
+                            <MenuFlyout>
+                                
+                            </MenuFlyout>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </MTUUControls:DataGrid.RowStyle>
+        </MTUUControls:DataGrid>
+
+    </Grid>
+</Page>

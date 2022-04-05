@@ -11,6 +11,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -35,12 +36,26 @@ namespace LibraryProjectUWP.Views.Book
         CancellationTokenSource cancellationTokenSourceSearchBookExemplaries = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceCompleteInfoBook = new CancellationTokenSource();
 
-        private void OpenBookCollection()
+        public void OpenBookCollection()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 this.NavigateToView(typeof(BookCollectionSubPage), this);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void OpenImportBookFromExcel()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.NavigateToView(typeof(ImportBookExcelSubPage), this);
             }
             catch (Exception ex)
             {
