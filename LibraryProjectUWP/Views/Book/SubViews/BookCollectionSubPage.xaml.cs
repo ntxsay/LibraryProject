@@ -456,12 +456,12 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     }
 
                     viewModel.JaquettePath = result.Result?.ToString() ?? EsGeneral.BookDefaultJaquette;
-                    //var image = GetSelectedThumbnailImage(viewModel);
-                    //if (image != null)
-                    //{
-                    //    var bitmapImage = await Files.BitmapImageFromFileAsync(viewModel.JaquettePath);
-                    //    image.Source = bitmapImage;
-                    //}
+                    var image = GetSelectedThumbnailImage(viewModel);
+                    if (image != null)
+                    {
+                        var bitmapImage = await Files.BitmapImageFromFileAsync(viewModel.JaquettePath);
+                        image.Source = bitmapImage;
+                    }
                 }
             }
             catch (Exception ex)
@@ -977,10 +977,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                                     if (scrollViewer != null)
                                     {
                                         var result = scrollViewer.ScrollToElement(selectedGridViewitem, true, false);
-                                        if (result == true)
-                                        {
-                                            OpenFlyoutSearchedItemGridView(_gridViewItemContainer);
-                                        }
+                                        OpenFlyoutSearchedItemGridView(_gridViewItemContainer);
                                     }
                                     return true;
                                 }
@@ -1129,5 +1126,106 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
         #endregion
+
+        private Image GetSelectedThumbnailImage(LivreVM viewModel)
+        {
+            try
+            {
+                if (viewModel == null)
+                {
+                    return null;
+                }
+
+                if (this.PivotItems.SelectedItem != null)
+                {
+                    if (this.PivotItems.SelectedItem is IGrouping<string, LivreVM> group && group.Any(f => f == viewModel))
+                    {
+
+                        var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
+                        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
+                        while (gridView != null && gridView.Name != "GridViewItems")
+                        {
+                            gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
+                            if (gridView == null)
+                            {
+                                return null;
+                            }
+                            else
+                            {
+                                if (gridView.Name == "GridViewItems")
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (gridView != null)
+                        {
+                            foreach (var gridViewItem in gridView.Items)
+                            {
+                                if (gridViewItem is LivreVM _viewModel && _viewModel == viewModel)
+                                {
+                                    if (gridView.SelectedItem != gridViewItem)
+                                    {
+                                        gridView.SelectedItem = gridViewItem;
+                                    }
+
+                                    var _gridViewItemContainer = gridView.ContainerFromItem(gridViewItem);
+                                    return SelectImageFromContainer(_gridViewItemContainer);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        private Image SelectImageFromContainer(DependencyObject _gridViewItemContainer)
+        {
+            try
+            {
+                if (_gridViewItemContainer == null)
+                {
+                    return null;
+                }
+
+                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
+                if (grid != null)
+                {
+                    Viewbox viewboxThumbnailContainer = grid.Children.FirstOrDefault(f => f is Viewbox _viewboxThumbnailContainer && _viewboxThumbnailContainer.Name == "ViewboxSimpleThumnailDatatemplate") as Viewbox;
+                    if (viewboxThumbnailContainer != null)
+                    {
+                        Border border = viewboxThumbnailContainer.Child as Border;
+                        if (border != null)
+                        {
+                            Grid gridImageContainer = border.Child as Grid;
+                            if (gridImageContainer != null)
+                            {
+                                Image image = gridImageContainer.Children.FirstOrDefault(f => f is Image _image) as Image;
+                                return image;
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+
     }
 }

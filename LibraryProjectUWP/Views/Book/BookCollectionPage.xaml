@@ -220,7 +220,7 @@
                             </ScrollViewer>
                         </Grid>
                     </Grid>-->
-                    <Frame x:Name="FrameContainer">
+                    <Frame x:Name="FrameContainer" Background="Transparent">
                         
                     </Frame>
                     <SplitView.Pane>
