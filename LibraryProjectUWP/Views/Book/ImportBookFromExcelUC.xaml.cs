@@ -59,7 +59,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             this.InitializeComponent();
             _parameters = parameters;
-            excelServices = new ExcelServices(parameters.ExcelFile);
+            excelServices = new ExcelServices(parameters.File);
         }
 
         private async void PivotItem_Loaded(object sender, RoutedEventArgs e)

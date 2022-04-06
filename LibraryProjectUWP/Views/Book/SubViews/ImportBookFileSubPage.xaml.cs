@@ -1,8 +1,11 @@
-﻿using LibraryProjectUWP.ViewModels.Book;
+﻿using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels.Book;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -29,7 +32,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         }
 
         public BookSubPageParametersDriverVM ParametersDriverVM { get; private set; }
-        
+        public IList<LivreVM> SelectedItems { get; set; } = new List<LivreVM>();
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -52,7 +56,24 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
         private void DataGridItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            try
+            {
+                if (sender is DataGrid dataGrid)
+                {
+                    this.SelectedItems = dataGrid.SelectedItems.Cast<LivreVM>().ToList();
+                    var sideBar = ParametersDriverVM.ParentPage.GetImportBookFromFileUC();
+                    if (sideBar != null)
+                    {
+                        sideBar.InitializeText();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
     }
 }

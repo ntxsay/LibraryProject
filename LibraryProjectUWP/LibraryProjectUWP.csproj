@@ -268,6 +268,9 @@
     <Compile Include="Views\Book\DeleteBookCD.xaml.cs">
       <DependentUpon>DeleteBookCD.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\ImportBookFromFileUC.xaml.cs">
+      <DependentUpon>ImportBookFromFileUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\ImportBookFromExcelUC.xaml.cs">
       <DependentUpon>ImportBookFromExcelUC.xaml</DependentUpon>
     </Compile>
@@ -454,6 +457,10 @@
     <Page Include="Views\Book\DeleteBookCD.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\ImportBookFromFileUC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Book\ImportBookFromExcelUC.xaml">
       <Generator>MSBuild:Compile</Generator>

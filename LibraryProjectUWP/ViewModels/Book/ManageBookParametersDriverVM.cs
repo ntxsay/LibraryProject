@@ -25,7 +25,7 @@ namespace LibraryProjectUWP.ViewModels.Book
     {
         public IEnumerable<LivreVM> ViewModelList { get; set; }
         public BookCollectionPage ParentPage { get; set; }
-        public StorageFile ExcelFile { get; set; }
+        public StorageFile File { get; set; }
     }
 
     public class BookImportDataTableVM

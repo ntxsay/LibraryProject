@@ -57,6 +57,7 @@ namespace LibraryProjectUWP.Views.Book
 
         private BookCollectionSubPage BookCollectionSubPage => FrameContainer.Content as BookCollectionSubPage;
         public ImportBookExcelSubPage ImportBookExcelSubPage => FrameContainer.Content as ImportBookExcelSubPage;
+        public ImportBookFileSubPage ImportBookFileSubPage => FrameContainer.Content as ImportBookFileSubPage;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -749,7 +750,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                this.ImportBook(storageFile);
+                this.ImportBookFromExcelFile(storageFile);
             }
             catch (Exception ex)
             {
@@ -779,6 +780,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
                     else
                     {
+                        ImportBookFromFile(viewModels, storageFile);
                         OpenImportBookFromFile(viewModels);
                     }
                 }
@@ -790,7 +792,166 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void ImportBook(StorageFile excelFile)
+        public void ImportBookFromFile(IEnumerable<LivreVM> viewModelList, StorageFile file)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is ImportBookFromExcelUC);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    ImportBookFromFileUC userControl = new ImportBookFromFileUC(new ImportBookParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        ViewModelList = viewModelList,
+                        File = file,
+                    });
+
+                    userControl.CancelModificationRequested += ImportBookFromFileUC_CancelModificationRequested;
+                    userControl.ImportDataRequested += ImportBookFromFileUC_ImportDataRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void ImportBookFromFileUC_ImportDataRequested(ImportBookFromFileUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                List<LivreVM> newViewModelList = sender.ViewModelPage.NewViewModel;
+                foreach (var newViewModel in newViewModelList)
+                {
+                    if (newViewModel.Auteurs != null && newViewModel.Auteurs.Any())
+                    {
+                        List<ContactVM> contactVMs = new List<ContactVM>();
+                        foreach (var author in newViewModel.Auteurs)
+                        {
+                            var auteurResult = await DbServices.Contact.CreateAsync(author);
+                            if (auteurResult.IsSuccess)
+                            {
+                                author.Id = auteurResult.Id;
+                                contactVMs.Add(author);
+                            }
+                            else
+                            {
+                                //Erreur
+                                sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                                sender.ViewModelPage.ResultMessage += "\n" + auteurResult.Message;
+                                sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                                sender.ViewModelPage.IsResultMessageOpen = true;
+                                continue;
+                            }
+                        }
+
+                        newViewModel.Auteurs = contactVMs.Count > 0 ? new ObservableCollection<ContactVM>(contactVMs) : new ObservableCollection<ContactVM>();
+                    }
+
+                    if (newViewModel.Publication != null)
+                    {
+                        if (newViewModel.Publication.Collections != null && newViewModel.Publication.Collections.Any())
+                        {
+                            List<CollectionVM> collectionVMs = new List<CollectionVM>();
+                            foreach (var collection in newViewModel.Publication.Collections)
+                            {
+                                var collectionResult = await DbServices.Collection.CreateAsync(collection, _parameters.ParentLibrary.Id);
+                                if (collectionResult.IsSuccess)
+                                {
+                                    //collection.IdLibrary = _parameters.ParentLibrary.Id;
+                                    collection.Id = collectionResult.Id;
+                                    collectionVMs.Add(collection);
+                                }
+                                else
+                                {
+                                    //Erreur
+                                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                                    sender.ViewModelPage.ResultMessage += "\n" + collectionResult.Message;
+                                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                                    sender.ViewModelPage.IsResultMessageOpen = true;
+                                    continue;
+                                }
+                            }
+                            newViewModel.Publication.Collections = collectionVMs.Count > 0 ? new ObservableCollection<CollectionVM>(collectionVMs) : new ObservableCollection<CollectionVM>();
+                        }
+                    }
+
+                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, _parameters.ParentLibrary.Id);
+                    if (creationResult.IsSuccess)
+                    {
+                        newViewModel.Id = creationResult.Id;
+                        this.CompleteBookInfos(newViewModel);
+                        _parameters.ParentLibrary.Books.Add(newViewModel);
+
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = creationResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+
+                sender.CancelModificationRequested -= ImportBookFromFileUC_CancelModificationRequested;
+                sender.ImportDataRequested -= ImportBookFromFileUC_ImportDataRequested;
+
+                this.RemoveItemToSideBar(sender);
+                this.OpenBookCollection();
+
+                //var bookCollectionSpage = this.BookCollectionSubPage;
+                //if (bookCollectionSpage != null)
+                //{
+                //    bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                //}
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ImportBookFromFileUC_CancelModificationRequested(ImportBookFromFileUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= ImportBookFromFileUC_CancelModificationRequested;
+                sender.ImportDataRequested -= ImportBookFromFileUC_ImportDataRequested;
+
+                this.RemoveItemToSideBar(sender);
+                this.OpenBookCollection();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void ImportBookFromExcelFile(StorageFile excelFile)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -805,7 +966,7 @@ namespace LibraryProjectUWP.Views.Book
                     ImportBookFromExcelUC userControl = new ImportBookFromExcelUC(new ImportBookParametersDriverVM()
                     {
                         ParentPage = this,
-                        ExcelFile = excelFile,
+                        File = excelFile,
                         ViewModelList = _parameters.ParentLibrary.Books,
                     });
 
@@ -940,6 +1101,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.ImportDataRequested -= ImportBookFromExcelUC_ImportDataRequested;
 
                 this.RemoveItemToSideBar(sender);
+                this.OpenBookCollection();
             }
             catch (Exception ex)
             {
@@ -2426,6 +2588,30 @@ namespace LibraryProjectUWP.Views.Book
                     if (itemPivot != null)
                     {
                         return itemPivot as ImportBookFromExcelUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        public ImportBookFromFileUC GetImportBookFromFileUC()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is ImportBookFromFileUC);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as ImportBookFromFileUC;
                     }
                 }
 

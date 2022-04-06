@@ -1,5 +1,5 @@
 ﻿<PivotItem
-    x:Class="LibraryProjectUWP.Views.Book.ImportBookFromExcelUC"
+    x:Class="LibraryProjectUWP.Views.Book.ImportBookFromFileUC"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:LibraryProjectUWP.Views.Book"
@@ -31,10 +31,6 @@
                        ExecuteRequested="CreateItemXUiCommand_ExecuteRequested"
                        Description="Crée un nouvel item">
         </XamlUICommand>
-        <XamlUICommand x:Name="SearchDataInFileXUiCommand" 
-                       ExecuteRequested="SearchDataInFileXUiCommand_ExecuteRequested">
-        </XamlUICommand>
-
         <XamlUICommand x:Name="DeleteItemXUiCommand" 
                        ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
                        Description="Supprime l'item">
@@ -70,7 +66,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap">
-            <Run Text="Vous êtes en train d'importer des livres à partir du fichier Excel «" />
+            <Run Text="Vous êtes en train d'importer des livres à partir du fichier «" />
             <Run Text="{x:Bind _parameters.File.Name}" FontWeight="SemiBold"/>
             <Run Text="»." />
         </TextBlock>
@@ -87,68 +83,10 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ComboBox Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.WorkSheetsName, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedWorkSheetName, Mode=TwoWay}" PlaceholderText="Sélectionnez une feuille" HorizontalAlignment="Stretch" SelectionChanged="ComboBox_SelectionChanged">
-                    <ComboBox.Header>
-                        <TextBlock Text="Nom de la feuille" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </ComboBox.Header>
-                </ComboBox>
-                <TextBlock x:Name="TbcAfterSearching" Grid.Row="1" Margin="0 5 0 15" TextWrapping="Wrap" TextAlignment="Left" HorizontalTextAlignment="Left" HorizontalAlignment="Stretch">
+                <TextBlock x:Name="TbcAfterSearching" Grid.Row="0" Margin="0 5 0 15" TextWrapping="Wrap" TextAlignment="Left" HorizontalTextAlignment="Left" HorizontalAlignment="Stretch">
             
                 </TextBlock>
-                <StackPanel Grid.Row="4" Orientation="Vertical" Spacing="16" Visibility="{x:Bind ViewModelPage.ItemstVisibility, Mode=OneWay}">
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Titles, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedTitle, Mode=TwoWay}"
-                          PlaceholderText="Sélectionnez une donnée représentant le titre" HorizontalAlignment="Stretch" ItemTemplate="{StaticResource itemImportTemplate}">
-                        <ComboBox.Header>
-                            <TextBlock Text="Titre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Auteurs, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedAuteur, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
-                          PlaceholderText="Sélectionnez une donnée représentant l'auteur" HorizontalAlignment="Stretch">
-                        <ComboBox.Header>
-                            <TextBlock Text="Auteur(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.MaisonsEdition, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedMaisonEdition, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
-                          PlaceholderText="Sélectionnez une donnée représentant la maison d'édition" HorizontalAlignment="Stretch">
-                        <ComboBox.Header>
-                            <TextBlock Text="Maison d'édition" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Langues, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedLangue, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
-                          PlaceholderText="Sélectionnez une donnée représentant la langue" HorizontalAlignment="Stretch">
-                        <ComboBox.Header>
-                            <TextBlock Text="Langue" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.DateParution, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedDateParution, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
-                          PlaceholderText="Sélectionnez une donnée représentant la date de parution" HorizontalAlignment="Stretch">
-                        <ComboBox.Header>
-                            <TextBlock Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Formats, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedFormat, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
-                          PlaceholderText="Sélectionnez une donnée représentant le format" HorizontalAlignment="Stretch">
-                        <ComboBox.Header>
-                            <TextBlock Text="Format" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.NumberOfPages, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedNumberOfPages, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
-                          PlaceholderText="Sélectionnez une donnée représentant le nombre de page" HorizontalAlignment="Stretch">
-                        <ComboBox.Header>
-                            <TextBlock Text="Nombre de pages" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
-                    <ComboBox ItemsSource="{x:Bind ViewModelPage.Collections, Mode=OneWay}" SelectedItem="{x:Bind ViewModelPage.SelectedCollection, Mode=TwoWay}" ItemTemplate="{StaticResource itemImportTemplate}"
-                          PlaceholderText="Sélectionnez une donnée représentant la collection" HorizontalAlignment="Stretch">
-                        <ComboBox.Header>
-                            <TextBlock Text="Collection(s)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
-                </StackPanel>
             </Grid>
         </ScrollViewer>
         <Grid Grid.Row="2" Margin="0 10 0 10">
