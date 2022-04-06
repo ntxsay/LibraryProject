@@ -292,6 +292,33 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
+        public async Task<LivreVM> OpenBookFromFileAsync(StorageFile storageFile)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (storageFile == null)
+                {
+                    Logs.Log(m, "Le fichier n'a pas pû être ouvert.");
+                    return null;
+                }
+
+                var result = await Files.Serialization.Json.DeserializeAsync<LivreVM>(storageFile);
+                if (result == null)
+                {
+                    Logs.Log(m, "Le flux n'a pas été ouvert correctement.");
+                    return null;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
         /// <summary>
         /// Crée le dossier d'un livre dans le dossier "Books" et/ou renvoie l'objet <see cref="StorageFolder"/> 
         /// </summary>

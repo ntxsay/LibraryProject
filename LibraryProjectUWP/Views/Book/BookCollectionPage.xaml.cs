@@ -700,7 +700,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 var dialog = new ImportBookFromUrlCD()
                 {
-                    Title = "Importer un livre depuis Amazom"
+                    Title = "Importer un livre depuis Amazon"
                 };
 
                 var result = await dialog.ShowAsync();
@@ -758,9 +758,29 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void ImportBookFromJsonFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void ImportBookFromJsonFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var storageFile = await Files.OpenStorageFileAsync(Files.BookExtensions);
+                if (storageFile == null)
+                {
+                    Logs.Log(m, $"Vous devez sélectionner un type de fichier valide.");
+                    return;
+                }
 
+                var viewModel = await esBook.OpenBookFromFileAsync(storageFile);
+                if (viewModel != null)
+                {
+                    NewBook(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         public void ImportBook(StorageFile excelFile)
