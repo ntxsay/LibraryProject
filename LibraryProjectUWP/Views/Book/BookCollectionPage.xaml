@@ -470,7 +470,13 @@
                             <MenuFlyoutSubItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
                             </MenuFlyoutSubItem.Icon>
-                            <MenuFlyoutItem Text="Nouveau livre" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewBookXamlUICommand}">
+                            <MenuFlyoutItem Text="Nouvel enregistrement" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewBookXamlUICommand}">
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Lien Amazon" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ImportBookFromWebSiteXamlUICommand}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xF6FA;"/>
+                                </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Ouvrir un fichier" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ImportBookFromFileXamlUICommand}">

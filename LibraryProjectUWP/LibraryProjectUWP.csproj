@@ -271,6 +271,9 @@
     <Compile Include="Views\Book\ImportBookFromExcelUC.xaml.cs">
       <DependentUpon>ImportBookFromExcelUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\ImportBookFromUrlCD.xaml.cs">
+      <DependentUpon>ImportBookFromUrlCD.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\NewEditBookPretUC.xaml.cs">
       <DependentUpon>NewEditBookPretUC.xaml</DependentUpon>
     </Compile>
@@ -452,6 +455,10 @@
     <Page Include="Views\Book\ImportBookFromExcelUC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Book\ImportBookFromUrlCD.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Book\NewEditBookPretUC.xaml">
       <Generator>MSBuild:Compile</Generator>

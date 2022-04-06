@@ -1,0 +1,38 @@
+﻿<ContentDialog
+    x:Class="LibraryProjectUWP.Views.Book.ImportBookFromUrlCD"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views.Book"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="TITLE"
+    Name="_dialog"
+    PrimaryButtonText="Rechercher"
+    CloseButtonText="Annuler">
+    <ContentDialog.TitleTemplate>
+        <DataTemplate>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF6FA;" FontSize="22"/>
+                <TextBlock Text="{Binding  ElementName=_dialog, Path=Title}"/>
+            </StackPanel>
+        </DataTemplate>
+    </ContentDialog.TitleTemplate>
+    <ContentDialog.CornerRadius>
+        <CornerRadius>8</CornerRadius>
+    </ContentDialog.CornerRadius>
+    <Grid RowSpacing="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="tbkName" Grid.Row="0" TextWrapping="Wrap">
+            <Run Text="Entrez l'adresse url du livre que vous souhaitez importer"/>
+        </TextBlock>
+        <TextBox x:Name="Tbx_Url" x:FieldModifier="public" Grid.Row="1" />
+        <TextBlock Grid.Row="2" TextWrapping="Wrap" Foreground="OrangeRed" FontWeight="Medium">
+            <Run Text="Veuillez noter que nous ne sommes pas partenaire d'Amazon ce qui signifie que cet outils peut ne plus fonctionner après la mise à jour de leur site." />
+        </TextBlock>
+    </Grid>
+</ContentDialog>

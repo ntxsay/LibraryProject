@@ -464,35 +464,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
-                if (checkedItem != null)
-                {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
-                }
-                else
-                {
-                    NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
-                    {
-                        ParentPage = this,
-                        EditMode = Code.EditMode.Create,
-                        ViewModelList = _parameters.ParentLibrary.Books,
-                        CurrentViewModel = new LivreVM()
-                        {
-                            IdLibrary = _parameters.ParentLibrary.Id,
-                        }
-                    });
-
-                    userControl.CancelModificationRequested += NewEditBookUC_Create_CancelModificationRequested;
-                    userControl.CreateItemRequested += NewEditBookUC_Create_CreateItemRequested;
-
-                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                    {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
-                    });
-                }
-                this.ViewModelPage.IsSplitViewOpen = true;
+                NewBook();
             }
             catch (Exception ex)
             {
@@ -562,6 +534,53 @@ namespace LibraryProjectUWP.Views.Book
                 sender.CreateItemRequested -= NewEditBookUC_Create_CreateItemRequested;
 
                 this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void NewBook(LivreVM viewModel = null)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                }
+                else
+                {
+                    if (viewModel != null)
+                    {
+                        viewModel.IdLibrary = _parameters.ParentLibrary.Id;
+                    }
+
+                    NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        EditMode = Code.EditMode.Create,
+                        ViewModelList = _parameters.ParentLibrary.Books,
+                        CurrentViewModel = viewModel ?? new LivreVM()
+                        {
+                            IdLibrary = _parameters.ParentLibrary.Id,
+                        }
+                    });
+
+                    userControl.CancelModificationRequested += NewEditBookUC_Create_CancelModificationRequested;
+                    userControl.CreateItemRequested += NewEditBookUC_Create_CreateItemRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.IdItem,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -673,27 +692,41 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
-        #region Import
+        #region Import Book
         private async void ImportBookFromWebSiteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                string url = (args.Parameter as string)?.Trim();
-                if (url == null || url.IsStringNullOrEmptyOrWhiteSpace())
+                var dialog = new ImportBookFromUrlCD()
                 {
-                    Logs.Log(m, $"Une url valide doit être renseignée.");
-                    return;
-                }
+                    Title = "Importer un livre depuis Amazom"
+                };
 
-                if (url.Contains("amazon"))
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
                 {
-                    htmlServices htmlservices = new htmlServices();
-                    var viewModel = await htmlservices.GetBookFromAmazonAsync(new Uri(url), new LivreVM());
+                    string url = dialog.Tbx_Url.Text?.Trim();
+                    if (url == null || url.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        Logs.Log(m, $"Une url valide doit être renseignée.");
+                        return;
+                    }
+
+                    if (url.Contains("amazon"))
+                    {
+                        htmlServices htmlservices = new htmlServices();
+                        var viewModel = await htmlservices.GetBookFromAmazonAsync(new Uri(url), new LivreVM());
+                        NewBook(viewModel);
+                    }
+                    else
+                    {
+                        Logs.Log(m, $"L'url doit provenir d'Amazon.");
+                        return;
+                    }
                 }
-                else
+                else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                 {
-                    Logs.Log(m, $"L'url doit provenir d'Amazon.");
                     return;
                 }
             }
@@ -730,10 +763,6 @@ namespace LibraryProjectUWP.Views.Book
 
         }
 
-        #endregion
-
-
-        #region Import Book
         public void ImportBook(StorageFile excelFile)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1427,23 +1456,7 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         #region Delete Book
-        private async void DeleteBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (args.Parameter is LivreVM viewModel)
-                {
-                    await DeleteBookAsync(new LivreVM[] { viewModel });
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
+        
         private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -1451,7 +1464,7 @@ namespace LibraryProjectUWP.Views.Book
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    bookCollectionSpage.DeleteAll();
+                    bookCollectionSpage.DeleteAllSelected();
                 }
             }
             catch (Exception ex)
