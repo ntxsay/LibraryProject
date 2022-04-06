@@ -770,10 +770,17 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                var viewModel = await esBook.OpenBookFromFileAsync(storageFile);
-                if (viewModel != null)
+                var viewModels = await esBook.OpenBooksFromFileAsync(storageFile);
+                if (viewModels != null && viewModels.Any())
                 {
-                    NewBook(viewModel);
+                    if (viewModels.Count() == 1)
+                    {
+                        NewBook(viewModels.First());
+                    }
+                    else
+                    {
+                        OpenImportBookFromFile(viewModels);
+                    }
                 }
             }
             catch (Exception ex)

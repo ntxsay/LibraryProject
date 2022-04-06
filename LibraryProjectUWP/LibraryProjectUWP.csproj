@@ -294,6 +294,9 @@
     <Compile Include="Views\Book\SubViews\ImportBookExcelSubPage.xaml.cs">
       <DependentUpon>ImportBookExcelSubPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\SubViews\ImportBookFileSubPage.xaml.cs">
+      <DependentUpon>ImportBookFileSubPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Categories\CategoriesListUC.xaml.cs">
       <DependentUpon>CategoriesListUC.xaml</DependentUpon>
     </Compile>
@@ -481,6 +484,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Book\SubViews\ImportBookExcelSubPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\SubViews\ImportBookFileSubPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -10,6 +10,7 @@ using LibraryProjectUWP.Views.Book.SubViews;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
@@ -56,6 +57,24 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 this.NavigateToView(typeof(ImportBookExcelSubPage), this);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void OpenImportBookFromFile(IEnumerable<LivreVM> viewModelList)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.NavigateToView(typeof(ImportBookFileSubPage), new BookSubPageParametersDriverVM()
+                {
+                    ParentPage = this,
+                    ViewModelList = new ObservableCollection<LivreVM>(viewModelList),
+                });
             }
             catch (Exception ex)
             {

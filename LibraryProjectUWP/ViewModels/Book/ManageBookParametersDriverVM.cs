@@ -2,7 +2,11 @@
 using LibraryProjectUWP.Views.Book;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -63,13 +67,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreVM CurrentViewModel { get; set; }
     }
 
-    [Obsolete]
-    public class BookCategorieParametersDriverVM
-    {
-        public BibliothequeVM ParentLibrary { get; set; }
-        public LivreVM CurrentViewModel { get; set; }
-        public BookCollectionPage ParentPage { get; set; }
-    }
+    
 
     public class BookExemplaryListParametersDriverVM
     {
@@ -80,5 +78,31 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreVM ParentBook { get; set; }
         public IEnumerable<LivreExemplaryVM> ViewModelList { get; set; }
         public BookCollectionPage ParentPage { get; set; }
+    }
+
+    public class BookSubPageParametersDriverVM : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public BookCollectionPage ParentPage { get; set; }
+        public DataTable DataTable { get; set; }
+        private ObservableCollection<LivreVM> _ViewModelList = new ObservableCollection<LivreVM>();
+        public ObservableCollection<LivreVM> ViewModelList
+        {
+            get => this._ViewModelList;
+            set
+            {
+                if (_ViewModelList != value)
+                {
+                    this._ViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
