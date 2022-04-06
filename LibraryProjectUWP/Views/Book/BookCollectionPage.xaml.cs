@@ -35,6 +35,7 @@ using System.Diagnostics;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Media.Animation;
 using LibraryProjectUWP.Views.Book.SubViews;
+using LibraryProjectUWP.Code.Services.Web;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -215,24 +216,6 @@ namespace LibraryProjectUWP.Views.Book
                 if (bookCollectionSpage != null)
                 {
                     bookCollectionSpage.DeSelectAll();
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
-                {
-                    bookCollectionSpage.DeleteAll();
                 }
             }
             catch (Exception ex)
@@ -689,6 +672,66 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
         #endregion
+
+        #region Import
+        private async void ImportBookFromWebSiteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                string url = (args.Parameter as string)?.Trim();
+                if (url == null || url.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    Logs.Log(m, $"Une url valide doit être renseignée.");
+                    return;
+                }
+
+                if (url.Contains("amazon"))
+                {
+                    htmlServices htmlservices = new htmlServices();
+                    var viewModel = await htmlservices.GetBookFromAmazonAsync(new Uri(url), new LivreVM());
+                }
+                else
+                {
+                    Logs.Log(m, $"L'url doit provenir d'Amazon.");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void ImportBookFromExcelFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var storageFile = await Files.OpenStorageFileAsync(Files.ExcelExtensions);
+                if (storageFile == null)
+                {
+                    Logs.Log(m, $"Vous devez sélectionner un fichier de type Microsoft Excel.");
+                    return;
+                }
+
+                this.ImportBook(storageFile);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ImportBookFromJsonFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
+        #endregion
+
 
         #region Import Book
         public void ImportBook(StorageFile excelFile)
@@ -1383,6 +1426,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        #region Delete Book
         private async void DeleteBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1390,12 +1434,86 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    var dialog = new DeleteBookCD(new LivreVM[] { viewModel });
+                    await DeleteBookAsync(new LivreVM[] { viewModel });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var bookCollectionSpage = this.BookCollectionSubPage;
+                if (bookCollectionSpage != null)
+                {
+                    bookCollectionSpage.DeleteAll();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public async Task DeleteBookAsync(IEnumerable<LivreVM> viewModelList)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModelList == null || !viewModelList.Any())
+                {
+                    return;
+                }
+
+                var bookCollectionSpage = this.BookCollectionSubPage;
+                if (bookCollectionSpage != null)
+                {
+                    var dialog = new DeleteBookCD(viewModelList);
 
                     var result = await dialog.ShowAsync();
                     if (result == ContentDialogResult.Primary)
                     {
-                        
+                        bool isSaved = await esBook.SaveBookViewModelAsAsync(viewModelList);
+                        if (isSaved)
+                        {
+                            foreach (var item in viewModelList)
+                            {
+                                var operationResult = await DbServices.Book.DeleteAsync(item.Id);
+                                if (operationResult.IsSuccess)
+                                {
+                                    _parameters.ParentLibrary.Books.Remove(item);
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                            bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                        }
+                    }
+                    else if (result == ContentDialogResult.Secondary)
+                    {
+                        foreach (var item in viewModelList)
+                        {
+                            var operationResult = await DbServices.Book.DeleteAsync(item.Id);
+                            if (operationResult.IsSuccess)
+                            {
+                                _parameters.ParentLibrary.Books.Remove(item);
+
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                        bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
                     }
                     else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                     {
@@ -1409,6 +1527,8 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        #endregion
 
         #region Contact
         internal async Task NewFreeContactAsync(string prenom, string nomNaissance, Guid? guid = null)

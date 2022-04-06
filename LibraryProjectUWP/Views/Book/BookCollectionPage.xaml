@@ -54,6 +54,18 @@
                        Description="Ajoute un nouveau livre" 
                        Label="Ajouter un livre">
         </XamlUICommand>
+        <XamlUICommand x:Name="ImportBookFromWebSiteXamlUICommand" 
+                       ExecuteRequested="ImportBookFromWebSiteXamlUICommand_ExecuteRequested"
+                       Description="Importe un livre existant">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ImportBookFromFileXamlUICommand" 
+                       ExecuteRequested="ImportBookFromJsonFileXamlUICommand_ExecuteRequested"
+                       Description="Importe un livre existant">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ImportBookFromExcelFileXamlUICommand" 
+                       ExecuteRequested="ImportBookFromExcelFileXamlUICommand_ExecuteRequested"
+                       Description="Importe un livre existant">
+        </XamlUICommand>
         <XamlUICommand x:Name="NewContactXamlUICommand" 
                        ExecuteRequested="NewContactXamlUICommand_ExecuteRequested"
                        Description="Ajoute un nouvel adhérant" 
@@ -346,40 +358,6 @@
                                 </Button>
                                 <Button x:Name="Btn_DeleteAll" Grid.Column="3" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_DeleteAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74D;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Supprimer les fiches fiches sélectionnées" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
-                                    <Button.Flyout>
-                                        <Flyout>
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="*" />
-                                                    <RowDefinition Height="*" />
-                                                    <RowDefinition Height="*" />
-                                                </Grid.RowDefinitions>
-                                                <TextBlock Grid.Row="0" MaxWidth="400" FontSize="13" FontWeight="Medium" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" TextWrapping="Wrap" Padding="4">
-                                                        <Run Text="Que souhaitez-vous effacer ?" />
-                                                    <LineBreak />
-                                                        <Run Text="Veuillez noter que ces actions sont irréversibles." />
-                                                </TextBlock>
-                                                <ListView Grid.Row="1" SelectionMode="Single">
-                                                    <ListViewItem>
-                                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe8f1;"/>
-                                                            <TextBlock Text="Décatégoriser ces livres"/>
-                                                        </StackPanel>
-                                                    </ListViewItem>
-                                                    <ListViewItem>
-                                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
-                                                            <TextBlock Text="Supprimer ces livres"/>
-                                                        </StackPanel>
-                                                    </ListViewItem>
-                                                </ListView>
-                                                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
-                                                    <Button Content="Annuler" HorizontalAlignment="Right" Margin="0,4" />
-                                                    <Button Content="Supprimer tout" HorizontalAlignment="Right" Margin="0,4"/>
-                                                </StackPanel>
-                                            </Grid>
-                                        </Flyout>
-                                    </Button.Flyout>
                                 </Button>
                             </Grid>
                             <Rectangle Height="1" Grid.Row="1" Fill="{ThemeResource SystemColorControlAccentBrush}"/>
@@ -488,11 +466,24 @@
             <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter un élément">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="Ajouter un livre" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewBookXamlUICommand}">
-                            <MenuFlyoutItem.Icon>
+                        <MenuFlyoutSubItem Text="Ajouter un livre" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                            <MenuFlyoutSubItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
+                            </MenuFlyoutSubItem.Icon>
+                            <MenuFlyoutItem Text="Nouveau livre" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewBookXamlUICommand}">
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Ouvrir un fichier" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ImportBookFromFileXamlUICommand}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8B5;" FontSize="14"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem Text="Ouvrir un classeur Excel" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ImportBookFromExcelFileXamlUICommand}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8B5;" FontSize="14"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                        </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Text="Ajouter un auteur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewAuthorXamlUICommand}">
                             <MenuFlyoutItem.Icon>

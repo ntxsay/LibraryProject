@@ -435,9 +435,21 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public void DeleteAll()
+        public async void DeleteAll()
         {
-
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
+                {
+                    await ParentPage.DeleteBookAsync(ParentPage.ViewModelPage.SelectedItems);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
         #endregion
 
@@ -585,17 +597,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    var dialog = new DeleteBookCD(new LivreVM[] { viewModel });
-
-                    var result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.Primary)
-                    {
-
-                    }
-                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                    {
-                        return;
-                    }
+                    await ParentPage.DeleteBookAsync(new LivreVM[] { viewModel });
                 }
             }
             catch (Exception ex)
@@ -604,6 +606,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 return;
             }
         }
+
 
         private void BookExemplaryListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {

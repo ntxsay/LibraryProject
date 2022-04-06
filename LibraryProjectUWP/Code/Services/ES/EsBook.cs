@@ -214,7 +214,7 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
-        public async Task SaveBookViewModelAsync(LivreVM viewModel)
+        public async Task SaveBookViewModelAsync(LivreVM viewModel, StorageFolder folderLocation = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -225,7 +225,7 @@ namespace LibraryProjectUWP.Code.Services.ES
                     return;
                 }
 
-                var folderItem = await this.GetBookItemFolderAsync(viewModel.Guid);
+                var folderItem = folderLocation ?? await this.GetBookItemFolderAsync(viewModel.Guid);
                 if (folderItem == null)
                 {
                     return;
@@ -249,6 +249,46 @@ namespace LibraryProjectUWP.Code.Services.ES
             {
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        public async Task<bool> SaveBookViewModelAsAsync(IEnumerable<LivreVM> viewModelList)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModelList == null || !viewModelList.Any())
+                {
+                    Logs.Log(m, "Le modèle de vue est null ou ne contient aucun élément.");
+                    return false;
+                }
+
+                var suggestedFileName = $"model_{viewModelList.Count()}_livre_s_{DateTime.Now:yyyyMMddHHmmss}";
+
+                var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
+                    {
+                        {"JavaScript Object Notation", new List<string>() { ".json" } }
+                    }, suggestedFileName);
+
+                if (savedFile == null)
+                {
+                    Logs.Log(m, "Le fichier n'a pas pû être créé.");
+                    return false;
+                }
+
+                bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModelList, savedFile);
+                if (isFileSaved == false)
+                {
+                    Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
+                    return false;
+                }
+
+                return isFileSaved;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return false;
             }
         }
 
