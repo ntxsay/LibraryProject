@@ -427,16 +427,7 @@ namespace LibraryProjectUWP.Views.Book
         #region New Book
         private void NewBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                NewBook();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            NewBook(null);
         }
 
         private async void NewEditBookUC_Create_CreateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
@@ -529,7 +520,6 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         EditMode = Code.EditMode.Create,
-                        ViewModelList = _parameters.ParentLibrary.Books,
                         CurrentViewModel = viewModel ?? new LivreVM()
                         {
                             IdLibrary = _parameters.ParentLibrary.Id,
@@ -573,8 +563,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         EditMode = Code.EditMode.Edit,
-                        ViewModelList = _parameters.ParentLibrary.Books,
-                        CurrentViewModel = viewModel,
+                        CurrentViewModel = DbServices.Book.DeepCopy(viewModel),
                     });
 
                     userControl.CancelModificationRequested += NewEditBookUC_Edit_CancelModificationRequested;

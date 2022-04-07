@@ -66,12 +66,13 @@ namespace LibraryProjectUWP.Views.Book
             _parameters = parameters;
             ViewModelPage.EditMode = parameters.EditMode;
             ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} un livre";
-            ViewModelPage.ViewModel = DbServices.Book.DeepCopy(parameters?.CurrentViewModel);
+            ViewModelPage.ViewModel = parameters?.CurrentViewModel;
             InitializeActionInfos();
         }
 
         private async void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
+#warning Ces méthodes ralentissent l'affichage de cette sideBar
             await UpdateAuthorListAsync();
             await UpdateCollectionListAsync();
             await UpdateEditeurListAsync();
