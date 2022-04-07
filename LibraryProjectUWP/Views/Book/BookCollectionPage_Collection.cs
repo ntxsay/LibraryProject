@@ -49,7 +49,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditCollectionUC_Create_CancelModificationRequested;
@@ -59,7 +59,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -89,7 +89,7 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
                             _parameters.ParentLibrary.Collections.Add(newViewModel);
                             NewEditCollectionUC_Create_CancelModificationRequested(sender, e);
@@ -139,7 +139,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditCollectionUC_Create_CancelModificationRequested;
@@ -149,7 +149,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -179,7 +179,7 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
 
                         }
@@ -249,7 +249,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;

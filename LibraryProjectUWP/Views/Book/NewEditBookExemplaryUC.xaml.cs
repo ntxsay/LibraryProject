@@ -36,8 +36,6 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class NewEditBookExemplaryUC : PivotItem
     {
         public readonly ManageBookExemplaryParametersDriverVM _parameters;
-        public readonly Guid IdItem = Guid.NewGuid();
-
         public NewEditBookExemplaryUCVM ViewModelPage { get; set; } = new NewEditBookExemplaryUCVM();
 
         public delegate void CancelModificationEventHandler(NewEditBookExemplaryUC sender, ExecuteRequestedEventArgs e);
@@ -260,16 +258,16 @@ namespace LibraryProjectUWP.Views.Book
                                 var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                 if (split.Length == 1)
                                 {
-                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], string.Empty, ViewModelPage.Guid);
+                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], string.Empty, ViewModelPage.ItemGuid);
                                 }
                                 else if (split.Length >= 2)
                                 {
-                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], split[1], ViewModelPage.Guid);
+                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], split[1], ViewModelPage.ItemGuid);
                                 }
                             }
                             else
                             {
-                                await _parameters.ParentPage.NewFreeContactAsync(string.Empty, string.Empty, ViewModelPage.Guid);
+                                await _parameters.ParentPage.NewFreeContactAsync(string.Empty, string.Empty, ViewModelPage.ItemGuid);
                             }
                             sender.Text = String.Empty;
                         }
@@ -569,7 +567,8 @@ namespace LibraryProjectUWP.Views.Book
         public IEnumerable<string> chooseDays = DatesHelpers.ChooseDays();
         public IEnumerable<string> chooseMonths = DatesHelpers.ChooseMonth();
         public List<string> chooseYear = new List<string>();
-        public Guid? Guid { get; set; }
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        public Guid? ParentGuid { get; set; }
 
         private string _Header;
         public string Header

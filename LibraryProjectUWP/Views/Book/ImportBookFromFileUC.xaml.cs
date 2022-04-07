@@ -39,7 +39,6 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class ImportBookFromFileUC : PivotItem
     {
         public readonly ImportBookParametersDriverVM _parameters;
-        public readonly Guid IdItem = Guid.NewGuid();
 
         public ImportBookFromFileUCVM ViewModelPage { get; set; } = new ImportBookFromFileUCVM();
 
@@ -182,7 +181,8 @@ namespace LibraryProjectUWP.Views.Book
         public readonly IEnumerable<string> SourceList = LibraryHelpers.Book.Entry.EntrySourceList;
         public readonly IEnumerable<string> EtatList = LibraryHelpers.Book.EtatModelList;
 
-        public Guid Guid { get; set; } = Guid.NewGuid();
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        //public Guid? ParentGuid { get; set; }
 
         private string _Header = "Importer un fichier";
         public string Header

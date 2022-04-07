@@ -42,8 +42,6 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class NewEditBookUC : PivotItem
     {
         public readonly ManageBookParametersDriverVM _parameters;
-        public readonly Guid IdItem = Guid.NewGuid();
-
         public NewEditBookUCVM ViewModelPage { get; set; } = new NewEditBookUCVM();
 
 
@@ -316,16 +314,16 @@ namespace LibraryProjectUWP.Views.Book
                                 var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                 if (split.Length == 1)
                                 {
-                                    await _parameters.ParentPage.NewAuthorAsync(split[0], string.Empty, ViewModelPage.Guid);
+                                    await _parameters.ParentPage.NewAuthorAsync(split[0], string.Empty, ViewModelPage.ItemGuid);
                                 }
                                 else if (split.Length >= 2)
                                 {
-                                    await _parameters.ParentPage.NewAuthorAsync(split[0], split[1], ViewModelPage.Guid);
+                                    await _parameters.ParentPage.NewAuthorAsync(split[0], split[1], ViewModelPage.ItemGuid);
                                 }
                             }
                             else
                             {
-                                await _parameters.ParentPage.NewAuthorAsync(string.Empty, string.Empty, ViewModelPage.Guid);
+                                await _parameters.ParentPage.NewAuthorAsync(string.Empty, string.Empty, ViewModelPage.ItemGuid);
                             }
                             sender.Text = String.Empty;
                         }
@@ -501,7 +499,7 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            await _parameters.ParentPage.NewCollectionAsync(sender.Text, ViewModelPage.Guid, typeof(NewEditBookUC));
+                            await _parameters.ParentPage.NewCollectionAsync(sender.Text, ViewModelPage.ItemGuid, typeof(NewEditBookUC));
                             sender.Text = String.Empty;
                         }
                     }
@@ -654,7 +652,7 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            await _parameters.ParentPage.NewEditorAsync(sender.Text, ViewModelPage.Guid);
+                            await _parameters.ParentPage.NewEditorAsync(sender.Text, ViewModelPage.ItemGuid);
                             sender.Text = String.Empty;
                         }
                     }
@@ -971,7 +969,8 @@ namespace LibraryProjectUWP.Views.Book
             chooseYear.Add(DatesHelpers.NoAnswer);
             chooseYear.AddRange(DatesHelpers.ChooseYear());
         }
-        public Guid Guid { get; private set; } = Guid.NewGuid();
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        //public Guid? ParentGuid { get; set; }
 
         public IEnumerable<string> chooseDays = DatesHelpers.ChooseDays();
         public IEnumerable<string> chooseMonths = DatesHelpers.ChooseMonth();

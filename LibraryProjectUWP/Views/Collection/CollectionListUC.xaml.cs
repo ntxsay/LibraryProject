@@ -38,7 +38,6 @@ namespace LibraryProjectUWP.Views.Collection
     public sealed partial class CollectionListUC : PivotItem
     {
         public CollectionListParametersDriverVM _parameters;
-        public readonly Guid IdItem = Guid.NewGuid();
 
         public CollectionListUCVM ViewModelPage { get; set; } = new CollectionListUCVM();
 
@@ -133,7 +132,7 @@ namespace LibraryProjectUWP.Views.Collection
 
         private async void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await _parameters.ParentPage.NewCollectionAsync(String.Empty, ViewModelPage.Guid, typeof(CollectionListUC));
+            await _parameters.ParentPage.NewCollectionAsync(String.Empty, ViewModelPage.ItemGuid, typeof(CollectionListUC));
         }
 
         private async void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -142,11 +141,11 @@ namespace LibraryProjectUWP.Views.Collection
             {
                 if (args.Parameter is CollectionVM viewModel)
                 {
-                    await _parameters.ParentPage.EditCollection(viewModel, ViewModelPage.Guid, typeof(CollectionListUC));
+                    await _parameters.ParentPage.EditCollection(viewModel, ViewModelPage.ItemGuid, typeof(CollectionListUC));
                 }
                 else
                 {
-                    await _parameters.ParentPage.EditCollection(ViewModelPage.SelectedViewModel, ViewModelPage.Guid, typeof(CollectionListUC));
+                    await _parameters.ParentPage.EditCollection(ViewModelPage.SelectedViewModel, ViewModelPage.ItemGuid, typeof(CollectionListUC));
                 }
             }
             catch (Exception ex)
@@ -804,9 +803,9 @@ namespace LibraryProjectUWP.Views.Collection
     public class CollectionListUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        //public Guid? ParentGuid { get; set; }
 
-        public Guid Guid { get; private set; } = Guid.NewGuid();
-        
         private string _Header;
         public string Header
         {

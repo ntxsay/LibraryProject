@@ -663,7 +663,7 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -707,7 +707,7 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -963,7 +963,7 @@ namespace LibraryProjectUWP.Views.Library
                         {
                             Glyph = userControl.ViewModelPage.Glyph,
                             Title = userControl.ViewModelPage.Header,
-                            IdItem = userControl.IdItem,
+                            IdItem = userControl.ViewModelPage.ItemGuid,
                         });
                     }
                 }
@@ -997,7 +997,7 @@ namespace LibraryProjectUWP.Views.Library
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
@@ -1008,7 +1008,7 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1043,7 +1043,7 @@ namespace LibraryProjectUWP.Views.Library
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditCategoryUC_CancelModificationRequested;
@@ -1053,7 +1053,7 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
 
@@ -1093,9 +1093,9 @@ namespace LibraryProjectUWP.Views.Library
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
-                            var bookManager = GetCategorieListSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            var bookManager = GetCategorieListSideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
                             if (bookManager != null)
                             {
                                 bookManager.ViewModelPage.ParentLibrary.Categories.Add(newViewModel);
@@ -1146,9 +1146,9 @@ namespace LibraryProjectUWP.Views.Library
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
-                            var bookManager = GetCategorieListSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            var bookManager = GetCategorieListSideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
                             if (bookManager != null)
                             {
                                 var item = bookManager.ViewModelPage.ParentLibrary.Categories.SingleOrDefault(s => s.Id == sender._categorieParameters.CurrentCategorie.Id);
@@ -1218,7 +1218,7 @@ namespace LibraryProjectUWP.Views.Library
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
@@ -1229,7 +1229,7 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1262,7 +1262,7 @@ namespace LibraryProjectUWP.Views.Library
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditSubCategoryUC_CancelModificationRequested;
@@ -1272,7 +1272,7 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1301,7 +1301,7 @@ namespace LibraryProjectUWP.Views.Library
                         Description = description,
                     };
 
-                    var creationResult = await DbServices.SubCategorie.CreateAsync(newViewModel);
+                    var creationResult = await DbServices.Categorie.CreateSubCategorieAsync(newViewModel);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
@@ -1311,9 +1311,9 @@ namespace LibraryProjectUWP.Views.Library
                         sender.ViewModelPage.IsResultMessageOpen = true;
                         sender._subCategorieParameters.Categorie.SubCategorieLivres.Add(newViewModel);
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
-                            var bookManager = GetCategorieListSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            var bookManager = GetCategorieListSideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
                             if (bookManager != null)
                             {
                                 //bookManager.ViewModelPage.ParentLibrary.Categories.sub.Add(newViewModel);
@@ -1355,7 +1355,7 @@ namespace LibraryProjectUWP.Views.Library
                         Description = newDescription,
                     };
 
-                    var updateResult = await DbServices.SubCategorie.UpdateAsync(updatedViewModel);
+                    var updateResult = await DbServices.Categorie.UpdateAsync(updatedViewModel);
                     if (updateResult.IsSuccess)
                     {
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
@@ -1363,7 +1363,7 @@ namespace LibraryProjectUWP.Views.Library
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
                             var item = sender._subCategorieParameters.Categorie.SubCategorieLivres.SingleOrDefault(s => s.Id == sender._subCategorieParameters.CurrentSubCategorie.Id);
                             if (item != null)
@@ -2086,7 +2086,7 @@ namespace LibraryProjectUWP.Views.Library
                         {
                             if (item is NewEditLibraryUC bookExemplaryUC)
                             {
-                                if (bookExemplaryUC.IdItem == headerVM.IdItem)
+                                if (bookExemplaryUC.ViewModelPage.ItemGuid == headerVM.IdItem)
                                 {
                                     ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
                                     break;
@@ -2121,7 +2121,7 @@ namespace LibraryProjectUWP.Views.Library
 
                 if (this.PivotRightSideBar.Items.Count > 0)
                 {
-                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is CategoriesListUC item && item.ViewModelPage.Guid == guid);
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is CategoriesListUC item && item.ViewModelPage.ItemGuid == guid);
                     if (itemPivot != null)
                     {
                         return itemPivot as CategoriesListUC;

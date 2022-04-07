@@ -40,7 +40,6 @@ namespace LibraryProjectUWP.Views.Categories
     public sealed partial class CategoriesListUC : PivotItem
     {
         public readonly CategorieParameterDriverVM _parameters;
-        public readonly Guid IdItem = Guid.NewGuid();
 
         public CategoriesListUCVM ViewModelPage { get; set; } = new CategoriesListUCVM();
 
@@ -129,11 +128,11 @@ namespace LibraryProjectUWP.Views.Categories
                 {
                     if (_parameters.BookPage != null)
                     {
-                        _parameters.BookPage.AddNewCategory(ViewModelPage.ParentLibrary, ViewModelPage.Guid);
+                        _parameters.BookPage.AddNewCategory(ViewModelPage.ParentLibrary, ViewModelPage.ItemGuid);
                     }
                     else if (_parameters.LibraryPage != null)
                     {
-                        _parameters.LibraryPage.AddNewCategory(ViewModelPage.ParentLibrary, ViewModelPage.Guid);
+                        _parameters.LibraryPage.AddNewCategory(ViewModelPage.ParentLibrary, ViewModelPage.ItemGuid);
                     }
                 }
             }
@@ -176,11 +175,11 @@ namespace LibraryProjectUWP.Views.Categories
                 {
                     if (_parameters.BookPage != null)
                     {
-                        _parameters.BookPage.AddNewSubCategory(_categorie, ViewModelPage.Guid);
+                        _parameters.BookPage.AddNewSubCategory(_categorie, ViewModelPage.ItemGuid);
                     }
                     else if (_parameters.LibraryPage != null)
                     {
-                        _parameters.LibraryPage.AddNewSubCategory(_categorie, ViewModelPage.Guid);
+                        _parameters.LibraryPage.AddNewSubCategory(_categorie, ViewModelPage.ItemGuid);
                     }
                 }
             }
@@ -252,11 +251,11 @@ namespace LibraryProjectUWP.Views.Categories
                 {
                     if (_parameters.BookPage != null)
                     {
-                        _parameters.BookPage.EditCategory(ViewModelPage.ParentLibrary, _categorie, ViewModelPage.Guid);
+                        _parameters.BookPage.EditCategory(ViewModelPage.ParentLibrary, _categorie, ViewModelPage.ItemGuid);
                     }
                     else if (_parameters.LibraryPage != null)
                     {
-                        _parameters.LibraryPage.EditCategory(ViewModelPage.ParentLibrary, _categorie, ViewModelPage.Guid);
+                        _parameters.LibraryPage.EditCategory(ViewModelPage.ParentLibrary, _categorie, ViewModelPage.ItemGuid);
                     }
                 }
                 else if (_subCategorie != null)
@@ -269,11 +268,11 @@ namespace LibraryProjectUWP.Views.Categories
 
                     if (_parameters.BookPage != null)
                     {
-                        _parameters.BookPage.EditSubCategory(viewModelParentCategorie, _subCategorie, ViewModelPage.Guid);
+                        _parameters.BookPage.EditSubCategory(viewModelParentCategorie, _subCategorie, ViewModelPage.ItemGuid);
                     }
                     else if (_parameters.LibraryPage != null)
                     {
-                        _parameters.LibraryPage.EditSubCategory(viewModelParentCategorie, _subCategorie, ViewModelPage.Guid);
+                        _parameters.LibraryPage.EditSubCategory(viewModelParentCategorie, _subCategorie, ViewModelPage.ItemGuid);
                     }
                     else
                     {
@@ -1178,7 +1177,8 @@ namespace LibraryProjectUWP.Views.Categories
     public class CategoriesListUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public Guid Guid { get; private set; } = Guid.NewGuid();
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        //public Guid? ParentGuid { get; set; }
 
         private string _Header;
         public string Header

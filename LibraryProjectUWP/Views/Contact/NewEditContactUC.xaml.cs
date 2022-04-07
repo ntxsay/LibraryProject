@@ -31,7 +31,6 @@ namespace LibraryProjectUWP.Views.Contact
     public sealed partial class NewEditContactUC : PivotItem
     {
         public readonly ManageContactParametersDriverVM _parameters;
-        public readonly Guid IdItem = Guid.NewGuid();
 
         public NewEditContactUCVM ViewModelPage { get; set; } = new NewEditContactUCVM();
 
@@ -410,7 +409,8 @@ namespace LibraryProjectUWP.Views.Contact
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public Guid? Guid { get; set; }
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        public Guid? ParentGuid { get; set; }
 
         public readonly IEnumerable<string> contactType = LibraryHelpers.Contact.ContactList;
         public readonly IEnumerable<string> nationalityList = CountryHelpers.NationalitiesList();

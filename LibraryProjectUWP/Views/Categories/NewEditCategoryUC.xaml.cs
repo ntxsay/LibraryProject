@@ -31,7 +31,6 @@ namespace LibraryProjectUWP.Views.Categories
     {
         public readonly ManageCategorieDialogParametersVM _categorieParameters;
         public readonly ManageSubCategorieDialogParametersVM _subCategorieParameters;
-        public readonly Guid IdItem = Guid.NewGuid();
 
         public NewEditCategoryUCVM ViewModelPage { get; set; } = new NewEditCategoryUCVM();
 
@@ -301,7 +300,8 @@ namespace LibraryProjectUWP.Views.Categories
     public class NewEditCategoryUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public Guid? Guid { get; set; }
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        public Guid? ParentGuid { get; set; }
 
         private string _Header;
         public string Header

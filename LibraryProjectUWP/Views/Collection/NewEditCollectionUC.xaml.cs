@@ -32,8 +32,6 @@ namespace LibraryProjectUWP.Views.Collection
     public sealed partial class NewEditCollectionUC : PivotItem
     {
         public readonly ManageCollectionParametersDriverVM _parameters;
-        public readonly Guid IdItem = Guid.NewGuid();
-
         public NewEditCollectionUCVM ViewModelPage { get; set; } = new NewEditCollectionUCVM();
 
         public delegate void CancelModificationEventHandler(NewEditCollectionUC sender, ExecuteRequestedEventArgs e);
@@ -214,8 +212,8 @@ namespace LibraryProjectUWP.Views.Collection
     public class NewEditCollectionUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-        public Guid? Guid { get; set; }
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        public Guid? ParentGuid { get; set; }
 
         private string _Header;
         public string Header

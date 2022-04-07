@@ -36,6 +36,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Media.Animation;
 using LibraryProjectUWP.Views.Book.SubViews;
 using LibraryProjectUWP.Code.Services.Web;
+using LibraryProjectUWP.Views.UserControls;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -358,44 +359,9 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     foreach (var item in this.PivotRightSideBar.Items)
                     {
-                        if (item is NewEditBookExemplaryUC bookExemplaryUC)
+                        if (item is PivotItem pivotItem && pivotItem.Header is Grid grid && grid.Children[0] is SideBarItemHeader itemHeader)
                         {
-                            if (bookExemplaryUC.IdItem == headerVM.IdItem)
-                            {
-                                this.PivotRightSideBar.SelectedItem = item;
-                            }
-                        }
-                        else if (item is NewEditBookUC newEditBookUC)
-                        {
-                            if (newEditBookUC.IdItem == headerVM.IdItem)
-                            {
-                                this.PivotRightSideBar.SelectedItem = item;
-                            }
-                        }
-                        else if (item is NewEditCollectionUC newEditCollectionUC)
-                        {
-                            if (newEditCollectionUC.IdItem == headerVM.IdItem)
-                            {
-                                this.PivotRightSideBar.SelectedItem = item;
-                            }
-                        }
-                        else if (item is NewEditContactUC newEditContactUC)
-                        {
-                            if (newEditContactUC.IdItem == headerVM.IdItem)
-                            {
-                                this.PivotRightSideBar.SelectedItem = item;
-                            }
-                        }
-                        else if (item is ContactListUC contactListUC)
-                        {
-                            if (contactListUC.IdItem == headerVM.IdItem)
-                            {
-                                this.PivotRightSideBar.SelectedItem = item;
-                            }
-                        }
-                        else if (item is CollectionListUC collectionListUC)
-                        {
-                            if (collectionListUC.IdItem == headerVM.IdItem)
+                            if (itemHeader.Guid == headerVM.IdItem)
                             {
                                 this.PivotRightSideBar.SelectedItem = item;
                             }
@@ -411,7 +377,6 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         #endregion
-
         
         #region Médias
         private async void ChangeBackgroundImageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -578,7 +543,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -619,7 +584,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -818,7 +783,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -977,7 +942,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1140,7 +1105,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
@@ -1150,7 +1115,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1180,7 +1145,7 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
                             this.InitializeSearchingBookWorker(sender._parameters.ParentBook);
                             NewEditBookExemplaryUC_Create_CancelModificationRequested(sender, e);
@@ -1295,7 +1260,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1389,7 +1354,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditBookPretUC_CancelModificationRequested;
@@ -1399,7 +1364,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1428,7 +1393,7 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
                             this.InitializeSearchingBookPretsWorker(sender._parameters.ParentBook);
                             NewEditBookPretUC_CancelModificationRequested(sender, e);
@@ -1509,7 +1474,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1766,7 +1731,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditFreeContactUC_Create_CancelModificationRequested;
@@ -1776,7 +1741,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1806,9 +1771,9 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
-                            var bookManager = GetBookExemplarySideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            var bookManager = GetBookExemplarySideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
                             if (bookManager != null)
                             {
                                 bookManager.ViewModelPage.ViewModel.ContactSource = newViewModel;
@@ -1886,7 +1851,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -1985,7 +1950,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -2038,7 +2003,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditAuthorUC_CancelModificationRequested;
@@ -2048,7 +2013,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -2079,9 +2044,9 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
-                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
                             if (bookManager != null)
                             {
                                 bookManager.ViewModelPage.ViewModel.Auteurs.Add(newViewModel);
@@ -2170,7 +2135,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     if (guid != null)
                     {
-                        userControl.ViewModelPage.Guid = guid;
+                        userControl.ViewModelPage.ParentGuid = guid;
                     }
 
                     userControl.CancelModificationRequested += NewEditEditorUC_Create_CancelModificationRequested;
@@ -2180,7 +2145,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.IdItem,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -2210,9 +2175,9 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.Guid != null)
+                        if (sender.ViewModelPage.ParentGuid != null)
                         {
-                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.Guid);
+                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
                             if (bookManager != null)
                             {
                                 bookManager.ViewModelPage.ViewModel.Publication.Editeurs.Add(newViewModel);
@@ -2490,6 +2455,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+
         private void RemoveItemToSideBar(PivotItem item)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -2502,60 +2468,20 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.CmbxSideBarItemTitle.Items.Count > 0)
                 {
-
-                    foreach (var cmbxItem in this.CmbxSideBarItemTitle.Items)
+                    if (item.Header is Grid grid && grid.Children[0] is SideBarItemHeader itemHeader)
                     {
-                        if (cmbxItem is SideBarItemHeaderVM headerVM)
+                        foreach (var cmbxItem in this.CmbxSideBarItemTitle.Items)
                         {
-                            if (item is NewEditBookExemplaryUC bookExemplaryUC)
+                            if (cmbxItem is SideBarItemHeaderVM headerVM)
                             {
-                                if (bookExemplaryUC.IdItem == headerVM.IdItem)
-                                {
-                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
-                                    break;
-                                }
-                            }
-                            else if (item is NewEditBookUC newEditBookUC)
-                            {
-                                if (newEditBookUC.IdItem == headerVM.IdItem)
-                                {
-                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
-                                    break;
-                                }
-                            }
-                            else if (item is NewEditCollectionUC newEditCollectionUC)
-                            {
-                                if (newEditCollectionUC.IdItem == headerVM.IdItem)
-                                {
-                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
-                                    break;
-                                }
-                            }
-                            else if (item is NewEditContactUC newEditContactUC)
-                            {
-                                if (newEditContactUC.IdItem == headerVM.IdItem)
-                                {
-                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
-                                    break;
-                                }
-                            }
-                            else if (item is ContactListUC contactListUC)
-                            {
-                                if (contactListUC.IdItem == headerVM.IdItem)
-                                {
-                                    ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
-                                    break;
-                                }
-                            }
-                            else if (item is CollectionListUC collectionListUC)
-                            {
-                                if (collectionListUC.IdItem == headerVM.IdItem)
+                                if (itemHeader.Guid == headerVM.IdItem)
                                 {
                                     ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
                                     break;
                                 }
                             }
                         }
+
                     }
                 }
 
@@ -2575,6 +2501,7 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
 
         public ImportBookFromExcelUC GetImportBookFromExcelUC()
         {
@@ -2632,7 +2559,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.PivotRightSideBar.Items.Count > 0)
                 {
-                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookExemplaryUC item && item.ViewModelPage.Guid == guid);
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookExemplaryUC item && item.ViewModelPage.ItemGuid == guid);
                     if (itemPivot != null)
                     {
                         return itemPivot as NewEditBookExemplaryUC;
@@ -2680,7 +2607,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.PivotRightSideBar.Items.Count > 0)
                 {
-                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is CategoriesListUC item && item.ViewModelPage.Guid == guid);
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is CategoriesListUC item && item.ViewModelPage.ItemGuid == guid);
                     if (itemPivot != null)
                     {
                         return itemPivot as CategoriesListUC;
@@ -2704,7 +2631,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.PivotRightSideBar.Items.Count > 0)
                 {
-                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC item && item.ViewModelPage.Guid == guid);
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC item && item.ViewModelPage.ItemGuid == guid);
                     if (itemPivot != null)
                     {
                         return itemPivot as BookExemplaryListUC;
@@ -2728,7 +2655,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.PivotRightSideBar.Items.Count > 0)
                 {
-                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC item && item.ViewModelPage.Guid == guid);
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC item && item.ViewModelPage.ItemGuid == guid);
                     if (itemPivot != null)
                     {
                         return itemPivot as BookPretListUC;
@@ -2752,7 +2679,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.PivotRightSideBar.Items.Count > 0)
                 {
-                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.Guid == guid);
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.ItemGuid == guid);
                     if (itemPivot != null)
                     {
                         return itemPivot as NewEditBookUC;
@@ -2776,7 +2703,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.PivotRightSideBar.Items.Count > 0)
                 {
-                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is CollectionListUC item && item.ViewModelPage.Guid == guid);
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is CollectionListUC item && item.ViewModelPage.ItemGuid == guid);
                     if (itemPivot != null)
                     {
                         return itemPivot as CollectionListUC;

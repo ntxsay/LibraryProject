@@ -20,9 +20,27 @@ namespace LibraryProjectUWP.Views.UserControls
 {
     public sealed partial class SideBarItemHeader : UserControl
     {
+        public Guid Guid { get; private set; }
         public SideBarItemHeader()
         {
             this.InitializeComponent();
+        }
+
+        public Guid HeaderGuid
+        {
+            get { return (Guid)GetValue(HeaderGuidProperty); }
+            set { SetValue(HeaderGuidProperty, value); }
+        }
+
+        public static readonly DependencyProperty HeaderGuidProperty = DependencyProperty.Register(nameof(HeaderGuid), typeof(Guid),
+                                                                typeof(SideBarItemHeader), new PropertyMetadata(null, new PropertyChangedCallback(OnHeaderGuidChanged)));
+
+        private static void OnHeaderGuidChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is SideBarItemHeader parent && e.NewValue is Guid guid)
+            {
+                parent.Guid = guid;
+            }
         }
 
         public String Title
@@ -60,6 +78,5 @@ namespace LibraryProjectUWP.Views.UserControls
                 parent.MyFontIcon.Glyph = glyph;
             }
         }
-
     }
 }

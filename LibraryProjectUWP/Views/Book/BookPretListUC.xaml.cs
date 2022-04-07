@@ -37,7 +37,6 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookPretListUC : PivotItem
     {
         public readonly BookPretListParametersDriverVM _parameters;
-        public readonly Guid IdItem = Guid.NewGuid();
         private CollectionViewSource CollectionViewSource { get; set; } = new CollectionViewSource()
         {
             IsSourceGrouped = true,
@@ -160,7 +159,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                await _parameters.ParentPage.NewBookPret(_parameters.ParentBook, ViewModelPage.Guid);
+                await _parameters.ParentPage.NewBookPret(_parameters.ParentBook, ViewModelPage.ItemGuid);
             }
             catch (Exception ex)
             {
@@ -301,7 +300,8 @@ namespace LibraryProjectUWP.Views.Book
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public Guid Guid { get; private set; } = Guid.NewGuid();
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        //public Guid? ParentGuid { get; set; }
 
         private string _Header;
         public string Header

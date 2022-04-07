@@ -27,7 +27,6 @@ namespace LibraryProjectUWP.Views.Contact
     public sealed partial class ContactListUC : PivotItem
     {
         readonly ContactListParametersDriverVM _parameters;
-        public readonly Guid IdItem = Guid.NewGuid();
         public ContactListUCVM ViewModelPage { get; set; } = new ContactListUCVM();
         public ContactListUC()
         {
@@ -224,6 +223,9 @@ namespace LibraryProjectUWP.Views.Contact
     public class ContactListUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        //public Guid? ParentGuid { get; set; }
 
         private string _Header;
         public string Header
