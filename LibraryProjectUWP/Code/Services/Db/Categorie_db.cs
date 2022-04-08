@@ -366,7 +366,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TlibraryBookConnector.CountAsync(d => d.IdLibrary == idLibrary && d.IdCategorie == null && d.IdSubCategorie == null);
+                        return await context.Tbook.CountAsync(d => d.IdLibrary == idLibrary && d.IdCategorie == null && d.IdSubCategorie == null);
                     }
                 }
                 catch (Exception ex)
@@ -383,7 +383,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TlibraryBookConnector.Where(d => d.IdLibrary == idLibrary && d.IdCategorie == null && d.IdSubCategorie == null).Select(s => s.IdBook).ToListAsync();
+                        return await context.Tbook.Where(d => d.IdLibrary == idLibrary && d.IdCategorie == null && d.IdSubCategorie == null).Select(s => s.Id).ToListAsync();
                     }
                 }
                 catch (Exception ex)
@@ -400,7 +400,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TlibraryBookConnector.Where(d => d.IdCategorie == idCategorie && d.IdSubCategorie == null).Select(s => s.IdBook).ToListAsync();
+                        return await context.Tbook.Where(d => d.IdCategorie == idCategorie && d.IdSubCategorie == null).Select(s => s.Id).ToListAsync();
                     }
                 }
                 catch (Exception ex)
@@ -417,7 +417,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TlibraryBookConnector.Where(d => d.IdSubCategorie == idSubCategorie).Select(s => s.IdBook).ToListAsync();
+                        return await context.Tbook.Where(d => d.IdSubCategorie == idSubCategorie).Select(s => s.Id).ToListAsync();
                     }
                 }
                 catch (Exception ex)
@@ -489,7 +489,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         foreach (var idBook in validIdList)
                         {
-                            var bookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(c => c.IdBook == idBook);
+                            var bookConnector = await context.Tbook.SingleOrDefaultAsync(c => c.Id == idBook);
                             if (bookConnector == null)
                             {
                                 continue;
@@ -501,7 +501,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 bookConnector.IdSubCategorie = subCategorie.Id;
                             }
 
-                            context.TlibraryBookConnector.Update(bookConnector);
+                            context.Tbook.Update(bookConnector);
                             await context.SaveChangesAsync();
                         }
 
@@ -563,7 +563,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         foreach (var idBook in validIdList)
                         {
-                            var bookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(c => c.IdBook == idBook);
+                            var bookConnector = await context.Tbook.SingleOrDefaultAsync(c => c.Id == idBook);
                             if (bookConnector == null)
                             {
                                 continue;
@@ -572,7 +572,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             bookConnector.IdCategorie = null;
                             bookConnector.IdSubCategorie = null;
 
-                            context.TlibraryBookConnector.Update(bookConnector);
+                            context.Tbook.Update(bookConnector);
                             await context.SaveChangesAsync();
                         }
 
@@ -903,7 +903,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 };
                             }
 
-                            var connectors = await context.TlibraryBookConnector.Where(a => a.IdCategorie == record.Id).ToListAsync();
+                            var connectors = await context.Tbook.Where(a => a.IdCategorie == record.Id).ToListAsync();
                             if (connectors != null && connectors.Any())
                             {
                                 foreach (var connector in connectors)
@@ -912,7 +912,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     connector.IdSubCategorie = null;
                                 }
 
-                                context.TlibraryBookConnector.UpdateRange(connectors);
+                                context.Tbook.UpdateRange(connectors);
                                 await context.SaveChangesAsync();
                             }
 
@@ -937,7 +937,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 };
                             }
 
-                            var connectors = await context.TlibraryBookConnector.Where(a => a.IdSubCategorie == record.Id).ToListAsync();
+                            var connectors = await context.Tbook.Where(a => a.IdSubCategorie == record.Id).ToListAsync();
                             if (connectors != null && connectors.Any())
                             {
                                 foreach (var connector in connectors)
@@ -945,7 +945,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     connector.IdSubCategorie = null;
                                 }
 
-                                context.TlibraryBookConnector.UpdateRange(connectors);
+                                context.Tbook.UpdateRange(connectors);
                                 await context.SaveChangesAsync();
                             }
 

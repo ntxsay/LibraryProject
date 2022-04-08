@@ -16,10 +16,12 @@ namespace DbConsoleHelpers.Models.Local
             TbookEditeurConnector = new HashSet<TbookEditeurConnector>();
             TbookExemplary = new HashSet<TbookExemplary>();
             TbookOtherTitle = new HashSet<TbookOtherTitle>();
-            TlibraryBookConnector = new HashSet<TlibraryBookConnector>();
         }
 
         public long Id { get; set; }
+        public long IdLibrary { get; set; }
+        public long? IdCategorie { get; set; }
+        public long? IdSubCategorie { get; set; }
         public string Guid { get; set; }
         public string DateAjout { get; set; }
         public string DateEdition { get; set; }
@@ -28,15 +30,14 @@ namespace DbConsoleHelpers.Models.Local
         public string DateParution { get; set; }
         public string Resume { get; set; }
         public string Notes { get; set; }
-        public long TypeClassification { get; set; }
-        public long ApartirDe { get; set; }
-        public long Jusqua { get; set; }
-        public long DeTelAge { get; set; }
-        public long AtelAge { get; set; }
         public string Langue { get; set; }
         public string Pays { get; set; }
         public string PhysicalLocation { get; set; }
 
+        public virtual TlibraryCategorie IdCategorieNavigation { get; set; }
+        public virtual Tlibrary IdLibraryNavigation { get; set; }
+        public virtual TlibrarySubCategorie IdSubCategorieNavigation { get; set; }
+        public virtual TbookClassification TbookClassification { get; set; }
         public virtual TbookFormat TbookFormat { get; set; }
         public virtual TbookIdentification TbookIdentification { get; set; }
         public virtual ICollection<TbookAuthorConnector> TbookAuthorConnector { get; set; }
@@ -44,6 +45,5 @@ namespace DbConsoleHelpers.Models.Local
         public virtual ICollection<TbookEditeurConnector> TbookEditeurConnector { get; set; }
         public virtual ICollection<TbookExemplary> TbookExemplary { get; set; }
         public virtual ICollection<TbookOtherTitle> TbookOtherTitle { get; set; }
-        public virtual ICollection<TlibraryBookConnector> TlibraryBookConnector { get; set; }
     }
 }

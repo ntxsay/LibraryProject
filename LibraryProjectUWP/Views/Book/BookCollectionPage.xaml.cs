@@ -2218,7 +2218,7 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Search
-        private void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private async void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             try
             {
@@ -2231,6 +2231,12 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     return;
                 }
+
+                var viewModelList = await DbServices.Book.SearchBooksVMAsync(_parameters.ParentLibrary.Id, sender.Text, new Code.Search.Book.In[]
+                {
+                    Code.Search.Book.In.MainTitle,
+                    Code.Search.Book.In.OtherTitle,
+                }, Code.Search.Book.Terms.Contains);
 
                 var FilteredItems = new List<LivreVM>();
                 var splitSearchTerm = sender.Text.ToLower().Split(" ");

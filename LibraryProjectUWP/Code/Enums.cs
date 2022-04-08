@@ -17,6 +17,12 @@ namespace LibraryProjectUWP.Code
                 StartWith,
                 EndWith,
             }
+
+            public enum In
+            {
+                MainTitle,
+                OtherTitle,
+            }
         }
     }
     public enum EditMode

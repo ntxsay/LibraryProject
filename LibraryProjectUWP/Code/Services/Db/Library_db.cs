@@ -122,7 +122,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TlibraryBookConnector.LongCountAsync(c => c.IdLibrary == idLibrary);
+                        return await context.Tbook.LongCountAsync(c => c.IdLibrary == idLibrary);
                     }
                 }
                 catch (Exception ex)

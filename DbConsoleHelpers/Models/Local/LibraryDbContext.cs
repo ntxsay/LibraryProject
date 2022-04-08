@@ -21,6 +21,7 @@ namespace DbConsoleHelpers.Models.Local
 
         public virtual DbSet<Tbook> Tbook { get; set; }
         public virtual DbSet<TbookAuthorConnector> TbookAuthorConnector { get; set; }
+        public virtual DbSet<TbookClassification> TbookClassification { get; set; }
         public virtual DbSet<TbookCollectionConnector> TbookCollectionConnector { get; set; }
         public virtual DbSet<TbookEditeurConnector> TbookEditeurConnector { get; set; }
         public virtual DbSet<TbookEtat> TbookEtat { get; set; }
@@ -32,7 +33,6 @@ namespace DbConsoleHelpers.Models.Local
         public virtual DbSet<Tcollection> Tcollection { get; set; }
         public virtual DbSet<Tcontact> Tcontact { get; set; }
         public virtual DbSet<Tlibrary> Tlibrary { get; set; }
-        public virtual DbSet<TlibraryBookConnector> TlibraryBookConnector { get; set; }
         public virtual DbSet<TlibraryCategorie> TlibraryCategorie { get; set; }
         public virtual DbSet<TlibrarySubCategorie> TlibrarySubCategorie { get; set; }
 
@@ -59,13 +59,25 @@ namespace DbConsoleHelpers.Models.Local
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.AtelAge).HasColumnName("ATelAge");
-
                 entity.Property(e => e.DateAjout).IsRequired();
 
                 entity.Property(e => e.Guid).IsRequired();
 
                 entity.Property(e => e.MainTitle).IsRequired();
+
+                entity.HasOne(d => d.IdCategorieNavigation)
+                    .WithMany(p => p.Tbook)
+                    .HasForeignKey(d => d.IdCategorie)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(d => d.IdLibraryNavigation)
+                    .WithMany(p => p.Tbook)
+                    .HasForeignKey(d => d.IdLibrary);
+
+                entity.HasOne(d => d.IdSubCategorieNavigation)
+                    .WithMany(p => p.Tbook)
+                    .HasForeignKey(d => d.IdSubCategorie)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<TbookAuthorConnector>(entity =>
@@ -84,6 +96,22 @@ namespace DbConsoleHelpers.Models.Local
                 entity.HasOne(d => d.IdBookNavigation)
                     .WithMany(p => p.TbookAuthorConnector)
                     .HasForeignKey(d => d.IdBook);
+            });
+
+            modelBuilder.Entity<TbookClassification>(entity =>
+            {
+                entity.ToTable("TBookClassification");
+
+                entity.HasIndex(e => e.Id)
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.AtelAge).HasColumnName("ATelAge");
+
+                entity.HasOne(d => d.IdNavigation)
+                    .WithOne(p => p.TbookClassification)
+                    .HasForeignKey<TbookClassification>(d => d.Id);
             });
 
             modelBuilder.Entity<TbookCollectionConnector>(entity =>
@@ -311,34 +339,6 @@ namespace DbConsoleHelpers.Models.Local
                 entity.Property(e => e.Guid).IsRequired();
 
                 entity.Property(e => e.Name).IsRequired();
-            });
-
-            modelBuilder.Entity<TlibraryBookConnector>(entity =>
-            {
-                entity.ToTable("TLibraryBookConnector");
-
-                entity.HasIndex(e => e.Id)
-                    .IsUnique();
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.HasOne(d => d.IdBookNavigation)
-                    .WithMany(p => p.TlibraryBookConnector)
-                    .HasForeignKey(d => d.IdBook);
-
-                entity.HasOne(d => d.IdCategorieNavigation)
-                    .WithMany(p => p.TlibraryBookConnector)
-                    .HasForeignKey(d => d.IdCategorie)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(d => d.IdLibraryNavigation)
-                    .WithMany(p => p.TlibraryBookConnector)
-                    .HasForeignKey(d => d.IdLibrary);
-
-                entity.HasOne(d => d.IdSubCategorieNavigation)
-                    .WithMany(p => p.TlibraryBookConnector)
-                    .HasForeignKey(d => d.IdSubCategorie)
-                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<TlibraryCategorie>(entity =>

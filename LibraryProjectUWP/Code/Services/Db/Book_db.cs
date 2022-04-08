@@ -95,22 +95,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<long>> AllIdLibraryAsync(long idLibrary)
-            {
-                try
-                {
-                    using (LibraryDbContext context = new LibraryDbContext())
-                    {
-                        return await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).Select(s => s.IdBook).ToListAsync();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Logs.Log(ex, m);
-                    return Enumerable.Empty<long>().ToList();
-                }
-            }
             #endregion
 
             #region Multiple
@@ -120,7 +104,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TlibraryBookConnector.LongCountAsync(w => w.IdLibrary == idLibrary && w.IdBook > -1, cancellationToken);
+                        return await context.Tbook.LongCountAsync(w => w.IdLibrary == idLibrary, cancellationToken);
                     }
                 }
                 catch (Exception ex)
@@ -131,13 +115,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<long>> GetIdBooksAsync(long idLibrary)
+            public static async Task<IList<long>> GetListOfIdBooksAsync(long idLibrary)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).Select(s => s.IdBook).ToListAsync();
+                        return await context.Tbook.Where(w => w.IdLibrary == idLibrary).Select(s => s.Id).ToListAsync();
                     }
                 }
                 catch (Exception ex)
@@ -154,28 +138,12 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var preCollection = await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
-                        if (preCollection.Any())
+                        var tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
+                        if (tbooks != null && tbooks.Any())
                         {
-                            List<Tbook> collection = new List<Tbook>();
-                            foreach (TlibraryBookConnector driver in preCollection)
-                            {
-                                if (cancellationToken.IsCancellationRequested)
-                                {
-                                    return collection;
-                                }
-
-                                Tbook model = await context.Tbook.SingleOrDefaultAsync(w => w.Id == driver.IdBook, cancellationToken);
-                                if (model != null)
-                                {
-                                    await CompleteModelInfos(context, model);
-                                    collection.Add(model);
-                                }
-                            }
-
-                            return collection;
+                            tbooks.ForEach(async (book) => await CompleteModelInfos(context, book));
+                            return tbooks;
                         }
-
                     }
 
                     return Enumerable.Empty<Tbook>().ToList();
@@ -342,15 +310,15 @@ namespace LibraryProjectUWP.Code.Services.Db
             #endregion
 
             #region Single
-            public static async Task<long?> GetLibraryIdAsync(long idBook, LibraryDbContext _context = null)
+            public static async Task<long?> GetLibraryIdAsync(long idBook)
             {
                 try
                 {
-                    using (LibraryDbContext context = _context ?? new LibraryDbContext())
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var tlibraryBookConnector = await context.TlibraryBookConnector.SingleOrDefaultAsync(w => w.IdBook == idBook);
-                        if (tlibraryBookConnector == null) return null;
-                        return tlibraryBookConnector.IdLibrary;
+                        var item = await context.Tbook.SingleOrDefaultAsync(w => w.Id == idBook);
+                        if (item == null) return null;
+                        return item.IdLibrary;
                     }
                 }
                 catch (Exception ex)
@@ -401,52 +369,81 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
-            public static async Task<IList<Tbook>> SearchBooksAsync(long idLibrary, string terms, Search.Book.Terms termContains, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksAsync(long idLibrary, string terms, IEnumerable<Search.Book.In> searchIn, Search.Book.Terms termContains, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    if (terms.IsStringNullOrEmptyOrWhiteSpace())
+                    if (terms.IsStringNullOrEmptyOrWhiteSpace() || searchIn == null || !searchIn.Any())
                     {
                         return Enumerable.Empty<Tbook>().ToList();
                     }
 
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        List<TlibraryBookConnector> preCollection = new List<TlibraryBookConnector>();
-                        switch (termContains)
+                        List<Tbook> tbooks = new List<Tbook>() ;
+                        
+                        foreach (Search.Book.In _searchin in searchIn)
                         {
-                            case Search.Book.Terms.Equals:
-                                break;
-                            case Search.Book.Terms.Contains:
-                                break;
-                            case Search.Book.Terms.StartWith:
-                                break;
-                            case Search.Book.Terms.EndWith:
-                                break;
-                            default:
-                                break;
-                        }
-                        preCollection = await context.Tbook.Where(w => w.TlibraryBookConnector. == idLibrary).ToListAsync(cancellationToken);
-                        preCollection = await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
-                        if (preCollection.Any())
-                        {
-                            List<Tbook> collection = new List<Tbook>();
-                            foreach (TlibraryBookConnector driver in preCollection)
+                            switch (_searchin)
                             {
-                                if (cancellationToken.IsCancellationRequested)
-                                {
-                                    return collection;
-                                }
+                                case Search.Book.In.MainTitle:
+                                    switch (termContains)
+                                    {
+                                        case Search.Book.Terms.Equals:
+                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle == terms).ToListAsync(cancellationToken);
+                                            break;
+                                        case Search.Book.Terms.Contains:
+                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle.Contains(terms)).ToListAsync(cancellationToken);
+                                            break;
+                                        case Search.Book.Terms.StartWith:
+                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle.StartsWith(terms)).ToListAsync(cancellationToken);
+                                            break;
+                                        case Search.Book.Terms.EndWith:
+                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle.EndsWith(terms)).ToListAsync(cancellationToken);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    break;
+                                case Search.Book.In.OtherTitle:
+                                    List<TbookOtherTitle> booksTitles = null;
+                                    switch (termContains)
+                                    {
+                                        case Search.Book.Terms.Equals:
+                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title == terms).ToListAsync(cancellationToken);
+                                            break;
+                                        case Search.Book.Terms.Contains:
+                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title.Contains(terms)).ToListAsync(cancellationToken);
+                                            break;
+                                        case Search.Book.Terms.StartWith:
+                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title.StartsWith(terms)).ToListAsync(cancellationToken);
+                                            break;
+                                        case Search.Book.Terms.EndWith:
+                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title.EndsWith(terms)).ToListAsync(cancellationToken);
+                                            break;
+                                        default:
+                                            break;
+                                    }
 
-                                Tbook model = await context.Tbook.SingleOrDefaultAsync(w => w.Id == driver.IdBook, cancellationToken);
-                                if (model != null)
-                                {
-                                    await CompleteModelInfos(context, model);
-                                    collection.Add(model);
-                                }
+                                    if (booksTitles != null && booksTitles.Any())
+                                    {
+                                        List<Tbook> _tbooks = booksTitles.Select(async s => await SingleAsync(s.Id)).Select(t => t.Result).Where(w => w.IdLibrary == idLibrary).ToList();
+                                        if (_tbooks != null && _tbooks.Any())
+                                        {
+                                            tbooks.AddRange(_tbooks);
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
+                        }
 
-                            return collection;
+                        if (tbooks != null && tbooks.Any())
+                        {
+                            tbooks = tbooks.Distinct().ToList();
+                            tbooks.ForEach(async (book) => await CompleteModelInfos(context, book));
+                            return tbooks;
                         }
                     }
 
@@ -457,6 +454,29 @@ namespace LibraryProjectUWP.Code.Services.Db
                     MethodBase m = MethodBase.GetCurrentMethod();
                     Logs.Log(ex, m);
                     return Enumerable.Empty<Tbook>().ToList();
+                }
+            }
+
+            public static async Task<IList<LivreVM>> SearchBooksVMAsync(long idLibrary, string terms, IEnumerable<Search.Book.In> searchIn, Search.Book.Terms termContains, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    if (terms.IsStringNullOrEmptyOrWhiteSpace() || searchIn == null || !searchIn.Any())
+                    {
+                        return Enumerable.Empty<LivreVM>().ToList();
+                    }
+
+                    var collection = await SearchBooksAsync(idLibrary, terms, searchIn.Distinct(), termContains, cancellationToken);
+                    if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
+
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<LivreVM>().ToList();
                 }
             }
 
@@ -504,11 +524,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                             CountOpening = viewModel.CountOpening,
                             Resume = viewModel.Description?.Resume,
                             Notes = viewModel.Description?.Notes,
-                            TypeClassification = (byte)(viewModel.ClassificationAge?.TypeClassification ?? 0),
-                            ApartirDe = viewModel.ClassificationAge?.ApartirDe ?? 0,
-                            DeTelAge = viewModel.ClassificationAge?.DeTelAge ?? 0,
-                            AtelAge = viewModel.ClassificationAge?.ATelAge ?? 0,
-                            Jusqua = viewModel.ClassificationAge?.Jusqua ?? 0,
                             Pays = viewModel.Publication?.Pays,
                             Langue = viewModel.Publication?.Langue,
                         };
@@ -516,14 +531,21 @@ namespace LibraryProjectUWP.Code.Services.Db
                         await context.Tbook.AddAsync(record);
                         await context.SaveChangesAsync();
 
-                        var libraryBookConnector = new TlibraryBookConnector()
+                        if (viewModel.ClassificationAge != null)
                         {
-                            IdLibrary = idLibrary,
-                            IdBook = record.Id,
-                        };
+                            var recordConnector = new TbookClassification()
+                            {
+                                Id = record.Id,
+                                TypeClassification = (byte)(viewModel.ClassificationAge?.TypeClassification ?? 0),
+                                ApartirDe = viewModel.ClassificationAge?.ApartirDe ?? 0,
+                                DeTelAge = viewModel.ClassificationAge?.DeTelAge ?? 0,
+                                AtelAge = viewModel.ClassificationAge?.ATelAge ?? 0,
+                                Jusqua = viewModel.ClassificationAge?.Jusqua ?? 0,
+                            };
 
-                        await context.TlibraryBookConnector.AddAsync(libraryBookConnector);
-                        await context.SaveChangesAsync();
+                            await context.TbookClassification.AddAsync(recordConnector);
+                            await context.SaveChangesAsync();
+                        }
 
                         if (viewModel.Identification != null)
                         {
@@ -821,11 +843,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                         record.CountOpening = viewModel.CountOpening;
                         record.Resume = viewModel.Description.Resume;
                         record.Notes = viewModel.Description.Notes;
-                        record.TypeClassification = (byte)(viewModel.ClassificationAge?.TypeClassification ?? 0);
-                        record.ApartirDe = viewModel.ClassificationAge?.ApartirDe ?? 0;
-                        record.DeTelAge = viewModel.ClassificationAge?.DeTelAge ?? 0;
-                        record.AtelAge = viewModel.ClassificationAge?.ATelAge ?? 0;
-                        record.Jusqua = viewModel.ClassificationAge?.Jusqua ?? 0;
                         record.Langue = viewModel.Publication?.Langue;
                         record.Pays = viewModel.Publication?.Pays;
 
@@ -923,47 +940,97 @@ namespace LibraryProjectUWP.Code.Services.Db
                             }
                         }
 
+                        if (viewModel.ClassificationAge != null)
+                        {
+                            TbookClassification recordClassification = await context.TbookClassification.SingleOrDefaultAsync(a => a.Id == record.Id);
+                            if (recordClassification == null)
+                            {
+                                recordClassification = new TbookClassification()
+                                {
+                                    Id = record.Id,
+                                    TypeClassification = (byte)viewModel.ClassificationAge.TypeClassification ,
+                                    ApartirDe = viewModel.ClassificationAge.ApartirDe,
+                                    DeTelAge = viewModel.ClassificationAge.DeTelAge,
+                                    AtelAge = viewModel.ClassificationAge.ATelAge,
+                                    Jusqua = viewModel.ClassificationAge.Jusqua,
+                                };
+
+                                _ = await context.TbookClassification.AddAsync(recordClassification);
+                                await context.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                recordClassification.TypeClassification = (byte)viewModel.ClassificationAge.TypeClassification;
+                                recordClassification.ApartirDe = viewModel.ClassificationAge.ApartirDe;
+                                recordClassification.DeTelAge = viewModel.ClassificationAge.DeTelAge;
+                                recordClassification.AtelAge = viewModel.ClassificationAge.ATelAge;
+                                recordClassification.Jusqua = viewModel.ClassificationAge.Jusqua;
+                                _ = context.TbookClassification.Update(recordClassification);
+                            }
+                        }
+
                         if (viewModel.Identification != null)
                         {
-                            var recordIdentification = await context.TbookIdentification.SingleOrDefaultAsync(a => a.Id == record.Id);
+                            TbookIdentification recordIdentification = await context.TbookIdentification.SingleOrDefaultAsync(a => a.Id == record.Id);
                             if (recordIdentification == null)
                             {
-                                return new OperationStateVM()
+                                recordIdentification = new TbookIdentification()
                                 {
-                                    IsSuccess = false,
-                                    Message = DbServices.RecordNotExistMessage,
+                                    Id = record.Id,
+                                    Isbn = viewModel.Identification.ISBN,
+                                    Isbn10 = viewModel.Identification.ISBN10,
+                                    Isbn13 = viewModel.Identification.ISBN13,
+                                    Issn = viewModel.Identification.ISSN,
+                                    Asin = viewModel.Identification.ASIN,
+                                    CodeBarre = viewModel.Identification.CodeBarre,
+                                    Cotation = viewModel.Identification.Cotation,
                                 };
-                            }
 
-                            recordIdentification.Isbn = viewModel.Identification.ISBN;
-                            recordIdentification.Isbn10 = viewModel.Identification.ISBN10;
-                            recordIdentification.Isbn13 = viewModel.Identification.ISBN13;
-                            recordIdentification.Issn = viewModel.Identification.ISSN;
-                            recordIdentification.Asin = viewModel.Identification.ASIN;
-                            recordIdentification.CodeBarre = viewModel.Identification.CodeBarre;
-                            recordIdentification.Cotation = viewModel.Identification.Cotation;
-                            _ = context.TbookIdentification.Update(recordIdentification);
+                                _ = await context.TbookIdentification.AddAsync(recordIdentification);
+                                await context.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                recordIdentification.Isbn = viewModel.Identification.ISBN;
+                                recordIdentification.Isbn10 = viewModel.Identification.ISBN10;
+                                recordIdentification.Isbn13 = viewModel.Identification.ISBN13;
+                                recordIdentification.Issn = viewModel.Identification.ISSN;
+                                recordIdentification.Asin = viewModel.Identification.ASIN;
+                                recordIdentification.CodeBarre = viewModel.Identification.CodeBarre;
+                                recordIdentification.Cotation = viewModel.Identification.Cotation;
+                                _ = context.TbookIdentification.Update(recordIdentification);
+                            }
                         }
 
                         if (viewModel.Format != null)
                         {
-                            var recordFormat = await context.TbookFormat.SingleOrDefaultAsync(a => a.Id == record.Id);
+                            TbookFormat recordFormat = await context.TbookFormat.SingleOrDefaultAsync(a => a.Id == record.Id);
                             if (recordFormat == null)
                             {
-                                return new OperationStateVM()
+                                recordFormat = new TbookFormat()
                                 {
-                                    IsSuccess = false,
-                                    Message = DbServices.RecordNotExistMessage,
+                                    Id = record.Id,
+                                    Format = viewModel.Format.Format,
+                                    NbOfPages = viewModel.Format.NbOfPages,
+                                    Epaisseur = viewModel.Format.Epaisseur,
+                                    Weight = viewModel.Format.Poids,
+                                    Hauteur = viewModel.Format.Hauteur,
+                                    Largeur = viewModel.Format.Largeur,
                                 };
-                            }
 
-                            recordFormat.Format = viewModel.Format.Format;
-                            recordFormat.NbOfPages = viewModel.Format.NbOfPages;
-                            recordFormat.Largeur = viewModel.Format.Largeur;
-                            recordFormat.Epaisseur = viewModel.Format.Epaisseur;
-                            recordFormat.Hauteur = viewModel.Format.Hauteur;
-                            recordFormat.Weight = viewModel.Format.Poids;
-                            _ = context.TbookFormat.Update(recordFormat);
+                                await context.TbookFormat.AddAsync(recordFormat);
+                                await context.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                recordFormat.Format = viewModel.Format.Format;
+                                recordFormat.NbOfPages = viewModel.Format.NbOfPages;
+                                recordFormat.Largeur = viewModel.Format.Largeur;
+                                recordFormat.Epaisseur = viewModel.Format.Epaisseur;
+                                recordFormat.Hauteur = viewModel.Format.Hauteur;
+                                recordFormat.Weight = viewModel.Format.Poids;
+                                _ = context.TbookFormat.Update(recordFormat);
+                            }
                         }
 
                         await context.SaveChangesAsync();
@@ -1009,13 +1076,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                             };
                         }
 
-                        List<TlibraryBookConnector> libraryDriverCollection = await context.TlibraryBookConnector.Where(w => w.IdBook == record.Id).ToListAsync();
-                        if (libraryDriverCollection.Any())
-                        {
-                            context.TlibraryBookConnector.RemoveRange(libraryDriverCollection);
-                            //await context.SaveChangesAsync();
-                        }
-
                         //Titles
                         var recordTitles = await context.TbookOtherTitle.Where(a => a.IdBook == record.Id).ToListAsync();
                         if (recordTitles.Any())
@@ -1028,6 +1088,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                         if (recordIdentification != null)
                         {
                             context.TbookIdentification.Remove(recordIdentification);
+                        }
+
+                        //Classification
+                        TbookClassification recordClassification = await context.TbookClassification.SingleOrDefaultAsync(a => a.Id == record.Id);
+                        if (recordClassification != null)
+                        {
+                            context.TbookClassification.Remove(recordClassification);
                         }
 
                         //Format
@@ -1128,6 +1195,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         return;
                     }
 
+                    model.TbookClassification = await context.TbookClassification.SingleOrDefaultAsync(s => s.Id == model.Id);
                     model.TbookFormat = await context.TbookFormat.SingleOrDefaultAsync(s => s.Id == model.Id);
                     model.TbookIdentification = await context.TbookIdentification.SingleOrDefaultAsync(s => s.Id == model.Id);
                     
@@ -1293,14 +1361,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                             Resume = model.Resume,
                             Notes = model.Notes,
                         },
-                        ClassificationAge = new LivreClassificationAgeVM()
-                        {
-                            TypeClassification = (ClassificationAgeType)model.TypeClassification,
-                            ApartirDe = (byte)(model.ApartirDe < byte.MinValue || model.ApartirDe > byte.MaxValue ? 0 : model.ApartirDe),
-                            DeTelAge = (byte)(model.DeTelAge < byte.MinValue || model.DeTelAge > byte.MaxValue ? 0 : model.DeTelAge),
-                            ATelAge = (byte)(model.AtelAge < byte.MinValue || model.AtelAge > byte.MaxValue ? 0 : model.AtelAge),
-                            Jusqua = (byte)(model.Jusqua < byte.MinValue || model.Jusqua > byte.MaxValue ? 0 : model.Jusqua)
-                        },
                     };
 
                     viewModel.ClassificationAge.GetClassificationAge();
@@ -1317,6 +1377,19 @@ namespace LibraryProjectUWP.Code.Services.Db
                             ASIN = model.TbookIdentification.Asin,
                             CodeBarre = model.TbookIdentification.CodeBarre,
                             Cotation = model.TbookIdentification.Cotation,
+                        };
+                    }
+
+                    if (model.TbookClassification != null)
+                    {
+                        viewModel.ClassificationAge = new LivreClassificationAgeVM()
+                        {
+                            Id = model.TbookIdentification.Id,
+                            TypeClassification = (ClassificationAgeType)model.TbookClassification.TypeClassification,
+                            ApartirDe = (byte)(model.TbookClassification.ApartirDe < byte.MinValue || model.TbookClassification.ApartirDe > byte.MaxValue ? 0 : model.TbookClassification.ApartirDe),
+                            DeTelAge = (byte)(model.TbookClassification.DeTelAge < byte.MinValue || model.TbookClassification.DeTelAge > byte.MaxValue ? 0 : model.TbookClassification.DeTelAge),
+                            ATelAge = (byte)(model.TbookClassification.AtelAge < byte.MinValue || model.TbookClassification.AtelAge > byte.MaxValue ? 0 : model.TbookClassification.AtelAge),
+                            Jusqua = (byte)(model.TbookClassification.Jusqua < byte.MinValue || model.TbookClassification.Jusqua > byte.MaxValue ? 0 : model.TbookClassification.Jusqua)
                         };
                     }
 

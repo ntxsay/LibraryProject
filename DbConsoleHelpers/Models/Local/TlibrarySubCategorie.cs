@@ -11,7 +11,7 @@ namespace DbConsoleHelpers.Models.Local
     {
         public TlibrarySubCategorie()
         {
-            TlibraryBookConnector = new HashSet<TlibraryBookConnector>();
+            Tbook = new HashSet<Tbook>();
         }
 
         public long Id { get; set; }
@@ -20,6 +20,6 @@ namespace DbConsoleHelpers.Models.Local
         public string Description { get; set; }
 
         public virtual TlibraryCategorie IdCategorieNavigation { get; set; }
-        public virtual ICollection<TlibraryBookConnector> TlibraryBookConnector { get; set; }
+        public virtual ICollection<Tbook> Tbook { get; set; }
     }
 }

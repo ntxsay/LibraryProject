@@ -191,6 +191,7 @@
     <Compile Include="Models\Local\LibraryDbContext.cs" />
     <Compile Include="Models\Local\Tbook.cs" />
     <Compile Include="Models\Local\TbookAuthorConnector.cs" />
+    <Compile Include="Models\Local\TbookClassification.cs" />
     <Compile Include="Models\Local\TbookCollectionConnector.cs" />
     <Compile Include="Models\Local\TbookEditeurConnector.cs" />
     <Compile Include="Models\Local\TbookEtat.cs" />
@@ -202,7 +203,6 @@
     <Compile Include="Models\Local\Tcollection.cs" />
     <Compile Include="Models\Local\Tcontact.cs" />
     <Compile Include="Models\Local\Tlibrary.cs" />
-    <Compile Include="Models\Local\TlibraryBookConnector.cs" />
     <Compile Include="Models\Local\TlibraryCategorie.cs" />
     <Compile Include="Models\Local\TlibrarySubCategorie.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

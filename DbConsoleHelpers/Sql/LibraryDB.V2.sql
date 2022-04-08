@@ -289,3 +289,5 @@ CREATE TABLE IF NOT EXISTS "TBookPret" (
     FOREIGN KEY("IdEtatAfter") REFERENCES "TBookEtat"("Id") ON DELETE CASCADE
     FOREIGN KEY("IdBookExemplary") REFERENCES "TBookExemplary"("Id") ON DELETE CASCADE
 );
+
+DROP TABLE IF EXISTS "TLibraryBookConnector";

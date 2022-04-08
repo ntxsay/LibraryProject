@@ -11,7 +11,7 @@ namespace LibraryProjectUWP.Models.Local
     {
         public TlibraryCategorie()
         {
-            TlibraryBookConnector = new HashSet<TlibraryBookConnector>();
+            Tbook = new HashSet<Tbook>();
             TlibrarySubCategorie = new HashSet<TlibrarySubCategorie>();
         }
 
@@ -21,7 +21,7 @@ namespace LibraryProjectUWP.Models.Local
         public string Description { get; set; }
 
         public virtual Tlibrary IdLibraryNavigation { get; set; }
-        public virtual ICollection<TlibraryBookConnector> TlibraryBookConnector { get; set; }
+        public virtual ICollection<Tbook> Tbook { get; set; }
         public virtual ICollection<TlibrarySubCategorie> TlibrarySubCategorie { get; set; }
     }
 }

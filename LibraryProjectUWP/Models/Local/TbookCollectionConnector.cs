@@ -16,5 +16,6 @@ namespace LibraryProjectUWP.Models.Local
 
         public virtual Tbook IdBookNavigation { get; set; }
         public virtual Tcollection IdCollectionNavigation { get; set; }
+        public virtual Tlibrary IdLibraryNavigation { get; set; }
     }
 }

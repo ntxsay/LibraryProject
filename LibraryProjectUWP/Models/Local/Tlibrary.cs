@@ -11,8 +11,9 @@ namespace LibraryProjectUWP.Models.Local
     {
         public Tlibrary()
         {
+            Tbook = new HashSet<Tbook>();
+            TbookCollectionConnector = new HashSet<TbookCollectionConnector>();
             Tcollection = new HashSet<Tcollection>();
-            TlibraryBookConnector = new HashSet<TlibraryBookConnector>();
             TlibraryCategorie = new HashSet<TlibraryCategorie>();
         }
 
@@ -23,8 +24,9 @@ namespace LibraryProjectUWP.Models.Local
         public string DateAjout { get; set; }
         public string DateEdition { get; set; }
 
+        public virtual ICollection<Tbook> Tbook { get; set; }
+        public virtual ICollection<TbookCollectionConnector> TbookCollectionConnector { get; set; }
         public virtual ICollection<Tcollection> Tcollection { get; set; }
-        public virtual ICollection<TlibraryBookConnector> TlibraryBookConnector { get; set; }
         public virtual ICollection<TlibraryCategorie> TlibraryCategorie { get; set; }
     }
 }
