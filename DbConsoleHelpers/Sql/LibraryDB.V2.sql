@@ -97,6 +97,9 @@ DROP TABLE IF EXISTS "TBook";
 --Cree la Table si n'existe pas
 CREATE TABLE IF NOT EXISTS "TBook" (
 	"Id" INTEGER NOT NULL UNIQUE,
+    "IdLibrary" INTEGER NOT NULL,
+    "IdCategorie" INTEGER NULL,
+	"IdSubCategorie" INTEGER NULL,
     "Guid" TEXT NOT NULL UNIQUE,--Si le dossier ce cree
     "DateAjout" TEXT NOT NULL,
     "DateEdition" TEXT NULL,
@@ -105,20 +108,17 @@ CREATE TABLE IF NOT EXISTS "TBook" (
     "DateParution" TEXT NULL,
     "Resume" TEXT NULL,
     "Notes" TEXT NULL,
-    "TypeClassification" INTEGER  NOT NULL DEFAULT 0,
-    "ApartirDe" INTEGER  NOT NULL DEFAULT 0,
-    "Jusqua" INTEGER  NOT NULL DEFAULT 0,
-    "DeTelAge" INTEGER  NOT NULL DEFAULT 0,
-    "ATelAge" INTEGER  NOT NULL DEFAULT 0,
 	"Langue" TEXT NULL,
 	"Pays" TEXT NULL,
     "PhysicalLocation" TEXT NULL,
-
     PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("IdLibrary") REFERENCES "TLibrary"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdCategorie") REFERENCES "TLibraryCategorie"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdSubCategorie") REFERENCES "TLibrarySubCategorie"("Id") ON DELETE CASCADE
 );
 
 ----------------------------------------------------------------------------------------------------
--- ISBN Livres -- 
+-- Identification Livres -- 
 --Supprime la Table si existe
 DROP TABLE IF EXISTS "TBookIdentification";
 --Cree la Table si n'existe pas
@@ -131,6 +131,22 @@ CREATE TABLE IF NOT EXISTS "TBookIdentification" (
     "ASIN" TEXT NULL, --Id Amazon
     "Cotation" TEXT NULL,
     "CodeBarre" TEXT NULL, -- voir le scan avec syncfusion si possible
+	PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("Id") REFERENCES "TBook"("Id") ON DELETE CASCADE
+);
+
+----------------------------------------------------------------------------------------------------
+-- Classification Livres -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TBookClassification";
+--Cree la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TBookClassification" (
+	"Id" INTEGER NOT NULL UNIQUE,
+    "TypeClassification" INTEGER  NOT NULL DEFAULT 0,
+    "ApartirDe" INTEGER  NOT NULL DEFAULT 0,
+    "Jusqua" INTEGER  NOT NULL DEFAULT 0,
+    "DeTelAge" INTEGER  NOT NULL DEFAULT 0,
+    "ATelAge" INTEGER  NOT NULL DEFAULT 0,
 	PRIMARY KEY("Id" AUTOINCREMENT)
     FOREIGN KEY("Id") REFERENCES "TBook"("Id") ON DELETE CASCADE
 );
@@ -187,24 +203,6 @@ CREATE TABLE IF NOT EXISTS "TBookExemplary" (
     "Observations" TEXT NULL,
 	PRIMARY KEY("Id" AUTOINCREMENT)
     FOREIGN KEY("IdContactSource") REFERENCES "TContact"("Id") ON DELETE CASCADE
-    FOREIGN KEY("IdBook") REFERENCES "TBook"("Id") ON DELETE CASCADE
-);
-
-----------------------------------------------------------------------------------------------------
--- Connecteur Categorie/Livres -- 
---Supprime la Table si existe
-DROP TABLE IF EXISTS "TLibraryBookConnector";
---Cree la Table si n'existe pas
-CREATE TABLE IF NOT EXISTS "TLibraryBookConnector" (
-	"Id" INTEGER NOT NULL UNIQUE,
-	"IdLibrary" INTEGER NOT NULL,
-	"IdCategorie" INTEGER NULL,
-	"IdSubCategorie" INTEGER NULL,
-	"IdBook" INTEGER NOT NULL,
-	PRIMARY KEY("Id" AUTOINCREMENT)
-    FOREIGN KEY("IdLibrary") REFERENCES "TLibrary"("Id") ON DELETE CASCADE
-    FOREIGN KEY("IdCategorie") REFERENCES "TLibraryCategorie"("Id") ON DELETE CASCADE
-    FOREIGN KEY("IdSubCategorie") REFERENCES "TLibrarySubCategorie"("Id") ON DELETE CASCADE
     FOREIGN KEY("IdBook") REFERENCES "TBook"("Id") ON DELETE CASCADE
 );
 

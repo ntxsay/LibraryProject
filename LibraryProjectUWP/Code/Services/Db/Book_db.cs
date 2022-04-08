@@ -401,13 +401,33 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
-            public static async Task<IList<Tbook>> SearchBooksAsync(long idLibrary, string terms, Search.Book.Terms term, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksAsync(long idLibrary, string terms, Search.Book.Terms termContains, CancellationToken cancellationToken = default)
             {
                 try
                 {
+                    if (terms.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
+
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var preCollection = await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
+                        List<TlibraryBookConnector> preCollection = new List<TlibraryBookConnector>();
+                        switch (termContains)
+                        {
+                            case Search.Book.Terms.Equals:
+                                break;
+                            case Search.Book.Terms.Contains:
+                                break;
+                            case Search.Book.Terms.StartWith:
+                                break;
+                            case Search.Book.Terms.EndWith:
+                                break;
+                            default:
+                                break;
+                        }
+                        preCollection = await context.Tbook.Where(w => w.TlibraryBookConnector. == idLibrary).ToListAsync(cancellationToken);
+                        preCollection = await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
                         if (preCollection.Any())
                         {
                             List<Tbook> collection = new List<Tbook>();
