@@ -18,28 +18,20 @@
     Loaded="Page_Loaded">
 
     <Grid>
-        <MTUUControls:DataGrid x:Name="DataGridItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        <Pivot>
+            <PivotItem Header="Importer des livres depuis un classeur Excel">
+                <MTUUControls:DataGrid x:Name="DataGridItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                                            HorizontalScrollBarVisibility="Visible" Loaded="DataGridItems_Loaded"
                                         VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
                                         AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
                                         AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
                                         MaxColumnWidth="500" FrozenColumnCount="1" GridLinesVisibility="None" HeadersVisibility="Column"
-                                        IsReadOnly="True" BorderThickness="0"
+                                        IsReadOnly="False" BorderThickness="0"
                                         RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
                                         RowGroupHeaderPropertyNameAlternative="Range" SelectionChanged="DataGridItems_SelectionChanged">
-            
-            <MTUUControls:DataGrid.RowStyle>
-                <Style TargetType="MTUUControls:DataGridRow">
-                    <Setter Property="MTUUControls:DataGridRow.ContextFlyout">
-                        <Setter.Value>
-                            <MenuFlyout>
-                                
-                            </MenuFlyout>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </MTUUControls:DataGrid.RowStyle>
-        </MTUUControls:DataGrid>
 
+                </MTUUControls:DataGrid>
+            </PivotItem>
+        </Pivot>
     </Grid>
 </Page>

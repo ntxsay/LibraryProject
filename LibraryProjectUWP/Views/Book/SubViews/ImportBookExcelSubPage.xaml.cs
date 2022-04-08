@@ -59,7 +59,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         DataGridItems.Columns.Add(new DataGridTextColumn()
                         {
                             Header = ParentPage.ViewModelPage.DataTable.Columns[i].ToString(),
-                            Binding = new Binding { Path = new PropertyPath("[" + i.ToString() + "]") }
+                            Binding = new Binding { Path = new PropertyPath("[" + i.ToString() + "]") },
+                            IsReadOnly = i == 0,
                         });
                     }
 

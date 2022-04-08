@@ -6,6 +6,19 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.Code
 {
+    public class Search
+    {
+        public struct Book
+        {
+            public enum Terms
+            {
+                Equals,
+                Contains,
+                StartWith,
+                EndWith,
+            }
+        }
+    }
     public enum EditMode
     {
         Create,

@@ -401,6 +401,45 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
+            public static async Task<IList<Tbook>> SearchBooksAsync(long idLibrary, string terms, Search.Book.Terms term, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var preCollection = await context.TlibraryBookConnector.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
+                        if (preCollection.Any())
+                        {
+                            List<Tbook> collection = new List<Tbook>();
+                            foreach (TlibraryBookConnector driver in preCollection)
+                            {
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    return collection;
+                                }
+
+                                Tbook model = await context.Tbook.SingleOrDefaultAsync(w => w.Id == driver.IdBook, cancellationToken);
+                                if (model != null)
+                                {
+                                    await CompleteModelInfos(context, model);
+                                    collection.Add(model);
+                                }
+                            }
+
+                            return collection;
+                        }
+                    }
+
+                    return Enumerable.Empty<Tbook>().ToList();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<Tbook>().ToList();
+                }
+            }
+
             public static async Task<OperationStateVM> CreateAsync(LivreVM viewModel, long idLibrary)
             {
                 try

@@ -289,6 +289,10 @@
     <Compile Include="Views\Book\ReturnBookExemplaryUC.xaml.cs">
       <DependentUpon>ReturnBookExemplaryUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Book\SubViews\BookSearchSubPage_ViewModelPage.cs" />
+    <Compile Include="Views\Book\SubViews\BookSearchSubPage.xaml.cs">
+      <DependentUpon>BookSearchSubPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\SubViews\BookCollectionSubPage.xaml.cs">
       <DependentUpon>BookCollectionSubPage.xaml</DependentUpon>
     </Compile>
@@ -485,6 +489,10 @@
     <Page Include="Views\Book\ReturnBookExemplaryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\SubViews\BookSearchSubPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Book\SubViews\BookCollectionSubPage.xaml">
       <Generator>MSBuild:Compile</Generator>
