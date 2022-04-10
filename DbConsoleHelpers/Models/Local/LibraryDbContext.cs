@@ -30,6 +30,7 @@ namespace DbConsoleHelpers.Models.Local
         public virtual DbSet<TbookIdentification> TbookIdentification { get; set; }
         public virtual DbSet<TbookOtherTitle> TbookOtherTitle { get; set; }
         public virtual DbSet<TbookPret> TbookPret { get; set; }
+        public virtual DbSet<TbookTranslatorConnector> TbookTranslatorConnector { get; set; }
         public virtual DbSet<Tcollection> Tcollection { get; set; }
         public virtual DbSet<Tcontact> Tcontact { get; set; }
         public virtual DbSet<Tlibrary> Tlibrary { get; set; }
@@ -89,13 +90,13 @@ namespace DbConsoleHelpers.Models.Local
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.HasOne(d => d.IdAuthorNavigation)
-                    .WithMany(p => p.TbookAuthorConnector)
-                    .HasForeignKey(d => d.IdAuthor);
-
                 entity.HasOne(d => d.IdBookNavigation)
                     .WithMany(p => p.TbookAuthorConnector)
                     .HasForeignKey(d => d.IdBook);
+
+                entity.HasOne(d => d.IdContactNavigation)
+                    .WithMany(p => p.TbookAuthorConnector)
+                    .HasForeignKey(d => d.IdContact);
             });
 
             modelBuilder.Entity<TbookClassification>(entity =>
@@ -149,9 +150,9 @@ namespace DbConsoleHelpers.Models.Local
                     .WithMany(p => p.TbookEditeurConnector)
                     .HasForeignKey(d => d.IdBook);
 
-                entity.HasOne(d => d.IdEditeurNavigation)
+                entity.HasOne(d => d.IdContactNavigation)
                     .WithMany(p => p.TbookEditeurConnector)
-                    .HasForeignKey(d => d.IdEditeur);
+                    .HasForeignKey(d => d.IdContact);
             });
 
             modelBuilder.Entity<TbookEtat>(entity =>
@@ -281,6 +282,24 @@ namespace DbConsoleHelpers.Models.Local
                 entity.HasOne(d => d.IdEtatBeforeNavigation)
                     .WithMany(p => p.TbookPretIdEtatBeforeNavigation)
                     .HasForeignKey(d => d.IdEtatBefore);
+            });
+
+            modelBuilder.Entity<TbookTranslatorConnector>(entity =>
+            {
+                entity.ToTable("TBookTranslatorConnector");
+
+                entity.HasIndex(e => e.Id)
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.IdBookNavigation)
+                    .WithMany(p => p.TbookTranslatorConnector)
+                    .HasForeignKey(d => d.IdBook);
+
+                entity.HasOne(d => d.IdContactNavigation)
+                    .WithMany(p => p.TbookTranslatorConnector)
+                    .HasForeignKey(d => d.IdContact);
             });
 
             modelBuilder.Entity<Tcollection>(entity =>

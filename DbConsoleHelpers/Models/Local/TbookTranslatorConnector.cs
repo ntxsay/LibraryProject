@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace DbConsoleHelpers.Models.Local
 {
-    public partial class TbookAuthorConnector
+    public partial class TbookTranslatorConnector
     {
         public long Id { get; set; }
         public long IdBook { get; set; }

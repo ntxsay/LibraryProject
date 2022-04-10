@@ -5,9 +5,9 @@ using System.Collections.Generic;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace DbConsoleHelpers.Models.Local
+namespace LibraryProjectUWP.Models.Local
 {
-    public partial class TbookAuthorConnector
+    public partial class TbookTranslatorConnector
     {
         public long Id { get; set; }
         public long IdBook { get; set; }

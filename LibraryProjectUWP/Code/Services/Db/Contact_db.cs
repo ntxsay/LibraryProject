@@ -126,7 +126,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         {
                             foreach (TbookAuthorConnector driver in preCollection)
                             {
-                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdAuthor);
+                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdContact);
                                 if (model != null)
                                 {
                                     collection.Add(model);
@@ -143,7 +143,24 @@ namespace LibraryProjectUWP.Code.Services.Db
                         {
                             foreach (TbookEditeurConnector driver in preCollection)
                             {
-                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdEditeur);
+                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdContact);
+                                if (model != null)
+                                {
+                                    collection.Add(model);
+                                }
+                            }
+
+                            return collection;
+                        }
+                    }
+                    else if (contactType == ContactType.Translator)
+                    {
+                        var preCollection = await context.TbookTranslatorConnector.Where(w => w.IdBook == idBook).ToListAsync();
+                        if (preCollection.Any())
+                        {
+                            foreach (TbookTranslatorConnector driver in preCollection)
+                            {
+                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdContact);
                                 if (model != null)
                                 {
                                     collection.Add(model);
@@ -181,6 +198,146 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return Enumerable.Empty<ContactVM>().ToList();
                 }
             }
+
+            public static async Task<IList<long>> GetIdListInBookAsync(long idBook, ContactType contactType)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+
+                        switch (contactType)
+                        {
+                            case ContactType.Adherant:
+                                break;
+                            case ContactType.Author:
+                                return await context.TbookAuthorConnector.Where(w => w.IdBook == idBook).Select(s => s.Id).ToListAsync();
+                            case ContactType.Translator:
+                                return await context.TbookTranslatorConnector.Where(w => w.IdBook == idBook).Select(s => s.Id).ToListAsync();
+                            case ContactType.EditorHouse:
+                                return await context.TbookEditeurConnector.Where(w => w.IdBook == idBook).Select(s => s.Id).ToListAsync();
+                            case ContactType.Enterprise:
+                                break;
+                        }
+
+                        return Enumerable.Empty<long>().ToList();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<long>().ToList();
+                }
+            }
+
+
+            public static async Task<IList<long>> CompareIdListInBookAsync(long idBook, IEnumerable<long> idContactList, ContactType contactType)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+
+                        List<long> collection = new List<long>(idContactList);
+                        if (contactType == ContactType.Author)
+                        {
+                            var preCollection = await context.TbookAuthorConnector.Where(w => w.IdBook == idBook).Select(s => s.Id).ToListAsync();
+                            if (preCollection.Any())
+                            {
+                                for (int i = 0; i < preCollection.Count; i++)
+                                {
+                                    if (collection.Count == 0)
+                                    {
+                                        break;
+                                    }
+
+                                    if (!collection.Any(a => a == collection[i]))
+                                    {
+                                        collection.Remove(collection[i]);
+                                        i = 0;
+                                    }
+                                }
+
+                                return collection;
+                            }
+                        }
+                        else if (contactType == ContactType.EditorHouse)
+                        {
+                            var preCollection = await context.TbookEditeurConnector.Where(w => w.IdBook == idBook).Select(s => s.Id).ToListAsync();
+                            if (preCollection.Any())
+                            {
+                                for (int i = 0; i < preCollection.Count; i++)
+                                {
+                                    if (collection.Count == 0)
+                                    {
+                                        break;
+                                    }
+
+                                    if (!collection.Any(a => a == collection[i]))
+                                    {
+                                        collection.Remove(collection[i]);
+                                        i = 0;
+                                    }
+                                }
+
+                                return collection;
+                            }
+                        }
+
+                        return collection;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<long>().ToList();
+                }
+            }
+
+            /// <summary>
+            /// Retourne uniquement les modèles qui font partie de la liste d'identifiants "<paramref name="idContactList"/>"
+            /// </summary>
+            /// <param name="idContactList"></param>
+            /// <param name="tcontacts"></param>
+            /// <returns></returns>
+            public static IEnumerable<Tcontact> CompareIdAndPurge(IEnumerable<long> idContactList, IEnumerable<Tcontact> tcontacts)
+            {
+                try
+                {
+                    if (tcontacts == null || !tcontacts.Any())
+                    {
+                        return Enumerable.Empty<Tcontact>().ToList();
+                    }
+
+                    if (idContactList == null || !idContactList.Any())
+                    {
+                        return tcontacts;
+                    }
+
+                    List<Tcontact> Ncollection = new List<Tcontact>();
+                    foreach (var idContact in idContactList)
+                    {
+                        if (tcontacts.Any(a => a.Id == idContact))
+                        {
+                            var tContact = tcontacts.FirstOrDefault(f => f.Id == idContact);
+                            if (tContact != null)
+                            {
+                                Ncollection.Add(tContact);
+                            }
+                        }
+                    }
+                    return Ncollection;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<Tcontact>().ToList();
+                }
+            }
+
             #endregion
 
 

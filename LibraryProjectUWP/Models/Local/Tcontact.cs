@@ -15,6 +15,7 @@ namespace LibraryProjectUWP.Models.Local
             TbookEditeurConnector = new HashSet<TbookEditeurConnector>();
             TbookExemplary = new HashSet<TbookExemplary>();
             TbookPret = new HashSet<TbookPret>();
+            TbookTranslatorConnector = new HashSet<TbookTranslatorConnector>();
         }
 
         public long Id { get; set; }
@@ -46,5 +47,6 @@ namespace LibraryProjectUWP.Models.Local
         public virtual ICollection<TbookEditeurConnector> TbookEditeurConnector { get; set; }
         public virtual ICollection<TbookExemplary> TbookExemplary { get; set; }
         public virtual ICollection<TbookPret> TbookPret { get; set; }
+        public virtual ICollection<TbookTranslatorConnector> TbookTranslatorConnector { get; set; }
     }
 }

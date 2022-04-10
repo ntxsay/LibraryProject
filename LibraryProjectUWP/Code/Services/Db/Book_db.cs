@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.Code.Helpers;
+﻿using LibraryProjectUWP.Code.Extensions;
+using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels.Author;
@@ -115,13 +116,53 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<long>> GetListOfIdBooksAsync(long idLibrary)
+            public static async Task<IList<long>> GetListOfIdBooksInLibraryAsync(long idLibrary)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
                         return await context.Tbook.Where(w => w.IdLibrary == idLibrary).Select(s => s.Id).ToListAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<long>().ToList();
+                }
+            }
+
+            public static async Task<IList<long>> GetListOfIdBooksFromContactListAsync(IEnumerable<long> idContactList, ContactType contactType)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        List<long> Ncollection = new List<long>();
+                        if (contactType == ContactType.Author)
+                        {
+                            foreach (var idContact in idContactList)
+                            {
+                                long? idBook = (await context.TbookAuthorConnector.SingleOrDefaultAsync(w => w.Id == idContact))?.IdBook;
+                                if (idBook != null)
+                                {
+                                    Ncollection.Add((long)idBook);
+                                }
+                            }
+                        }
+                        else if (contactType == ContactType.EditorHouse)
+                        {
+                            foreach (var idContact in idContactList)
+                            {
+                                long? idBook = (await context.TbookEditeurConnector.SingleOrDefaultAsync(w => w.Id == idContact))?.IdBook;
+                                if (idBook != null)
+                                {
+                                    Ncollection.Add((long)idBook);
+                                }
+                            }
+                        }
+                        return Ncollection.Distinct().ToList() ;
                     }
                 }
                 catch (Exception ex)
@@ -335,16 +376,26 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
             /// <param name="id">Identifiant unique</param>
             /// <returns></returns>
-            public static async Task<Tbook> SingleAsync(long id)
+            public static async Task<Tbook> SingleAsync(long id, long? idLibrary = null)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var s = await context.Tbook.SingleOrDefaultAsync(d => d.Id == id);
-                        await CompleteModelInfos(context, s);
-                        if (s == null) return null;
+                        Tbook s = null;
+                        
+                        if (idLibrary != null)
+                        {
+                            s = await context.Tbook.SingleOrDefaultAsync(d => d.Id == id && d.IdLibrary == (long)idLibrary);
+                        }
+                        else
+                        {
+                            s = await context.Tbook.SingleOrDefaultAsync(d => d.Id == id);
+                        }
 
+                        if (s == null) return null;
+                        
+                        await CompleteModelInfos(context, s);
                         return s;
                     }
                 }
@@ -363,17 +414,21 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <typeparam name="T2">Type sortie (Modèle de vue)</typeparam>
             /// <param name="id"></param>
             /// <returns></returns>
-            public static async Task<LivreVM> SingleVMAsync(long id)
+            public static async Task<LivreVM> SingleVMAsync(long id, long? idLibrary = null)
             {
-                return await ViewModelConverterAsync(await SingleAsync(id));
+                return await ViewModelConverterAsync(await SingleAsync(id, idLibrary));
             }
             #endregion
 
-            public static async Task<IList<Tbook>> SearchBooksAsync(long idLibrary, string terms, IEnumerable<Search.Book.In> searchIn, Search.Book.Terms termContains, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksAsync(ResearchBookVM parameters, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    if (terms.IsStringNullOrEmptyOrWhiteSpace() || searchIn == null || !searchIn.Any())
+                    if (parameters == null)
+                    {
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
+                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace() || parameters.SearchIn == null || !parameters.SearchIn.Any())
                     {
                         return Enumerable.Empty<Tbook>().ToList();
                     }
@@ -381,25 +436,26 @@ namespace LibraryProjectUWP.Code.Services.Db
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
                         List<Tbook> tbooks = new List<Tbook>() ;
-                        
-                        foreach (Search.Book.In _searchin in searchIn)
+                        TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
+
+                        foreach (Search.Book.In _searchin in parameters.SearchIn)
                         {
                             switch (_searchin)
                             {
                                 case Search.Book.In.MainTitle:
-                                    switch (termContains)
+                                    switch (parameters.TermParameter)
                                     {
                                         case Search.Book.Terms.Equals:
-                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle == terms).ToListAsync(cancellationToken);
+                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle == parameters.Term).ToListAsync(cancellationToken);
                                             break;
                                         case Search.Book.Terms.Contains:
-                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle.Contains(terms)).ToListAsync(cancellationToken);
+                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.Contains(parameters.Term)).ToListAsync(cancellationToken);
                                             break;
                                         case Search.Book.Terms.StartWith:
-                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle.StartsWith(terms)).ToListAsync(cancellationToken);
+                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
                                             break;
                                         case Search.Book.Terms.EndWith:
-                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle.EndsWith(terms)).ToListAsync(cancellationToken);
+                                            tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
                                             break;
                                         default:
                                             break;
@@ -407,19 +463,19 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     break;
                                 case Search.Book.In.OtherTitle:
                                     List<TbookOtherTitle> booksTitles = null;
-                                    switch (termContains)
+                                    switch (parameters.TermParameter)
                                     {
                                         case Search.Book.Terms.Equals:
-                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title == terms).ToListAsync(cancellationToken);
+                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title == parameters.Term).ToListAsync(cancellationToken);
                                             break;
                                         case Search.Book.Terms.Contains:
-                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title.Contains(terms)).ToListAsync(cancellationToken);
+                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title.Contains(parameters.Term)).ToListAsync(cancellationToken);
                                             break;
                                         case Search.Book.Terms.StartWith:
-                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title.StartsWith(terms)).ToListAsync(cancellationToken);
+                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
                                             break;
                                         case Search.Book.Terms.EndWith:
-                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title.EndsWith(terms)).ToListAsync(cancellationToken);
+                                            booksTitles = await context.TbookOtherTitle.Where(w => w.Title.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
                                             break;
                                         default:
                                             break;
@@ -427,21 +483,64 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                                     if (booksTitles != null && booksTitles.Any())
                                     {
-                                        List<Tbook> _tbooks = booksTitles.Select(async s => await SingleAsync(s.Id)).Select(t => t.Result).Where(w => w.IdLibrary == idLibrary).ToList();
+                                        List<Tbook> _tbooks = booksTitles.Select(async s => await SingleAsync(s.Id, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
                                         if (_tbooks != null && _tbooks.Any())
                                         {
                                             tbooks.AddRange(_tbooks);
                                         }
                                     }
                                     break;
+                                case Search.Book.In.Author:
+                                    if (await context.Tcontact.AnyAsync())
+                                    {
+                                        List<Tcontact> tcontactsAuthor = null;
+                                        switch (parameters.TermParameter)
+                                        {
+                                            case Search.Book.Terms.Equals:
+                                                tcontactsAuthor = await context.Tcontact.Where(w => w.NomNaissance.ToUpperInvariant() == parameters.Term.ToUpperInvariant() || w.Prenom == parameters.Term || (w.AutresPrenoms != null && w.AutresPrenoms.ToUpperInvariant() == parameters.Term.ToUpperInvariant()) || (w.SocietyName != null && w.SocietyName.ToUpperInvariant() == parameters.Term.ToUpperInvariant())).ToListAsync(cancellationToken);
+                                                break;
+                                            case Search.Book.Terms.Contains:
+                                                tcontactsAuthor = await context.Tcontact.Where(w => w.NomNaissance.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant()) || w.Prenom.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant()) || (w.AutresPrenoms != null && w.AutresPrenoms.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant())) || (w.SocietyName != null && w.SocietyName.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
+                                                break;
+                                            case Search.Book.Terms.StartWith:
+                                                tcontactsAuthor = await context.Tcontact.Where(w => w.NomNaissance.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant()) || w.Prenom.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant()) || (w.AutresPrenoms != null && w.AutresPrenoms.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant())) || (w.SocietyName != null && w.SocietyName.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
+                                                break;
+                                            case Search.Book.Terms.EndWith:
+                                                tcontactsAuthor = await context.Tcontact.Where(w => w.NomNaissance.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant()) || w.Prenom.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant()) || (w.AutresPrenoms != null && w.AutresPrenoms.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant())) || (w.SocietyName != null && w.SocietyName.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+                                        if (tcontactsAuthor != null && tcontactsAuthor.Any())
+                                        {
+                                            var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontactsAuthor.Select(s => s.Id), ContactType.Author);
+                                            List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
+                                            if (_tbooks != null && _tbooks.Any())
+                                            {
+                                                tbooks.AddRange(_tbooks);
+                                            }
+                                        }
+                                    }
+                                    
+                                    break;
+                                case Search.Book.In.Collection:
+                                    break;
+                                case Search.Book.In.Editor:
+                                    break;
                                 default:
                                     break;
+                            }
+
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                break;
                             }
                         }
 
                         if (tbooks != null && tbooks.Any())
                         {
-                            tbooks = tbooks.Distinct().ToList();
+                            tbooks = tbooks.Distinct(tbookIdEqualityComparer).ToList();
                             tbooks.ForEach(async (book) => await CompleteModelInfos(context, book));
                             return tbooks;
                         }
@@ -457,16 +556,20 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<LivreVM>> SearchBooksVMAsync(long idLibrary, string terms, IEnumerable<Search.Book.In> searchIn, Search.Book.Terms termContains, CancellationToken cancellationToken = default)
+            public static async Task<IList<LivreVM>> SearchBooksVMAsync(ResearchBookVM parameters, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    if (terms.IsStringNullOrEmptyOrWhiteSpace() || searchIn == null || !searchIn.Any())
+                    if (parameters == null)
+                    {
+                        return Enumerable.Empty<LivreVM>().ToList();
+                    }
+                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace() || parameters.SearchIn == null || !parameters.SearchIn.Any())
                     {
                         return Enumerable.Empty<LivreVM>().ToList();
                     }
 
-                    var collection = await SearchBooksAsync(idLibrary, terms, searchIn.Distinct(), termContains, cancellationToken);
+                    var collection = await SearchBooksAsync(parameters, cancellationToken);
                     if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
 
                     var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
@@ -516,6 +619,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         var record = new Tbook()
                         {
+                            IdLibrary = idLibrary,
                             Guid = viewModel.Guid.ToString(),
                             DateAjout = viewModel.DateAjout.ToString(),
                             DateEdition = viewModel.DateEdition?.ToString(),
@@ -606,7 +710,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     var authorConnector = new TbookAuthorConnector()
                                     {
                                         IdBook = record.Id,
-                                        IdAuthor = author.Id,
+                                        IdContact = author.Id,
                                     };
                                     _ = await context.TbookAuthorConnector.AddAsync(authorConnector);
                                     await context.SaveChangesAsync();
@@ -642,7 +746,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     var itemConnector = new TbookEditeurConnector()
                                     {
                                         IdBook = record.Id,
-                                        IdEditeur = editeur.Id,
+                                        IdContact = editeur.Id,
                                     };
 
                                     _ = await context.TbookEditeurConnector.AddAsync(itemConnector);
@@ -886,7 +990,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     var authorConnector = new TbookAuthorConnector()
                                     {
                                         IdBook = record.Id,
-                                        IdAuthor = author.Id,
+                                        IdContact = author.Id,
                                     };
 
                                     _ = await context.TbookAuthorConnector.AddAsync(authorConnector);
@@ -932,7 +1036,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     var itemConnector = new TbookEditeurConnector()
                                     {
                                         IdBook = record.Id,
-                                        IdEditeur = editeur.Id,
+                                        IdContact = editeur.Id,
                                     };
 
                                     _ = await context.TbookEditeurConnector.AddAsync(itemConnector);

@@ -26,6 +26,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
         private BackgroundWorker workerCountBooks;
+        private BackgroundWorker workerResearchBooks;
         private BackgroundWorker workerSearchBooks;
         private BackgroundWorker workerSearchPretsBook;
         private BackgroundWorker workerSearchExemplariesBook;
@@ -36,6 +37,7 @@ namespace LibraryProjectUWP.Views.Book
         CancellationTokenSource cancellationTokenSourceSearchPretsBook = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceSearchBookExemplaries = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceCompleteInfoBook = new CancellationTokenSource();
+        CancellationTokenSource cancellationTokenSourceResearchBooks = new CancellationTokenSource();
 
         public void OpenBookCollection()
         {
@@ -837,6 +839,140 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        #region ResearchBook
+        public void InitializeResearchingBookWorker()
+        {
+            try
+            {
+                if (workerResearchBooks == null)
+                {
+                    workerResearchBooks = new BackgroundWorker()
+                    {
+                        WorkerReportsProgress = false,
+                        WorkerSupportsCancellation = true,
+                    };
 
+                    workerResearchBooks.DoWork += WorkerResearchBooks_DoWork;
+                    workerResearchBooks.RunWorkerCompleted += WorkerResearchBooks_RunWorkerCompleted;
+                }
+
+                if (workerResearchBooks != null)
+                {
+                    if (!workerResearchBooks.IsBusy)
+                    {
+                        cancellationTokenSourceResearchBooks = new CancellationTokenSource();
+
+                        if (!ViewModelPage.TaskList.Any(a => a.Id == EnumTaskId.ResearchBooks))
+                        {
+                            ViewModelPage.TaskList.Add(new TaskVM()
+                            {
+                                Id = EnumTaskId.ResearchBooks,
+                                Description = $"Recherche de livres avec le terme : \"{ViewModelPage.ResearchBook.Term}\" en cours.."
+                            });
+                        }
+
+                        workerResearchBooks.RunWorkerAsync();
+                        //new ToastContentBuilder()
+                        //.AddText($"Exemplaires de {viewModel.MainTitle}")
+                        //.AddText($"Nous sommes en train de récupérer les exemplaire du livre {viewModel.MainTitle}, nous vous prions de patienter quelques instants.")
+                        //.Show();
+                    }
+                    else
+                    {
+                        new ToastContentBuilder()
+                        .AddText($"Rechercher des livres")
+                        .AddText($"Nous sommes toujours en train de rechercher les livres, nous vous prions de patienter quelques instants.")
+                        .Show();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void WorkerResearchBooks_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                if (sender is BackgroundWorker worker)
+                {
+                    using (Task<IList<LivreVM>> task = DbServices.Book.SearchBooksVMAsync(ViewModelPage.ResearchBook, cancellationTokenSourceResearchBooks.Token))
+                    {
+                        task.Wait();
+
+                        if (worker.CancellationPending || cancellationTokenSourceResearchBooks.IsCancellationRequested)
+                        {
+                            if (!cancellationTokenSourceResearchBooks.IsCancellationRequested)
+                            {
+                                cancellationTokenSourceResearchBooks.Cancel();
+                            }
+
+                            e.Cancel = true;
+                            return;
+                        }
+
+                        var result = task.Result;
+                        var state = new WorkerState<LivreVM, LivreVM>()
+                        {
+                            ResultList = result,
+                        };
+
+                        e.Result = state;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void WorkerResearchBooks_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            try
+            {
+                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == EnumTaskId.ResearchBooks);
+                if (item != null)
+                {
+                    ViewModelPage.TaskList.Remove(item);
+                }
+
+                // Si erreur
+                if (e.Error != null)
+                {
+
+                }
+                else if (e.Cancelled)
+                {
+                    // Support de l'annulation a été désactivée
+                }
+                else
+                {
+                    if (e.Result is WorkerState<LivreVM, LivreVM> state)
+                    {
+                        new ToastContentBuilder()
+                        .AddText($"Rechercher des livres")
+                        .AddText($"La recherche s'est terminé avec {state.ResultList.Count()} livre(s) trouvé.")
+                        .Show();
+                    }
+                }
+
+                workerResearchBooks.Dispose();
+                workerResearchBooks = null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #endregion
     }
 }

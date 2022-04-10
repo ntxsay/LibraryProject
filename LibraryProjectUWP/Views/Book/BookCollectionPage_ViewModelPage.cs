@@ -32,6 +32,20 @@ namespace LibraryProjectUWP.Views.Book
         {
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+            private ResearchBookVM _ResearchBook;
+            public ResearchBookVM ResearchBook
+            {
+                get => this._ResearchBook;
+                set
+                {
+                    if (this._ResearchBook != value)
+                    {
+                        this._ResearchBook = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
             private DataTable _DataTable;
             public DataTable DataTable
             {

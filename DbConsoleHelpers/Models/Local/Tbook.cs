@@ -16,6 +16,7 @@ namespace DbConsoleHelpers.Models.Local
             TbookEditeurConnector = new HashSet<TbookEditeurConnector>();
             TbookExemplary = new HashSet<TbookExemplary>();
             TbookOtherTitle = new HashSet<TbookOtherTitle>();
+            TbookTranslatorConnector = new HashSet<TbookTranslatorConnector>();
         }
 
         public long Id { get; set; }
@@ -45,5 +46,6 @@ namespace DbConsoleHelpers.Models.Local
         public virtual ICollection<TbookEditeurConnector> TbookEditeurConnector { get; set; }
         public virtual ICollection<TbookExemplary> TbookExemplary { get; set; }
         public virtual ICollection<TbookOtherTitle> TbookOtherTitle { get; set; }
+        public virtual ICollection<TbookTranslatorConnector> TbookTranslatorConnector { get; set; }
     }
 }

@@ -22,6 +22,9 @@ namespace LibraryProjectUWP.Code
             {
                 MainTitle,
                 OtherTitle,
+                Author,
+                Collection,
+                Editor,
             }
         }
     }
@@ -71,6 +74,7 @@ namespace LibraryProjectUWP.Code
     {
         Adherant,
         Author,
+        Translator,
         EditorHouse,
         Enterprise,
     }
@@ -109,6 +113,7 @@ namespace LibraryProjectUWP.Code
     public enum EnumTaskId : byte
     {
         SearchBooks,
+        ResearchBooks,
         CountBooks,
         SearchBookExemplary,
         SearchBookPret,

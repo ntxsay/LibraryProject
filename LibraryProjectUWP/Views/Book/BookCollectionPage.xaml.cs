@@ -2218,7 +2218,8 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Search
-        private async void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+
+        private void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             try
             {
@@ -2227,16 +2228,26 @@ namespace LibraryProjectUWP.Views.Book
                 //    ViewModelPage.SearchedViewModel = null;
                 //}
 
-                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || _parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace())
                 {
                     return;
                 }
 
-                var viewModelList = await DbServices.Book.SearchBooksVMAsync(_parameters.ParentLibrary.Id, sender.Text, new Code.Search.Book.In[]
+                ViewModelPage.ResearchBook = new ResearchBookVM()
                 {
-                    Code.Search.Book.In.MainTitle,
-                    Code.Search.Book.In.OtherTitle,
-                }, Code.Search.Book.Terms.Contains);
+                    IdLibrary = _parameters.ParentLibrary.Id,
+                    Term = sender.Text.Trim(),
+                    TermParameter = Code.Search.Book.Terms.Contains,
+                    SearchIn = new ObservableCollection<Code.Search.Book.In>()
+                    {
+                        Code.Search.Book.In.MainTitle,
+                        Code.Search.Book.In.OtherTitle,
+                        Code.Search.Book.In.Author
+                    },
+                };
+
+                InitializeResearchingBookWorker();
+                return;
 
                 var FilteredItems = new List<LivreVM>();
                 var splitSearchTerm = sender.Text.ToLower().Split(" ");

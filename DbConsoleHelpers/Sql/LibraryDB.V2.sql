@@ -214,12 +214,25 @@ DROP TABLE IF EXISTS "TBookAuthorConnector";
 CREATE TABLE IF NOT EXISTS "TBookAuthorConnector" (
 	"Id" INTEGER NOT NULL UNIQUE,
 	"IdBook" INTEGER NOT NULL,
-	"IdAuthor" INTEGER NOT NULL,
+	"IdContact" INTEGER NOT NULL,
 	PRIMARY KEY("Id" AUTOINCREMENT)
     FOREIGN KEY("IdBook") REFERENCES "TBook"("Id") ON DELETE CASCADE
-    FOREIGN KEY("IdAuthor") REFERENCES "TContact"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdContact") REFERENCES "TContact"("Id") ON DELETE CASCADE
 );
 
+----------------------------------------------------------------------------------------------------
+-- Connecteur Traducteurs/Livres -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TBookTranslatorConnector";
+--Cree la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TBookTranslatorConnector" (
+	"Id" INTEGER NOT NULL UNIQUE,
+	"IdBook" INTEGER NOT NULL,
+	"IdContact" INTEGER NOT NULL,
+	PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("IdBook") REFERENCES "TBook"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdContact") REFERENCES "TContact"("Id") ON DELETE CASCADE
+);
 
 ----------------------------------------------------------------------------------------------------
 -- Connecteur Editeur/Livres -- 
@@ -228,10 +241,10 @@ DROP TABLE IF EXISTS "TBookEditeurConnector";
 --Cree la Table si n'existe pas
 CREATE TABLE IF NOT EXISTS "TBookEditeurConnector" (
 	"Id" INTEGER NOT NULL UNIQUE,
-	"IdEditeur" INTEGER NOT NULL,
+	"IdContact" INTEGER NOT NULL,
 	"IdBook" INTEGER NOT NULL,
 	PRIMARY KEY("Id" AUTOINCREMENT)
-    FOREIGN KEY("IdEditeur") REFERENCES "TContact"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdContact") REFERENCES "TContact"("Id") ON DELETE CASCADE
     FOREIGN KEY("IdBook") REFERENCES "TBook"("Id") ON DELETE CASCADE
 );
 

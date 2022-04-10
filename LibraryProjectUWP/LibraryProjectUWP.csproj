@@ -150,6 +150,8 @@
     <Compile Include="Code\DataTemplatesSelector\DataViewModeTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\CategoriesDataTemplateSelector.cs" />
     <Compile Include="Code\Enums.cs" />
+    <Compile Include="Code\Extensions\EqualityComparerExtensions.cs" />
+    <Compile Include="Code\Extensions\LinqExtensions.cs" />
     <Compile Include="Code\Extensions\ScrollViewerExtensions.cs" />
     <Compile Include="Code\Helpers\CivilityHelpers.cs" />
     <Compile Include="Code\Helpers\CountryHelpers.cs" />
@@ -200,6 +202,7 @@
     <Compile Include="Models\Local\TbookIdentification.cs" />
     <Compile Include="Models\Local\TbookOtherTitle.cs" />
     <Compile Include="Models\Local\TbookPret.cs" />
+    <Compile Include="Models\Local\TbookTranslatorConnector.cs" />
     <Compile Include="Models\Local\Tcollection.cs" />
     <Compile Include="Models\Local\Tcontact.cs" />
     <Compile Include="Models\Local\Tlibrary.cs" />
@@ -222,6 +225,7 @@
     <Compile Include="ViewModels\Book\LivreFormatVM.cs" />
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
     <Compile Include="ViewModels\Book\ManageBookParametersDriverVM.cs" />
+    <Compile Include="ViewModels\Book\ResearchBookVM.cs" />
     <Compile Include="ViewModels\CategorieLivreVM.cs" />
     <Compile Include="ViewModels\Categorie\CategorieParameterDriverVM.cs" />
     <Compile Include="ViewModels\Collection\CollectionVM.cs" />
