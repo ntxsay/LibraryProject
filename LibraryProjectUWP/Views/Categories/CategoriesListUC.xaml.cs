@@ -1057,13 +1057,13 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-        private void NavigateInUncategorizedItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void NavigateInUncategorizedItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 _parameters.BookPage.ViewModelPage.DisplayUnCategorizedBooks = true;
-                _parameters.BookPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                await _parameters.BookPage.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -1120,14 +1120,14 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-        private void NavigateInAllItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void NavigateInAllItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 _parameters.BookPage.ViewModelPage.DisplayUnCategorizedBooks = false;
                 _parameters.BookPage.ViewModelPage.SelectedSCategories = null;
-                _parameters.BookPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                await _parameters.BookPage.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -1136,7 +1136,7 @@ namespace LibraryProjectUWP.Views.Categories
             }
         }
 
-        private void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1144,7 +1144,7 @@ namespace LibraryProjectUWP.Views.Categories
                 if (ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
                 {
                     _parameters.BookPage.ViewModelPage.SelectedSCategories = ViewModelPage.SelectedItems.Select(s => s.Content).ToList();
-                    _parameters.BookPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                    await _parameters.BookPage.RefreshItemsGrouping();
                 }
             }
             catch (Exception ex)

@@ -131,12 +131,12 @@ namespace LibraryProjectUWP.Views.Settings
         }
         #endregion
 
-        private void BtnCancel_Click(object sender, RoutedEventArgs e)
+        private async void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                VisualViewHelpers.MainControlsUI.MainPage.GoToBack();
+                await VisualViewHelpers.MainControlsUI.MainPage.GoToBack();
             }
             catch (Exception ex)
             {

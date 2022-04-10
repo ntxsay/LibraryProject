@@ -950,7 +950,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void WorkerResearchBooks_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private async void WorkerResearchBooks_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             try
             {
@@ -974,7 +974,7 @@ namespace LibraryProjectUWP.Views.Book
                     if (e.Result is WorkerState<LivreVM, LivreVM> state)
                     {
                         //GroupItemsBySearch(state.ResultList.ToList());
-                        RefreshItemsGrouping(state.ResultList.ToList());
+                        //await RefreshItemsGrouping(state.ResultList.ToList());
                         new ToastContentBuilder()
                         .AddText($"Rechercher des livres")
                         .AddText($"La recherche s'est terminé avec {state.ResultList.Count()} livre(s) trouvé.")

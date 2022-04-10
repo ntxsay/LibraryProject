@@ -165,6 +165,7 @@
     <Compile Include="Code\Services\Db\BookEtat_db.cs" />
     <Compile Include="Code\Services\Db\BookPret_db.cs" />
     <Compile Include="Code\Services\Db\BookExemplary_db.cs" />
+    <Compile Include="Code\Services\Db\Book_search_db.cs" />
     <Compile Include="Code\Services\Db\Book_pagination_db.cs" />
     <Compile Include="Code\Services\Db\Contact_db.cs" />
     <Compile Include="Code\Services\Db\Book_db.cs" />

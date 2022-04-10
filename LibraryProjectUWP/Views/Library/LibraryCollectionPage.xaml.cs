@@ -2322,17 +2322,12 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is Viewbox viewbox && viewbox.Tag is BibliothequeVM viewModel)
                 {
-                    if (viewModel.Books != null && viewModel.Books.Count > 0)
+                    VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
+                    var mainPage = mainControlsUI.GetMainPage;
+                    if (mainPage != null)
                     {
-                        VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
-                        var mainPage = mainControlsUI.GetMainPage;
-                        if (mainPage != null)
-                        {
-                            mainPage.BookCollectionNavigationAsync(viewModel, null);
-                        }
-                        return;
+                        mainPage.BookCollectionNavigationAsync(viewModel, null);
                     }
-                    InitializeSearchingBookWorker(viewModel);
                 }
             }
             catch (Exception ex)

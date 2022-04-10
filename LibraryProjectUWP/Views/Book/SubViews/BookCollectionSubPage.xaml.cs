@@ -42,13 +42,13 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             this.InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             if (e.Parameter is BookCollectionPage parameters)
             {
                 ParentPage = parameters;
-                InitializeDataAsync(true);
+                await InitializeDataAsync(true);
             }
         }
 
@@ -90,18 +90,18 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private void InitializeDataAsync(bool firstLoad)
+        private async Task InitializeDataAsync(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
                 {
-                    this.GridViewMode(firstLoad);
+                    await this.GridViewMode(firstLoad);
                 }
                 else if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
                 {
-                    this.DataGridViewMode(firstLoad);
+                    await this.DataGridViewMode(firstLoad);
                 }
             }
             catch (Exception ex)
@@ -111,7 +111,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public void GridViewMode(bool firstLoad)
+        public async Task GridViewMode(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -123,7 +123,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
                 }
                 
-                RefreshItemsGrouping(ParentPage._parameters.ParentLibrary.Books);
+                await RefreshItemsGrouping();
                 this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                 this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
@@ -134,7 +134,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public void DataGridViewMode(bool firstLoad)
+        public async Task DataGridViewMode(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -146,7 +146,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
                 }
                 
-                RefreshItemsGrouping(ParentPage._parameters.ParentLibrary.Books);
+                await RefreshItemsGrouping();
                 this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                 this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
@@ -675,14 +675,14 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         #endregion
 
         #region Paginations
-        private void GotoPageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void GotoPageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (args.Parameter is int page)
                 {
-                    GotoPage(page);
+                    await GotoPage(page);
                 }
             }
             catch (Exception ex)
@@ -700,22 +700,22 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 if (e.Key == Windows.System.VirtualKey.Q)
                 {
                     await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                    () =>
+                    async () =>
                     {
                         var selectedPage = this.GetSelectedPage - 1;
                         if (selectedPage >= 1)
                         {
-                            this.GotoPage(selectedPage);
+                            await this.GotoPage(selectedPage);
                         }
                     });
                 }
                 else if (e.Key == Windows.System.VirtualKey.D)
                 {
                     await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                    () =>
+                    async () =>
                     {
                         var selectedPage = this.GetSelectedPage;
-                        this.GotoPage(selectedPage + 1);
+                        await this.GotoPage(selectedPage + 1);
                     });
                 }
                 else if (e.Key == Windows.System.VirtualKey.Z)
@@ -740,7 +740,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public void GotoPage(int page)
+        public async Task GotoPage(int page)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -759,7 +759,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     }
                 }
 
-                this.RefreshItemsGrouping(ParentPage._parameters.ParentLibrary.Books, page, false);
+                await this.RefreshItemsGrouping(page, false);
                 var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
                 if (buttonsPage != null && buttonsPage.Any())
                 {
@@ -878,20 +878,20 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
 
         #region Search
-        public void SearchViewModel(LivreVM viewModel)
+        public async Task SearchViewModel(LivreVM viewModel)
         {
             if (viewModel == null) return;
             if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
             {
-                SearchViewModelGridView(viewModel);
+                await SearchViewModelGridView(viewModel);
             }
             else if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
             {
-                SearchViewModelDataGridView(viewModel);
+                await SearchViewModelDataGridView(viewModel);
             }
         }
 
-        public void SearchViewModelGridView(LivreVM viewModel)
+        public async Task SearchViewModelGridView(LivreVM viewModel)
         {
             try
             {
@@ -908,7 +908,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         if (search != null && search.Any(f => f.Id == viewModel.Id))
                         {
                             ViewModelPage.SearchedViewModel = viewModel;
-                            GotoPage(pageVm.CurrentPage);
+                            await GotoPage(pageVm.CurrentPage);
                             return;
                         }
                     }
@@ -1034,7 +1034,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private void SearchViewModelDataGridView(LivreVM viewModel)
+        private async Task SearchViewModelDataGridView(LivreVM viewModel)
         {
             try
             {
@@ -1052,7 +1052,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         if (search != null && search.Any(f => f.Id == viewModel.Id))
                         {
                             ViewModelPage.SearchedViewModel = viewModel;
-                            GotoPage(pageVm.CurrentPage);
+                            await GotoPage(pageVm.CurrentPage);
                             return;
                         }
                     }

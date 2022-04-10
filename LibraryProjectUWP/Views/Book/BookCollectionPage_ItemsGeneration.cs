@@ -27,14 +27,14 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
-        public void GroupItemsBySearch(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
+        public async Task GroupItemsBySearch(int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    bookCollectionSpage.GroupItemsBySearch(viewModelList, goToPage, resetPage);
+                    await bookCollectionSpage.GroupItemsBySearch(goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -45,14 +45,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void GroupItemsByNone(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
+        public async Task GroupItemsByNone(int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    bookCollectionSpage.GroupItemsByNone(viewModelList, goToPage, resetPage);
+                    await bookCollectionSpage.GroupItemsByNone(goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -63,14 +63,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void GroupItemsByAlphabetic(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
+        public async Task GroupItemsByAlphabetic(int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    bookCollectionSpage.GroupItemsByAlphabetic(viewModelList, goToPage, resetPage);
+                    await bookCollectionSpage.GroupItemsByAlphabetic(goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -81,14 +81,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void GroupByCreationYear(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
+        public async Task GroupByCreationYear(int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    bookCollectionSpage.GroupByCreationYear(viewModelList, goToPage, resetPage);
+                    await bookCollectionSpage.GroupByCreationYear(goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -98,14 +98,14 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-        public void GroupByParutionYear(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
+        public async Task GroupByParutionYear(int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    bookCollectionSpage.GroupByParutionYear(viewModelList, goToPage, resetPage);
+                    await bookCollectionSpage.GroupByParutionYear(goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -116,13 +116,13 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void OrderByCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void OrderByCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
-                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                await this.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -131,13 +131,13 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void OrderByDCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void OrderByDCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
-                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                await this.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -146,13 +146,13 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void SortByNameXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void SortByNameXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
-                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                await this.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -161,13 +161,13 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void SortByDateCreationXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void SortByDateCreationXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
-                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                await this.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -176,7 +176,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void RefreshItemsGrouping(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
+        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -184,7 +184,7 @@ namespace LibraryProjectUWP.Views.Book
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    bookCollectionSpage.RefreshItemsGrouping(viewModelList, goToPage, resetPage);
+                    await bookCollectionSpage.RefreshItemsGrouping(goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -259,39 +259,5 @@ namespace LibraryProjectUWP.Views.Book
                 return Enumerable.Empty<LivreVM>();
             }
         }
-
-
-        private void InitializePages(IList<LivreVM> viewModelList)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                ViewModelPage.PagesList.Clear();
-
-                if (viewModelList != null && viewModelList.Any())
-                {
-                    int nbPageDefault = viewModelList.Count() / ViewModelPage.MaxItemsPerPage;
-                    double nbPageExact = viewModelList.Count() / Convert.ToDouble(ViewModelPage.MaxItemsPerPage);
-                    int nbPageRounded = nbPageExact > nbPageDefault ? nbPageDefault + 1 : nbPageDefault;
-                    ViewModelPage.CountPages = nbPageRounded;
-
-                    for (int i = 0; i < ViewModelPage.CountPages; i++)
-                    {
-                        ViewModelPage.PagesList.Add(new PageSystemVM()
-                        {
-                            CurrentPage = i + 1,
-                            IsPageSelected = i == 0,
-                            BackgroundColor = i == 0 ? Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush : Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush,
-                        });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
     }
 }

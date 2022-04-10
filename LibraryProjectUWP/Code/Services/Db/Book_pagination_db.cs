@@ -82,6 +82,152 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static IEnumerable<PageSystemVM> InitializePages(int countItems, int maxItemsPerPage)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                try
+                {
+                    if (countItems > 0)
+                    {
+                        int nbPageDefault = countItems / maxItemsPerPage;
+                        double nbPageExact = countItems / Convert.ToDouble(maxItemsPerPage);
+                        int nbPageRounded = nbPageExact > nbPageDefault ? nbPageDefault + 1 : nbPageDefault;
+
+                        List<PageSystemVM> pages = new List<PageSystemVM>();
+                        for (int i = 0; i < nbPageRounded; i++)
+                        {
+                            pages.Add(new PageSystemVM()
+                            {
+                                CurrentPage = i + 1,
+                                IsPageSelected = i == 0,
+                                BackgroundColor = i == 0 ? Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush : Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush,
+                            });
+                        }
+
+                        return pages;
+                    }
+                    return Enumerable.Empty<PageSystemVM>().ToList();
+                }
+                catch (Exception ex)
+                {
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<PageSystemVM>().ToList();
+                }
+            }
+
+
+
+            public static IEnumerable<LivreVM> GetPaginatedItems(IEnumerable<LivreVM> viewModelList, int maxItemsPerPage, int goToPage = 1)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                try
+                {
+                    IEnumerable<LivreVM> itemsPage = Enumerable.Empty<LivreVM>();
+
+                    //Si la séquence contient plus d'items que le nombre max éléments par page
+                    if (viewModelList.Count() > maxItemsPerPage)
+                    {
+                        //Si la première page (ou moins ^^')
+                        if (goToPage <= 1)
+                        {
+                            itemsPage = viewModelList.Take(maxItemsPerPage);
+                        }
+                        else //Si plus que la première page
+                        {
+                            var nbItemsToSkip = maxItemsPerPage * (goToPage - 1);
+                            if (viewModelList.Count() >= nbItemsToSkip)
+                            {
+                                var getRest = viewModelList.Skip(nbItemsToSkip);
+                                //Si reste de la séquence contient plus d'items que le nombre max éléments par page
+                                if (getRest.Count() > maxItemsPerPage)
+                                {
+                                    itemsPage = getRest.Take(maxItemsPerPage);
+                                }
+                                else
+                                {
+                                    itemsPage = getRest;
+                                }
+                            }
+                        }
+                    }
+                    else //Si la séquence contient moins ou le même nombre d'items que le nombre max éléments par page
+                    {
+                        itemsPage = viewModelList;
+                    }
+
+                    return itemsPage;
+                }
+                catch (Exception ex)
+                {
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<LivreVM>();
+                }
+            }
+
+            public static IEnumerable<Tbook> GetPaginatedItems(IEnumerable<Tbook> modelList, int maxItemsPerPage, int goToPage = 1)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                try
+                {
+                    IEnumerable<Tbook> itemsPage = Enumerable.Empty<Tbook>();
+
+                    //Si la séquence contient plus d'items que le nombre max éléments par page
+                    if (modelList.Count() > maxItemsPerPage)
+                    {
+                        //Si la première page (ou moins ^^')
+                        if (goToPage <= 1)
+                        {
+                            itemsPage = modelList.Take(maxItemsPerPage);
+                        }
+                        else //Si plus que la première page
+                        {
+                            var nbItemsToSkip = maxItemsPerPage * (goToPage - 1);
+                            if (modelList.Count() >= nbItemsToSkip)
+                            {
+                                var getRest = modelList.Skip(nbItemsToSkip);
+                                //Si reste de la séquence contient plus d'items que le nombre max éléments par page
+                                if (getRest.Count() > maxItemsPerPage)
+                                {
+                                    itemsPage = getRest.Take(maxItemsPerPage);
+                                }
+                                else
+                                {
+                                    itemsPage = getRest;
+                                }
+                            }
+                        }
+                    }
+                    else //Si la séquence contient moins ou le même nombre d'items que le nombre max éléments par page
+                    {
+                        itemsPage = modelList;
+                    }
+
+                    return itemsPage;
+                }
+                catch (Exception ex)
+                {
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<Tbook>();
+                }
+            }
+
+            public static IEnumerable<LivreVM> GetPaginatedItemsVm(IEnumerable<Tbook> modelList, int maxItemsPerPage, int goToPage = 1)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                try
+                {
+                    var selectedBooks = GetPaginatedItems(modelList, maxItemsPerPage, goToPage);
+                    List<LivreVM> viewModelList = selectedBooks.Select(async s => await SingleVMAsync(s.Id)).Select(t => t.Result).ToList();
+                    return viewModelList;
+                }
+                catch (Exception ex)
+                {
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<LivreVM>();
+                }
+            }
+
+
             public static async Task<IEnumerable<Tbook>> GetPaginatedItemsAsync(long idLibrary, int maxItemsPerPage, int goToPage = 1)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
@@ -92,7 +238,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
                         var tBooks = await context.Tbook.Where(c => c.IdLibrary == idLibrary).ToListAsync();
-                        
+
                         //Si la séquence contient plus d'items que le nombre max éléments par page
                         if (tBooks.Count > maxItemsPerPage)
                         {
@@ -133,7 +279,22 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-        }
-    }
+            public static async Task<IEnumerable<LivreVM>> GetPaginatedItemsVmAsync(long idLibrary, int maxItemsPerPage, int goToPage = 1)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                try
+                {
+                    var selectedBooks = await GetPaginatedItemsAsync(idLibrary, maxItemsPerPage, goToPage);
+                    List<LivreVM> viewModelList = selectedBooks.Select(async s => await SingleVMAsync(s.Id)).Select(t => t.Result).ToList();
+                    return viewModelList;
+                }
+                catch (Exception ex)
+                {
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<LivreVM>();
+                }
+            }
 
+        }        
+    }
 }

@@ -539,7 +539,7 @@ namespace LibraryProjectUWP.Views.Collection
             TtipDeleteCollection.IsOpen = false;
         }
 
-        private void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -547,7 +547,7 @@ namespace LibraryProjectUWP.Views.Collection
                 if (ViewModelPage.SelectedViewModels != null)
                 {
                     _parameters.ParentPage.ViewModelPage.SelectedCollections = ViewModelPage.SelectedViewModels;
-                    _parameters.ParentPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                    await _parameters.ParentPage.RefreshItemsGrouping();
                 }
             }
             catch (Exception ex)
@@ -557,13 +557,13 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
-        private void NavigateInAllItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void NavigateInAllItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 _parameters.ParentPage.ViewModelPage.SelectedCollections = null;
-                _parameters.ParentPage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                await _parameters.ParentPage.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {

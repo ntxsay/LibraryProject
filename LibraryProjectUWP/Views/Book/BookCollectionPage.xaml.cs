@@ -91,7 +91,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                _parameters.ParentLibrary.Books.Clear();
+                //_parameters.ParentLibrary.Books.Clear();
                 //_parameters.ParentLibrary.Books.Clear();
                 _parameters.ParentLibrary.CountBooks = 0;
                 ViewModelPage = null;
@@ -152,11 +152,11 @@ namespace LibraryProjectUWP.Views.Book
                 ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
                 if (ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
                 {
-                    this.GridViewMode(firstLoad);
+                    await this.GridViewMode(firstLoad);
                 }
                 else if (ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
                 {
-                    this.DataGridViewMode(firstLoad);
+                    await this.DataGridViewMode(firstLoad);
                 }
             }
             catch (Exception ex)
@@ -171,7 +171,7 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Selection
-        private void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
@@ -180,7 +180,7 @@ namespace LibraryProjectUWP.Views.Book
                     var bookCollectionSpage = this.BookCollectionSubPage;
                     if (bookCollectionSpage != null)
                     {
-                        bookCollectionSpage.SearchViewModel(viewModel);
+                        await bookCollectionSpage.SearchViewModel(viewModel);
                     }
                 }
             }
@@ -230,9 +230,9 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Navigation
-        private void ABTBtn_GridViewMode_Click(object sender, RoutedEventArgs e)
+        private async void ABTBtn_GridViewMode_Click(object sender, RoutedEventArgs e)
         {
-            this.GridViewMode(true);
+            await this.GridViewMode(true);
         }
 
         private void ABTBtn_GridViewMode_Unchecked(object sender, RoutedEventArgs e)
@@ -253,9 +253,9 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void ABTBtn_DataGridViewMode_Click(object sender, RoutedEventArgs e)
+        private async void ABTBtn_DataGridViewMode_Click(object sender, RoutedEventArgs e)
         {
-            this.DataGridViewMode(true);
+            await this.DataGridViewMode(true);
         }
 
         private void ABTBtn_DataGridViewMode_Unchecked(object sender, RoutedEventArgs e)
@@ -276,7 +276,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void GridViewMode(bool firstLoad)
+        private async Task GridViewMode(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -284,7 +284,7 @@ namespace LibraryProjectUWP.Views.Book
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    bookCollectionSpage.GridViewMode(firstLoad);
+                    await bookCollectionSpage.GridViewMode(firstLoad);
                 }
             }
             catch (Exception ex)
@@ -294,7 +294,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void DataGridViewMode(bool firstLoad)
+        private async Task DataGridViewMode(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -302,7 +302,7 @@ namespace LibraryProjectUWP.Views.Book
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    bookCollectionSpage.DataGridViewMode(firstLoad);
+                    await bookCollectionSpage.DataGridViewMode(firstLoad);
                 }
             }
             catch (Exception ex)
@@ -328,24 +328,24 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Sort - Group - Order
-        private void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            this.GroupItemsByAlphabetic(_parameters.ParentLibrary.Books);
+            await this.GroupItemsByAlphabetic();
         }
 
-        private void GroupByCreationYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void GroupByCreationYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            this.GroupByCreationYear(_parameters.ParentLibrary.Books);
+            await this.GroupByCreationYear();
         }
 
-        private void GroupByParutionYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void GroupByParutionYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            this.GroupByParutionYear(_parameters.ParentLibrary.Books);
+            await this.GroupByParutionYear();
         }
 
-        private void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            this.GroupItemsByNone(_parameters.ParentLibrary.Books);
+            await this.GroupItemsByNone();
         }
         #endregion
 
@@ -451,7 +451,7 @@ namespace LibraryProjectUWP.Views.Book
                         var bookCollectionSpage = this.BookCollectionSubPage;
                         if (bookCollectionSpage != null)
                         {
-                            bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                            await bookCollectionSpage.RefreshItemsGrouping();
                         }
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
@@ -1032,12 +1032,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.ImportDataRequested -= ImportBookFromExcelUC_ImportDataRequested;
 
                 this.RemoveItemToSideBar(sender);
-
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
-                {
-                    bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
-                }
+                this.OpenBookCollection();
             }
             catch (Exception ex)
             {
@@ -1651,7 +1646,7 @@ namespace LibraryProjectUWP.Views.Book
 
                                 }
                             }
-                            bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                            await bookCollectionSpage.RefreshItemsGrouping();
                         }
                     }
                     else if (result == ContentDialogResult.Secondary)
@@ -1669,7 +1664,7 @@ namespace LibraryProjectUWP.Views.Book
 
                             }
                         }
-                        bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                        await bookCollectionSpage.RefreshItemsGrouping();
                     }
                     else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                     {
@@ -2249,24 +2244,24 @@ namespace LibraryProjectUWP.Views.Book
                 InitializeResearchingBookWorker();
                 return;
 
-                var FilteredItems = new List<LivreVM>();
-                var splitSearchTerm = sender.Text.ToLower().Split(" ");
+                //var FilteredItems = new List<LivreVM>();
+                //var splitSearchTerm = sender.Text.ToLower().Split(" ");
 
-                foreach (var value in _parameters.ParentLibrary.Books)
-                {
-                    if (value.MainTitle.IsStringNullOrEmptyOrWhiteSpace()) continue;
+                //foreach (var value in _parameters.ParentLibrary.Books)
+                //{
+                //    if (value.MainTitle.IsStringNullOrEmptyOrWhiteSpace()) continue;
 
-                    var found = splitSearchTerm.All((key) =>
-                    {
-                        return value.MainTitle.ToLower().Contains(key.ToLower());
-                    });
+                //    var found = splitSearchTerm.All((key) =>
+                //    {
+                //        return value.MainTitle.ToLower().Contains(key.ToLower());
+                //    });
 
-                    if (found)
-                    {
-                        FilteredItems.Add(value);
-                    }
-                }
-                sender.ItemsSource = FilteredItems;
+                //    if (found)
+                //    {
+                //        FilteredItems.Add(value);
+                //    }
+                //}
+                //sender.ItemsSource = FilteredItems;
             }
             catch (Exception ex)
             {
@@ -2293,7 +2288,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void ASB_SearchItem_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private async void ASB_SearchItem_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             try
             {
@@ -2302,7 +2297,7 @@ namespace LibraryProjectUWP.Views.Book
                     var bookCollectionSpage = this.BookCollectionSubPage;
                     if (bookCollectionSpage != null)
                     {
-                        bookCollectionSpage.SearchViewModel(viewModel);
+                        await bookCollectionSpage.SearchViewModel(viewModel);
                     }
                 }
                 else
@@ -2919,7 +2914,7 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         
-        private void Slider_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
+        private async void Slider_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
             try
             {
@@ -2928,7 +2923,7 @@ namespace LibraryProjectUWP.Views.Book
                     var bookCollectionSpage = this.BookCollectionSubPage;
                     if (bookCollectionSpage != null)
                     {
-                        bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                        await bookCollectionSpage.RefreshItemsGrouping();
                     }
                 }
             }
