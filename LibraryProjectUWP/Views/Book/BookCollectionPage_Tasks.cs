@@ -85,6 +85,24 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        public void OpenResearchedBook(IEnumerable<LivreVM> viewModelList)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.NavigateToView(typeof(BookSearchSubPage), new BookSubPageParametersDriverVM()
+                {
+                    ParentPage = this,
+                    ViewModelList = new ObservableCollection<LivreVM>(viewModelList),
+                });
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #region Complete Info Book
         public void InitializeCompleteInfoBookWorker()
         {
@@ -955,6 +973,8 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (e.Result is WorkerState<LivreVM, LivreVM> state)
                     {
+                        //GroupItemsBySearch(state.ResultList.ToList());
+                        RefreshItemsGrouping(state.ResultList.ToList());
                         new ToastContentBuilder()
                         .AddText($"Rechercher des livres")
                         .AddText($"La recherche s'est terminé avec {state.ResultList.Count()} livre(s) trouvé.")

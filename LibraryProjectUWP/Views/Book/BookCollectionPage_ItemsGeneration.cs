@@ -27,6 +27,24 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
+        public void GroupItemsBySearch(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
+        {
+            try
+            {
+                var bookCollectionSpage = this.BookCollectionSubPage;
+                if (bookCollectionSpage != null)
+                {
+                    bookCollectionSpage.GroupItemsBySearch(viewModelList, goToPage, resetPage);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         public void GroupItemsByNone(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
         {
             try
@@ -103,12 +121,8 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
-                {
-                    ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
-                    bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
-                }
+                ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
+                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
             }
             catch (Exception ex)
             {
@@ -122,12 +136,8 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
-                {
-                    ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
-                    bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
-                }
+                ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
+                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
             }
             catch (Exception ex)
             {
@@ -141,12 +151,8 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
-                {
-                    ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
-                    bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
-                }
+                ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
+                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
             }
             catch (Exception ex)
             {
@@ -160,12 +166,8 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
-                {
-                    ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
-                    bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
-                }
+                ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
+                this.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
             }
             catch (Exception ex)
             {
@@ -174,29 +176,15 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        [Obsolete]
         public void RefreshItemsGrouping(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                switch (ViewModelPage.GroupedBy)
+                var bookCollectionSpage = this.BookCollectionSubPage;
+                if (bookCollectionSpage != null)
                 {
-                    case BookGroupVM.GroupBy.None:
-                        this.GroupItemsByNone(viewModelList, goToPage, resetPage);
-                        break;
-                    case BookGroupVM.GroupBy.Letter:
-                        this.GroupItemsByAlphabetic(viewModelList, goToPage, resetPage);
-                        break;
-                    case BookGroupVM.GroupBy.CreationYear:
-                        this.GroupByCreationYear(viewModelList, goToPage, resetPage);
-                        break;
-                    case BookGroupVM.GroupBy.ParutionYear:
-                        this.GroupByParutionYear(viewModelList, goToPage, resetPage);
-                        break;
-                    default:
-                        this.GroupItemsByNone(viewModelList, goToPage, resetPage);
-                        break;
+                    bookCollectionSpage.RefreshItemsGrouping(viewModelList, goToPage, resetPage);
                 }
             }
             catch (Exception ex)

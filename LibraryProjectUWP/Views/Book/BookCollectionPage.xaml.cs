@@ -56,7 +56,7 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
         }
 
-        private BookCollectionSubPage BookCollectionSubPage => FrameContainer.Content as BookCollectionSubPage;
+        public BookCollectionSubPage BookCollectionSubPage => FrameContainer.Content as BookCollectionSubPage;
         public ImportBookExcelSubPage ImportBookExcelSubPage => FrameContainer.Content as ImportBookExcelSubPage;
         public ImportBookFileSubPage ImportBookFileSubPage => FrameContainer.Content as ImportBookFileSubPage;
 
@@ -2925,7 +2925,11 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is Slider slider)
                 {
-                    RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                    var bookCollectionSpage = this.BookCollectionSubPage;
+                    if (bookCollectionSpage != null)
+                    {
+                        bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
+                    }
                 }
             }
             catch (Exception ex)

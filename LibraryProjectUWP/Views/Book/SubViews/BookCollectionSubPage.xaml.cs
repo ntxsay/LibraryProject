@@ -802,7 +802,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 IEnumerable<LivreVM> itemsPage = Enumerable.Empty<LivreVM>();
                 
-
                 //Si la séquence contient plus d'items que le nombre max éléments par page
                 if (viewModelList.Count > ViewModelPage.MaxItemsPerPage)
                 {

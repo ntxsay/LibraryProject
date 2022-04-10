@@ -16,6 +16,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         
         public enum GroupBy
         {
+            Search,
             None,
             Letter,
             CreationYear,

@@ -111,6 +111,38 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
+        public void GroupItemsBySearch(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
+        {
+            try
+            {
+                var preparedViewModelList = this.PrepareBooks(viewModelList);
+                if (preparedViewModelList == null || !preparedViewModelList.Any())
+                {
+                    return;
+                }
+
+                IEnumerable<LivreVM> itemsPage = GetPaginatedItems(preparedViewModelList.ToList(), goToPage);
+
+                var GroupingItems = this.OrderItems(itemsPage, ParentPage.ViewModelPage.OrderedBy, ParentPage.ViewModelPage.SortedBy).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Résultat de la recherche").OrderBy(o => o.Key).Select(s => s);
+                if (GroupingItems != null && GroupingItems.Any())
+                {
+                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                    ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
+                }
+
+                if (resetPage)
+                {
+                    this.InitializePages(preparedViewModelList.ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         public void GroupItemsByNone(IList<LivreVM> viewModelList, int goToPage = 1, bool resetPage = true)
         {
             try
@@ -300,6 +332,9 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         break;
                     case BookGroupVM.GroupBy.ParutionYear:
                         this.GroupByParutionYear(viewModelList, goToPage, resetPage);
+                        break;
+                    case BookGroupVM.GroupBy.Search:
+                        this.GroupItemsBySearch(viewModelList, goToPage, resetPage);
                         break;
                     default:
                         this.GroupItemsByNone(viewModelList, goToPage, resetPage);
