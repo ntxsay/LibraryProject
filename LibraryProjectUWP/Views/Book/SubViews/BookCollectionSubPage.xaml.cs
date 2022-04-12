@@ -23,6 +23,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using static LibraryProjectUWP.Code.Helpers.VisualViewHelpers;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -33,6 +34,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
     /// </summary>
     public sealed partial class BookCollectionSubPage : Page
     {
+        readonly MainControlsUI mainControlsUI = new MainControlsUI();
         public BookCollectionSubPageVM ViewModelPage { get; set; } = new BookCollectionSubPageVM();
         readonly EsBook esBook = new EsBook();
         readonly UiServices uiServices = new UiServices();
@@ -675,15 +677,27 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         #endregion
 
         #region Paginations
-        private async void GotoPageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void GotoPageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (args.Parameter is int page)
                 {
-                    await GotoPage(page);
+                    
+                    
+
+                    InitializeGotoPageWorker(page);
                 }
+                //var isOpened = await ParentPage.OpenLoading();
+                //if (isOpened)
+                //{
+                //    if (args.Parameter is int page)
+                //    {
+                //        InitializeGotoWorker()
+                //        await GotoPage(page);
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -745,30 +759,34 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                foreach (var pageVm in ViewModelPage.PagesList)
-                {
-                    if (pageVm.CurrentPage != page && pageVm.IsPageSelected == true)
+                await this.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal,
+                   async () =>
                     {
-                        pageVm.IsPageSelected = false;
-                        pageVm.BackgroundColor = Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush;
-                    }
-                    else if (pageVm.CurrentPage == page && pageVm.IsPageSelected == false)
-                    {
-                        pageVm.IsPageSelected = true;
-                        pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
-                    }
-                }
+                        foreach (var pageVm in ViewModelPage.PagesList)
+                        {
+                            if (pageVm.CurrentPage != page && pageVm.IsPageSelected == true)
+                            {
+                                pageVm.IsPageSelected = false;
+                                pageVm.BackgroundColor = Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush;
+                            }
+                            else if (pageVm.CurrentPage == page && pageVm.IsPageSelected == false)
+                            {
+                                pageVm.IsPageSelected = true;
+                                pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
+                            }
+                        }
 
-                await this.RefreshItemsGrouping(page, false);
-                var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
-                if (buttonsPage != null && buttonsPage.Any())
-                {
-                    var buttonPage = buttonsPage.FirstOrDefault(f => f.CommandParameter is int commandPage && commandPage == page);
-                    if (buttonPage != null)
-                    {
-                        scrollVPages.ScrollToElement(buttonPage, false);
-                    }
-                }
+                        await this.RefreshItemsGrouping(true, page, false);
+                        var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
+                        if (buttonsPage != null && buttonsPage.Any())
+                        {
+                            var buttonPage = buttonsPage.FirstOrDefault(f => f.CommandParameter is int commandPage && commandPage == page);
+                            if (buttonPage != null)
+                            {
+                                scrollVPages.ScrollToElement(buttonPage, false);
+                            }
+                        }
+                    });
             }
             catch (Exception ex)
             {
@@ -904,7 +922,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 {
                     foreach (var pageVm in ViewModelPage.PagesList)
                     {
-                        var search = GetPaginatedItems(ParentPage._parameters.ParentLibrary.Books, pageVm.CurrentPage);
+                        var search = GetPaginatedItems(ParentPage.Parameters.ParentLibrary.Books, pageVm.CurrentPage);
                         if (search != null && search.Any(f => f.Id == viewModel.Id))
                         {
                             ViewModelPage.SearchedViewModel = viewModel;
@@ -1048,7 +1066,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 {
                     foreach (var pageVm in ViewModelPage.PagesList)
                     {
-                        var search = GetPaginatedItems(ParentPage._parameters.ParentLibrary.Books, pageVm.CurrentPage);
+                        var search = GetPaginatedItems(ParentPage.Parameters.ParentLibrary.Books, pageVm.CurrentPage);
                         if (search != null && search.Any(f => f.Id == viewModel.Id))
                         {
                             ViewModelPage.SearchedViewModel = viewModel;

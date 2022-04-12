@@ -85,24 +85,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void OpenResearchedBook(IEnumerable<LivreVM> viewModelList)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                this.NavigateToView(typeof(BookSearchSubPage), new BookSubPageParametersDriverVM()
-                {
-                    ParentPage = this,
-                    ViewModelList = new ObservableCollection<LivreVM>(viewModelList),
-                });
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         #region Complete Info Book
         public void InitializeCompleteInfoBookWorker()
         {
@@ -152,7 +134,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 var worker = sender as BackgroundWorker;
-                foreach (var book in _parameters.ParentLibrary.Books)
+                foreach (var book in Parameters.ParentLibrary.Books)
                 {
                     using (Task<long> task = DbServices.Book.CountExemplaryInBookAsync(book.Id, cancellationTokenSourceCompleteInfoBook.Token))
                     {
@@ -677,8 +659,8 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (e.Result is WorkerState<LivreVM, LivreVM> state)
                     {
-                        _parameters.ParentLibrary.Books.Clear();
-                        _parameters.ParentLibrary.Books.AddRange(state.ResultList);
+                        Parameters.ParentLibrary.Books.Clear();
+                        Parameters.ParentLibrary.Books.AddRange(state.ResultList);
                         this.InitializeCompleteInfoBookWorker();
                     }
                 }

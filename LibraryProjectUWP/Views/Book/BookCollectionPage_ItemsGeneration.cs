@@ -27,14 +27,14 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
-        public async Task GroupItemsBySearch(int goToPage = 1, bool resetPage = true)
+        public async Task GroupItemsBySearch(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    await bookCollectionSpage.GroupItemsBySearch(goToPage, resetPage);
+                    await bookCollectionSpage.GroupItemsBySearch(reloadFromDb, goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -45,14 +45,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task GroupItemsByNone(int goToPage = 1, bool resetPage = true)
+        public async Task GroupItemsByNone(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    await bookCollectionSpage.GroupItemsByNone(goToPage, resetPage);
+                    await bookCollectionSpage.GroupItemsByNone(reloadFromDb, goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -63,14 +63,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task GroupItemsByAlphabetic(int goToPage = 1, bool resetPage = true)
+        public async Task GroupItemsByAlphabetic(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    await bookCollectionSpage.GroupItemsByAlphabetic(goToPage, resetPage);
+                    await bookCollectionSpage.GroupItemsByAlphabetic(reloadFromDb, goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -81,14 +81,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task GroupByCreationYear(int goToPage = 1, bool resetPage = true)
+        public async Task GroupByCreationYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    await bookCollectionSpage.GroupByCreationYear(goToPage, resetPage);
+                    await bookCollectionSpage.GroupByCreationYear(reloadFromDb, goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -98,14 +98,14 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-        public async Task GroupByParutionYear(int goToPage = 1, bool resetPage = true)
+        public async Task GroupByParutionYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    await bookCollectionSpage.GroupByParutionYear(goToPage, resetPage);
+                    await bookCollectionSpage.GroupByParutionYear(reloadFromDb, goToPage, resetPage);
                 }
             }
             catch (Exception ex)
@@ -122,7 +122,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
-                await this.RefreshItemsGrouping();
+                await this.RefreshItemsGrouping(false);
             }
             catch (Exception ex)
             {
@@ -137,7 +137,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
-                await this.RefreshItemsGrouping();
+                await this.RefreshItemsGrouping(false);
             }
             catch (Exception ex)
             {
@@ -152,7 +152,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
-                await this.RefreshItemsGrouping();
+                await this.RefreshItemsGrouping(false);
             }
             catch (Exception ex)
             {
@@ -167,7 +167,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
-                await this.RefreshItemsGrouping();
+                await this.RefreshItemsGrouping(false);
             }
             catch (Exception ex)
             {
@@ -176,7 +176,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true)
+        public async Task RefreshItemsGrouping(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -184,7 +184,7 @@ namespace LibraryProjectUWP.Views.Book
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    await bookCollectionSpage.RefreshItemsGrouping(goToPage, resetPage);
+                    await bookCollectionSpage.RefreshItemsGrouping(reloadFromDb, goToPage, resetPage);
                 }
             }
             catch (Exception ex)

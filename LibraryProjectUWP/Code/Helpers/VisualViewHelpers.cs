@@ -16,7 +16,30 @@ namespace LibraryProjectUWP.Code.Helpers
         public class MainControlsUI
         {
             public static MainPage MainPage => (Window.Current.Content as Frame).Content as MainPage;
-            public MainPage GetMainPage => (Window.Current.Content as Frame).Content as MainPage;
+            public MainPage GetMainPage
+            {
+                get 
+                {
+                    try
+                    {
+                        if (Window.Current == null)
+                        {
+                            return null;
+                        }
+
+                        if (Window.Current.Content is Frame frame)
+                        {
+                            return frame.Content as MainPage;
+                        }
+
+                        return null;
+                    }
+                    catch (Exception)
+                    {
+                        return null;
+                    }
+                }
+            }
             public Frame GetMainFrameContainer => GetMainPage.MainFrameContainer;
             public static Frame MainFrameContainer => MainPage.MainFrameContainer;
         }

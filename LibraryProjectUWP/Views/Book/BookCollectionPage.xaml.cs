@@ -48,7 +48,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
         public BookCollectionPageVM ViewModelPage { get; set; } = new BookCollectionPageVM();
-        public LibraryToBookNavigationDriverVM _parameters;
+        public LibraryToBookNavigationDriverVM Parameters { get; private set; }
         readonly EsBook esBook = new EsBook();
 
         public BookCollectionPage()
@@ -65,7 +65,7 @@ namespace LibraryProjectUWP.Views.Book
             base.OnNavigatedTo(e);
             if (e.Parameter is LibraryToBookNavigationDriverVM parameters)
             {
-                _parameters = parameters;
+                Parameters = parameters;
                 ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
                 //_parameters.ParentLibrary.Books = new List<LivreVM>(parameters.ParentLibrary.Books);
                 if (e.NavigationMode == NavigationMode.Back && parameters.ParentLibrary != null && parameters.ParentLibrary.CountBooks == 0)
@@ -78,6 +78,7 @@ namespace LibraryProjectUWP.Views.Book
                 var dd = ViewModelPage;
             }
         }
+        
 
         #region Loading
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -93,7 +94,7 @@ namespace LibraryProjectUWP.Views.Book
                 ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                 //_parameters.ParentLibrary.Books.Clear();
                 //_parameters.ParentLibrary.Books.Clear();
-                _parameters.ParentLibrary.CountBooks = 0;
+                Parameters.ParentLibrary.CountBooks = 0;
                 ViewModelPage = null;
                 //_parameters = null;
             }
@@ -132,7 +133,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                _parameters.ParentPage?.InitializeSearchingBookWorker(_parameters.ParentLibrary);
+                Parameters.ParentPage?.InitializeSearchingBookWorker(Parameters.ParentLibrary);
                 //var bookList = await DbServices.Book.MultipleVmWithIdLibraryAsync(_parameters.ParentLibrary.Id);
                 //_parameters.ParentLibrary.Books = bookList?.ToList() ?? new List<LivreVM>(); ;
                 await InitializeDataAsync(firstLoad);
@@ -165,9 +166,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-
-
         #endregion
 
         #region Selection
@@ -330,22 +328,22 @@ namespace LibraryProjectUWP.Views.Book
         #region Sort - Group - Order
         private async void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await this.GroupItemsByAlphabetic();
+            await this.GroupItemsByAlphabetic(false);
         }
 
         private async void GroupByCreationYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await this.GroupByCreationYear();
+            await this.GroupByCreationYear(false);
         }
 
         private async void GroupByParutionYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await this.GroupByParutionYear();
+            await this.GroupByParutionYear(false);
         }
 
         private async void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await this.GroupItemsByNone();
+            await this.GroupItemsByNone(false);
         }
         #endregion
 
@@ -439,12 +437,12 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     LivreVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, _parameters.ParentLibrary.Id);
+                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
                         this.CompleteBookInfos(newViewModel);
-                        _parameters.ParentLibrary.Books.Add(newViewModel);
+                        Parameters.ParentLibrary.Books.Add(newViewModel);
 
                         await esBook.SaveBookViewModelAsync(newViewModel);
 
@@ -472,7 +470,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 sender.ViewModelPage.ViewModel = new LivreVM()
                 {
-                    IdLibrary = _parameters.ParentLibrary.Id,
+                    IdLibrary = Parameters.ParentLibrary.Id,
                 };
             }
             catch (Exception ex)
@@ -513,7 +511,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (viewModel != null)
                     {
-                        viewModel.IdLibrary = _parameters.ParentLibrary.Id;
+                        viewModel.IdLibrary = Parameters.ParentLibrary.Id;
                     }
 
                     NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
@@ -522,7 +520,7 @@ namespace LibraryProjectUWP.Views.Book
                         EditMode = Code.EditMode.Create,
                         CurrentViewModel = viewModel ?? new LivreVM()
                         {
-                            IdLibrary = _parameters.ParentLibrary.Id,
+                            IdLibrary = Parameters.ParentLibrary.Id,
                         }
                     });
 
@@ -824,7 +822,7 @@ namespace LibraryProjectUWP.Views.Book
                             List<CollectionVM> collectionVMs = new List<CollectionVM>();
                             foreach (var collection in newViewModel.Publication.Collections)
                             {
-                                var collectionResult = await DbServices.Collection.CreateAsync(collection, _parameters.ParentLibrary.Id);
+                                var collectionResult = await DbServices.Collection.CreateAsync(collection, Parameters.ParentLibrary.Id);
                                 if (collectionResult.IsSuccess)
                                 {
                                     //collection.IdLibrary = _parameters.ParentLibrary.Id;
@@ -845,12 +843,12 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     }
 
-                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, _parameters.ParentLibrary.Id);
+                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
                         this.CompleteBookInfos(newViewModel);
-                        _parameters.ParentLibrary.Books.Add(newViewModel);
+                        Parameters.ParentLibrary.Books.Add(newViewModel);
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
@@ -921,7 +919,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         File = excelFile,
-                        ViewModelList = _parameters.ParentLibrary.Books,
+                        ViewModelList = Parameters.ParentLibrary.Books,
                     });
 
                     userControl.CancelModificationRequested += ImportBookFromExcelUC_CancelModificationRequested;
@@ -983,7 +981,7 @@ namespace LibraryProjectUWP.Views.Book
                             List<CollectionVM> collectionVMs = new List<CollectionVM>();
                             foreach (var collection in newViewModel.Publication.Collections)
                             {
-                                var collectionResult = await DbServices.Collection.CreateAsync(collection, _parameters.ParentLibrary.Id);
+                                var collectionResult = await DbServices.Collection.CreateAsync(collection, Parameters.ParentLibrary.Id);
                                 if (collectionResult.IsSuccess)
                                 {
                                     //collection.IdLibrary = _parameters.ParentLibrary.Id;
@@ -1004,12 +1002,12 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     }
 
-                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, _parameters.ParentLibrary.Id);
+                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
                         this.CompleteBookInfos(newViewModel);
-                        _parameters.ParentLibrary.Books.Add(newViewModel);
+                        Parameters.ParentLibrary.Books.Add(newViewModel);
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
@@ -1490,7 +1488,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (_parameters.ParentLibrary.Books != null)
+                if (Parameters.ParentLibrary.Books != null)
                 {
                     var suggestedFileName = $"Rostalotheque_Livres_All_{DateTime.Now:yyyyMMddHHmmss}";
 
@@ -1506,7 +1504,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
 
                     //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
-                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(_parameters.ParentLibrary.Books, savedFile);// savedFile.Path
+                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(Parameters.ParentLibrary.Books, savedFile);// savedFile.Path
                     if (isFileSaved == false)
                     {
                         Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
@@ -1639,7 +1637,7 @@ namespace LibraryProjectUWP.Views.Book
                                 var operationResult = await DbServices.Book.DeleteAsync(item.Id);
                                 if (operationResult.IsSuccess)
                                 {
-                                    _parameters.ParentLibrary.Books.Remove(item);
+                                    Parameters.ParentLibrary.Books.Remove(item);
                                 }
                                 else
                                 {
@@ -1656,7 +1654,7 @@ namespace LibraryProjectUWP.Views.Book
                             var operationResult = await DbServices.Book.DeleteAsync(item.Id);
                             if (operationResult.IsSuccess)
                             {
-                                _parameters.ParentLibrary.Books.Remove(item);
+                                Parameters.ParentLibrary.Books.Remove(item);
 
                             }
                             else
@@ -2230,7 +2228,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 ViewModelPage.ResearchBook = new ResearchBookVM()
                 {
-                    IdLibrary = _parameters.ParentLibrary.Id,
+                    IdLibrary = Parameters.ParentLibrary.Id,
                     Term = sender.Text.Trim(),
                     TermParameter = Code.Search.Book.Terms.Contains,
                     SearchIn = new ObservableCollection<Code.Search.Book.In>()
@@ -2376,7 +2374,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 var selectedPage = ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
-                return GetPaginatedItems(_parameters.ParentLibrary.Books, selectedPage);
+                return GetPaginatedItems(Parameters.ParentLibrary.Books, selectedPage);
             }
             catch (Exception ex)
             {

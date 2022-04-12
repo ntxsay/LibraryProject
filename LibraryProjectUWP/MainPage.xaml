@@ -9,6 +9,7 @@
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:brushes="using:Microsoft.Toolkit.Uwp.UI.Media"
     mc:Ignorable="d" Loaded="Page_Loaded" MinWidth="640"
     Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
     <!--Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"-->
@@ -85,6 +86,17 @@
             </Grid>
             <Grid Grid.Column="1" Background="Transparent"/>
         </Grid>
-
+        <MTUUControls:Loading x:Name="LoadingControl" IsLoading="{x:Bind ViewModelPage.IsBusyLoading, Mode=OneWay}">
+            <MTUUControls:Loading.Background>
+                <brushes:AcrylicBrush BackgroundSource="Backdrop"
+                              TintColor="Black"
+                              TintOpacity="0.4"
+                              BlurAmount="8"/>
+            </MTUUControls:Loading.Background>
+            <StackPanel Orientation="Horizontal" Padding="12">
+                <ProgressRing IsActive="True" Margin="0,0,12,0" Foreground="{ThemeResource SystemAccentColor}" />
+                <TextBlock Text="Loading control with wait ring" VerticalAlignment="Center" Foreground="White" />
+            </StackPanel>
+        </MTUUControls:Loading>
     </Grid>
 </Page>

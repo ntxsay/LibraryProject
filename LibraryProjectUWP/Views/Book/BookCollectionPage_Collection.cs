@@ -42,7 +42,7 @@ namespace LibraryProjectUWP.Views.Book
                         //ParentLibrary = _parameters.ParentLibrary,
                         CurrentViewModel = new CollectionVM()
                         {
-                            IdLibrary = _parameters.ParentLibrary.Id,
+                            IdLibrary = Parameters.ParentLibrary.Id,
                             Name = partName,
                         }
                     });
@@ -80,7 +80,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     CollectionVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                    var creationResult = await DbServices.Collection.CreateAsync(newViewModel, _parameters.ParentLibrary.Id);
+                    var creationResult = await DbServices.Collection.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
                     if (creationResult.IsSuccess)
                     {
                         newViewModel.Id = creationResult.Id;
@@ -91,7 +91,7 @@ namespace LibraryProjectUWP.Views.Book
 
                         if (sender.ViewModelPage.ParentGuid != null)
                         {
-                            _parameters.ParentLibrary.Collections.Add(newViewModel);
+                            Parameters.ParentLibrary.Collections.Add(newViewModel);
                             NewEditCollectionUC_Create_CancelModificationRequested(sender, e);
                         }
                     }
@@ -239,7 +239,7 @@ namespace LibraryProjectUWP.Views.Book
                     CollectionListUC userControl = new CollectionListUC(new CollectionListParametersDriverVM()
                     {
                         ParentPage = this,
-                        ParentLibrary = _parameters.ParentLibrary,
+                        ParentLibrary = Parameters.ParentLibrary,
                         //ViewModelList = itemList?.OrderBy(o => o.Name).ToList(), //ViewModelPage.ContactViewModelList,
                     });
 
@@ -282,18 +282,18 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (_parameters.ParentLibrary != null)
+                if (Parameters.ParentLibrary != null)
                 {
-                    _parameters.ParentLibrary.CountNotInCollectionBooks = await DbServices.Collection.CountUnCategorizedBooks(_parameters.ParentLibrary.Id);
-                    if (_parameters.ParentLibrary.Collections.Any())
+                    Parameters.ParentLibrary.CountNotInCollectionBooks = await DbServices.Collection.CountUnCategorizedBooks(Parameters.ParentLibrary.Id);
+                    if (Parameters.ParentLibrary.Collections.Any())
                     {
-                        _parameters.ParentLibrary.Collections.Clear();
-                        var itemList = await DbServices.Collection.MultipleVmInLibraryAsync(_parameters.ParentLibrary.Id);
+                        Parameters.ParentLibrary.Collections.Clear();
+                        var itemList = await DbServices.Collection.MultipleVmInLibraryAsync(Parameters.ParentLibrary.Id);
                         if (itemList != null && itemList.Any())
                         {
                             foreach (var item in itemList)
                             {
-                                _parameters.ParentLibrary.Collections.Add(item);
+                                Parameters.ParentLibrary.Collections.Add(item);
                             }
 
                         }

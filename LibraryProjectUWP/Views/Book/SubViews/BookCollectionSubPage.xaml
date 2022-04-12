@@ -15,6 +15,7 @@
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    xmlns:brushes="using:Microsoft.Toolkit.Uwp.UI.Media"
     Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Page.Resources>
         <customConverters:ClassificationAgeToStringConverter x:Key="classificationAgeToStringConverter" />
@@ -357,5 +358,4 @@
             </ScrollViewer>
         </Grid>
     </Grid>
-
 </Page>

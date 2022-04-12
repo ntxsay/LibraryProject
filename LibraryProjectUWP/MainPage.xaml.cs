@@ -35,6 +35,7 @@ using LibraryProjectUWP.Views.UserControls.TitleBar;
 using LibraryProjectUWP.Views.Library;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Icons;
+using Windows.UI.Core;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -262,11 +263,11 @@ namespace LibraryProjectUWP
             {
                 if (this.MainFrameContainer.CanGoBack)
                 {
-                    if (this.MainFrameContainer.Content is BookCollectionPage bookCollection && bookCollection._parameters.ParentLibrary.Books.Count > 100)
+                    if (this.MainFrameContainer.Content is BookCollectionPage bookCollection && bookCollection.Parameters.ParentLibrary.Books.Count > 100)
                     {
                         var dialog = new BookBeforeGoBackCD()
                         {
-                            Title = $"Quitter la bibliothèque {bookCollection._parameters.ParentLibrary.Name}"
+                            Title = $"Quitter la bibliothèque {bookCollection.Parameters.ParentLibrary.Name}"
                         };
 
                         var result = await dialog.ShowAsync();
@@ -391,7 +392,7 @@ namespace LibraryProjectUWP
                 { 
                     Margin = new Thickness(0, 14, 0, 0),
                 });
-                return NavigateToView("Book.BookCollectionPage", new LibraryToBookNavigationDriverVM() { ParentLibrary = parentLibrary, ParentPage = parentPage });
+                return NavigateToView("Book.BookCollectionPage", new LibraryToBookNavigationDriverVM() { ParentLibrary = parentLibrary, ParentPage = parentPage, MainPage = this, });
             }
             catch (Exception ex)
             {
@@ -492,7 +493,57 @@ namespace LibraryProjectUWP
 
         #endregion
 
+        public async Task<bool> OpenLoadingAsync()
+        {
+            try
+            {
+                return await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    if (!LoadingControl.IsLoading)
+                    {
+                        LoadingControl.IsLoading = true;
+                    }
+                });
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
+        }
+
+        public void OpenLoading()
+        {
+            try
+            {
+                if (!LoadingControl.IsLoading)
+                {
+                    LoadingControl.IsLoading = true;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public void CloseLoading()
+        {
+            try
+            {
+                if (LoadingControl.IsLoading)
+                {
+                    LoadingControl.IsLoading = false;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 
     public class MainPageViewModel : INotifyPropertyChanged
@@ -503,6 +554,19 @@ namespace LibraryProjectUWP
 
         }
 
+        private bool _IsBusyLoading = false;
+        public bool IsBusyLoading
+        {
+            get => this._IsBusyLoading;
+            set
+            {
+                if (_IsBusyLoading != value)
+                {
+                    this._IsBusyLoading = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
         public ItemTagContentVM AboutMenuItem => new ItemTagContentVM()
         {
             Text = "À propos de ...",

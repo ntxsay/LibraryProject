@@ -16,6 +16,7 @@
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:brushes="using:Microsoft.Toolkit.Uwp.UI.Media"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls" Margin="0 38 0 0" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Page.Resources>
         <customConverters:ClassificationAgeToStringConverter x:Key="classificationAgeToStringConverter" />
@@ -314,7 +315,7 @@
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
                     <Run Text="Nombre de livre :" />
-                    <Run Text="{x:Bind _parameters.ParentLibrary.Books.Count, Mode=OneWay}" />
+                    <Run Text="{x:Bind Parameters.ParentLibrary.Books.Count, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">

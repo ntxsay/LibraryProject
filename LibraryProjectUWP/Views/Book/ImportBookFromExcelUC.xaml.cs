@@ -301,7 +301,7 @@ namespace LibraryProjectUWP.Views.Book
                                     {
                                         CollectionVM collectionVm = new CollectionVM()
                                         {
-                                            IdLibrary = _parameters.ParentPage._parameters.ParentLibrary.Id,
+                                            IdLibrary = _parameters.ParentPage.Parameters.ParentLibrary.Id,
                                             Name = collection,
                                         };
                                         collectionViewModelList.Add(collectionVm);
