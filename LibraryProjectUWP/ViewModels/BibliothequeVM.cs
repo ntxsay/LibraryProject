@@ -74,6 +74,7 @@ namespace LibraryProjectUWP.ViewModels
             }
         }
         private List<LivreVM> _Books = new List<LivreVM>();
+        [Obsolete]
         public List<LivreVM> Books
         {
             get => _Books;

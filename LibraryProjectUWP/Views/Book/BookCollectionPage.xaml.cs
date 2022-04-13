@@ -67,15 +67,6 @@ namespace LibraryProjectUWP.Views.Book
             {
                 Parameters = parameters;
                 ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
-                //_parameters.ParentLibrary.Books = new List<LivreVM>(parameters.ParentLibrary.Books);
-                if (e.NavigationMode == NavigationMode.Back && parameters.ParentLibrary != null && parameters.ParentLibrary.CountBooks == 0)
-                {
-                    InitializeSearchingBookWorker(parameters.ParentLibrary);
-                }
-            }
-            else
-            {
-                var dd = ViewModelPage;
             }
         }
         
@@ -83,7 +74,7 @@ namespace LibraryProjectUWP.Views.Book
         #region Loading
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            InitializeCompleteInfoBookWorker();
+            OpenBookCollection();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

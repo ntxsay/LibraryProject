@@ -8,10 +8,12 @@ using LibraryProjectUWP.ViewModels.General;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -44,19 +46,19 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             this.InitializeComponent();
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             if (e.Parameter is BookCollectionPage parameters)
             {
                 ParentPage = parameters;
-                await InitializeDataAsync(true);
+                //InitializeData(true);
             }
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-
+            InitializeData(true);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -92,18 +94,65 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private async Task InitializeDataAsync(bool firstLoad)
+        public void InitializeData(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
+                ParentPage.Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                 {
-                    await this.GridViewMode(firstLoad);
-                }
-                else if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                    ProgessText = $"Mise à jour du catalogue",
+                });
+
+                using (BackgroundWorker worker = new BackgroundWorker()
                 {
-                    await this.DataGridViewMode(firstLoad);
+                    WorkerSupportsCancellation = false,
+                    WorkerReportsProgress = false,
+                })
+                {
+                    worker.DoWork += (s, e) =>
+                    {
+                        switch (ParentPage.ViewModelPage.DataViewMode)
+                        {
+                            case Code.DataViewModeEnum.DataGridView:
+                                using (Task task = Task.Run(() => this.DataGridViewMode(firstLoad)))
+                                {
+                                    task.Wait();
+                                }
+                                break;
+                            case Code.DataViewModeEnum.GridView:
+                                using (Task task = Task.Run(() => this.GridViewMode(firstLoad)))
+                                {
+                                    task.Wait();
+                                }
+                                break;
+                            default:
+                                using (Task task = Task.Run(() => this.GridViewMode(firstLoad)))
+                                {
+                                    task.Wait();
+                                }
+                                break;
+                        }
+                    };
+
+                    worker.RunWorkerCompleted += (s, e) =>
+                    {
+                        DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 3),
+                        };
+
+                        dispatcherTimer.Tick += (t, f) =>
+                        {
+                            ParentPage.Parameters.MainPage.CloseBusyLoader();
+                            dispatcherTimer.Stop();
+                            dispatcherTimer = null;
+                        };
+
+                        dispatcherTimer.Start();
+                    };
+
+                    worker.RunWorkerAsync();
                 }
             }
             catch (Exception ex)
@@ -118,16 +167,20 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
+                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    async () =>
+                    {
+                        this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
 
-                if (firstLoad)
-                {
-                    ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
-                }
-                
-                await RefreshItemsGrouping();
-                this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
-                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+                        if (firstLoad)
+                        {
+                            ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
+                        }
+
+                        await RefreshItemsGrouping();
+                        this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                        this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+                    });
             }
             catch (Exception ex)
             {
@@ -141,16 +194,20 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
+                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    async () =>
+                    {
+                        this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
 
-                if (firstLoad)
-                {
-                    ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
-                }
-                
-                await RefreshItemsGrouping();
-                this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
-                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+                        if (firstLoad)
+                        {
+                            ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
+                        }
+
+                        await RefreshItemsGrouping();
+                        this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                        this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+                    });
             }
             catch (Exception ex)
             {

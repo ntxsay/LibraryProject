@@ -36,6 +36,7 @@ using LibraryProjectUWP.Views.Library;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Icons;
 using Windows.UI.Core;
+using LibraryProjectUWP.Views.UserControls;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -536,6 +537,41 @@ namespace LibraryProjectUWP
                 if (LoadingControl.IsLoading)
                 {
                     LoadingControl.IsLoading = false;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public void OpenBusyLoader(BusyLoaderParametersVM parametersVM)
+        {
+            try
+            {
+                if (!gridMainContainer.Children.Any(a => a is BusyLoader))
+                {
+                    gridMainContainer.Children.Add(new BusyLoader(parametersVM)
+                    {
+                        Title = parametersVM.ProgessText,
+                    });
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public void CloseBusyLoader()
+        {
+            try
+            {
+                if (gridMainContainer.Children.FirstOrDefault(a => a is BusyLoader) is BusyLoader busyLoader)
+                {
+                    gridMainContainer.Children.Remove(busyLoader);
                 }
             }
             catch (Exception)

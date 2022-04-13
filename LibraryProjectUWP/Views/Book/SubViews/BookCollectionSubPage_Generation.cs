@@ -50,6 +50,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     orderedLocalViewModelList = Enumerable.Empty<LivreVM>();
                 }
 
+                itemsPage = await this.CompleteBooksInfoAsync(itemsPage);
+
                 IEnumerable<IGrouping<string, LivreVM>> GroupingItems = itemsPage.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
                 {
@@ -102,6 +104,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     localViewModelList.Clear();
                     orderedLocalViewModelList = Enumerable.Empty<LivreVM>();
                 }
+
+                itemsPage = await this.CompleteBooksInfoAsync(itemsPage);
 
                 IEnumerable<IGrouping<string, LivreVM>> GroupingItems = itemsPage.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
@@ -157,6 +161,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     orderedLocalViewModelList = Enumerable.Empty<LivreVM>();
                 }
 
+                itemsPage = await this.CompleteBooksInfoAsync(itemsPage);
+
                 IEnumerable<IGrouping<string, LivreVM>> GroupingItems = itemsPage.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
@@ -210,6 +216,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     orderedLocalViewModelList = Enumerable.Empty<LivreVM>();
                 }
 
+                itemsPage = await this.CompleteBooksInfoAsync(itemsPage);
+
                 IEnumerable<IGrouping<string, LivreVM>> GroupingItems = itemsPage.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
                 {
@@ -262,6 +270,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     localViewModelList.Clear();
                     orderedLocalViewModelList = Enumerable.Empty<LivreVM>();
                 }
+
+                itemsPage = await this.CompleteBooksInfoAsync(itemsPage);
 
                 IEnumerable<IGrouping<string, LivreVM>> GroupingItems = itemsPage.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Publication.YearParution ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
@@ -328,6 +338,37 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 return Enumerable.Empty<LivreVM>();
             }
         }
+
+        public async Task<IEnumerable<LivreVM>> CompleteBooksInfoAsync(IEnumerable<LivreVM> viewModelList)
+        {
+            try
+            {
+                if (viewModelList == null || !viewModelList.Any())
+                {
+                    return Enumerable.Empty<LivreVM>();
+                }
+
+                foreach (var book in viewModelList)
+                {
+                    long countExemplaries = await DbServices.Book.CountExemplaryInBookAsync(book.Id);
+                    book.NbExemplaires = countExemplaries;
+
+                    var jaquettes = await esBook.GetBookItemJaquettePathAsync(book);
+                    string combinedPath = jaquettes;
+                    string jaquetteFile = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : EsGeneral.BookDefaultJaquette;
+                    book.JaquettePath = jaquetteFile;
+                }
+
+                return viewModelList;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return viewModelList;
+            }
+        }
+
 
         public async Task RefreshItemsGrouping(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
