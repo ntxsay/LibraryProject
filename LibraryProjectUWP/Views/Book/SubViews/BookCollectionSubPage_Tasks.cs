@@ -110,16 +110,19 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 };
 
                 dispatcherTimer.Start(); 
-                workerGotoPage.DoWork -= WorkerGotoPage_DoWork;
-                workerGotoPage.RunWorkerCompleted -= WorkerGotoPage_RunWorkerCompleted;
-                workerGotoPage.Dispose();
-                workerGotoPage = null;
             }
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
+            }
+            finally
+            {
+                workerGotoPage.DoWork -= WorkerGotoPage_DoWork;
+                workerGotoPage.RunWorkerCompleted -= WorkerGotoPage_RunWorkerCompleted;
+                workerGotoPage.Dispose();
+                workerGotoPage = null;
             }
         }
         #endregion
