@@ -20,6 +20,7 @@ namespace LibraryProjectUWP.Code.Services.ES
 
         readonly EsGeneral _EsGeneral = new EsGeneral();
 
+        [Obsolete]
         public async Task<string> GetBookCollectionBackgroundImagePathAsync()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -52,6 +53,7 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
+        [Obsolete]
         public async Task<OperationStateVM> ChangeBookCollectionBackgroundImageAsync()
         {
             MethodBase m = MethodBase.GetCurrentMethod();

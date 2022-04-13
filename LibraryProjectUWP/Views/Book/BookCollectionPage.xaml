@@ -114,18 +114,6 @@
                        ExecuteRequested="DisplayCollectionListXUiCmd_ExecuteRequested"
                        Description="Affiche les collections">
         </XamlUICommand>
-        <XamlUICommand x:Name="GroupByLetterXamlUICommand" 
-                       ExecuteRequested="GroupByLetterXamlUICommand_ExecuteRequested">
-        </XamlUICommand>
-        <XamlUICommand x:Name="GroupByCreationYearXamlUICommand" 
-                       ExecuteRequested="GroupByCreationYearXamlUICommand_ExecuteRequested">
-        </XamlUICommand>
-        <XamlUICommand x:Name="GroupByParutionYearXamlUICommand" 
-                       ExecuteRequested="GroupByParutionYearXamlUICommand_ExecuteRequested">
-        </XamlUICommand>
-        <XamlUICommand x:Name="GroupByNoneXamlUICommand" 
-                       ExecuteRequested="GroupByNoneXamlUICommand_ExecuteRequested">
-        </XamlUICommand>
         <XamlUICommand x:Name="OrderByCroissantXamlUICommand" 
                        ExecuteRequested="OrderByCroissantXamlUICommand_ExecuteRequested">
         </XamlUICommand>
@@ -377,11 +365,11 @@
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='parution-year', Mode=OneWay}" Text="Année de parution" Command="{StaticResource GroupByParutionYearXamlUICommand}"/>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='creation-year', Mode=OneWay}" Text="Année de création" Command="{StaticResource GroupByCreationYearXamlUICommand}"/>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='letter', Mode=OneWay}" Text="Lettre" Command="{StaticResource GroupByLetterXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='parution-year', Mode=OneWay}" Text="Année de parution" Click="TMFI_GroupByParutionYear_Click"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='creation-year', Mode=OneWay}" Text="Année de création" Click="TMFI_GroupByCreationYear_Click"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='letter', Mode=OneWay}" Text="Lettre" Click="TMFI_GroupByLetter_Click"/>
                         <MenuFlyoutSeparator/>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='none', Mode=OneWay}" Text="Aucun" Command="{StaticResource GroupByNoneXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='none', Mode=OneWay}" Text="Aucun" Click="TMFI_GroupByNone_Click"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

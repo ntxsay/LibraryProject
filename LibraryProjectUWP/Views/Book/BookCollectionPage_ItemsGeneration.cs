@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -27,15 +28,46 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
-        public async Task GroupItemsBySearch(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public void GroupItemsBySearch(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                 {
-                    await bookCollectionSpage.GroupItemsBySearch(reloadFromDb, goToPage, resetPage);
-                }
+                    ProgessText = $"Recherche en cours des livres...",
+                });
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    var bookCollectionSpage = this.BookCollectionSubPage;
+                    if (bookCollectionSpage != null)
+                    {
+                        await bookCollectionSpage.GroupItemsBySearch(reloadFromDb, goToPage, resetPage);
+                    }
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, e) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        dispatcherTimer2.Stop();
+                        //dispatcherTimer2 = null;
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                    //dispatcherTimer = null;
+                };
+
+                dispatcherTimer.Start();
             }
             catch (Exception ex)
             {
@@ -45,15 +77,46 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task GroupItemsByNone(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public void GroupItemsByNone(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                 {
-                    await bookCollectionSpage.GroupItemsByNone(reloadFromDb, goToPage, resetPage);
-                }
+                    ProgessText = $"Dégroupement en cours des livres...",
+                });
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    var bookCollectionSpage = this.BookCollectionSubPage;
+                    if (bookCollectionSpage != null)
+                    {
+                        await bookCollectionSpage.GroupItemsByNone(reloadFromDb, goToPage, resetPage);
+                    }
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, e) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        dispatcherTimer2.Stop();
+                        //dispatcherTimer2 = null;
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                    //dispatcherTimer = null;
+                };
+
+                dispatcherTimer.Start();
             }
             catch (Exception ex)
             {
@@ -63,15 +126,46 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task GroupItemsByAlphabetic(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public void GroupItemsByAlphabetic(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                 {
-                    await bookCollectionSpage.GroupItemsByAlphabetic(reloadFromDb, goToPage, resetPage);
-                }
+                    ProgessText = $"Groupement en cours des livres par lettre...",
+                });
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    var bookCollectionSpage = this.BookCollectionSubPage;
+                    if (bookCollectionSpage != null)
+                    {
+                        await bookCollectionSpage.GroupItemsByAlphabeticAsync(reloadFromDb, goToPage, resetPage);
+                    }
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, e) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        dispatcherTimer2.Stop();
+                        //dispatcherTimer2 = null;
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                    //dispatcherTimer = null;
+                };
+
+                dispatcherTimer.Start();
             }
             catch (Exception ex)
             {
@@ -81,15 +175,47 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task GroupByCreationYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+
+        public void GroupByCreationYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                 {
-                    await bookCollectionSpage.GroupByCreationYear(reloadFromDb, goToPage, resetPage);
-                }
+                    ProgessText = $"Groupement en cours des livres par année de création...",
+                });
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    var bookCollectionSpage = this.BookCollectionSubPage;
+                    if (bookCollectionSpage != null)
+                    {
+                        await bookCollectionSpage.GroupByCreationYear(reloadFromDb, goToPage, resetPage);
+                    }
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, e) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        dispatcherTimer2.Stop();
+                        //dispatcherTimer2 = null;
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                    //dispatcherTimer = null;
+                };
+
+                dispatcherTimer.Start();
             }
             catch (Exception ex)
             {
@@ -98,15 +224,46 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-        public async Task GroupByParutionYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public void GroupByParutionYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
         {
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                 {
-                    await bookCollectionSpage.GroupByParutionYear(reloadFromDb, goToPage, resetPage);
-                }
+                    ProgessText = $"Groupement en cours des livres par année de parution...",
+                });
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    var bookCollectionSpage = this.BookCollectionSubPage;
+                    if (bookCollectionSpage != null)
+                    {
+                        await bookCollectionSpage.GroupByParutionYear(reloadFromDb, goToPage, resetPage);
+                    }
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, e) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        dispatcherTimer2.Stop();
+                        //dispatcherTimer2 = null;
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                    //dispatcherTimer = null;
+                };
+
+                dispatcherTimer.Start();
             }
             catch (Exception ex)
             {

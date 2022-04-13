@@ -117,21 +117,6 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private DataViewModeEnum _DataViewMode = DataViewModeEnum.GridView;
-        [Obsolete]
-        public DataViewModeEnum DataViewMode
-        {
-            get => this._DataViewMode;
-            set
-            {
-                if (this._DataViewMode != value)
-                {
-                    this._DataViewMode = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
         private ObservableCollection<IGrouping<string, LivreVM>> _Collection = new ObservableCollection<IGrouping<string, LivreVM>>();
         public ObservableCollection<IGrouping<string, LivreVM>> Collection
         {
@@ -146,6 +131,45 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class BookGroupItemVM : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        private int _CountPage;
+        public int CountPage
+        {
+            get => this._CountPage;
+            set
+            {
+                if (this._CountPage != value)
+                {
+                    this._CountPage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private IEnumerable<LivreVM> _ViewModelList;
+        public IEnumerable<LivreVM> ViewModelList
+        {
+            get => this._ViewModelList;
+            set
+            {
+                if (this._ViewModelList != value)
+                {
+                    this._ViewModelList = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

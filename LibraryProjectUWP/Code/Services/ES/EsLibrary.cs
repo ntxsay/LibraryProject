@@ -17,7 +17,99 @@ namespace LibraryProjectUWP.Code.Services.ES
     {
         internal const string LibraryDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
         internal const string JaquetteBaseFileName = "Library_Jaquette";
+        internal const string baseBackgroundFile = "Book_Collection_Bacground_Image";
         readonly EsGeneral _EsGeneral = new EsGeneral();
+
+        public async Task<string> GetBookCollectionBackgroundImagePathAsync(Guid guidLibrary)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var libraryFolder = await this.GetLibraryItemFolderAsync(guidLibrary);
+                if (libraryFolder == null)
+                {
+                    return EsGeneral.BookCollectionDefaultBackgroundImage;
+                }
+
+                foreach (var ext in Files.ImageExtensions)
+                {
+                    string fileName = $"{baseBackgroundFile}{ext}";
+                    var storageItem = await libraryFolder.TryGetItemAsync(fileName);
+                    if (storageItem == null || !storageItem.IsOfType(StorageItemTypes.File))
+                    {
+                        continue;
+                    }
+
+                    return storageItem.Path;
+                }
+
+                return EsGeneral.BookCollectionDefaultBackgroundImage;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return EsGeneral.BookCollectionDefaultBackgroundImage;
+            }
+        }
+
+        public async Task<OperationStateVM> ChangeBookCollectionBackgroundImageAsync(Guid guidLibrary)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var storageFile = await Files.OpenStorageFileAsync(Files.ImageExtensions);
+                if (storageFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le fichier n'a pas pas pû être récupéré par le sélecteur de fichier.",
+                    };
+                }
+
+                var libraryFolder = await this.GetLibraryItemFolderAsync(guidLibrary);
+                if (libraryFolder == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le répertoire des livres n'a pas pû être trouvé.",
+                    };
+                }
+
+                var deleteResult = await _EsGeneral.RemoveFileAsync(baseBackgroundFile, libraryFolder, EsGeneral.SearchOptions.StartWith);
+                if (!deleteResult.IsSuccess)
+                {
+                    return deleteResult;
+                }
+
+                var newCopyFile = await storageFile.CopyAsync(libraryFolder, baseBackgroundFile + System.IO.Path.GetExtension(storageFile.Path), NameCollisionOption.ReplaceExisting);
+                if (newCopyFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = "Le fichier n'a pû être copié dans le répertoire de l'application.",
+                    };
+                }
+
+                return new OperationStateVM()
+                {
+                    IsSuccess = true,
+                    Result = newCopyFile.Path,
+                };
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return new OperationStateVM()
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
+
 
         public async Task<OperationStateVM> ChangeLibraryItemJaquetteAsync(BibliothequeVM viewModel)
         {

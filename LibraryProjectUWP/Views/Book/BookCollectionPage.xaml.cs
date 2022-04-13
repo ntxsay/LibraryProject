@@ -72,9 +72,21 @@ namespace LibraryProjectUWP.Views.Book
         
 
         #region Loading
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            OpenBookCollection();
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                EsLibrary esLibrary = new EsLibrary(); 
+                ViewModelPage.BackgroundImagePath = await esLibrary.GetBookCollectionBackgroundImagePathAsync(Parameters.ParentLibrary.Guid);
+                await InitializeBackgroundImagesync();
+                OpenBookCollection();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -317,24 +329,68 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Sort - Group - Order
-        private async void GroupByLetterXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void TMFI_GroupByLetter_Click(object sender, RoutedEventArgs e)
         {
-            await this.GroupItemsByAlphabetic(false);
+            if (sender is ToggleMenuFlyoutItem item)
+            {
+                if (this.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.Letter)
+                {
+                    if (!item.IsChecked)
+                    {
+                        item.IsChecked = true;
+                    }
+                    return;
+                }
+                this.GroupItemsByAlphabetic();
+            }
         }
 
-        private async void GroupByCreationYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void TMFI_GroupByCreationYear_Click(object sender, RoutedEventArgs e)
         {
-            await this.GroupByCreationYear(false);
+            if (sender is ToggleMenuFlyoutItem item)
+            {
+                if (this.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.CreationYear)
+                {
+                    if (!item.IsChecked)
+                    {
+                        item.IsChecked = true;
+                    }
+                    return;
+                }
+                this.GroupByCreationYear();
+            }
         }
 
-        private async void GroupByParutionYearXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void TMFI_GroupByParutionYear_Click(object sender, RoutedEventArgs e)
         {
-            await this.GroupByParutionYear(false);
+            if (sender is ToggleMenuFlyoutItem item)
+            {
+                if (this.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.ParutionYear)
+                {
+                    if (!item.IsChecked)
+                    {
+                        item.IsChecked = true;
+                    }
+                    return;
+                }
+                this.GroupByParutionYear();
+            }
         }
 
-        private async void GroupByNoneXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void TMFI_GroupByNone_Click(object sender, RoutedEventArgs e)
         {
-            await this.GroupItemsByNone(false);
+            if (sender is ToggleMenuFlyoutItem item)
+            {
+                if (this.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.None)
+                {
+                    if (!item.IsChecked)
+                    {
+                        item.IsChecked = true;
+                    }
+                    return;
+                }
+                this.GroupItemsByNone();
+            }
         }
         #endregion
 
@@ -373,13 +429,14 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var result = await esBook.ChangeBookCollectionBackgroundImageAsync();
+                EsLibrary esLibrary = new EsLibrary();
+                var result = await esLibrary.ChangeBookCollectionBackgroundImageAsync(Parameters.ParentLibrary.Guid);
                 if (!result.IsSuccess)
                 {
                     return;
                 }
 
-                ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.BookDefaultBackgroundImage;
+                ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.BookCollectionDefaultBackgroundImage;
                 await InitializeBackgroundImagesync();
             }
             catch (Exception ex)
@@ -2924,6 +2981,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-       
+        
     }
 }

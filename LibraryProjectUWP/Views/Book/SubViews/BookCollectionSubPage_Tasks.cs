@@ -23,7 +23,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
     {
         private BackgroundWorker workerGotoPage;
 
-        #region Complete Info Book
+        #region GoToPage
         public void InitializeGotoPageWorker(int page)
         {
             try
