@@ -204,7 +204,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
                         }
 
-                        await RefreshItemsGrouping();
+                        await RefreshItemsGrouping(true, this.GetSelectedPage, false);
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });
