@@ -488,17 +488,36 @@ namespace LibraryProjectUWP.Views.Book
                     var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
                     if (creationResult.IsSuccess)
                     {
-                        newViewModel.Id = creationResult.Id;
-                        this.CompleteBookInfos(newViewModel);
-                        Parameters.ParentLibrary.Books.Add(newViewModel);
-
-                        await esBook.SaveBookViewModelAsync(newViewModel);
-
-                        var bookCollectionSpage = this.BookCollectionSubPage;
-                        if (bookCollectionSpage != null)
+                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                         {
-                            await bookCollectionSpage.RefreshItemsGrouping();
-                        }
+                            ProgessText = $"Actualisation du catalogue des livres en cours...",
+                        });
+
+                        DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 0, 1),
+                        };
+
+                        dispatcherTimer.Tick += async (t, f) =>
+                        {
+                            await this.RefreshItemsGrouping(true, GetSelectedPage);
+
+                            DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                            {
+                                Interval = new TimeSpan(0, 0, 0, 2),
+                            };
+
+                            dispatcherTimer2.Tick += (s, i) =>
+                            {
+                                Parameters.MainPage.CloseBusyLoader();
+                                dispatcherTimer2.Stop();
+                            };
+                            dispatcherTimer2.Start();
+
+                            dispatcherTimer.Stop();
+                        };
+
+                        dispatcherTimer.Start();
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = creationResult.Message;
@@ -2939,26 +2958,6 @@ namespace LibraryProjectUWP.Views.Book
         //    }
         //}
         #endregion
-
-
-        private async void ImageBackground_Loaded(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is Image imageCtrl)
-                {
-                    var bitmapImage = await Files.BitmapImageFromFileAsync(ViewModelPage.BackgroundImagePath);
-                    imageCtrl.Source = bitmapImage;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         
         private async void Slider_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
@@ -2980,7 +2979,5 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-        
     }
 }

@@ -113,6 +113,17 @@ namespace LibraryProjectUWP.Code.Converters
                         return true;
                     }
                 }
+                else if (value is BookGroupVM.OrderBy bookOrderBy && parameter is string sortby2)
+                {
+                    if (sortby2 == "croissant" && bookOrderBy == BookGroupVM.OrderBy.Croissant)
+                    {
+                        return true;
+                    }
+                    else if (sortby2 == "dCroissant" && bookOrderBy == BookGroupVM.OrderBy.DCroissant)
+                    {
+                        return true;
+                    }
+                }
 
                 return false;
             }

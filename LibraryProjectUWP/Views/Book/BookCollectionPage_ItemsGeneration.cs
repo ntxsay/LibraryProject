@@ -273,13 +273,54 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void OrderByCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void TMFI_OrderByCroissant_Click(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
-                await this.RefreshItemsGrouping(false);
+                if (sender is ToggleMenuFlyoutItem item)
+                {
+                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.Croissant)
+                    {
+                        if (!item.IsChecked)
+                        {
+                            item.IsChecked = true;
+                        }
+                        return;
+                    }
+
+                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                    {
+                        ProgessText = $"Organisation en cours des livres par ordre croissant...",
+                    });
+
+                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 1),
+                    };
+
+                    dispatcherTimer.Tick += async (t, f) =>
+                    {
+                        ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
+                        await this.RefreshItemsGrouping();
+
+                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 0, 2),
+                        };
+
+                        dispatcherTimer2.Tick += (s, d) =>
+                        {
+                            Parameters.MainPage.CloseBusyLoader();
+                            dispatcherTimer2.Stop();
+                        };
+                        dispatcherTimer2.Start();
+
+                        dispatcherTimer.Stop();
+                    };
+
+                    dispatcherTimer.Start();
+                }
             }
             catch (Exception ex)
             {
@@ -288,13 +329,56 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void OrderByDCroissantXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void TMFI_OrderByDCroissant_Click(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
-                await this.RefreshItemsGrouping(false);
+                if (sender is ToggleMenuFlyoutItem item)
+                {
+                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
+                    {
+                        if (!item.IsChecked)
+                        {
+                            item.IsChecked = true;
+                        }
+                        return;
+                    }
+
+                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                    {
+                        ProgessText = $"Organisation en cours des livres par ordre décroissant...",
+                    });
+
+                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 1),
+                    };
+
+                    dispatcherTimer.Tick += async (t, f) =>
+                    {
+                        ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
+                        await this.RefreshItemsGrouping();
+
+                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 0, 2),
+                        };
+
+                        dispatcherTimer2.Tick += (s, d) =>
+                        {
+                            Parameters.MainPage.CloseBusyLoader();
+                            dispatcherTimer2.Stop();
+                            //dispatcherTimer2 = null;
+                        };
+                        dispatcherTimer2.Start();
+
+                        dispatcherTimer.Stop();
+                        //dispatcherTimer = null;
+                    };
+
+                    dispatcherTimer.Start();
+                }
             }
             catch (Exception ex)
             {
