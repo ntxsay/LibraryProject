@@ -22,7 +22,7 @@ namespace DbConsoleHelpers.Models.Local
         public virtual DbSet<Tbook> Tbook { get; set; }
         public virtual DbSet<TbookAuthorConnector> TbookAuthorConnector { get; set; }
         public virtual DbSet<TbookClassification> TbookClassification { get; set; }
-        public virtual DbSet<TbookCollectionConnector> TbookCollectionConnector { get; set; }
+        public virtual DbSet<TbookCollections> TbookCollections { get; set; }
         public virtual DbSet<TbookEditeurConnector> TbookEditeurConnector { get; set; }
         public virtual DbSet<TbookEtat> TbookEtat { get; set; }
         public virtual DbSet<TbookExemplary> TbookExemplary { get; set; }
@@ -115,9 +115,9 @@ namespace DbConsoleHelpers.Models.Local
                     .HasForeignKey<TbookClassification>(d => d.Id);
             });
 
-            modelBuilder.Entity<TbookCollectionConnector>(entity =>
+            modelBuilder.Entity<TbookCollections>(entity =>
             {
-                entity.ToTable("TBookCollectionConnector");
+                entity.ToTable("TBookCollections");
 
                 entity.HasIndex(e => e.Id)
                     .IsUnique();
@@ -125,16 +125,12 @@ namespace DbConsoleHelpers.Models.Local
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.HasOne(d => d.IdBookNavigation)
-                    .WithMany(p => p.TbookCollectionConnector)
+                    .WithMany(p => p.TbookCollections)
                     .HasForeignKey(d => d.IdBook);
 
                 entity.HasOne(d => d.IdCollectionNavigation)
-                    .WithMany(p => p.TbookCollectionConnector)
+                    .WithMany(p => p.TbookCollections)
                     .HasForeignKey(d => d.IdCollection);
-
-                entity.HasOne(d => d.IdLibraryNavigation)
-                    .WithMany(p => p.TbookCollectionConnector)
-                    .HasForeignKey(d => d.IdLibrary);
             });
 
             modelBuilder.Entity<TbookEditeurConnector>(entity =>

@@ -92,7 +92,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TbookCollectionConnector.Where(w => w.IdBook == idBook).Select(s => s.IdCollection).ToListAsync();
+                        return await context.TbookCollections.Where(w => w.IdBook == idBook).Select(s => s.IdCollection).ToListAsync();
                     }
                 }
                 catch (Exception ex)
@@ -128,11 +128,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var preCollection = await context.TbookCollectionConnector.Where(w => w.IdBook == idBook).ToListAsync();
+                        var preCollection = await context.TbookCollections.Where(w => w.IdBook == idBook).ToListAsync();
                         if (preCollection.Any())
                         {
                             List<Tcollection> collection = new List<Tcollection>();
-                            foreach (TbookCollectionConnector driver in preCollection)
+                            foreach (TbookCollections driver in preCollection)
                             {
                                 if (collectionType == CollectionTypeEnum.All)
                                 {
@@ -270,26 +270,14 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
+#warning Cette méthode nuit considérablement aux performances lorsqu'il y a beaucoup de collection
             public static async Task<long> CountUnCategorizedBooks(long idLibrary)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var collections = await context.Tcollection.Where(d => d.IdLibrary == idLibrary).ToListAsync();
-                        if (collections.Count > 0)
-                        {
-                            for (int i = 0; i < collections.Count; i++)
-                            {
-                                if (!await context.TbookCollectionConnector.AnyAsync(w => w.IdCollection == collections[i].Id))
-                                {
-                                    collections.RemoveAt(i);
-                                    i = -1;
-                                    continue;
-                                }
-                            }
-                        }
-                        
+                        var collections = await context.Tbook.Where(d => d.IdLibrary == idLibrary && d.TbookCollections.Count == 0).ToListAsync();
                         return collections.Distinct().ToList().Count;
                     }
                 }
@@ -324,7 +312,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TbookCollectionConnector.Where(d => d.IdCollection == idCollection).Select(s => s.IdBook).ToListAsync();
+                        return await context.TbookCollections.Where(d => d.IdCollection == idCollection).Select(s => s.IdBook).ToListAsync();
                     }
                 }
                 catch (Exception ex)
@@ -335,13 +323,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<long> CountBooksIdInCollectionAsync(long idCollection)
+            public static async Task<long> CountBooksInCollectionAsync(long idCollection)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return await context.TbookCollectionConnector.CountAsync(d => d.IdCollection == idCollection);
+                        return await context.TbookCollections.CountAsync(d => d.IdCollection == idCollection);
                     }
                 }
                 catch (Exception ex)
@@ -401,23 +389,23 @@ namespace LibraryProjectUWP.Code.Services.Db
                         
                         foreach (var idBook in validIdList)
                         {
-                            var bookConnector = await context.TbookCollectionConnector.SingleOrDefaultAsync(c => c.IdBook == idBook);
+                            var bookConnector = await context.TbookCollections.SingleOrDefaultAsync(c => c.IdBook == idBook);
                             if (bookConnector != null)
                             {
                                 bookConnector.IdCollection = viewModel.Id;
 
-                                context.TbookCollectionConnector.Update(bookConnector);
+                                context.TbookCollections.Update(bookConnector);
                                 await context.SaveChangesAsync();
                             }
                             else
                             {
-                                TbookCollectionConnector tbookCollectionConnector = new TbookCollectionConnector()
+                                TbookCollections tbookCollectionConnector = new TbookCollections()
                                 {
                                     IdBook = idBook,
                                     IdCollection = viewModel.Id,
                                 };
 
-                                await context.TbookCollectionConnector.AddAsync(tbookCollectionConnector);
+                                await context.TbookCollections.AddAsync(tbookCollectionConnector);
                                 await context.SaveChangesAsync();
                             }
                         }
@@ -479,13 +467,13 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         foreach (var idBook in validIdList)
                         {
-                            var bookConnector = await context.TbookCollectionConnector.SingleOrDefaultAsync(c => c.IdBook == idBook);
+                            var bookConnector = await context.TbookCollections.SingleOrDefaultAsync(c => c.IdBook == idBook);
                             if (bookConnector == null)
                             {
                                 continue;
                             }
 
-                            context.TbookCollectionConnector.Remove(bookConnector);
+                            context.TbookCollections.Remove(bookConnector);
                             await context.SaveChangesAsync();
                         }
 
@@ -564,13 +552,13 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (viewModel.IdBook != -1)
                         {
-                            var recordConnector = new TbookCollectionConnector()
+                            var recordConnector = new TbookCollections()
                             {
                                 IdBook = viewModel.IdBook,
                                 IdCollection = record.Id,
                             };
 
-                            await context.TbookCollectionConnector.AddAsync(recordConnector);
+                            await context.TbookCollections.AddAsync(recordConnector);
                             await context.SaveChangesAsync();
                         }
 
@@ -721,10 +709,10 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    List<TbookCollectionConnector> driverCollection = await context.TbookCollectionConnector.Where(w => w.IdCollection == Id).ToListAsync();
+                    List<TbookCollections> driverCollection = await context.TbookCollections.Where(w => w.IdCollection == Id).ToListAsync();
                     if (driverCollection.Any())
                     {
-                        context.TbookCollectionConnector.RemoveRange(driverCollection);
+                        context.TbookCollections.RemoveRange(driverCollection);
                         //await context.SaveChangesAsync();
                     }
 

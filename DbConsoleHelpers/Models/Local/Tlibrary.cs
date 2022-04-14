@@ -12,7 +12,6 @@ namespace DbConsoleHelpers.Models.Local
         public Tlibrary()
         {
             Tbook = new HashSet<Tbook>();
-            TbookCollectionConnector = new HashSet<TbookCollectionConnector>();
             Tcollection = new HashSet<Tcollection>();
             TlibraryCategorie = new HashSet<TlibraryCategorie>();
         }
@@ -25,7 +24,6 @@ namespace DbConsoleHelpers.Models.Local
         public string DateEdition { get; set; }
 
         public virtual ICollection<Tbook> Tbook { get; set; }
-        public virtual ICollection<TbookCollectionConnector> TbookCollectionConnector { get; set; }
         public virtual ICollection<Tcollection> Tcollection { get; set; }
         public virtual ICollection<TlibraryCategorie> TlibraryCategorie { get; set; }
     }

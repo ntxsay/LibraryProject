@@ -33,21 +33,21 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <returns></returns>
             public static async Task<IList<Tlibrary>> AllAsync()
             {
-                try
+                using (LibraryDbContext context = new LibraryDbContext())
                 {
-                    using (LibraryDbContext context = new LibraryDbContext())
+                    try
                     {
                         var collection = await context.Tlibrary.ToListAsync();
                         if (collection == null || !collection.Any()) return Enumerable.Empty<Tlibrary>().ToList();
 
                         return collection;
                     }
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Debug.WriteLine(Logs.GetLog(ex, m));
-                    return Enumerable.Empty<Tlibrary>().ToList();
+                    catch (Exception ex)
+                    {
+                        MethodBase m = MethodBase.GetCurrentMethod();
+                        Debug.WriteLine(Logs.GetLog(ex, m));
+                        return Enumerable.Empty<Tlibrary>().ToList();
+                    }
                 }
             }
 
@@ -64,7 +64,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     var collection = await Library.AllAsync();
                     if (!collection.Any()) return Enumerable.Empty<BibliothequeVM>().ToList();
 
-                    var values = collection.Select(async s => await Library.ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
                     return values;
                 }
                 catch (Exception ex)
@@ -369,6 +369,9 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     IList<CategorieLivreVM> categoriesList = await Categorie.MultipleVmAsync(model.Id);
                     IOrderedEnumerable<CollectionVM> collectionList = (await Collection.MultipleVmInLibraryAsync(model.Id))?.OrderBy(o => o.Name);
+                    var countBooks = await Book.CountBooksInLibraryAsync(model.Id);
+                    var countUnCategorizedBooks = await Categorie.CountUnCategorizedBooks(model.Id);
+                    var countNotInCollectionBooks = await Collection.CountUnCategorizedBooks(model.Id);
 
                     var viewModel = new BibliothequeVM()
                     {
@@ -380,8 +383,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Guid = isGuidCorrect ? guid : Guid.Empty,
                         Collections = collectionList != null && collectionList.Any() ? new ObservableCollection<CollectionVM>(collectionList) : new ObservableCollection<CollectionVM>(),
                         Categories = categoriesList != null && categoriesList.Any() ? new ObservableCollection<CategorieLivreVM>(categoriesList) : new ObservableCollection<CategorieLivreVM>(),
-                        CountUnCategorizedBooks = await Categorie.CountUnCategorizedBooks(model.Id),
-                        CountNotInCollectionBooks = await Collection.CountUnCategorizedBooks(model.Id),
+                        CountUnCategorizedBooks = countUnCategorizedBooks,
+                        CountNotInCollectionBooks = countNotInCollectionBooks,
+                        CountBooks = countBooks,
                     };
 
                     if (viewModel.Categories.Any())

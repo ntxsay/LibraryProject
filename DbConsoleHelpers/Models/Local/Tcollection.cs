@@ -11,7 +11,7 @@ namespace DbConsoleHelpers.Models.Local
     {
         public Tcollection()
         {
-            TbookCollectionConnector = new HashSet<TbookCollectionConnector>();
+            TbookCollections = new HashSet<TbookCollections>();
         }
 
         public long Id { get; set; }
@@ -21,6 +21,6 @@ namespace DbConsoleHelpers.Models.Local
         public string Description { get; set; }
 
         public virtual Tlibrary IdLibraryNavigation { get; set; }
-        public virtual ICollection<TbookCollectionConnector> TbookCollectionConnector { get; set; }
+        public virtual ICollection<TbookCollections> TbookCollections { get; set; }
     }
 }

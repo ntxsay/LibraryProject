@@ -98,9 +98,6 @@
         <XamlUICommand x:Name="GotoPageXUiCmd" 
                        ExecuteRequested="GotoPageXUiCmd_ExecuteRequested">
         </XamlUICommand>
-        <XamlUICommand x:Name="CancelTaskXUiCmd" 
-                       ExecuteRequested="CancelTaskXUiCmd_ExecuteRequested">
-        </XamlUICommand>
         <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ThumbnailSimpleDataTemplate">
             <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
                 <ToolTipService.ToolTip>
@@ -431,7 +428,7 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" Text="{x:Bind Description, Mode=OneWay}" TextWrapping="Wrap" MaxWidth="200"/>
-                                                <Button Grid.Column="1" Command="{StaticResource CancelTaskXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                                                <Button Grid.Column="1"  MTUUi:FrameworkElementExtensions.Cursor="Hand">
                                                     <TextBlock Text="Annuler" />
                                                 </Button>
                                             </Grid>

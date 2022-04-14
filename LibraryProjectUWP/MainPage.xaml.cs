@@ -514,38 +514,6 @@ namespace LibraryProjectUWP
             }
         }
 
-        public void OpenLoading()
-        {
-            try
-            {
-                if (!LoadingControl.IsLoading)
-                {
-                    LoadingControl.IsLoading = true;
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        public void CloseLoading()
-        {
-            try
-            {
-                if (LoadingControl.IsLoading)
-                {
-                    LoadingControl.IsLoading = false;
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
         public void OpenBusyLoader(BusyLoaderParametersVM parametersVM)
         {
             try
@@ -590,19 +558,6 @@ namespace LibraryProjectUWP
 
         }
 
-        private bool _IsBusyLoading = false;
-        public bool IsBusyLoading
-        {
-            get => this._IsBusyLoading;
-            set
-            {
-                if (_IsBusyLoading != value)
-                {
-                    this._IsBusyLoading = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
         public ItemTagContentVM AboutMenuItem => new ItemTagContentVM()
         {
             Text = "À propos de ...",

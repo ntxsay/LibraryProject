@@ -133,7 +133,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 {
                                     foreach (long id in collectionsId)
                                     {
-                                        if (await context.TbookCollectionConnector.AnyAsync(a => a.IdBook == model.Id && a.IdCollection == id))
+                                        if (await context.TbookCollections.AnyAsync(a => a.IdBook == model.Id && a.IdCollection == id))
                                         {
                                             if (!vms.Contains(model))
                                             {
@@ -244,7 +244,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 {
                                     foreach (long id in collectionsId)
                                     {
-                                        if (await context.TbookCollectionConnector.AnyAsync(a => a.IdBook == model.Id && a.IdCollection == id))
+                                        if (await context.TbookCollections.AnyAsync(a => a.IdBook == model.Id && a.IdCollection == id))
                                         {
                                             if (!vms.Contains(model))
                                             {
@@ -357,7 +357,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 {
                                     foreach (long id in collectionsId)
                                     {
-                                        if (await context.TbookCollectionConnector.AnyAsync(a => a.IdBook == model.Id && a.IdCollection == id))
+                                        if (await context.TbookCollections.AnyAsync(a => a.IdBook == model.Id && a.IdCollection == id))
                                         {
                                             if (!vms.Contains(model))
                                             {

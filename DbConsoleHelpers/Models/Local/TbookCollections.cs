@@ -5,17 +5,15 @@ using System.Collections.Generic;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace LibraryProjectUWP.Models.Local
+namespace DbConsoleHelpers.Models.Local
 {
-    public partial class TbookCollectionConnector
+    public partial class TbookCollections
     {
         public long Id { get; set; }
-        public long IdCollection { get; set; }
-        public long IdLibrary { get; set; }
         public long IdBook { get; set; }
+        public long IdCollection { get; set; }
 
         public virtual Tbook IdBookNavigation { get; set; }
         public virtual Tcollection IdCollectionNavigation { get; set; }
-        public virtual Tlibrary IdLibraryNavigation { get; set; }
     }
 }

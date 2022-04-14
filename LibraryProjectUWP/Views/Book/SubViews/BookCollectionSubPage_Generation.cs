@@ -61,6 +61,10 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             try
             {
                 var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                if (item == null)
+                {
+                    return;
+                }
 
                 IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Any())
@@ -92,6 +96,10 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             try
             {
                 var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                if (item == null)
+                {
+                    return;
+                }
 
                 IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
@@ -123,6 +131,10 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             try
             {
                 var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                if (item == null)
+                {
+                    return;
+                }
 
                 IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)
@@ -153,6 +165,10 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             try
             {
                 var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                if (item == null)
+                {
+                    return;
+                }
 
                 IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Publication.YearParution ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
                 if (GroupingItems != null && GroupingItems.Count() > 0)

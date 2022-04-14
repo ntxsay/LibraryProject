@@ -86,7 +86,7 @@
             </Grid>
             <Grid Grid.Column="1" Background="Transparent"/>
         </Grid>
-        <MTUUControls:Loading x:Name="LoadingControl" IsLoading="{x:Bind ViewModelPage.IsBusyLoading, Mode=OneWay}">
+        <MTUUControls:Loading x:Name="LoadingControl">
             <MTUUControls:Loading.Background>
                 <brushes:AcrylicBrush BackgroundSource="Backdrop"
                               TintColor="Black"

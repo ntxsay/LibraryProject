@@ -561,14 +561,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                             {
                                 if (await context.Tcollection.AnyAsync(a => a.Id == collection.Id))
                                 {
-                                    var itemConnector = new TbookCollectionConnector()
+                                    var itemConnector = new TbookCollections()
                                     {
                                         IdBook = record.Id,
-                                        IdLibrary = idLibrary,
                                         IdCollection = collection.Id,
                                     };
 
-                                    _ = await context.TbookCollectionConnector.AddAsync(itemConnector);
+                                    _ = await context.TbookCollections.AddAsync(itemConnector);
                                     await context.SaveChangesAsync();
                                 }
                             }
@@ -837,23 +836,23 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (viewModel.Publication.Collections != null)
                         {
-                            var recorditemList = await context.TbookCollectionConnector.Where(a => a.IdBook == record.Id).ToListAsync();
+                            var recorditemList = await context.TbookCollections.Where(a => a.IdBook == record.Id).ToListAsync();
                             if (recorditemList.Any())
                             {
-                                context.TbookCollectionConnector.RemoveRange(recorditemList);
+                                context.TbookCollections.RemoveRange(recorditemList);
                             }
 
                             if (viewModel.Publication.Collections.Any())
                             {
                                 foreach (CollectionVM collection in viewModel.Publication.Collections)
                                 {
-                                    var itemConnector = new TbookCollectionConnector()
+                                    var itemConnector = new TbookCollections()
                                     {
                                         IdBook = record.Id,
                                         IdCollection = collection.Id,
                                     };
 
-                                    _ = await context.TbookCollectionConnector.AddAsync(itemConnector);
+                                    _ = await context.TbookCollections.AddAsync(itemConnector);
                                 }
                             }
                         }
@@ -1060,10 +1059,10 @@ namespace LibraryProjectUWP.Code.Services.Db
                         }
 
                         //Collection connecto
-                        var recordCollection = await context.TbookCollectionConnector.Where(a => a.IdBook == record.Id).ToListAsync();
+                        var recordCollection = await context.TbookCollections.Where(a => a.IdBook == record.Id).ToListAsync();
                         if (recordCollection.Any())
                         {
-                            context.TbookCollectionConnector.RemoveRange(recordCollection);
+                            context.TbookCollections.RemoveRange(recordCollection);
                         }
 
                         //Exemplaries

@@ -12,7 +12,7 @@ namespace LibraryProjectUWP.Models.Local
         public Tbook()
         {
             TbookAuthorConnector = new HashSet<TbookAuthorConnector>();
-            TbookCollectionConnector = new HashSet<TbookCollectionConnector>();
+            TbookCollections = new HashSet<TbookCollections>();
             TbookEditeurConnector = new HashSet<TbookEditeurConnector>();
             TbookExemplary = new HashSet<TbookExemplary>();
             TbookOtherTitle = new HashSet<TbookOtherTitle>();
@@ -42,7 +42,7 @@ namespace LibraryProjectUWP.Models.Local
         public virtual TbookFormat TbookFormat { get; set; }
         public virtual TbookIdentification TbookIdentification { get; set; }
         public virtual ICollection<TbookAuthorConnector> TbookAuthorConnector { get; set; }
-        public virtual ICollection<TbookCollectionConnector> TbookCollectionConnector { get; set; }
+        public virtual ICollection<TbookCollections> TbookCollections { get; set; }
         public virtual ICollection<TbookEditeurConnector> TbookEditeurConnector { get; set; }
         public virtual ICollection<TbookExemplary> TbookExemplary { get; set; }
         public virtual ICollection<TbookOtherTitle> TbookOtherTitle { get; set; }
