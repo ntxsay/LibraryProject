@@ -175,8 +175,8 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     var item = new BookImportDataTableVM()
                     {
-                        //ColumnIndex = i,
-                        //ColumnName = ViewModelPage.DataTable.Columns[i].ColumnName,
+                        ColumnIndex = i,
+                        ColumnName = _parameters.ParentPage.ViewModelPage.DataTable.Columns[i + 1].ColumnName,
                         RowName = row[i]?.ToString(),
                     };
 
@@ -197,8 +197,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -224,8 +222,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-
 
         private async Task<bool> IsModelValided()
         {

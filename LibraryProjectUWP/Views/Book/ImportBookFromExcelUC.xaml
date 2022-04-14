@@ -45,6 +45,8 @@
         </Style>
         <DataTemplate x:DataType="bookVm:BookImportDataTableVM" x:Key="itemImportTemplate">
             <TextBlock>
+                <Run Text="{x:Bind ColumnName, Mode=OneWay}" FontWeight="SemiBold"/>
+                <Run Text=":" FontWeight="SemiBold"/>
                 <Run Text="{x:Bind RowName, Mode=OneWay}" />
             </TextBlock>
         </DataTemplate>
