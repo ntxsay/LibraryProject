@@ -28,7 +28,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
-        public void GroupItemsBySearch(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public void GroupItemsBySearch(ResearchBookVM searchParams, int goToPage = 1, bool resetPage = true)
         {
             try
             {
@@ -47,7 +47,7 @@ namespace LibraryProjectUWP.Views.Book
                     var bookCollectionSpage = this.BookCollectionSubPage;
                     if (bookCollectionSpage != null)
                     {
-                        await bookCollectionSpage.GroupItemsBySearch(reloadFromDb, goToPage, resetPage);
+                        await bookCollectionSpage.GroupItemsBySearch(searchParams, goToPage, resetPage);
                     }
 
                     DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
@@ -59,12 +59,10 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Parameters.MainPage.CloseBusyLoader();
                         dispatcherTimer2.Stop();
-                        //dispatcherTimer2 = null;
                     };
                     dispatcherTimer2.Start();
 
                     dispatcherTimer.Stop();
-                    //dispatcherTimer = null;
                 };
 
                 dispatcherTimer.Start();
@@ -369,12 +367,10 @@ namespace LibraryProjectUWP.Views.Book
                         {
                             Parameters.MainPage.CloseBusyLoader();
                             dispatcherTimer2.Stop();
-                            //dispatcherTimer2 = null;
                         };
                         dispatcherTimer2.Start();
 
                         dispatcherTimer.Stop();
-                        //dispatcherTimer = null;
                     };
 
                     dispatcherTimer.Start();
@@ -387,12 +383,54 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void SortByNameXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void TMFI_SortByName_Click(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
+                if (sender is ToggleMenuFlyoutItem item)
+                {
+                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
+                    {
+                        if (!item.IsChecked)
+                        {
+                            item.IsChecked = true;
+                        }
+                        return;
+                    }
+
+                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                    {
+                        ProgessText = $"Organisation en cours des livres par nom...",
+                    });
+
+                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 1),
+                    };
+
+                    dispatcherTimer.Tick += async (t, f) =>
+                    {
+                        ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
+                        await this.RefreshItemsGrouping();
+
+                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 0, 2),
+                        };
+
+                        dispatcherTimer2.Tick += (s, d) =>
+                        {
+                            Parameters.MainPage.CloseBusyLoader();
+                            dispatcherTimer2.Stop();
+                        };
+                        dispatcherTimer2.Start();
+
+                        dispatcherTimer.Stop();
+                    };
+
+                    dispatcherTimer.Start();
+                }
                 await this.RefreshItemsGrouping(false);
             }
             catch (Exception ex)
@@ -402,12 +440,54 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void SortByDateCreationXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void TMFI_SortByDateCreation_Click(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
+                if (sender is ToggleMenuFlyoutItem item)
+                {
+                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
+                    {
+                        if (!item.IsChecked)
+                        {
+                            item.IsChecked = true;
+                        }
+                        return;
+                    }
+
+                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                    {
+                        ProgessText = $"Organisation en cours des livres par date de création...",
+                    });
+
+                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 1),
+                    };
+
+                    dispatcherTimer.Tick += async (t, f) =>
+                    {
+                        ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
+                        await this.RefreshItemsGrouping();
+
+                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 0, 2),
+                        };
+
+                        dispatcherTimer2.Tick += (s, d) =>
+                        {
+                            Parameters.MainPage.CloseBusyLoader();
+                            dispatcherTimer2.Stop();
+                        };
+                        dispatcherTimer2.Start();
+
+                        dispatcherTimer.Stop();
+                    };
+
+                    dispatcherTimer.Start();
+                }
                 await this.RefreshItemsGrouping(false);
             }
             catch (Exception ex)
@@ -417,7 +497,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task RefreshItemsGrouping(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public async Task RefreshItemsGrouping(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -425,7 +505,7 @@ namespace LibraryProjectUWP.Views.Book
                 var bookCollectionSpage = this.BookCollectionSubPage;
                 if (bookCollectionSpage != null)
                 {
-                    await bookCollectionSpage.RefreshItemsGrouping(reloadFromDb, goToPage, resetPage);
+                    await bookCollectionSpage.RefreshItemsGrouping(reloadFromDb, goToPage, resetPage, searchParams);
                 }
             }
             catch (Exception ex)

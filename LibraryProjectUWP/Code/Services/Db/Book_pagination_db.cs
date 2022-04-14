@@ -82,7 +82,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static IEnumerable<PageSystemVM> InitializePages(int countItems, int maxItemsPerPage)
+            public static IEnumerable<PageSystemVM> InitializePages(int countItems, int maxItemsPerPage, int selectedPage = 1)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
                 try
@@ -99,8 +99,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                             pages.Add(new PageSystemVM()
                             {
                                 CurrentPage = i + 1,
-                                IsPageSelected = i == 0,
-                                BackgroundColor = i == 0 ? Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush : Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush,
+                                IsPageSelected = selectedPage == (i + 1),
+                                BackgroundColor = selectedPage == (i + 1) ? Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush : Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush,
                             });
                         }
 

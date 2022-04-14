@@ -32,7 +32,7 @@ namespace LibraryProjectUWP.Code.Converters
             }
             catch (Exception)
             {
-                return Visibility.Collapsed;
+                return false;
             }
         }
 

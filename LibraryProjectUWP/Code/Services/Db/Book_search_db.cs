@@ -72,6 +72,48 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static IEnumerable<Tbook> OrderBooks(IEnumerable<Tbook> modelList, BookGroupVM.OrderBy OrderBy = BookGroupVM.OrderBy.Croissant, BookGroupVM.SortBy SortBy = BookGroupVM.SortBy.Name)
+            {
+                try
+                {
+                    if (modelList == null || !modelList.Any())
+                    {
+                        return Enumerable.Empty<Tbook>();
+                    }
+
+                    if (SortBy == BookGroupVM.SortBy.Name)
+                    {
+                        if (OrderBy == BookGroupVM.OrderBy.Croissant)
+                        {
+                            return modelList.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.MainTitle);
+                        }
+                        else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
+                        {
+                            return modelList.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.MainTitle);
+                        }
+                    }
+                    else if (SortBy == BookGroupVM.SortBy.DateCreation)
+                    {
+                        if (OrderBy == BookGroupVM.OrderBy.Croissant)
+                        {
+                            return modelList.OrderBy(o => o.DateAjout);
+                        }
+                        else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
+                        {
+                            return modelList.OrderByDescending(o => o.DateAjout);
+                        }
+                    }
+
+                    return Enumerable.Empty<Tbook>();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<Tbook>();
+                }
+            }
+
             public static async Task<IEnumerable<Tbook>> FilterBooksAsync(long idLibrary, IEnumerable<long> collectionsId, bool displayUnCategorizedBooks, IEnumerable<object> selectedSCategories
                 , BookGroupVM.OrderBy OrderBy = BookGroupVM.OrderBy.Croissant, BookGroupVM.SortBy SortBy = BookGroupVM.SortBy.Name)
             {
@@ -292,6 +334,125 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return Enumerable.Empty<LivreVM>().ToList();
                 }
             }
+
+            public static async Task<IEnumerable<Tbook>> FilterBooksAsync(IEnumerable<Tbook> modelList, IEnumerable<long> collectionsId, bool displayUnCategorizedBooks, IEnumerable<object> selectedSCategories)
+            {
+                try
+                {
+                    if (modelList == null || !modelList.Any())
+                    {
+                        return Enumerable.Empty<Tbook>();
+                    }
+
+                    List<Tbook> PreSelectedModelList = new List<Tbook>();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        if (collectionsId != null && collectionsId.Any() || displayUnCategorizedBooks == true ||
+                            selectedSCategories != null && selectedSCategories.Any())
+                        {
+                            List<Tbook> vms = new List<Tbook>();
+                            foreach (Tbook model in modelList)
+                            {
+                                if (collectionsId != null && collectionsId.Any())
+                                {
+                                    foreach (long id in collectionsId)
+                                    {
+                                        if (await context.TbookCollectionConnector.AnyAsync(a => a.IdBook == model.Id && a.IdCollection == id))
+                                        {
+                                            if (!vms.Contains(model))
+                                            {
+                                                vms.Add(model);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (displayUnCategorizedBooks == false && selectedSCategories != null && selectedSCategories.Any())
+                                {
+                                    foreach (var item in selectedSCategories)
+                                    {
+                                        if (item is CategorieLivreVM categorie)
+                                        {
+                                            if (categorie.BooksId.Any(f => f == model.Id))
+                                            {
+                                                if (!vms.Contains(model))
+                                                {
+                                                    vms.Add(model);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        else if (item is SubCategorieLivreVM subCategorie)
+                                        {
+                                            var result = subCategorie.BooksId.Any(a => a == model.Id);
+                                            if (result == true)
+                                            {
+                                                if (!vms.Contains(model))
+                                                {
+                                                    vms.Add(model);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (displayUnCategorizedBooks == true)
+                                {
+                                    var uncategorizedBooksId = await Categorie.GetUnCategorizedBooksId(model.IdLibrary);
+                                    if (uncategorizedBooksId.Any(f => f == model.Id))
+                                    {
+                                        if (!vms.Contains(model))
+                                        {
+                                            vms.Add(model);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (vms.Count > 0)
+                            {
+                                PreSelectedModelList.AddRange(vms);
+                            }
+
+                            vms.Clear();
+                            vms = null;
+                        }
+
+                        return PreSelectedModelList == null || PreSelectedModelList.Count == 0 ? modelList : PreSelectedModelList.Distinct();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<Tbook>();
+                }
+            }
+
+            public static async Task<IEnumerable<LivreVM>> FilterBooksVmAsync(IEnumerable<Tbook> modelList, IEnumerable<long> collectionsId, bool displayUnCategorizedBooks, IEnumerable<object> selectedSCategories)
+            {
+                try
+                {
+                    if (modelList == null || !modelList.Any())
+                    {
+                        return Enumerable.Empty<LivreVM>();
+                    }
+
+                    var collection = await FilterBooksAsync(modelList, collectionsId, displayUnCategorizedBooks, selectedSCategories);
+                    if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
+
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<LivreVM>().ToList();
+                }
+            }
+
 
             public static async Task<IList<Tbook>> SearchBooksAsync(ResearchBookVM parameters, CancellationToken cancellationToken = default)
             {

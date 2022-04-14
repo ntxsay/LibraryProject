@@ -172,12 +172,12 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     {
                         this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
 
-                        if (firstLoad)
+                        if (ParentPage.ViewModelPage.DataViewMode != Code.DataViewModeEnum.GridView)
                         {
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
                         }
 
-                        await RefreshItemsGrouping();
+                        await RefreshItemsGrouping(true, this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });
@@ -199,12 +199,12 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     {
                         this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
 
-                        if (firstLoad)
+                        if (ParentPage.ViewModelPage.DataViewMode != Code.DataViewModeEnum.DataGridView)
                         {
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
                         }
 
-                        await RefreshItemsGrouping(true, this.GetSelectedPage, false);
+                        await RefreshItemsGrouping(true, this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });
@@ -819,21 +819,21 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 await this.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal,
                    async () =>
                     {
-                        foreach (var pageVm in ViewModelPage.PagesList)
-                        {
-                            if (pageVm.CurrentPage != page && pageVm.IsPageSelected == true)
-                            {
-                                pageVm.IsPageSelected = false;
-                                pageVm.BackgroundColor = Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush;
-                            }
-                            else if (pageVm.CurrentPage == page && pageVm.IsPageSelected == false)
-                            {
-                                pageVm.IsPageSelected = true;
-                                pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
-                            }
-                        }
+                        //foreach (var pageVm in ViewModelPage.PagesList)
+                        //{
+                        //    if (pageVm.CurrentPage != page && pageVm.IsPageSelected == true)
+                        //    {
+                        //        pageVm.IsPageSelected = false;
+                        //        pageVm.BackgroundColor = Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush;
+                        //    }
+                        //    else if (pageVm.CurrentPage == page && pageVm.IsPageSelected == false)
+                        //    {
+                        //        pageVm.IsPageSelected = true;
+                        //        pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
+                        //    }
+                        //}
 
-                        await this.RefreshItemsGrouping(true, page, false);
+                        await this.RefreshItemsGrouping(true, page, true);
                         var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
                         if (buttonsPage != null && buttonsPage.Any())
                         {
@@ -914,39 +914,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 Logs.Log(ex, m);
                 return Enumerable.Empty<LivreVM>();
-            }
-        }
-
-
-        private void InitializePages(IList<LivreVM> viewModelList)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                ViewModelPage.PagesList.Clear();
-
-                if (viewModelList != null && viewModelList.Any())
-                {
-                    int nbPageDefault = viewModelList.Count() / ViewModelPage.MaxItemsPerPage;
-                    double nbPageExact = viewModelList.Count() / Convert.ToDouble(ViewModelPage.MaxItemsPerPage);
-                    int nbPageRounded = nbPageExact > nbPageDefault ? nbPageDefault + 1 : nbPageDefault;
-                    ViewModelPage.CountPages = nbPageRounded;
-
-                    for (int i = 0; i < ViewModelPage.CountPages; i++)
-                    {
-                        ViewModelPage.PagesList.Add(new PageSystemVM()
-                        {
-                            CurrentPage = i + 1,
-                            IsPageSelected = i == 0,
-                            BackgroundColor = i == 0 ? Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush : Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush,
-                        });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
             }
         }
         #endregion

@@ -346,8 +346,8 @@
                                 <ToolTipService.ToolTip>
                                     <ToolTip>
                                         <TextBlock>
-                                                            <Run Text="Accéder à la page" />
-                                                            <Run Text="{x:Bind CurrentPage, Mode=OneWay}" FontWeight="Medium"/>
+                                            <Run Text="Accéder à la page" />
+                                            <Run Text="{x:Bind CurrentPage, Mode=OneWay}" FontWeight="Medium"/>
                                         </TextBlock>
                                     </ToolTip>
                                 </ToolTipService.ToolTip>

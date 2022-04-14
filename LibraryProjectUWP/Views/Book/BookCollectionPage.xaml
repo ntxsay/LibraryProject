@@ -114,12 +114,6 @@
                        ExecuteRequested="DisplayCollectionListXUiCmd_ExecuteRequested"
                        Description="Affiche les collections">
         </XamlUICommand>
-        <XamlUICommand x:Name="SortByNameXamlUICommand" 
-                       ExecuteRequested="SortByNameXamlUICommand_ExecuteRequested">
-        </XamlUICommand>
-        <XamlUICommand x:Name="SortByDateCreationXamlUICommand" 
-                       ExecuteRequested="SortByDateCreationXamlUICommand_ExecuteRequested">
-        </XamlUICommand>
         <XamlUICommand x:Name="CancelTaskXUiCmd" 
                        ExecuteRequested="CancelTaskXUiCmd_ExecuteRequested">
         </XamlUICommand>
@@ -373,8 +367,8 @@
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource orderbyToBooleanConverter}, ConverterParameter='croissant', Mode=OneWay}" Text="Croissant" Click="TMFI_OrderByCroissant_Click"/>
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource orderbyToBooleanConverter}, ConverterParameter='dCroissant', Mode=OneWay}" Text="Décroissant" Click="TMFI_OrderByDCroissant_Click"/>
                         <MenuFlyoutSeparator/>
-                        <ToggleMenuFlyoutItem Text="Nom" IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource sortbyToBooleanConverter}, ConverterParameter='name', Mode=OneWay}" Command="{StaticResource SortByNameXamlUICommand}"/>
-                        <ToggleMenuFlyoutItem Text="Date de création" IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource sortbyToBooleanConverter}, ConverterParameter='dateCreation', Mode=OneWay}" Command="{StaticResource SortByDateCreationXamlUICommand}"/>
+                        <ToggleMenuFlyoutItem Text="Nom" IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource sortbyToBooleanConverter}, ConverterParameter='name', Mode=OneWay}" Click="TMFI_SortByName_Click"/>
+                        <ToggleMenuFlyoutItem Text="Date de création" IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource sortbyToBooleanConverter}, ConverterParameter='dateCreation', Mode=OneWay}" Click="TMFI_SortByDateCreation_Click"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
@@ -404,12 +398,12 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='DataGridView'}" Click="ABTBtn_DataGridViewMode_Click" Unchecked="ABTBtn_DataGridViewMode_Unchecked">
+            <AppBarToggleButton ToolTipService.ToolTip="Vue liste" Label="Liste" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='DataGridView'}" Click="ABTBtn_DataGridViewMode_Click">
                 <AppBarToggleButton.Icon>
                     <FontIcon Glyph="&#xE8FD;"/>
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
-            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='GridView'}" Click="ABTBtn_GridViewMode_Click" Unchecked="ABTBtn_GridViewMode_Unchecked">
+            <AppBarToggleButton ToolTipService.ToolTip="Vue grille" Label="Grille" LabelPosition="Collapsed" IsChecked="{x:Bind ViewModelPage.DataViewMode, Mode=OneWay, Converter={StaticResource objectToBooleanConverter}, ConverterParameter='GridView'}" Click="ABTBtn_GridViewMode_Click">
                 <AppBarToggleButton.Icon>
                     <FontIcon Glyph="&#xF0E2;"/>
                 </AppBarToggleButton.Icon>
@@ -522,7 +516,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <AutoSuggestBox x:Name="ASB_SearchItem" Width="310" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,8,0,4" 
                     PlaceholderText="Rechercher un livre" IsSuggestionListOpen="False" ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}"
-                                    TextChanged="ASB_SearchItem_TextChanged" SuggestionChosen="ASB_SearchItem_SuggestionChosen" QuerySubmitted="ASB_SearchItem_QuerySubmitted">
+                                    QuerySubmitted="ASB_SearchItem_QuerySubmitted">
                         <AutoSuggestBox.QueryIcon>
                             <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
                         </AutoSuggestBox.QueryIcon>

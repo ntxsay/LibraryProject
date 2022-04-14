@@ -143,15 +143,29 @@ namespace LibraryProjectUWP.ViewModels.Book
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        private int _CountPage;
-        public int CountPage
+        //private int _CountPage;
+        //public int CountPage
+        //{
+        //    get => this._CountPage;
+        //    set
+        //    {
+        //        if (this._CountPage != value)
+        //        {
+        //            this._CountPage = value;
+        //            this.OnPropertyChanged();
+        //        }
+        //    }
+        //}
+
+        private int _CountItems;
+        public int CountItems
         {
-            get => this._CountPage;
+            get => this._CountItems;
             set
             {
-                if (this._CountPage != value)
+                if (this._CountItems != value)
                 {
-                    this._CountPage = value;
+                    this._CountItems = value;
                     this.OnPropertyChanged();
                 }
             }

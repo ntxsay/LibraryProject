@@ -233,17 +233,19 @@ namespace LibraryProjectUWP.Views.Book
         #region Navigation
         private async void ABTBtn_GridViewMode_Click(object sender, RoutedEventArgs e)
         {
-            await this.GridViewMode(true);
-        }
-
-        private void ABTBtn_GridViewMode_Unchecked(object sender, RoutedEventArgs e)
-        {
             try
             {
-                if (sender is AppBarToggleButton toggleButton && toggleButton.IsChecked != true &&
-                    ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
+                if (sender is AppBarToggleButton toggleButton)
                 {
-                    toggleButton.IsChecked = true;
+                    if (ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
+                    {
+                        if (toggleButton.IsChecked != true)
+                        {
+                            toggleButton.IsChecked = true;
+                        }
+                        return;
+                    }
+                    await this.GridViewMode(false);
                 }
             }
             catch (Exception ex)
@@ -256,17 +258,19 @@ namespace LibraryProjectUWP.Views.Book
 
         private async void ABTBtn_DataGridViewMode_Click(object sender, RoutedEventArgs e)
         {
-            await this.DataGridViewMode(true);
-        }
-
-        private void ABTBtn_DataGridViewMode_Unchecked(object sender, RoutedEventArgs e)
-        {
             try
             {
-                if (sender is AppBarToggleButton toggleButton && toggleButton.IsChecked != true &&
-                    ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                if (sender is AppBarToggleButton toggleButton)
                 {
-                    toggleButton.IsChecked = true;
+                    if (ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                    {
+                        if (toggleButton.IsChecked != true)
+                        {
+                            toggleButton.IsChecked = true;
+                        }
+                        return;
+                    }
+                    await this.DataGridViewMode(false);
                 }
             }
             catch (Exception ex)
@@ -1694,42 +1698,64 @@ namespace LibraryProjectUWP.Views.Book
                     var dialog = new DeleteBookCD(viewModelList);
 
                     var result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.Primary)
+                    if (result == ContentDialogResult.Primary || result == ContentDialogResult.Secondary)
                     {
-                        bool isSaved = await esBook.SaveBookViewModelAsAsync(viewModelList);
-                        if (isSaved)
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            bool isSaved = await esBook.SaveBookViewModelAsAsync(viewModelList);
+                            if (isSaved)
+                            {
+                                foreach (var item in viewModelList)
+                                {
+                                    var operationResult = await DbServices.Book.DeleteAsync(item.Id);
+                                }
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+                        else
                         {
                             foreach (var item in viewModelList)
                             {
                                 var operationResult = await DbServices.Book.DeleteAsync(item.Id);
-                                if (operationResult.IsSuccess)
-                                {
-                                    Parameters.ParentLibrary.Books.Remove(item);
-                                }
-                                else
-                                {
 
-                                }
                             }
-                            await bookCollectionSpage.RefreshItemsGrouping();
                         }
-                    }
-                    else if (result == ContentDialogResult.Secondary)
-                    {
-                        foreach (var item in viewModelList)
+
+                        ViewModelPage.SelectedItems.Clear();
+
+                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                         {
-                            var operationResult = await DbServices.Book.DeleteAsync(item.Id);
-                            if (operationResult.IsSuccess)
-                            {
-                                Parameters.ParentLibrary.Books.Remove(item);
+                            ProgessText = $"Actualisation du catalogue des livres en cours...",
+                        });
 
-                            }
-                            else
-                            {
+                        DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 0, 1),
+                        };
 
-                            }
-                        }
-                        await bookCollectionSpage.RefreshItemsGrouping();
+                        dispatcherTimer.Tick += async (t, f) =>
+                        {
+                            await bookCollectionSpage.RefreshItemsGrouping(true, 1, true, ViewModelPage.ResearchBook);
+
+                            DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                            {
+                                Interval = new TimeSpan(0, 0, 0, 2),
+                            };
+
+                            dispatcherTimer2.Tick += (s, i) =>
+                            {
+                                Parameters.MainPage.CloseBusyLoader();
+                                dispatcherTimer2.Stop();
+                            };
+                            dispatcherTimer2.Start();
+
+                            dispatcherTimer.Stop();
+                        };
+
+                        dispatcherTimer.Start();
                     }
                     else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                     {
@@ -2278,16 +2304,10 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Search
-
-        private void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void ASB_SearchItem_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             try
             {
-                //if (ViewModelPage.SearchedViewModel != null)
-                //{
-                //    ViewModelPage.SearchedViewModel = null;
-                //}
-
                 if (sender.Text.IsStringNullOrEmptyOrWhiteSpace())
                 {
                     return;
@@ -2306,69 +2326,7 @@ namespace LibraryProjectUWP.Views.Book
                     },
                 };
 
-                InitializeResearchingBookWorker();
-                return;
-
-                //var FilteredItems = new List<LivreVM>();
-                //var splitSearchTerm = sender.Text.ToLower().Split(" ");
-
-                //foreach (var value in _parameters.ParentLibrary.Books)
-                //{
-                //    if (value.MainTitle.IsStringNullOrEmptyOrWhiteSpace()) continue;
-
-                //    var found = splitSearchTerm.All((key) =>
-                //    {
-                //        return value.MainTitle.ToLower().Contains(key.ToLower());
-                //    });
-
-                //    if (found)
-                //    {
-                //        FilteredItems.Add(value);
-                //    }
-                //}
-                //sender.ItemsSource = FilteredItems;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void ASB_SearchItem_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-            try
-            {
-                if (args.SelectedItem != null && args.SelectedItem is LivreVM value)
-                {
-                    sender.Text = value.MainTitle;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void ASB_SearchItem_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            try
-            {
-                if (args.ChosenSuggestion != null && args.ChosenSuggestion is LivreVM viewModel)
-                {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
-                    {
-                        await bookCollectionSpage.SearchViewModel(viewModel);
-                    }
-                }
-                else
-                {
-                    //
-                }
+                GroupItemsBySearch(ViewModelPage.ResearchBook);
             }
             catch (Exception ex)
             {
