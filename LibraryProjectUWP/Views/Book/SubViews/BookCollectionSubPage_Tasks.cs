@@ -47,8 +47,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         ParentPage.Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                         {
                             ProgessText = $"Recherche des livres de la page {page}",
-                            Parameter = page,
-                            Callback = () => workerGotoPage.RunWorkerAsync(page)
+                            OpenedLoaderParameter = page,
+                            OpenedLoaderCallback = () => workerGotoPage.RunWorkerAsync(page)
                         });
                     }
                 }

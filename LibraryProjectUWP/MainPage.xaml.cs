@@ -523,6 +523,13 @@ namespace LibraryProjectUWP
                     gridMainContainer.Children.Add(new BusyLoader(parametersVM)
                     {
                         Title = parametersVM.ProgessText,
+                        PrimaryButtonTitle = parametersVM.PrimaryButtonText,
+                        PrimaryButtonVisibility = parametersVM.PrimaryButtonVisibility,
+                        SecondaryButtonTitle = parametersVM.SecondaryButtonText,
+                        SecondaryButtonVisibility = parametersVM.SecondaryButtonVisibility,
+                        CancelButtonTitle = parametersVM.CancelButtonText,
+                        CancelButtonVisibility = parametersVM.CancelButtonVisibility,
+
                     });
                 }
             }
@@ -540,6 +547,12 @@ namespace LibraryProjectUWP
                 if (gridMainContainer.Children.FirstOrDefault(a => a is BusyLoader) is BusyLoader busyLoader)
                 {
                     busyLoader.Title = parametersVM.ProgessText;
+                    busyLoader.PrimaryButtonTitle = parametersVM.PrimaryButtonText;
+                    busyLoader.PrimaryButtonVisibility = parametersVM.PrimaryButtonVisibility;
+                    busyLoader.SecondaryButtonTitle = parametersVM.SecondaryButtonText;
+                    busyLoader.SecondaryButtonVisibility = parametersVM.SecondaryButtonVisibility;
+                    busyLoader.CancelButtonTitle = parametersVM.CancelButtonText;
+                    busyLoader.BtnCancel.Visibility = parametersVM.CancelButtonVisibility;
                 }
             }
             catch (Exception)

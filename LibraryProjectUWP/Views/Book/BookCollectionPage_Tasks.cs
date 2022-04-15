@@ -399,11 +399,18 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         this.Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                         {
-                            ProgessText = $"Import en cours de {viewModelList.Count()}",
-                            //Parameter = page,
-                            Callback = () => WorkerImportBooksFromExcel.RunWorkerAsync(viewModelList)
+                            ProgessText = $"Import en cours de {viewModelList.Count()} livre(s)",
+                            OpenedLoaderCallback = () => WorkerImportBooksFromExcel.RunWorkerAsync(viewModelList),
+                            CancelButtonText = "Annuler l'import",
+                            CancelButtonVisibility = Visibility.Visible,
+                            CancelButtonCallback = () =>
+                            {
+                                if (WorkerImportBooksFromExcel.IsBusy)
+                                {
+                                    WorkerImportBooksFromExcel.CancelAsync();
+                                }
+                            },
                         });
-
                     }
                     else
                     {
@@ -480,9 +487,17 @@ namespace LibraryProjectUWP.Views.Book
                         double Operation = (double)NumberModel / (double)ModelCount;
                         progressPercentage = Operation * 100;
                         int ProgressValue = Convert.ToInt32(progressPercentage);
-
-                        Thread.Sleep(500);
-                        worker.ReportProgress(ProgressValue, bookResult);
+                        
+                        if (worker.CancellationPending == true)
+                        {
+                            e.Cancel = true;
+                            break;
+                        }
+                        else
+                        {
+                            Thread.Sleep(500);
+                            worker.ReportProgress(ProgressValue, bookResult);
+                        }
                         count++;
 
                     }
@@ -507,7 +522,16 @@ namespace LibraryProjectUWP.Views.Book
                     //Progress bar/text
                     this.Parameters.MainPage.UpdateBusyLoader(new BusyLoaderParametersVM()
                     {
-                        ProgessText = $"{e.ProgressPercentage} % des livres importés "
+                        ProgessText = $"{e.ProgressPercentage} % des livres importés. {(workerUserState.Result.IsSuccess ? 0 : 1)} erreur(s), {workerUserState.ResultList.Where(w => w.IsSuccess == false).Count()} avertissement(s)",
+                        CancelButtonText = "Annuler l'import",
+                        CancelButtonVisibility = Visibility.Visible,
+                        CancelButtonCallback = () =>
+                        {
+                            if (WorkerImportBooksFromExcel.IsBusy)
+                            {
+                                WorkerImportBooksFromExcel.CancelAsync();
+                            }
+                        },
                     });
                 }
             }
@@ -537,36 +561,7 @@ namespace LibraryProjectUWP.Views.Book
                     
                 }
 
-                Parameters.MainPage.UpdateBusyLoader(new BusyLoaderParametersVM()
-                {
-                    ProgessText = $"Actualisation du catalogue des livres en cours...",
-                });
-
-                DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                {
-                    Interval = new TimeSpan(0, 0, 0, 1),
-                };
-
-                dispatcherTimer.Tick += async (t, f) =>
-                {
-                    this.OpenBookCollection();
-
-                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 2),
-                    };
-
-                    dispatcherTimer2.Tick += (s, i) =>
-                    {
-                        Parameters.MainPage.CloseBusyLoader();
-                        dispatcherTimer2.Stop();
-                    };
-                    dispatcherTimer2.Start();
-
-                    dispatcherTimer.Stop();
-                };
-
-                dispatcherTimer.Start();
+                this.OpenBookCollection();
 
                 WorkerImportBooksFromExcel.Dispose();
                 WorkerImportBooksFromExcel = null;
