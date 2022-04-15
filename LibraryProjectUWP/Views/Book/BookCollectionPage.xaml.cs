@@ -1723,38 +1723,38 @@ namespace LibraryProjectUWP.Views.Book
                             }
                         }
 
-                        //ViewModelPage.SelectedItems.Clear();
+                        ViewModelPage.SelectedItems.Clear();
 
-                        //Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                        //{
-                        //    ProgessText = $"Actualisation du catalogue des livres en cours...",
-                        //});
+                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                        {
+                            ProgessText = $"Actualisation du catalogue des livres en cours...",
+                        });
 
-                        //DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                        //{
-                        //    Interval = new TimeSpan(0, 0, 0, 1),
-                        //};
+                        DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 0, 1),
+                        };
 
-                        //dispatcherTimer.Tick += async (t, f) =>
-                        //{
-                        //    await bookCollectionSpage.RefreshItemsGrouping(true, 1, true, ViewModelPage.ResearchBook);
+                        dispatcherTimer.Tick += async (t, f) =>
+                        {
+                            await bookCollectionSpage.RefreshItemsGrouping(true, 1, true, ViewModelPage.ResearchBook);
 
-                        //    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                        //    {
-                        //        Interval = new TimeSpan(0, 0, 0, 2),
-                        //    };
+                            DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                            {
+                                Interval = new TimeSpan(0, 0, 0, 2),
+                            };
 
-                        //    dispatcherTimer2.Tick += (s, i) =>
-                        //    {
-                        //        Parameters.MainPage.CloseBusyLoader();
-                        //        dispatcherTimer2.Stop();
-                        //    };
-                        //    dispatcherTimer2.Start();
+                            dispatcherTimer2.Tick += (s, i) =>
+                            {
+                                Parameters.MainPage.CloseBusyLoader();
+                                dispatcherTimer2.Stop();
+                            };
+                            dispatcherTimer2.Start();
 
-                        //    dispatcherTimer.Stop();
-                        //};
+                            dispatcherTimer.Stop();
+                        };
 
-                        //dispatcherTimer.Start();
+                        dispatcherTimer.Start();
                     }
                     else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                     {

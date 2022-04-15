@@ -175,7 +175,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     var item = new BookImportDataTableVM()
                     {
-                        ColumnIndex = i,
+                        ColumnIndex = i + 1,
                         ColumnName = _parameters.ParentPage.ViewModelPage.DataTable.Columns[i + 1].ColumnName,
                         RowName = row[i]?.ToString(),
                     };
@@ -241,10 +241,11 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (selectedItems[i] is object[] row)
                     {
+                        var title = row[ViewModelPage.SelectedTitle.ColumnIndex].ToString();
                         var viewModel = new LivreVM()
                         {
                             Publication = new LivrePublicationVM(),
-                            MainTitle = row[ViewModelPage.SelectedTitle.ColumnIndex].ToString(),
+                            MainTitle = title,
                         };
 
                         if (ViewModelPage.SelectedAuteur != null)

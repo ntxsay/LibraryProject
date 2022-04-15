@@ -453,7 +453,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-
             public static async Task<IList<Tbook>> SearchBooksAsync(ResearchBookVM parameters, CancellationToken cancellationToken = default)
             {
                 try
@@ -531,16 +530,30 @@ namespace LibraryProjectUWP.Code.Services.Db
                                         switch (parameters.TermParameter)
                                         {
                                             case Search.Book.Terms.Equals:
-                                                tcontactsAuthor = await context.Tcontact.Where(w => w.NomNaissance.ToUpperInvariant() == parameters.Term.ToUpperInvariant() || w.Prenom == parameters.Term || (w.AutresPrenoms != null && w.AutresPrenoms.ToUpperInvariant() == parameters.Term.ToUpperInvariant()) || (w.SocietyName != null && w.SocietyName.ToUpperInvariant() == parameters.Term.ToUpperInvariant())).ToListAsync(cancellationToken);
+                                                tcontactsAuthor = await context.Tcontact.Where(w => (!w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && w.NomNaissance.ToUpperInvariant() == parameters.Term.ToUpperInvariant()) ||
+                                                (!w.Prenom.IsStringNullOrEmptyOrWhiteSpace() && w.Prenom == parameters.Term) || 
+                                                (!w.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() && w.AutresPrenoms.ToUpperInvariant() == parameters.Term.ToUpperInvariant()) || 
+                                                (!w.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && w.SocietyName.ToUpperInvariant() == parameters.Term.ToUpperInvariant())).ToListAsync(cancellationToken);
                                                 break;
                                             case Search.Book.Terms.Contains:
-                                                tcontactsAuthor = await context.Tcontact.Where(w => w.NomNaissance.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant()) || w.Prenom.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant()) || (w.AutresPrenoms != null && w.AutresPrenoms.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant())) || (w.SocietyName != null && w.SocietyName.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
+                                                var nomNaissance = await context.Tcontact.Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace()).Select(s => s.NomNaissance.Contains(parameters.Term)).ToListAsync();
+
+                                                //tcontactsAuthor = await context.Tcontact.Where(w => (!w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && w.NomNaissance.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant())) || 
+                                                //(!w.Prenom.IsStringNullOrEmptyOrWhiteSpace() && w.Prenom.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant())) || 
+                                                //(!w.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() && w.AutresPrenoms.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant())) || 
+                                                //(!w.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && w.SocietyName.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
                                                 break;
                                             case Search.Book.Terms.StartWith:
-                                                tcontactsAuthor = await context.Tcontact.Where(w => w.NomNaissance.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant()) || w.Prenom.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant()) || (w.AutresPrenoms != null && w.AutresPrenoms.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant())) || (w.SocietyName != null && w.SocietyName.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
+                                                tcontactsAuthor = await context.Tcontact.Where(w => (!w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && w.NomNaissance.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant())) || 
+                                                (!w.Prenom.IsStringNullOrEmptyOrWhiteSpace() && w.Prenom.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant())) || 
+                                                (!w.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() && w.AutresPrenoms.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant())) || 
+                                                (!w.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && w.SocietyName.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
                                                 break;
                                             case Search.Book.Terms.EndWith:
-                                                tcontactsAuthor = await context.Tcontact.Where(w => w.NomNaissance.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant()) || w.Prenom.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant()) || (w.AutresPrenoms != null && w.AutresPrenoms.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant())) || (w.SocietyName != null && w.SocietyName.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
+                                                tcontactsAuthor = await context.Tcontact.Where(w => (!w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && w.NomNaissance.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant())) || 
+                                                (!w.Prenom.IsStringNullOrEmptyOrWhiteSpace() && w.Prenom.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant())) || 
+                                                (!w.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() && w.AutresPrenoms.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant())) || 
+                                                (!w.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && w.SocietyName.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
                                                 break;
                                             default:
                                                 break;
