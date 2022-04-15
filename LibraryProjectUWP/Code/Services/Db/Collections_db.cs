@@ -340,6 +340,41 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static IEnumerable<CollectionVM> CreateViewModel(long idLibrary, string value, char separator = ',')
+            {
+                try
+                {
+                    if (!value.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        var splittedValue = StringHelpers.SplitWord(value, new string[] { separator.ToString() });
+                        if (splittedValue != null && splittedValue.Length > 0)
+                        {
+                            List<CollectionVM> viewModelList = new List<CollectionVM>();
+                            foreach (var _value in splittedValue)
+                            {
+                                CollectionVM collectionVm = new CollectionVM()
+                                {
+                                    IdLibrary = idLibrary,
+                                    Name = _value,
+                                };
+                                viewModelList.Add(collectionVm);
+                            }
+
+                            return viewModelList;
+                        }
+
+                    }
+                    return Enumerable.Empty<CollectionVM>();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<CollectionVM>();
+                }
+            }
+
+
             public static async Task<OperationStateVM> CreateCollectionConnectorAsync(IEnumerable<long> idBooks, CollectionVM viewModel)
             {
                 try

@@ -380,6 +380,53 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
+            public static IEnumerable<ContactVM> CreateViewModel(string value, ContactType contactType, char separator = ',')
+            {
+                try
+                {
+                    if (!value.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        var splittedValue = StringHelpers.SplitWord(value, new string[] { separator.ToString() });
+                        if (splittedValue != null && splittedValue.Length > 0)
+                        {
+                            List<ContactVM> contactVMs = new List<ContactVM>();
+                            foreach (var _value in splittedValue)
+                            {
+                                ContactVM authorVm = new ContactVM()
+                                {
+                                    ContactType = contactType,
+                                    TitreCivilite = CivilityHelpers.NonSpecifie,
+                                };
+
+                                var split = StringHelpers.SplitWord(_value, new string[] { " " });
+
+                                if (split.Length == 1)
+                                {
+                                    authorVm.Prenom = split[0];
+                                }
+                                else if (split.Length >= 2)
+                                {
+                                    authorVm.Prenom = split[0];
+                                    authorVm.NomNaissance = split[1];
+                                }
+
+                                contactVMs.Add(authorVm);
+                            }
+
+                            return contactVMs;
+                        }
+
+                    }
+                    return Enumerable.Empty<ContactVM>();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<ContactVM>();
+                }
+            }
+
             public static async Task<OperationStateVM> CreateAsync(ContactVM viewModel)
             {
                 try

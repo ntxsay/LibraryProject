@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
@@ -25,7 +26,7 @@ namespace LibraryProjectUWP.Views.Book
 {
     public sealed partial class BookCollectionPage : Page
     {
-        private BackgroundWorker workerCountBooks;
+        private BackgroundWorker WorkerImportBooksFromExcel;
         private BackgroundWorker workerSearchBooks;
         private BackgroundWorker workerSearchPretsBook;
         private BackgroundWorker workerSearchExemplariesBook;
@@ -369,38 +370,40 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
-        #region CountBooks
-        public void InitializeCountBookWorker()
+        #region Import
+        public void InitializeImportBooksFromExcelWorker(IEnumerable<LivreVM> viewModelList)
         {
             try
             {
-                if (workerCountBooks == null)
+                if (viewModelList == null|| !viewModelList.Any())
                 {
-                    workerCountBooks = new BackgroundWorker()
+                    return;
+                }
+
+                if (WorkerImportBooksFromExcel == null)
+                {
+                    WorkerImportBooksFromExcel = new BackgroundWorker()
                     {
-                        WorkerReportsProgress = false,
+                        WorkerReportsProgress = true,
                         WorkerSupportsCancellation = true,
                     };
 
-                    //worker.ProgressChanged += Worker_ProgressChanged;
-                    workerCountBooks.DoWork += WorkerCountBooks_DoWork; ;
-                    workerCountBooks.RunWorkerCompleted += WorkerCountBooks_RunWorkerCompleted; ;
+                    WorkerImportBooksFromExcel.ProgressChanged += WorkerImportBooksFromExcel_ProgressChanged;
+                    WorkerImportBooksFromExcel.DoWork += WorkerImportBooksFromExcel_DoWork; ;
+                    WorkerImportBooksFromExcel.RunWorkerCompleted += WorkerImportBooksFromExcel_RunWorkerCompleted; ;
                 }
 
-                if (workerCountBooks != null)
+                if (WorkerImportBooksFromExcel != null)
                 {
-                    if (!workerCountBooks.IsBusy)
+                    if (!WorkerImportBooksFromExcel.IsBusy)
                     {
-                        if (!ViewModelPage.TaskList.Any(a => a.Id == EnumTaskId.CountBooks))
+                        this.Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                         {
-                            ViewModelPage.TaskList.Add(new TaskVM()
-                            {
-                                Id = EnumTaskId.CountBooks,
-                                Description = "Recherche du nombre de livre par bibliothèque."
-                            });
-                        }
+                            ProgessText = $"Import en cours de {viewModelList.Count()}",
+                            //Parameter = page,
+                            Callback = () => WorkerImportBooksFromExcel.RunWorkerAsync(viewModelList)
+                        });
 
-                        workerCountBooks.RunWorkerAsync();
                     }
                     else
                     {
@@ -414,33 +417,77 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void WorkerCountBooks_DoWork(object sender, DoWorkEventArgs e)
+        private void WorkerImportBooksFromExcel_DoWork(object sender, DoWorkEventArgs e)
         {
             try
             {
-                var worker = sender as BackgroundWorker;
-                List<WorkerState<long>> workerStates = new List<WorkerState<long>>();
-                //foreach (BibliothequeVM viewModel in ViewModelPage.ViewModelList)
-                //{
-                //    Task<long> task = DbServices.Book.CountBooksInLibraryAsync(viewModel.Id, cancellationTokenSourceCountBooks.Token);
-                //    task.Wait();
-                //    var result = task.Result;
-                //    workerStates.Add(new WorkerState<long>()
-                //    {
-                //        Id = viewModel.Id,
-                //        Result = result,
-                //    });
-                //    task.Dispose();
+                if (sender is BackgroundWorker worker && e.Argument is IEnumerable<LivreVM> viewModelList)
+                {
+                    int ModelCount = viewModelList.Count();
+                    double progressPercentage;
+                    int count = 0;
 
-                //    if (worker.CancellationPending)
-                //    {
-                //        cancellationTokenSourceCountBooks.Cancel();
-                //        e.Cancel = true;
-                //        return;
-                //    }
-                //    Thread.Sleep(1000);
-                //}
-                e.Result = workerStates.ToArray();
+                    List<WorkerState<OperationStateVM, OperationStateVM>> workerStates = new List<WorkerState<OperationStateVM, OperationStateVM>>();
+                    foreach (var newViewModel in viewModelList)
+                    {
+                        List<WorkerState<OperationStateVM, OperationStateVM>> _subWorkerStates = new List<WorkerState<OperationStateVM, OperationStateVM>>();
+                        if (newViewModel.Auteurs != null && newViewModel.Auteurs.Any())
+                        {
+                            foreach (var author in newViewModel.Auteurs)
+                            {
+                                using (Task<OperationStateVM> task = DbServices.Contact.CreateAsync(author))
+                                {
+                                    task.Wait();
+                                    _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
+                                    {
+                                        Result = task.Result,
+                                    });
+                                }                                
+                            }
+                        }
+
+                        if (newViewModel.Publication != null)
+                        {
+                            if (newViewModel.Publication.Collections != null && newViewModel.Publication.Collections.Any())
+                            {
+                                foreach (var collection in newViewModel.Publication.Collections)
+                                {
+                                    using (Task<OperationStateVM> task = DbServices.Collection.CreateAsync(collection, Parameters.ParentLibrary.Id))
+                                    {
+                                        task.Wait();
+                                        _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
+                                        {
+                                            Result = task.Result,
+                                        });
+                                    }
+                                }
+                            }
+                        }
+
+                        var bookResult = new WorkerState<OperationStateVM, OperationStateVM>()
+                        {
+                            ResultList = _subWorkerStates.Select(s => s.Result).ToList(),
+                        };
+
+                        using (Task<OperationStateVM> task = DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id))
+                        {
+                            task.Wait();
+                            bookResult.Result = task.Result;
+                            workerStates.Add(bookResult);
+                        }
+
+                        var NumberModel = count + 1;
+                        double Operation = (double)NumberModel / (double)ModelCount;
+                        progressPercentage = Operation * 100;
+                        int ProgressValue = Convert.ToInt32(progressPercentage);
+
+                        Thread.Sleep(500);
+                        worker.ReportProgress(ProgressValue, bookResult);
+                        count++;
+
+                    }
+                    e.Result = workerStates.ToArray();
+                }
             }
             catch (Exception ex)
             {
@@ -451,7 +498,28 @@ namespace LibraryProjectUWP.Views.Book
 
         }
 
-        private void WorkerCountBooks_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void WorkerImportBooksFromExcel_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            try
+            {
+                if (e.UserState != null && e.UserState is WorkerState<OperationStateVM, OperationStateVM> workerUserState)
+                {
+                    //Progress bar/text
+                    this.Parameters.MainPage.UpdateBusyLoader(new BusyLoaderParametersVM()
+                    {
+                        ProgessText = $"{e.ProgressPercentage} % des livres importés "
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void WorkerImportBooksFromExcel_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             try
             {
@@ -466,27 +534,42 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    if (e.Result is IEnumerable<WorkerState<long>> workerStates)
-                    {
-                        //foreach (BibliothequeVM viewModel in ViewModelPage.ViewModelList)
-                        //{
-                        //    var state = workerStates.SingleOrDefault(w => w.Id == viewModel.Id);
-                        //    if (state != null)
-                        //    {
-                        //        viewModel.CountBooks = state.Result;
-                        //    }
-                        //}
-                    }
+                    
                 }
 
-                var item = ViewModelPage.TaskList.SingleOrDefault(a => a.Id == EnumTaskId.CountBooks);
-                if (item != null)
+                Parameters.MainPage.UpdateBusyLoader(new BusyLoaderParametersVM()
                 {
-                    ViewModelPage.TaskList.Remove(item);
-                }
+                    ProgessText = $"Actualisation du catalogue des livres en cours...",
+                });
 
-                workerCountBooks.Dispose();
-                workerCountBooks = null;
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    this.OpenBookCollection();
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, i) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        dispatcherTimer2.Stop();
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                };
+
+                dispatcherTimer.Start();
+
+                WorkerImportBooksFromExcel.Dispose();
+                WorkerImportBooksFromExcel = null;
             }
             catch (Exception ex)
             {
@@ -506,9 +589,9 @@ namespace LibraryProjectUWP.Views.Book
                     if (taskVM.Id == EnumTaskId.CountBooks)
                     {
                         cancellationTokenSourceCountBooks?.Cancel();
-                        if (workerCountBooks != null && workerCountBooks.IsBusy)
+                        if (WorkerImportBooksFromExcel != null && WorkerImportBooksFromExcel.IsBusy)
                         {
-                            workerCountBooks.CancelAsync();
+                            WorkerImportBooksFromExcel.CancelAsync();
                         }
                     }
                     else if (taskVM.Id == EnumTaskId.SearchBooks)

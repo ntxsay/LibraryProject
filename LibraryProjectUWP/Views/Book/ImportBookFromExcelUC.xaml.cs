@@ -236,82 +236,51 @@ namespace LibraryProjectUWP.Views.Book
                     return false;
                 }
                 List<LivreVM> list = new List<LivreVM>();
-                var selectedItems = _parameters.ParentPage.ImportBookExcelSubPage.SelectedItems;
-                for (int i = 0; i < selectedItems.Count; i++)
+                IList<object> selectedItems = _parameters.ParentPage.ImportBookExcelSubPage.SelectedItems;
+                if (selectedItems != null)
                 {
-                    if (selectedItems[i] is object[] row)
+                    for (int i = 0; i < selectedItems.Count; i++)
                     {
-                        var title = row[ViewModelPage.SelectedTitle.ColumnIndex].ToString();
-                        var viewModel = new LivreVM()
+                        if (selectedItems[i] is object[] row)
                         {
-                            Publication = new LivrePublicationVM(),
-                            MainTitle = title,
-                        };
-
-                        if (ViewModelPage.SelectedAuteur != null)
-                        {
-                            List<ContactVM> authorViewModelList = new List<ContactVM>();
-                            var authors = row[ViewModelPage.SelectedAuteur.ColumnIndex].ToString();
-                            if (!authors.IsStringNullOrEmptyOrWhiteSpace())
+                            var title = row[ViewModelPage.SelectedTitle.ColumnIndex].ToString();
+                            var viewModel = new LivreVM()
                             {
-                                var authorsList = StringHelpers.SplitWord(authors, new string[] { "," });
-                                if (authorsList != null && authorsList.Length > 0)
+                                Publication = new LivrePublicationVM(),
+                                MainTitle = title,
+                            };
+
+                            if (ViewModelPage.SelectedAuteur != null)
+                            {
+                                var authors = row[ViewModelPage.SelectedAuteur.ColumnIndex].ToString();
+                                if (!authors.IsStringNullOrEmptyOrWhiteSpace())
                                 {
-                                    foreach (var author in authorsList)
+                                    var authorsVm = DbServices.Contact.CreateViewModel(authors, ContactType.Author, ',');
+                                    if (authorsVm != null && authorsVm.Any())
                                     {
-                                        ContactVM authorVm = new ContactVM()
-                                        {
-                                            ContactType = ContactType.Author,
-                                            TitreCivilite = CivilityHelpers.NonSpecifie,
-                                        };
-
-                                        var split = StringHelpers.SplitWord(author, new string[] { " " });
-
-                                        if (split.Length == 1)
-                                        {
-                                            authorVm.Prenom = split[0];
-                                        }
-                                        else if (split.Length >= 2)
-                                        {
-                                            authorVm.Prenom = split[0];
-                                            authorVm.NomNaissance = split[1];
-                                        }
-
-                                        authorViewModelList.Add(authorVm);
+                                        viewModel.Auteurs = new ObservableCollection<ContactVM>(authorsVm);
                                     }
                                 }
-
                             }
-                            viewModel.Auteurs = new ObservableCollection<ContactVM>(authorViewModelList);
-                        }
 
-                        if (ViewModelPage.SelectedCollection != null)
-                        {
-                            List<CollectionVM> collectionViewModelList = new List<CollectionVM>();
-                            var collections = row[ViewModelPage.SelectedCollection.ColumnIndex].ToString();
-                            if (!collections.IsStringNullOrEmptyOrWhiteSpace())
+                            if (ViewModelPage.SelectedCollection != null)
                             {
-                                var collectionList = StringHelpers.SplitWord(collections, new string[] { "," });
-                                if (collectionList != null && collectionList.Length > 0)
+                                List<CollectionVM> collectionViewModelList = new List<CollectionVM>();
+                                var collections = row[ViewModelPage.SelectedCollection.ColumnIndex].ToString();
+                                if (!collections.IsStringNullOrEmptyOrWhiteSpace())
                                 {
-                                    foreach (var collection in collectionList)
+                                    var collectionsVm = DbServices.Collection.CreateViewModel(_parameters.ParentPage.Parameters.ParentLibrary.Id, collections, ',');
+                                    if (collectionsVm != null && collectionsVm.Any())
                                     {
-                                        CollectionVM collectionVm = new CollectionVM()
-                                        {
-                                            IdLibrary = _parameters.ParentPage.Parameters.ParentLibrary.Id,
-                                            Name = collection,
-                                        };
-                                        collectionViewModelList.Add(collectionVm);
+                                        viewModel.Publication.Collections = new ObservableCollection<CollectionVM>(collectionsVm);
                                     }
                                 }
-
                             }
-                            viewModel.Publication.Collections = new ObservableCollection<CollectionVM>(collectionViewModelList);
+
+                            list.Add(viewModel);
                         }
 
-                        list.Add(viewModel);
                     }
-                    
                 }
 
                 ViewModelPage.NewViewModel = list;

@@ -533,6 +533,23 @@ namespace LibraryProjectUWP
             }
         }
 
+        public void UpdateBusyLoader(BusyLoaderParametersVM parametersVM)
+        {
+            try
+            {
+                if (gridMainContainer.Children.FirstOrDefault(a => a is BusyLoader) is BusyLoader busyLoader)
+                {
+                    busyLoader.Title = parametersVM.ProgessText;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+
         public void CloseBusyLoader()
         {
             try
