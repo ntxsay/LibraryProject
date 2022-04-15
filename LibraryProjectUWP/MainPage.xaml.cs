@@ -361,7 +361,7 @@ namespace LibraryProjectUWP
             try
             {
                 this.ChangeAppTitle(ViewModelPage.MainTitleBar);
-                return NavigateToView("Library.LibraryCollectionPage", null);
+                return NavigateToView("Library.LibraryCollectionPage", this);
             }
             catch (Exception ex)
             {
@@ -529,7 +529,6 @@ namespace LibraryProjectUWP
                         SecondaryButtonVisibility = parametersVM.SecondaryButtonVisibility,
                         CancelButtonTitle = parametersVM.CancelButtonText,
                         CancelButtonVisibility = parametersVM.CancelButtonVisibility,
-
                     });
                 }
             }
@@ -546,13 +545,20 @@ namespace LibraryProjectUWP
             {
                 if (gridMainContainer.Children.FirstOrDefault(a => a is BusyLoader) is BusyLoader busyLoader)
                 {
-                    busyLoader.Title = parametersVM.ProgessText;
-                    busyLoader.PrimaryButtonTitle = parametersVM.PrimaryButtonText;
-                    busyLoader.PrimaryButtonVisibility = parametersVM.PrimaryButtonVisibility;
-                    busyLoader.SecondaryButtonTitle = parametersVM.SecondaryButtonText;
-                    busyLoader.SecondaryButtonVisibility = parametersVM.SecondaryButtonVisibility;
-                    busyLoader.CancelButtonTitle = parametersVM.CancelButtonText;
-                    busyLoader.BtnCancel.Visibility = parametersVM.CancelButtonVisibility;
+                    if (busyLoader.TbcTitle.Text != parametersVM.ProgessText)
+                        busyLoader.TbcTitle.Text = parametersVM.ProgessText;
+                    if (busyLoader.TbcPrimary.Text != parametersVM.PrimaryButtonText)
+                        busyLoader.TbcPrimary.Text = parametersVM.PrimaryButtonText;
+                    if (busyLoader.BtnPrimary.Visibility != parametersVM.PrimaryButtonVisibility)
+                        busyLoader.BtnPrimary.Visibility = parametersVM.PrimaryButtonVisibility;
+                    if (busyLoader.TbcSecondary.Text != parametersVM.SecondaryButtonText)
+                        busyLoader.TbcSecondary.Text = parametersVM.SecondaryButtonText;
+                    if (busyLoader.BtnSecondary.Visibility != parametersVM.SecondaryButtonVisibility)
+                        busyLoader.BtnSecondary.Visibility = parametersVM.SecondaryButtonVisibility;
+                    if (busyLoader.TbcCancel.Text != parametersVM.CancelButtonText)
+                        busyLoader.TbcCancel.Text = parametersVM.CancelButtonText;
+                    if (busyLoader.BtnCancel.Visibility != parametersVM.CancelButtonVisibility)
+                        busyLoader.BtnCancel.Visibility = parametersVM.CancelButtonVisibility;
                 }
             }
             catch (Exception)
@@ -562,6 +568,7 @@ namespace LibraryProjectUWP
             }
         }
 
+        public BusyLoader GetBusyLoader => gridMainContainer.Children.FirstOrDefault(a => a is BusyLoader) as BusyLoader;
 
         public void CloseBusyLoader()
         {

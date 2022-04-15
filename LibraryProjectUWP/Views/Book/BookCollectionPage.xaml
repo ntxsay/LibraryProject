@@ -245,59 +245,16 @@
                 <SolidColorBrush Color="White" Opacity="0.5" />
             </Grid.Background>-->
             <StackPanel Orientation="Horizontal" Spacing="18" Padding="5, 0" VerticalAlignment="Center">
-                <Button Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                        Background="Transparent" BorderThickness="0">
-                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <Grid>
-                            <MUIXC:ProgressRing IsIndeterminate="{x:Bind ViewModelPage.TaskList.Count, Converter={StaticResource intToBooleanConverter}, Mode=OneWay}" Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" Height="20" Width="20"/>
-                            <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE73E;" Visibility="{x:Bind ViewModelPage.TaskList.Count, Converter={StaticResource intToInvertVisibilityConverter}, Mode=OneWay}"/>
-                        </Grid>
-                        <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
-                            <Run Text="{x:Bind ViewModelPage.TaskList.Count, Mode=OneWay}"/>
-                            <Run Text="tâche(s) en cours d'exécution"/>
-                        </TextBlock>
-                    </StackPanel>
-                    <Button.Flyout>
-                        <Flyout>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="Tâches en cours d'exécution" Foreground="{ThemeResource SystemColorControlAccentBrush}"/>
-                                <Rectangle Height="1" Grid.Row="1" Fill="{ThemeResource SystemColorControlAccentBrush}"/>
-                                <ListView Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.TaskList, Mode=OneWay}" SelectionMode="Single" IsItemClickEnabled="False">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="generalVm:TaskVM">
-                                            <Grid ColumnSpacing="8" Padding="0 5">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{x:Bind Description, Mode=OneWay}" TextWrapping="Wrap" MaxWidth="200"/>
-                                                <Button Grid.Column="1" Command="{StaticResource CancelTaskXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand">
-                                                    <TextBlock Text="Annuler" />
-                                                </Button>
-                                            </Grid>
-                                        </DataTemplate>
-
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                            </Grid>
-                        </Flyout>
-                    </Button.Flyout>
-                </Button>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
-                    <Run Text="Nombre de livre :" />
-                    <Run Text="{x:Bind Parameters.ParentLibrary.Books.Count, Mode=OneWay}" />
+                    <Run Text="Nombre total de livre :" />
+                    <Run Text="{x:Bind ViewModelPage.NbBooks, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
-                    <Run Text="Elements sélectionnés :" />
-                    <Run Text="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay}" />
+                    <Run Text="Nombre de livre affiché :" />
+                    <Run Text="{x:Bind ViewModelPage.NbElementDisplayed, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
             </StackPanel>
@@ -338,7 +295,7 @@
                                 </Button>
                             </Grid>
                             <Rectangle Height="1" Grid.Row="1" Fill="{ThemeResource SystemColorControlAccentBrush}"/>
-                            <ListView x:Name="Lv_SelectedItems" Margin="0,5,0,0" HorizontalAlignment="Stretch" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.SelectedItems, Mode=OneWay}" MaxHeight="500"
+                            <ListView x:Name="Lv_SelectedItems" Margin="0,5,0,0" HorizontalAlignment="Stretch" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.SelectedItems, Mode=OneWay}" MaxHeight="500" MaxWidth="350"
                                       ItemTemplate="{StaticResource ItemAutoSuggestDataTemplate}" IsItemClickEnabled="False" SelectionMode="Single" SelectionChanged="Lv_SelectedItems_SelectionChanged">
 
                             </ListView>

@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels.Author;
@@ -1090,6 +1091,12 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         context.Tbook.Remove(record);
                         await context.SaveChangesAsync();
+
+                        if (Guid.TryParse(record.Guid, out Guid guid))
+                        {
+                            EsBook esBook = new EsBook();
+                            await esBook.DeleteBookItemFolderAsync(guid);
+                        }
 
                         return new OperationStateVM()
                         {

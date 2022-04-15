@@ -29,6 +29,13 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 var item = await this.GenerateResearchBookGroupItemAsync(searchParams, goToPage);
                 if (item == null)
                 {
+                    if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
+                        ViewModelPage.PagesList.Clear();
+                    if (this.ViewModelPage.GroupedRelatedViewModel != null && this.ViewModelPage.GroupedRelatedViewModel.Collection != null
+                        && this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
+                    {
+                        this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                    }
                     return;
                 }
 
@@ -63,6 +70,13 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
                 if (item == null)
                 {
+                    if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
+                        ViewModelPage.PagesList.Clear();
+                    if (this.ViewModelPage.GroupedRelatedViewModel != null && this.ViewModelPage.GroupedRelatedViewModel.Collection != null
+                        && this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
+                    {
+                        this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                    }
                     return;
                 }
 
@@ -98,6 +112,13 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
                 if (item == null)
                 {
+                    if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
+                        ViewModelPage.PagesList.Clear();
+                    if (this.ViewModelPage.GroupedRelatedViewModel != null && this.ViewModelPage.GroupedRelatedViewModel.Collection != null
+                        && this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
+                    {
+                        this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                    }
                     return;
                 }
 
@@ -133,6 +154,13 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
                 if (item == null)
                 {
+                    if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
+                        ViewModelPage.PagesList.Clear();
+                    if (this.ViewModelPage.GroupedRelatedViewModel != null && this.ViewModelPage.GroupedRelatedViewModel.Collection != null
+                        && this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
+                    {
+                        this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                    }
                     return;
                 }
 
@@ -167,6 +195,13 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
                 if (item == null)
                 {
+                    if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
+                        ViewModelPage.PagesList.Clear();
+                    if (this.ViewModelPage.GroupedRelatedViewModel != null && this.ViewModelPage.GroupedRelatedViewModel.Collection != null
+                        && this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
+                    {
+                        this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                    }
                     return;
                 }
 
@@ -269,6 +304,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 }
 
                 itemsPage = await this.CompleteBooksInfoAsync(itemsPage);
+                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage.Count();
+                
                 return new BookGroupItemVM()
                 {
                     CountItems = countItems,
@@ -381,6 +418,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         await this.GroupItemsByNone(reloadFromDb, goToPage, resetPage);
                         break;
                 }
+
+                ParentPage.ViewModelPage.NbBooks = (int)await DbServices.Book.CountBooksInLibraryAsync(ParentPage.Parameters.ParentLibrary.Id);
             }
             catch (Exception ex)
             {

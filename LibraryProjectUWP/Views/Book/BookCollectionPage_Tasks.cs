@@ -371,7 +371,7 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Import
-        public void InitializeImportBooksFromExcelWorker(IEnumerable<LivreVM> viewModelList)
+        public void InitializeImportBooksWorker(IEnumerable<LivreVM> viewModelList)
         {
             try
             {
@@ -399,9 +399,8 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         this.Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                         {
-                            ProgessText = $"Import en cours de {viewModelList.Count()} livre(s)",
-                            OpenedLoaderCallback = () => WorkerImportBooksFromExcel.RunWorkerAsync(viewModelList),
-                            CancelButtonText = "Annuler l'import",
+                            ProgessText = $"Importation de {viewModelList.Count()} livre(s) en cours",
+                            CancelButtonText = "Annuler l'importation",
                             CancelButtonVisibility = Visibility.Visible,
                             CancelButtonCallback = () =>
                             {
@@ -410,6 +409,7 @@ namespace LibraryProjectUWP.Views.Book
                                     WorkerImportBooksFromExcel.CancelAsync();
                                 }
                             },
+                            OpenedLoaderCallback = () => WorkerImportBooksFromExcel.RunWorkerAsync(viewModelList),
                         });
                     }
                     else
@@ -520,19 +520,13 @@ namespace LibraryProjectUWP.Views.Book
                 if (e.UserState != null && e.UserState is WorkerState<OperationStateVM, OperationStateVM> workerUserState)
                 {
                     //Progress bar/text
-                    this.Parameters.MainPage.UpdateBusyLoader(new BusyLoaderParametersVM()
+                    var busyLoader = Parameters.MainPage.GetBusyLoader;
+                    if (busyLoader != null)
                     {
-                        ProgessText = $"{e.ProgressPercentage} % des livres importés. {(workerUserState.Result.IsSuccess ? 0 : 1)} erreur(s), {workerUserState.ResultList.Where(w => w.IsSuccess == false).Count()} avertissement(s)",
-                        CancelButtonText = "Annuler l'import",
-                        CancelButtonVisibility = Visibility.Visible,
-                        CancelButtonCallback = () =>
-                        {
-                            if (WorkerImportBooksFromExcel.IsBusy)
-                            {
-                                WorkerImportBooksFromExcel.CancelAsync();
-                            }
-                        },
-                    });
+                        busyLoader.TbcTitle.Text = $"{e.ProgressPercentage} % des livres importés. {(workerUserState.Result.IsSuccess ? 0 : 1)} erreur(s), {workerUserState.ResultList.Where(w => w.IsSuccess == false).Count()} avertissement(s)";
+                        if (busyLoader.BtnCancel.Visibility != Visibility.Visible)
+                            busyLoader.BtnCancel.Visibility = Visibility.Visible;
+                    }
                 }
             }
             catch (Exception ex)
@@ -547,21 +541,43 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                // Si erreur
-                if (e.Error != null)
+                var busyLoader = Parameters.MainPage.GetBusyLoader;
+                if (busyLoader != null)
                 {
+                    // Si erreur
+                    if (e.Error != null)
+                    {
+                        busyLoader.TbcTitle.Text = $"L'import s'est terminé avec l'erreur :\n\"{e.Error.Message}\"\n\nActualisation du catalogue des livres en cours...";
+                    }
+                    else if (e.Cancelled)
+                    {
+                        busyLoader.TbcTitle.Text = $"L'import a été annulé par l'utilisateur\nActualisation du catalogue des livres en cours...";
+                    }
+                    else
+                    {
 
-                }
-                else if (e.Cancelled)
-                {
-                    // Support de l'annulation a été désactivée
-                }
-                else
-                {
-                    
+                        if (e.Result != null && e.Result is WorkerState<OperationStateVM, OperationStateVM>[] workerUserState)
+                        {
+                            busyLoader.TbcTitle.Text = $"L'import des livres s'est terminé avec {workerUserState.Count(w => w.Result.IsSuccess == false)} erreur(s) et {workerUserState.Select(s => s.ResultList).SelectMany(w => w.ToList()).Select(q => q).Count(c => c.IsSuccess == false)} avertissement(s)\nActualisation du catalogue des livres en cours...";
+                        }
+                    }
+
+                    if (busyLoader.BtnCancel.Visibility != Visibility.Collapsed)
+                        busyLoader.BtnCancel.Visibility = Visibility.Collapsed;
                 }
 
-                this.OpenBookCollection();
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += (t, f) =>
+                {
+                    this.OpenBookCollection();
+                    dispatcherTimer.Stop();
+                };
+
+                dispatcherTimer.Start();
 
                 WorkerImportBooksFromExcel.Dispose();
                 WorkerImportBooksFromExcel = null;
@@ -574,6 +590,7 @@ namespace LibraryProjectUWP.Views.Book
             }
 
         }
+        #endregion
 
         private void CancelTaskXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -606,6 +623,5 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-        #endregion
     }
 }

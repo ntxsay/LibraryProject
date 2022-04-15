@@ -852,101 +852,18 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ImportBookFromFileUC_ImportDataRequested(ImportBookFromFileUC sender, ExecuteRequestedEventArgs e)
+        private void ImportBookFromFileUC_ImportDataRequested(ImportBookFromFileUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 List<LivreVM> newViewModelList = sender.ViewModelPage.NewViewModel;
-                foreach (var newViewModel in newViewModelList)
-                {
-                    if (newViewModel.Auteurs != null && newViewModel.Auteurs.Any())
-                    {
-                        List<ContactVM> contactVMs = new List<ContactVM>();
-                        foreach (var author in newViewModel.Auteurs)
-                        {
-                            var auteurResult = await DbServices.Contact.CreateAsync(author);
-                            if (auteurResult.IsSuccess)
-                            {
-                                author.Id = auteurResult.Id;
-                                contactVMs.Add(author);
-                            }
-                            else
-                            {
-                                //Erreur
-                                sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                                sender.ViewModelPage.ResultMessage += "\n" + auteurResult.Message;
-                                sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                                sender.ViewModelPage.IsResultMessageOpen = true;
-                                continue;
-                            }
-                        }
-
-                        newViewModel.Auteurs = contactVMs.Count > 0 ? new ObservableCollection<ContactVM>(contactVMs) : new ObservableCollection<ContactVM>();
-                    }
-
-                    if (newViewModel.Publication != null)
-                    {
-                        if (newViewModel.Publication.Collections != null && newViewModel.Publication.Collections.Any())
-                        {
-                            List<CollectionVM> collectionVMs = new List<CollectionVM>();
-                            foreach (var collection in newViewModel.Publication.Collections)
-                            {
-                                var collectionResult = await DbServices.Collection.CreateAsync(collection, Parameters.ParentLibrary.Id);
-                                if (collectionResult.IsSuccess)
-                                {
-                                    //collection.IdLibrary = _parameters.ParentLibrary.Id;
-                                    collection.Id = collectionResult.Id;
-                                    collectionVMs.Add(collection);
-                                }
-                                else
-                                {
-                                    //Erreur
-                                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                                    sender.ViewModelPage.ResultMessage += "\n" + collectionResult.Message;
-                                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                                    sender.ViewModelPage.IsResultMessageOpen = true;
-                                    continue;
-                                }
-                            }
-                            newViewModel.Publication.Collections = collectionVMs.Count > 0 ? new ObservableCollection<CollectionVM>(collectionVMs) : new ObservableCollection<CollectionVM>();
-                        }
-                    }
-
-                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
-                    if (creationResult.IsSuccess)
-                    {
-                        newViewModel.Id = creationResult.Id;
-                        this.CompleteBookInfos(newViewModel);
-                        Parameters.ParentLibrary.Books.Add(newViewModel);
-
-                        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                        return;
-                    }
-                }
+                InitializeImportBooksWorker(newViewModelList);
 
                 sender.CancelModificationRequested -= ImportBookFromFileUC_CancelModificationRequested;
                 sender.ImportDataRequested -= ImportBookFromFileUC_ImportDataRequested;
 
                 this.RemoveItemToSideBar(sender);
-                this.OpenBookCollection();
-
-                //var bookCollectionSpage = this.BookCollectionSubPage;
-                //if (bookCollectionSpage != null)
-                //{
-                //    bookCollectionSpage.RefreshItemsGrouping(_parameters.ParentLibrary.Books);
-                //}
             }
             catch (Exception ex)
             {
@@ -1010,72 +927,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ImportBookFromExcelUC_ImportDataRequested(ImportBookFromExcelUC sender, ExecuteRequestedEventArgs e)
+        private void ImportBookFromExcelUC_ImportDataRequested(ImportBookFromExcelUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 List<LivreVM> newViewModelList = sender.ViewModelPage.NewViewModel;
-                InitializeImportBooksFromExcelWorker(newViewModelList);
-                //foreach (var newViewModel in newViewModelList)
-                //{
-                //    if (newViewModel.Auteurs != null && newViewModel.Auteurs.Any())
-                //    {
-                //        foreach (var author in newViewModel.Auteurs)
-                //        {
-                //            var auteurResult = await DbServices.Contact.CreateAsync(author);
-                //            if (!auteurResult.IsSuccess)
-                //            {
-                //                //Erreur
-                //                sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                //                sender.ViewModelPage.ResultMessage += "\n" + auteurResult.Message;
-                //                sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                //                sender.ViewModelPage.IsResultMessageOpen = true;
-                //                continue;
-                //            }
-                //        }
-                //    }
-
-                //    if (newViewModel.Publication != null)
-                //    {
-                //        if (newViewModel.Publication.Collections != null && newViewModel.Publication.Collections.Any())
-                //        {
-                //            foreach (var collection in newViewModel.Publication.Collections)
-                //            {
-                //                var collectionResult = await DbServices.Collection.CreateAsync(collection, Parameters.ParentLibrary.Id);
-                //                if (!collectionResult.IsSuccess)
-                //                {
-                //                    //Erreur
-                //                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                //                    sender.ViewModelPage.ResultMessage += "\n" + collectionResult.Message;
-                //                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                //                    sender.ViewModelPage.IsResultMessageOpen = true;
-                //                    continue;
-                //                }
-                //            }
-                //        }
-                //    }
-
-                //    var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
-                //    if (creationResult.IsSuccess)
-                //    {
-                //        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                //        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                //        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                //        sender.ViewModelPage.IsResultMessageOpen = true;
-                //    }
-                //    else
-                //    {
-                //        //Erreur
-                //        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                //        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                //        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                //        sender.ViewModelPage.IsResultMessageOpen = true;
-                //        continue;
-                //    }
-                //}
-
-
+                InitializeImportBooksWorker(newViewModelList);
+                
                 sender.CancelModificationRequested -= ImportBookFromExcelUC_CancelModificationRequested;
                 sender.ImportDataRequested -= ImportBookFromExcelUC_ImportDataRequested;
 
@@ -1665,6 +1524,8 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                ABBtn_SelectedItems.Flyout.Hide();
+                
                 if (viewModelList == null || !viewModelList.Any())
                 {
                     return;

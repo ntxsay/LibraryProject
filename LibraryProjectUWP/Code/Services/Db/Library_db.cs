@@ -116,6 +116,40 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
+            public static async Task<int> CountLibrariesAsync()
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.Tlibrary.CountAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return 0;
+                }
+            }
+
+            public static async Task<IEnumerable<long>> GetIdLibrariesAsync()
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.Tlibrary.Select(s => s.Id).ToListAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<long>();
+                }
+            }
+
             public static async Task<long> CountBookAsync(long idLibrary)
             {
                 try

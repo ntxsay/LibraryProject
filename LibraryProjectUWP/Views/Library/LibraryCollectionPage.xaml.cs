@@ -48,7 +48,8 @@ namespace LibraryProjectUWP.Views.Library
     {
         public LibraryCollectionPageVM ViewModelPage { get; set; } = new LibraryCollectionPageVM();
         EsLibrary esLibrary = new EsLibrary();
-        
+        public MainPage MainPage { get; private set; }
+
         public LibraryCollectionPage()
         {
             this.InitializeComponent();
@@ -57,17 +58,21 @@ namespace LibraryProjectUWP.Views.Library
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            if (e.Parameter is MainPage parameters)
+            {
+                MainPage = parameters;
+            }
         }
 
         #region Loading
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadDataAsync(true);
+            LoadDataAsync(true);
         }
 
-        private async void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await LoadDataAsync(false);
+            LoadDataAsync(false);
         }
 
         private async void Image_Loaded(object sender, RoutedEventArgs e)
@@ -88,14 +93,12 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private async Task LoadDataAsync(bool firstLoad)
+        private void LoadDataAsync(bool firstLoad)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var itemList = await DbServices.Library.AllVMAsync();
-                ViewModelPage.ViewModelList = itemList?.ToList() ?? new List<BibliothequeVM>(); ;
-                await InitializeDataAsync(firstLoad);
+                InitializeLoadingLibrariesWorker();
             }
             catch (Exception ex)
             {
@@ -280,10 +283,11 @@ namespace LibraryProjectUWP.Views.Library
             {
                 this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
 
-                if (firstLoad)
+                if (ViewModelPage.GroupedRelatedViewModel.DataViewMode != Code.DataViewModeEnum.GridView)
                 {
                     ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.GridView;
                 }
+                
                 this.RefreshItemsGrouping();
                 this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                 this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
@@ -302,10 +306,11 @@ namespace LibraryProjectUWP.Views.Library
             {
                 this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
 
-                if (firstLoad)
+                if (ViewModelPage.GroupedRelatedViewModel.DataViewMode != Code.DataViewModeEnum.DataGridView)
                 {
                     ViewModelPage.GroupedRelatedViewModel.DataViewMode = Code.DataViewModeEnum.DataGridView;
                 }
+
                 this.RefreshItemsGrouping();
                 this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                 this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
@@ -2308,6 +2313,199 @@ namespace LibraryProjectUWP.Views.Library
                 return;
             }
         }
+
+        #region Loading BacKGroundWorker
+        private BackgroundWorker WorkerLoadLibraries;
+        public void InitializeLoadingLibrariesWorker()
+        {
+            try
+            {
+                if (WorkerLoadLibraries == null)
+                {
+                    WorkerLoadLibraries = new BackgroundWorker()
+                    {
+                        WorkerReportsProgress = true,
+                        WorkerSupportsCancellation = true,
+                    };
+
+                    WorkerLoadLibraries.ProgressChanged += WorkerLoadLibraries_ProgressChanged;
+                    WorkerLoadLibraries.DoWork += WorkerLoadLibraries_DoWork; ;
+                    WorkerLoadLibraries.RunWorkerCompleted += WorkerLoadLibraries_RunWorkerCompleted; ;
+                }
+
+                if (WorkerLoadLibraries != null)
+                {
+                    if (!WorkerLoadLibraries.IsBusy)
+                    {
+                        ViewModelPage.ViewModelList.Clear();
+                        this.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                        {
+                            ProgessText = $"Chargement des bibliothèques en cours.",
+                            CancelButtonText = "Annuler le chargement",
+                            CancelButtonVisibility = Visibility.Visible,
+                            CancelButtonCallback = () =>
+                            {
+                                if (WorkerLoadLibraries.IsBusy)
+                                {
+                                    WorkerLoadLibraries.CancelAsync();
+                                }
+                            },
+                            OpenedLoaderCallback = () => WorkerLoadLibraries.RunWorkerAsync(),
+                        });
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void WorkerLoadLibraries_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                if (sender is BackgroundWorker worker)
+                {
+                    using (Task<IEnumerable<long>> task = DbServices.Library.GetIdLibrariesAsync())
+                    {
+                        task.Wait();
+                        int ModelCount = task.Result.Count();
+                        double progressPercentage;
+                        int count = 0;
+
+                        List<BibliothequeVM> bibliothequeVMs = new List<BibliothequeVM>();
+                        foreach (var id in task.Result)
+                        {
+                            using (Task<BibliothequeVM> getLibraryTask = DbServices.Library.SingleVMAsync(id))
+                            {
+                                getLibraryTask.Wait();
+                                var viewModel = getLibraryTask.Result;
+                                if (viewModel != null)
+                                {
+                                    using (Task<string> jaquetteTask = esLibrary.GetLibraryItemJaquettePathAsync(viewModel))
+                                    {
+                                        jaquetteTask.Wait();
+                                        viewModel.JaquettePath = !jaquetteTask.Result.IsStringNullOrEmptyOrWhiteSpace() ? jaquetteTask.Result : EsGeneral.LibraryDefaultJaquette;
+                                    }
+
+                                    bibliothequeVMs.Add(viewModel);
+                                }
+
+                                var NumberModel = count + 1;
+                                double Operation = (double)NumberModel / (double)ModelCount;
+                                progressPercentage = Operation * 100;
+                                int ProgressValue = Convert.ToInt32(progressPercentage);
+
+                                if (worker.CancellationPending == true)
+                                {
+                                    e.Cancel = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    Thread.Sleep(500);
+                                    worker.ReportProgress(ProgressValue, viewModel);
+                                }
+                                count++;
+                            }
+                        }
+
+                        e.Result = bibliothequeVMs.ToArray();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+
+        }
+
+        private void WorkerLoadLibraries_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            try
+            {
+                if (e.UserState != null && e.UserState is BibliothequeVM bibliothequeVM)
+                {
+                    //Progress bar/text
+                    var busyLoader = this.MainPage.GetBusyLoader;
+                    if (busyLoader != null)
+                    {
+                        busyLoader.TbcTitle.Text = $"{e.ProgressPercentage} % des bibliothèques chargées.\nBibliothèque en cours : \"{bibliothequeVM.Name}\"";
+                        if (busyLoader.BtnCancel.Visibility != Visibility.Visible)
+                            busyLoader.BtnCancel.Visibility = Visibility.Visible;
+                        
+                        ViewModelPage.ViewModelList.Add(bibliothequeVM);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void WorkerLoadLibraries_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            try
+            {
+                var busyLoader = this.MainPage.GetBusyLoader;
+                if (busyLoader != null)
+                {
+                    // Si erreur
+                    if (e.Error != null)
+                    {
+                        busyLoader.TbcTitle.Text = $"Le chargement des bibliothèques s'est terminé avec l'erreur :\n\"{e.Error.Message}\"\n\nActualisation du catalogue des livres en cours...";
+                    }
+                    else if (e.Cancelled)
+                    {
+                        busyLoader.TbcTitle.Text = $"Le chargement des bibliothèques a été annulé par l'utilisateur\nActualisation du catalogue des livres en cours...";
+                    }
+                    else
+                    {
+                        if (e.Result != null && e.Result is BibliothequeVM[] viewModelList)
+                        {
+                            busyLoader.TbcTitle.Text = $"{viewModelList.Length} {(viewModelList.Length > 1 ? "bibliothèques ont été chargées": "bibliothèque a été chargée")}.";
+                        }
+                    }
+
+                    if (busyLoader.BtnCancel.Visibility != Visibility.Collapsed)
+                        busyLoader.BtnCancel.Visibility = Visibility.Collapsed;
+                }
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += (t, f) =>
+                {
+                    this.MainPage.CloseBusyLoader();
+                    this.GridViewMode(true);
+                    dispatcherTimer.Stop();
+                };
+
+                dispatcherTimer.Start();
+
+                WorkerLoadLibraries.Dispose();
+                WorkerLoadLibraries = null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+
+        }
+        #endregion
+
     }
 
     public class LibraryCollectionPageVM : INotifyPropertyChanged
@@ -2519,7 +2717,7 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private List<BibliothequeVM> _ViewModelList;
+        private List<BibliothequeVM> _ViewModelList = new List<BibliothequeVM>();
         public List<BibliothequeVM> ViewModelList
         {
             get => this._ViewModelList;

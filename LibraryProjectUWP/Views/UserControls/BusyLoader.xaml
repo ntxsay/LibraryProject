@@ -16,17 +16,18 @@
     <StackPanel Orientation="Vertical" Spacing="8" Padding="12" VerticalAlignment="Center" HorizontalAlignment="Center">
         <StackPanel Orientation="Horizontal">
             <ProgressRing IsActive="True" Margin="0,0,12,0" Foreground="White" Height="40" Width="40" FontSize="30"/>
-            <TextBlock x:Name="TbcTitle" Text="Loading control with wait ring" VerticalAlignment="Center" Foreground="White" FontSize="18" FontWeight="Bold"/>
+            <TextBlock x:Name="TbcTitle" x:FieldModifier="public" Text="Loading control with wait ring" VerticalAlignment="Center" Foreground="White" FontSize="18" FontWeight="Bold"
+                       TextWrapping="Wrap" TextAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
-            <Button x:Name="BtnPrimary" Click="BtnPrimary_Click"  Visibility="Collapsed">
-                <TextBlock x:Name="TbcPrimary"/>
+            <Button x:Name="BtnPrimary" x:FieldModifier="public" Click="BtnPrimary_Click"  Visibility="Collapsed">
+                <TextBlock x:Name="TbcPrimary" x:FieldModifier="public" />
             </Button>
-            <Button x:Name="BtnSecondary" Click="BtnSecondary_Click" Visibility="Collapsed">
-                <TextBlock x:Name="TbcSecondary"/>
+            <Button x:Name="BtnSecondary" x:FieldModifier="public" Click="BtnSecondary_Click" Visibility="Collapsed">
+                <TextBlock x:Name="TbcSecondary" x:FieldModifier="public" />
             </Button>
             <Button x:Name="BtnCancel" x:FieldModifier="public" Click="BtnCancel_Click" Visibility="Collapsed">
-                <TextBlock x:Name="TbcCancel" Text="Annuler"/>
+                <TextBlock x:Name="TbcCancel" Text="Annuler" x:FieldModifier="public" />
             </Button>
         </StackPanel>
     </StackPanel>

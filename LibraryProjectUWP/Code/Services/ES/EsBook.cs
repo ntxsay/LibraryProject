@@ -339,6 +339,34 @@ namespace LibraryProjectUWP.Code.Services.ES
         }
 
         /// <summary>
+        /// Supprime le dossier d'un livre dans le dossier "Books" et/ou renvoie l'objet <see cref="StorageFolder"/> 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> DeleteBookItemFolderAsync(Guid guid)
+        {
+            try
+            {
+                if (guid == Guid.Empty)
+                {
+                    return false;
+                }
+
+                var bookFolder = await GetBookItemFolderAsync(guid);
+                if (bookFolder == null)
+                {
+                    return true;
+                }
+
+                await bookFolder.DeleteAsync(StorageDeleteOption.Default);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Crée le dossier d'un livre dans le dossier "Books" et/ou renvoie l'objet <see cref="StorageFolder"/> 
         /// </summary>
         /// <returns></returns>

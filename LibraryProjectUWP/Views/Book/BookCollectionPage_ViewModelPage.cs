@@ -259,29 +259,29 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
-            private int _SelectedPage;
-            public int SelectedPage
+            private int _NbBooks;
+            public int NbBooks
             {
-                get => this._SelectedPage;
+                get => this._NbBooks;
                 set
                 {
-                    if (_SelectedPage != value)
+                    if (_NbBooks != value)
                     {
-                        this._SelectedPage = value;
+                        this._NbBooks = value;
                         this.OnPropertyChanged();
                     }
                 }
             }
 
-            private int _CountPages;
-            public int CountPages
+            private int _NbElementDisplayed;
+            public int NbElementDisplayed
             {
-                get => this._CountPages;
+                get => this._NbElementDisplayed;
                 set
                 {
-                    if (_CountPages != value)
+                    if (_NbElementDisplayed != value)
                     {
-                        this._CountPages = value;
+                        this._NbElementDisplayed = value;
                         this.OnPropertyChanged();
                     }
                 }
