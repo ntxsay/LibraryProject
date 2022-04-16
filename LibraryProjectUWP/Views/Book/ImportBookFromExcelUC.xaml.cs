@@ -39,6 +39,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class ImportBookFromExcelUC : PivotItem
     {
         private readonly ExcelServices excelServices;
+        private readonly SyncfusionXlsServices syncfusionXlsServices;
         public readonly ImportBookParametersDriverVM _parameters;
 
         public ImportBookFromExcelUCVM ViewModelPage { get; set; } = new ImportBookFromExcelUCVM();
@@ -59,6 +60,7 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
             _parameters = parameters;
             excelServices = new ExcelServices(parameters.File);
+            syncfusionXlsServices = new SyncfusionXlsServices(parameters.File);
         }
 
         private async void PivotItem_Loaded(object sender, RoutedEventArgs e)
@@ -70,7 +72,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var worksheetsName = await excelServices.GetExcelSheetsName();
+                var worksheetsName = await syncfusionXlsServices.GetExcelSheetsName();
                 ViewModelPage.WorkSheetsName = new ObservableCollection<string>(worksheetsName);
 
             }
@@ -88,7 +90,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is ComboBox comboBox && comboBox.SelectedItem is string workSheetName)
                 {
-                    var rr = await excelServices.ImportExcelToDatatable(workSheetName);
+                    var rr = await syncfusionXlsServices.ImportExcelToDatatable(workSheetName);
                     _parameters.ParentPage.ViewModelPage.DataTable = rr;
                     _parameters.ParentPage.OpenImportBookFromExcel();
                     SearchingResult();

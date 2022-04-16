@@ -25,9 +25,10 @@
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
-    <AppInstallerUri>\\LOCBASTARAUCBA8\PublishUWP</AppInstallerUri>
+    <AppInstallerUri>\\AKA-DESKTOP\UWP Deploy</AppInstallerUri>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <PackageCertificateKeyFile />
+    <AppxPackageDir>D:\SPB-Project\LibraryProject\</AppxPackageDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -184,6 +185,7 @@
     <Compile Include="Code\Services\ES\Files.cs" />
     <Compile Include="Code\Services\ES\Files_JsonSerialization.cs" />
     <Compile Include="Code\Services\ES\Folders.cs" />
+    <Compile Include="Code\Services\Excel\SyncfusionXlsServices.cs" />
     <Compile Include="Code\Services\Excel\ExcelServices.cs" />
     <Compile Include="Code\Services\Logging\Logs.cs" />
     <Compile Include="Code\Services\Tasks\BookBackgroundTask.cs" />
@@ -599,11 +601,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite">
       <Version>3.1.23</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
-      <Version>3.1.23</Version>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.13</Version>
     </PackageReference>
@@ -624,6 +621,9 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Syncfusion.XlsIO.UWP">
+      <Version>20.1.0.48</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
