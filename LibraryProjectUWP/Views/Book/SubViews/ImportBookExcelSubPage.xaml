@@ -20,12 +20,12 @@
     <Grid>
         <Pivot>
             <PivotItem Header="Importer des livres depuis un classeur Excel">
-                <MTUUControls:DataGrid x:Name="DataGridItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                <MTUUControls:DataGrid x:Name="DataGridItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 5 0 0"
                                                            HorizontalScrollBarVisibility="Visible" Loaded="DataGridItems_Loaded"
                                         VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
                                         AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
                                         AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
-                                        MaxColumnWidth="500" FrozenColumnCount="1" GridLinesVisibility="None" HeadersVisibility="Column"
+                                        FrozenColumnCount="1" GridLinesVisibility="None" HeadersVisibility="Column"
                                         IsReadOnly="False" BorderThickness="0"
                                         RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
                                         RowGroupHeaderPropertyNameAlternative="Range" SelectionChanged="DataGridItems_SelectionChanged">

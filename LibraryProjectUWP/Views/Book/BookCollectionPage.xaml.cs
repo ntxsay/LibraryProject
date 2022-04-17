@@ -829,7 +829,7 @@ namespace LibraryProjectUWP.Views.Book
                     ImportBookFromFileUC userControl = new ImportBookFromFileUC(new ImportBookParametersDriverVM()
                     {
                         ParentPage = this,
-                        ViewModelList = viewModelList,
+                        //ViewModelList = viewModelList,
                         File = file,
                     });
 
@@ -902,20 +902,23 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    ImportBookFromExcelUC userControl = new ImportBookFromExcelUC(new ImportBookParametersDriverVM()
-                    {
-                        ParentPage = this,
-                        File = excelFile,
-                    });
+                    ImportBookFromExcelUC userControl = new ImportBookFromExcelUC()
+                    {  
+                        ViewModelPivotItem = new ImportBookFromExcelUCVM()
+                        {
+                            FileStorage = excelFile,
+                            ParentPage = this,
+                        },
+                    };
 
                     userControl.CancelModificationRequested += ImportBookFromExcelUC_CancelModificationRequested;
                     userControl.ImportDataRequested += ImportBookFromExcelUC_ImportDataRequested;
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
+                        Glyph = userControl.ViewModelPivotItem.Glyph,
+                        Title = userControl.ViewModelPivotItem.Header,
+                        IdItem = userControl.ViewModelPivotItem.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -932,7 +935,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                List<LivreVM> newViewModelList = sender.ViewModelPage.NewViewModel;
+                List<LivreVM> newViewModelList = sender.ViewModelPivotItem.NewViewModel;
                 InitializeImportBooksWorker(newViewModelList);
                 
                 sender.CancelModificationRequested -= ImportBookFromExcelUC_CancelModificationRequested;

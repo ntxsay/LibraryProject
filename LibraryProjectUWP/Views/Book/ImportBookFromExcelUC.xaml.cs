@@ -1,6 +1,7 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Excel;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Author;
@@ -21,6 +22,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -38,29 +40,19 @@ namespace LibraryProjectUWP.Views.Book
 {
     public sealed partial class ImportBookFromExcelUC : PivotItem
     {
-        private readonly ExcelServices excelServices;
-        private readonly SyncfusionXlsServices syncfusionXlsServices;
-        public readonly ImportBookParametersDriverVM _parameters;
+        private SyncfusionXlsServices syncfusionXlsServices;
 
-        public ImportBookFromExcelUCVM ViewModelPage { get; set; } = new ImportBookFromExcelUCVM();
+        public ImportBookFromExcelUCVM ViewModelPivotItem { get; set; } = new ImportBookFromExcelUCVM();
 
         public delegate void CancelModificationEventHandler(ImportBookFromExcelUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
 
-
         public delegate void ImportDataEventHandler(ImportBookFromExcelUC sender, ExecuteRequestedEventArgs e);
         public event ImportDataEventHandler ImportDataRequested;
+        
         public ImportBookFromExcelUC()
         {
             this.InitializeComponent();
-        }
-
-        public ImportBookFromExcelUC(ImportBookParametersDriverVM parameters)
-        {
-            this.InitializeComponent();
-            _parameters = parameters;
-            excelServices = new ExcelServices(parameters.File);
-            syncfusionXlsServices = new SyncfusionXlsServices(parameters.File);
         }
 
         private async void PivotItem_Loaded(object sender, RoutedEventArgs e)
@@ -68,13 +60,37 @@ namespace LibraryProjectUWP.Views.Book
             await InitializeDataAsync();
         }
 
+        private async void Hyperlink_PickAnotherFile_Click(Hyperlink sender, HyperlinkClickEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var storageFile = await Files.OpenStorageFileAsync(Files.ExcelExtensions);
+                if (storageFile == null)
+                {
+                    Logs.Log(m, $"Vous devez sélectionner un fichier de type Microsoft Excel.");
+                    return;
+                }
+
+                ViewModelPivotItem.ParentPage.ImportBookFromExcelFile(storageFile);
+                ViewModelPivotItem.FileStorage = storageFile;
+                syncfusionXlsServices = new SyncfusionXlsServices(storageFile);
+                await InitializeDataAsync();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private async Task InitializeDataAsync()
         {
             try
             {
+                syncfusionXlsServices = new SyncfusionXlsServices(ViewModelPivotItem.FileStorage);
                 var worksheetsName = await syncfusionXlsServices.GetExcelSheetsName();
-                ViewModelPage.WorkSheetsName = new ObservableCollection<string>(worksheetsName);
-
+                ViewModelPivotItem.WorkSheetsName = new ObservableCollection<string>(worksheetsName);
             }
             catch (Exception ex)
             {
@@ -91,43 +107,10 @@ namespace LibraryProjectUWP.Views.Book
                 if (sender is ComboBox comboBox && comboBox.SelectedItem is string workSheetName)
                 {
                     var rr = await syncfusionXlsServices.ImportExcelToDatatable(workSheetName);
-                    _parameters.ParentPage.ViewModelPage.DataTable = rr;
-                    _parameters.ParentPage.OpenImportBookFromExcel();
+                    ViewModelPivotItem.ParentPage.ViewModelPage.DataTable = rr;
+                    ViewModelPivotItem.ParentPage.OpenImportBookFromExcel();
                     SearchingResult();
                 }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        private async void SearchDataInFileXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (ViewModelPage.SelectedWorkSheetName.IsStringNullOrEmptyOrWhiteSpace())
-                {
-                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Vous devez sélectionner une feuille";
-                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                    ViewModelPage.IsResultMessageOpen = true;
-                    return;
-                }
-
-                if (ViewModelPage.TableRange.IsStringNullOrEmptyOrWhiteSpace())
-                {
-                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Vous devez sélectionner une plage de cellule pour délimiter votre tableau.";
-                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                    ViewModelPage.IsResultMessageOpen = true;
-                    return;
-                }
-
-                var rr = await excelServices.ImportExcelToDatatable(ViewModelPage.SelectedWorkSheetName, ViewModelPage.TableRange, ViewModelPage.IsTableRangeContainsHeader);
-                ViewModelPage.DataTable = rr;
-                SearchingResult();
             }
             catch (Exception ex)
             {
@@ -137,27 +120,55 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void Btn_RemoveSelectedData_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Button button && button.Parent is Grid parentGrid)
+                {
+                    var comboBox = parentGrid.Children.FirstOrDefault(f => f is ComboBox) as ComboBox;
+                    if (comboBox != null)
+                    {
+                        comboBox.SelectedItem = null;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         public void SearchingResult(object[] row = null)
         {
             try
             {
-                ViewModelPage.ItemstVisibility = Visibility.Collapsed;
+                TbcAfterSearching.Inlines.Clear();
                 if (row == null || row.Length == 0)
                 {
+                    if (ViewModelPivotItem.ItemsVisibility != Visibility.Collapsed)
+                    {
+                        ViewModelPivotItem.ItemsVisibility = Visibility.Collapsed;
+                    }
+
+                    Run lineCount1 = new Run()
+                    {
+                        Text = $"Sélectionnez au moins une ligne pour préparer l'importation de vos livres.",
+                        FontWeight = FontWeights.Medium,
+                    };
+                    TbcAfterSearching.Inlines.Add(lineCount1);
                     return;
                 }
 
-                TbcAfterSearching.Inlines.Clear();
 
                 Run lineCount = new Run()
                 {
-                    Text = $"{_parameters.ParentPage.ImportBookExcelSubPage.SelectedItems.Count} {(_parameters.ParentPage.ImportBookExcelSubPage.SelectedItems.Count > 1 ? "lignes ont été sélectionnées" : "ligne a été sélectionnée")}. ",
+                    Text = $"{ViewModelPivotItem.ParentPage.ImportBookExcelSubPage.SelectedItems.Count} {(ViewModelPivotItem.ParentPage.ImportBookExcelSubPage.SelectedItems.Count > 1 ? "lignes ont été sélectionnées" : "ligne a été sélectionnée")}. ",
                     FontWeight = FontWeights.Medium,
                 };
                 TbcAfterSearching.Inlines.Add(lineCount);
                 
-
-                ViewModelPage.ItemstVisibility = Visibility.Visible;
                 Run runTitle = new Run()
                 {
                     Text = $"La première ligne a été sélectionnée afin de nous aider à importer vos livres.",
@@ -165,31 +176,36 @@ namespace LibraryProjectUWP.Views.Book
                 };
                 TbcAfterSearching.Inlines.Add(runTitle);
 
-                ViewModelPage.Titles.Clear();
-                ViewModelPage.Auteurs.Clear();
-                ViewModelPage.MaisonsEdition.Clear();
-                ViewModelPage.Langues.Clear();
-                ViewModelPage.DateParution.Clear();
-                ViewModelPage.Formats.Clear();
-                ViewModelPage.NumberOfPages.Clear();
-                ViewModelPage.Collections.Clear();
+                ViewModelPivotItem.Titles.Clear();
+                ViewModelPivotItem.Auteurs.Clear();
+                ViewModelPivotItem.MaisonsEdition.Clear();
+                ViewModelPivotItem.Langues.Clear();
+                ViewModelPivotItem.DateParution.Clear();
+                ViewModelPivotItem.Formats.Clear();
+                ViewModelPivotItem.NumberOfPages.Clear();
+                ViewModelPivotItem.Collections.Clear();
                 for (int i = 0; i < row.Length; i++)
                 {
                     var item = new BookImportDataTableVM()
                     {
                         ColumnIndex = i + 1,
-                        ColumnName = _parameters.ParentPage.ViewModelPage.DataTable.Columns[i + 1].ColumnName,
+                        ColumnName = ViewModelPivotItem.ParentPage.ViewModelPage.DataTable.Columns[i + 1].ColumnName,
                         RowName = row[i]?.ToString(),
                     };
 
-                    ViewModelPage.Titles.Add(item);
-                    ViewModelPage.Auteurs.Add(item);
-                    ViewModelPage.Langues.Add(item);
-                    ViewModelPage.MaisonsEdition.Add(item);
-                    ViewModelPage.Formats.Add(item);
-                    ViewModelPage.DateParution.Add(item);
-                    ViewModelPage.NumberOfPages.Add(item);
-                    ViewModelPage.Collections.Add(item);
+                    ViewModelPivotItem.Titles.Add(item);
+                    ViewModelPivotItem.Auteurs.Add(item);
+                    ViewModelPivotItem.Langues.Add(item);
+                    ViewModelPivotItem.MaisonsEdition.Add(item);
+                    ViewModelPivotItem.Formats.Add(item);
+                    ViewModelPivotItem.DateParution.Add(item);
+                    ViewModelPivotItem.NumberOfPages.Add(item);
+                    ViewModelPivotItem.Collections.Add(item);
+                }
+
+                if (ViewModelPivotItem.ItemsVisibility != Visibility.Visible)
+                {
+                    ViewModelPivotItem.ItemsVisibility = Visibility.Visible;
                 }
             }
             catch (Exception ex)
@@ -205,11 +221,11 @@ namespace LibraryProjectUWP.Views.Book
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private async void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
-                bool isValided = await IsModelValided();
+                bool isValided = IsModelValided();
                 if (!isValided)
                 {
                     return;
@@ -225,36 +241,36 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async Task<bool> IsModelValided()
+        private bool IsModelValided()
         {
             try
             {
-                if (ViewModelPage.SelectedTitle == null)
+                if (ViewModelPivotItem.SelectedTitle == null)
                 {
-                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Vous devez sélectionner la donnée qui correspond au titre.";
-                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                    ViewModelPage.IsResultMessageOpen = true;
+                    ViewModelPivotItem.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPivotItem.ResultMessage = $"Vous devez sélectionner la donnée qui correspond au titre.";
+                    ViewModelPivotItem.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPivotItem.IsResultMessageOpen = true;
                     return false;
                 }
                 List<LivreVM> list = new List<LivreVM>();
-                IList<object> selectedItems = _parameters.ParentPage.ImportBookExcelSubPage.SelectedItems;
+                IList<object> selectedItems = ViewModelPivotItem.ParentPage.ImportBookExcelSubPage.SelectedItems;
                 if (selectedItems != null)
                 {
                     for (int i = 0; i < selectedItems.Count; i++)
                     {
                         if (selectedItems[i] is object[] row)
                         {
-                            var title = row[ViewModelPage.SelectedTitle.ColumnIndex].ToString();
+                            var title = row[ViewModelPivotItem.SelectedTitle.ColumnIndex].ToString();
                             var viewModel = new LivreVM()
                             {
                                 Publication = new LivrePublicationVM(),
                                 MainTitle = title,
                             };
 
-                            if (ViewModelPage.SelectedAuteur != null)
+                            if (ViewModelPivotItem.SelectedAuteur != null)
                             {
-                                var authors = row[ViewModelPage.SelectedAuteur.ColumnIndex].ToString();
+                                var authors = row[ViewModelPivotItem.SelectedAuteur.ColumnIndex].ToString();
                                 if (!authors.IsStringNullOrEmptyOrWhiteSpace())
                                 {
                                     var authorsVm = DbServices.Contact.CreateViewModel(authors, ContactType.Author, ',');
@@ -265,13 +281,13 @@ namespace LibraryProjectUWP.Views.Book
                                 }
                             }
 
-                            if (ViewModelPage.SelectedCollection != null)
+                            if (ViewModelPivotItem.SelectedCollection != null)
                             {
                                 List<CollectionVM> collectionViewModelList = new List<CollectionVM>();
-                                var collections = row[ViewModelPage.SelectedCollection.ColumnIndex].ToString();
+                                var collections = row[ViewModelPivotItem.SelectedCollection.ColumnIndex].ToString();
                                 if (!collections.IsStringNullOrEmptyOrWhiteSpace())
                                 {
-                                    var collectionsVm = DbServices.Collection.CreateViewModel(_parameters.ParentPage.Parameters.ParentLibrary.Id, collections, ',');
+                                    var collectionsVm = DbServices.Collection.CreateViewModel(ViewModelPivotItem.ParentPage.Parameters.ParentLibrary.Id, collections, ',');
                                     if (collectionsVm != null && collectionsVm.Any())
                                     {
                                         viewModel.Publication.Collections = new ObservableCollection<CollectionVM>(collectionsVm);
@@ -285,8 +301,8 @@ namespace LibraryProjectUWP.Views.Book
                     }
                 }
 
-                ViewModelPage.NewViewModel = list;
-                ViewModelPage.IsResultMessageOpen = false;
+                ViewModelPivotItem.NewViewModel = list;
+                ViewModelPivotItem.IsResultMessageOpen = false;
                 return true;
             }
             catch (Exception ex)
@@ -295,12 +311,6 @@ namespace LibraryProjectUWP.Views.Book
                 Logs.Log(ex, m);
                 return false;
             }
-        }
-
-
-        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -358,6 +368,34 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     _Glyph = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        private StorageFile _FileStorage;
+        public StorageFile FileStorage
+        {
+            get => this._FileStorage;
+            set
+            {
+                if (this._FileStorage != value)
+                {
+                    this._FileStorage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookCollectionPage _ParentPage;
+        public BookCollectionPage ParentPage
+        {
+            get => this._ParentPage;
+            set
+            {
+                if (this._ParentPage != value)
+                {
+                    this._ParentPage = value;
+                    this.OnPropertyChanged();
                 }
             }
         }
@@ -658,15 +696,15 @@ namespace LibraryProjectUWP.Views.Book
         }
 
 
-        private Visibility _ItemstVisibility = Visibility.Collapsed;
-        public Visibility ItemstVisibility
+        private Visibility _ItemsVisibility = Visibility.Collapsed;
+        public Visibility ItemsVisibility
         {
-            get => this._ItemstVisibility;
+            get => this._ItemsVisibility;
             set
             {
-                if (this._ItemstVisibility != value)
+                if (this._ItemsVisibility != value)
                 {
-                    this._ItemstVisibility = value;
+                    this._ItemsVisibility = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -741,9 +779,6 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
         }
-
-
-        
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

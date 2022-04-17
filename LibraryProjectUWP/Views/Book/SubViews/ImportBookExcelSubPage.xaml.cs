@@ -100,12 +100,13 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                                     list.Add(row[i]);
                                 }
                                 sideBar.SearchingResult(list.ToArray());
+                                return;
                             }
                         }
+
+                        sideBar.SearchingResult(null);
                     }
                 }
-
-                
             }
             catch (Exception ex)
             {
