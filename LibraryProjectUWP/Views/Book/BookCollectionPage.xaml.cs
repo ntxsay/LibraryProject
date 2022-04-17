@@ -1547,10 +1547,7 @@ namespace LibraryProjectUWP.Views.Book
                             bool isSaved = await esBook.SaveBookViewModelAsAsync(viewModelList);
                             if (isSaved)
                             {
-                                foreach (var item in viewModelList)
-                                {
-                                    var operationResult = await DbServices.Book.DeleteAsync(item.Id);
-                                }
+                                InitializeDeleteBooksWorker(viewModelList);
                             }
                             else
                             {
@@ -1559,45 +1556,8 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         else
                         {
-                            foreach (var item in viewModelList)
-                            {
-                                var operationResult = await DbServices.Book.DeleteAsync(item.Id);
-
-                            }
+                            InitializeDeleteBooksWorker(viewModelList);
                         }
-
-                        ViewModelPage.SelectedItems.Clear();
-
-                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                        {
-                            ProgessText = $"Actualisation du catalogue des livres en cours...",
-                        });
-
-                        DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                        {
-                            Interval = new TimeSpan(0, 0, 0, 1),
-                        };
-
-                        dispatcherTimer.Tick += async (t, f) =>
-                        {
-                            await bookCollectionSpage.RefreshItemsGrouping(true, 1, true, ViewModelPage.ResearchBook);
-
-                            DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                            {
-                                Interval = new TimeSpan(0, 0, 0, 2),
-                            };
-
-                            dispatcherTimer2.Tick += (s, i) =>
-                            {
-                                Parameters.MainPage.CloseBusyLoader();
-                                dispatcherTimer2.Stop();
-                            };
-                            dispatcherTimer2.Start();
-
-                            dispatcherTimer.Stop();
-                        };
-
-                        dispatcherTimer.Start();
                     }
                     else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
                     {
@@ -1747,7 +1707,7 @@ namespace LibraryProjectUWP.Views.Book
                 else
                 {
                     var contactsList = await DbServices.Contact.AllVMAsync();
-                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactType.Adherant);
+                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactRole.Adherant);
                     var parameters = new ManageContactParametersDriverVM()
                     {
                         EditMode = Code.EditMode.Create,
@@ -1899,7 +1859,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactType.Author);
+                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactRole.Author);
                     ViewModelPage.AuthorViewModelList = itemList?.ToList();
                     var parameters = new ManageContactParametersDriverVM()
                     {
@@ -2033,7 +1993,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactType.EditorHouse);
+                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactRole.EditorHouse);
                     var parameters = new ManageContactParametersDriverVM()
                     {
                         EditMode = Code.EditMode.Create,

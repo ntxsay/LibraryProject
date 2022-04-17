@@ -3,7 +3,6 @@ using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Models.Local;
-using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
@@ -1355,8 +1354,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                     if (viewModel == null) return null;
 
                     IList<string> titres = await GetOtherTitlesInBookAsync(model.Id);
-                    IList<ContactVM> authors = await Contact.GetContactsVmInBookAsync(model.Id, ContactType.Author);
-                    IList<ContactVM> editors = await Contact.GetContactsVmInBookAsync(model.Id, ContactType.EditorHouse);
+                    IList<ContactVM> authors = await Contact.GetContactsVmInBookAsync<TbookAuthorConnector>(model.Id);
+                    IList<ContactVM> editors = await Contact.GetContactsVmInBookAsync<TbookEditeurConnector>(model.Id);
                     IList<CollectionVM> collections = await Collection.GetCollectionsVmInBookAsync(model.Id, CollectionTypeEnum.Collection);
                     
                     viewModel.TitresOeuvre = titres != null && titres.Any() ? new ObservableCollection<string>(titres) : new ObservableCollection<string>();

@@ -4,7 +4,6 @@ using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Excel;
 using LibraryProjectUWP.Code.Services.Logging;
-using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
@@ -273,7 +272,7 @@ namespace LibraryProjectUWP.Views.Book
                                 var authors = row[ViewModelPivotItem.SelectedAuteur.ColumnIndex].ToString();
                                 if (!authors.IsStringNullOrEmptyOrWhiteSpace())
                                 {
-                                    var authorsVm = DbServices.Contact.CreateViewModel(authors, ContactType.Author, ',');
+                                    var authorsVm = DbServices.Contact.CreateViewModel(authors, ContactType.Human, ContactRole.Author, ',');
                                     if (authorsVm != null && authorsVm.Any())
                                     {
                                         viewModel.Auteurs = new ObservableCollection<ContactVM>(authorsVm);
@@ -286,7 +285,7 @@ namespace LibraryProjectUWP.Views.Book
                                 var contacts = row[ViewModelPivotItem.SelectedMaisonEdition.ColumnIndex].ToString();
                                 if (!contacts.IsStringNullOrEmptyOrWhiteSpace())
                                 {
-                                    var contactVMs = DbServices.Contact.CreateViewModel(contacts, ContactType.EditorHouse, ',');
+                                    var contactVMs = DbServices.Contact.CreateViewModel(contacts, ContactType.Society, ContactRole.EditorHouse, ',');
                                     if (contactVMs != null && contactVMs.Any())
                                     {
                                         viewModel.Publication.Editeurs = new ObservableCollection<ContactVM>(contactVMs);

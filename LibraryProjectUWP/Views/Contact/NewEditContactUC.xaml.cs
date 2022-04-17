@@ -286,7 +286,7 @@ namespace LibraryProjectUWP.Views.Contact
         {
             try
             {
-                if (_parameters.ContactType == ContactType.Adherant || _parameters.ContactType == ContactType.Author)
+                if (_parameters.ContactType == ContactType.Human)
                 {
                     ViewModelPage.ViewModel.SocietyName = String.Empty;
                     if (ViewModelPage.ViewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace())
@@ -324,7 +324,7 @@ namespace LibraryProjectUWP.Views.Contact
                         
                     }
                 }
-                else if (_parameters.ContactType == ContactType.EditorHouse || _parameters.ContactType == ContactType.Enterprise)
+                else if (_parameters.ContactType == ContactType.Society)
                 {
                     ViewModelPage.ViewModel.TitreCivilite = String.Empty;
                     ViewModelPage.ViewModel.NomNaissance = String.Empty;

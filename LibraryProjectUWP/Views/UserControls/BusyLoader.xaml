@@ -14,8 +14,8 @@
                               BlurAmount="8"/>
     </Grid.Background>
     <StackPanel Orientation="Vertical" Spacing="8" Padding="12" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <ProgressRing IsActive="True" Margin="0,0,12,0" Foreground="White" Height="42" Width="42"/>
         <StackPanel Orientation="Horizontal">
-            <ProgressRing IsActive="True" Margin="0,0,12,0" Foreground="White" Height="40" Width="40" FontSize="30"/>
             <TextBlock x:Name="TbcTitle" x:FieldModifier="public" Text="Loading control with wait ring" VerticalAlignment="Center" Foreground="White" FontSize="18" FontWeight="Bold"
                        TextWrapping="Wrap" TextAlignment="Center"/>
         </StackPanel>

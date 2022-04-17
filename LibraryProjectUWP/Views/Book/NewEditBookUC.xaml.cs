@@ -5,7 +5,6 @@ using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Excel;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Code.Services.Web;
-using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
@@ -165,7 +164,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var authorsList = await DbServices.Contact.MultipleVMAsync(ContactType.Author);
+                var authorsList = await DbServices.Contact.MultipleVMAsync(ContactRole.Author);
                 ViewModelPage.AuthorViewModelList = authorsList?.ToList();
             }
             catch (Exception ex)
@@ -525,7 +524,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var itemList = await DbServices.Contact.MultipleVMAsync(ContactType.EditorHouse);
+                var itemList = await DbServices.Contact.MultipleVMAsync(ContactRole.EditorHouse);
                 ViewModelPage.EditorsViewModelList = itemList?.ToList();
             }
             catch (Exception ex)

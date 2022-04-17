@@ -30,6 +30,20 @@ namespace LibraryProjectUWP.ViewModels.Contact
             }
         }
 
+        private ContactRole _ContactRole;
+        public ContactRole ContactRole
+        {
+            get => _ContactRole;
+            set
+            {
+                if (_ContactRole != value)
+                {
+                    _ContactRole = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private DateTime _DateAjout = DateTime.UtcNow;
         public DateTime DateAjout
         {

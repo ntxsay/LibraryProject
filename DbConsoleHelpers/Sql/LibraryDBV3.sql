@@ -65,6 +65,7 @@ DROP TABLE IF EXISTS "TContact";
 CREATE TABLE IF NOT EXISTS "TContact" (
 	"Id" INTEGER NOT NULL UNIQUE,
     "Type" INTEGER NOT NULL DEFAULT 0, --Client, Auteur, maison d'édition, Entreprise
+    "Role" INTEGER NOT NULL DEFAULT 0, --Client, Auteur, maison d'édition, Entreprise
     "Guid" TEXT NOT NULL UNIQUE,--Si le dossier ce cree
     "DateAjout" TEXT NOT NULL,
     "DateEdition" TEXT NULL,

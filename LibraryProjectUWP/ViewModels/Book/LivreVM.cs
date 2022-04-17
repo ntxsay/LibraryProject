@@ -1,7 +1,6 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.ES;
-using LibraryProjectUWP.ViewModels.Author;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
 using Newtonsoft.Json;

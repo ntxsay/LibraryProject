@@ -20,6 +20,7 @@ namespace DbConsoleHelpers.Models.Local
 
         public long Id { get; set; }
         public long Type { get; set; }
+        public long Role { get; set; }
         public string Guid { get; set; }
         public string DateAjout { get; set; }
         public string DateEdition { get; set; }

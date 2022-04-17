@@ -26,6 +26,7 @@ namespace LibraryProjectUWP.Views.Book
 {
     public sealed partial class BookCollectionPage : Page
     {
+        private BackgroundWorker WorkerDeleteBooks;
         private BackgroundWorker WorkerImportBooksFromExcel;
         private BackgroundWorker workerSearchPretsBook;
         private BackgroundWorker workerSearchExemplariesBook;
@@ -530,7 +531,7 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         else
                         {
-                            Thread.Sleep(500);
+                            Thread.Sleep(100);
                             worker.ReportProgress(ProgressValue, bookResult);
                         }
                         count++;
@@ -626,6 +627,217 @@ namespace LibraryProjectUWP.Views.Book
 
         }
         #endregion
+
+        #region Delete Books
+        public void InitializeDeleteBooksWorker(IEnumerable<LivreVM> viewModelList)
+        {
+            try
+            {
+                if (viewModelList == null || !viewModelList.Any())
+                {
+                    return;
+                }
+
+                if (WorkerDeleteBooks == null)
+                {
+                    WorkerDeleteBooks = new BackgroundWorker()
+                    {
+                        WorkerReportsProgress = true,
+                        WorkerSupportsCancellation = true,
+                    };
+
+                    WorkerDeleteBooks.ProgressChanged += WorkerDeleteBooks_ProgressChanged;
+                    WorkerDeleteBooks.DoWork += WorkerDeleteBooks_DoWork; ;
+                    WorkerDeleteBooks.RunWorkerCompleted += WorkerDeleteBooks_RunWorkerCompleted; ;
+                }
+
+                if (WorkerDeleteBooks != null)
+                {
+                    if (!WorkerDeleteBooks.IsBusy)
+                    {
+                        this.Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                        {
+                            ProgessText = $"Suppression en cours de {viewModelList.Count()} livre(s).",
+                            CancelButtonText = "Annuler la suppression",
+                            CancelButtonVisibility = Visibility.Visible,
+                            CancelButtonCallback = () =>
+                            {
+                                if (WorkerDeleteBooks.IsBusy)
+                                {
+                                    WorkerDeleteBooks.CancelAsync();
+                                }
+                            },
+                            OpenedLoaderCallback = () => WorkerDeleteBooks.RunWorkerAsync(viewModelList),
+                        });
+                    }
+                    else
+                    {
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void WorkerDeleteBooks_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                if (sender is BackgroundWorker worker && e.Argument is IEnumerable<LivreVM> viewModelList)
+                {
+                    int ModelCount = viewModelList.Count();
+                    double progressPercentage;
+                    int count = 0;
+
+                    List<OperationStateVM> workerStates = new List<OperationStateVM>();
+                    foreach (var viewModel in viewModelList)
+                    {
+                        using (Task<OperationStateVM> task = DbServices.Book.DeleteAsync(viewModel.Id))
+                        {
+                            task.Wait();
+                            workerStates.Add(task.Result);
+
+                            var NumberModel = count + 1;
+                            double Operation = (double)NumberModel / (double)ModelCount;
+                            progressPercentage = Operation * 100;
+                            int ProgressValue = Convert.ToInt32(progressPercentage);
+
+                            if (worker.CancellationPending == true)
+                            {
+                                e.Cancel = true;
+                                break;
+                            }
+                            else
+                            {
+                                Thread.Sleep(100);
+                                worker.ReportProgress(ProgressValue, viewModel);
+                            }
+                            count++;
+                        }
+                    }
+                    e.Result = workerStates.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+
+        }
+
+        private void WorkerDeleteBooks_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            try
+            {
+                if (e.UserState != null && e.UserState is LivreVM viewModel)
+                {
+                    //Progress bar/text
+                    var busyLoader = Parameters.MainPage.GetBusyLoader;
+                    if (busyLoader != null)
+                    {
+                        busyLoader.TbcTitle.Text = $"Suppression en cours du livre « {viewModel.MainTitle} ».\n{e.ProgressPercentage} % des livres supprimés.";
+                        if (busyLoader.BtnCancel.Visibility != Visibility.Visible)
+                            busyLoader.BtnCancel.Visibility = Visibility.Visible;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void WorkerDeleteBooks_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            try
+            {
+                ViewModelPage.SelectedItems.Clear();
+
+                var busyLoader = Parameters.MainPage.GetBusyLoader;
+                if (busyLoader != null)
+                {
+                    // Si erreur
+                    if (e.Error != null)
+                    {
+                        if (e.Result != null && e.Result is OperationStateVM[] workerUserState)
+                        {
+                            busyLoader.TbcTitle.Text = $"{workerUserState.Count(w => w.IsSuccess == true)} {(workerUserState.Count(w => w.IsSuccess == true) > 1 ? "livres" : "livre")} sur {workerUserState.Count()} {(workerUserState.Count() > 1 ? "ont été supprimés" : "a été supprimé")}, une erreur s'est produite lors de la suppresion.\nActualisation du catalogue des livres en cours...";
+                        }
+                        else
+                        {
+                            busyLoader.TbcTitle.Text = $"Une erreur s'est produite lors de la suppresion.\nActualisation du catalogue des livres en cours...";
+                        }
+                    }
+                    else if (e.Cancelled)
+                    {
+                        if (e.Result != null && e.Result is OperationStateVM[] workerUserState)
+                        {
+                            busyLoader.TbcTitle.Text = $"La suppression a été annulée par l'utilisateur. {workerUserState.Count(w => w.IsSuccess == true)} {(workerUserState.Count(w => w.IsSuccess == true) > 1 ? "livres ont été supprimés" : "livre a été supprimé")}.\nActualisation du catalogue des livres en cours...";
+                        }
+                        else
+                        {
+                            busyLoader.TbcTitle.Text = $"La suppression a été annulée par l'utilisateur.\nActualisation du catalogue des livres en cours...";
+                        }
+                    }
+                    else
+                    {
+                        if (e.Result != null && e.Result is OperationStateVM[] workerUserState)
+                        {
+                            busyLoader.TbcTitle.Text = $"{workerUserState.Count(w => w.IsSuccess == true)} {(workerUserState.Count(w => w.IsSuccess == true) > 1 ? "livres" : "livre")} sur {workerUserState.Count()} {(workerUserState.Count() > 1 ? "ont été supprimés" : "a été supprimé")}.\nActualisation du catalogue des livres en cours...";
+                        }
+                    }
+
+                    if (busyLoader.BtnCancel.Visibility != Visibility.Collapsed)
+                        busyLoader.BtnCancel.Visibility = Visibility.Collapsed;
+                }
+
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    await this.RefreshItemsGrouping(true, 1, true, ViewModelPage.ResearchBook);
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, i) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        dispatcherTimer2.Stop();
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                };
+
+                dispatcherTimer.Start();
+
+                WorkerDeleteBooks.Dispose();
+                WorkerDeleteBooks = null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+
+        }
+        #endregion
+
 
         private void CancelTaskXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {

@@ -212,8 +212,6 @@
     <Compile Include="Models\Local\TlibraryCategorie.cs" />
     <Compile Include="Models\Local\TlibrarySubCategorie.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\Author\AuthorVM.cs" />
-    <Compile Include="ViewModels\Author\ManageAuthorParametersDriverVM.cs" />
     <Compile Include="ViewModels\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
     <Compile Include="ViewModels\Book\LibraryToBookNavigationDriverVM.cs" />

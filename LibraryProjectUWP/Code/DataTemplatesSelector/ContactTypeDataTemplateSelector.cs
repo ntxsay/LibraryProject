@@ -21,7 +21,7 @@ namespace LibraryProjectUWP.Code.DataTemplatesSelector
             {
                 if (item is ContactVM viewModel)
                 {
-                    if (viewModel.ContactType == ContactType.EditorHouse || viewModel.ContactType == ContactType.Enterprise)
+                    if (viewModel.ContactType == ContactType.Society)
                     {
                         return EnterpriseTemplate;
                     }
