@@ -27,11 +27,9 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
         private BackgroundWorker WorkerImportBooksFromExcel;
-        private BackgroundWorker workerSearchBooks;
         private BackgroundWorker workerSearchPretsBook;
         private BackgroundWorker workerSearchExemplariesBook;
 
-        CancellationTokenSource cancellationTokenSourceSearchBooks = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceCountBooks = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceSearchPretsBook = new CancellationTokenSource();
         CancellationTokenSource cancellationTokenSourceSearchBookExemplaries = new CancellationTokenSource();
@@ -604,14 +602,6 @@ namespace LibraryProjectUWP.Views.Book
                         if (WorkerImportBooksFromExcel != null && WorkerImportBooksFromExcel.IsBusy)
                         {
                             WorkerImportBooksFromExcel.CancelAsync();
-                        }
-                    }
-                    else if (taskVM.Id == EnumTaskId.SearchBooks)
-                    {
-                        cancellationTokenSourceSearchBooks?.Cancel();
-                        if (workerSearchBooks != null && workerSearchBooks.IsBusy)
-                        {
-                            workerSearchBooks.CancelAsync();
                         }
                     }
                 }
