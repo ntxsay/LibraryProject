@@ -467,15 +467,26 @@ namespace LibraryProjectUWP.Views.Book
                         {
                             if (newViewModel.Publication.Collections != null && newViewModel.Publication.Collections.Any())
                             {
-                                foreach (var collection in newViewModel.Publication.Collections)
+                                for (int i = 0; i < newViewModel.Publication.Collections.Count; i++)
                                 {
-                                    using (Task<OperationStateVM> task = DbServices.Collection.CreateAsync(collection, Parameters.ParentLibrary.Id))
+                                    using (Task<OperationStateVM> task = DbServices.Collection.CreateAsync(newViewModel.Publication.Collections[i], Parameters.ParentLibrary.Id))
                                     {
                                         task.Wait();
                                         _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
                                         {
                                             Result = task.Result,
                                         });
+
+                                        if (!task.Result.IsSuccess)
+                                        {
+                                            newViewModel.Publication.Collections.RemoveAt(i);
+                                            i = 0;
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            newViewModel.Publication.Collections[i].Id = task.Result.Id;
+                                        }
                                     }
                                 }
                             }
@@ -553,16 +564,13 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (e.UserState != null && e.UserState is WorkerState<OperationStateVM, OperationStateVM> workerUserState)
+                //Progress bar/text
+                var busyLoader = Parameters.MainPage.GetBusyLoader;
+                if (busyLoader != null)
                 {
-                    //Progress bar/text
-                    var busyLoader = Parameters.MainPage.GetBusyLoader;
-                    if (busyLoader != null)
-                    {
-                        busyLoader.TbcTitle.Text = $"{e.ProgressPercentage} % des livres importés. {(workerUserState.Result.IsSuccess ? 0 : 1)} erreur(s), {workerUserState.ResultList.Where(w => w.IsSuccess == false).Count()} avertissement(s)";
-                        if (busyLoader.BtnCancel.Visibility != Visibility.Visible)
-                            busyLoader.BtnCancel.Visibility = Visibility.Visible;
-                    }
+                    busyLoader.TbcTitle.Text = $"{e.ProgressPercentage} % des livres ont été importés.\nCette opération peut prendre un certain temps";
+                    if (busyLoader.BtnCancel.Visibility != Visibility.Visible)
+                        busyLoader.BtnCancel.Visibility = Visibility.Visible;
                 }
             }
             catch (Exception ex)

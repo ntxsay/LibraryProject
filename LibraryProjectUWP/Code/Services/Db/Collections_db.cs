@@ -565,13 +565,14 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var isExist = await context.Tcollection.AnyAsync(c => c.Name.ToLower() == viewModel.Name.Trim().ToLower());
-                        if (isExist)
+                        var existingItem = await context.Tcollection.FirstOrDefaultAsync(c => c.Name.ToLower() == viewModel.Name.Trim().ToLower());
+                        if (existingItem != null)
                         {
                             return new OperationStateVM()
                             {
                                 IsSuccess = true,
-                                Message = DbServices.RecordAlreadyExistMessage
+                                Message = DbServices.RecordAlreadyExistMessage,
+                                Id = existingItem.Id,
                             };
                         }
 
