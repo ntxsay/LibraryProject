@@ -281,6 +281,19 @@ namespace LibraryProjectUWP.Views.Book
                                 }
                             }
 
+                            if (ViewModelPivotItem.SelectedMaisonEdition != null)
+                            {
+                                var contacts = row[ViewModelPivotItem.SelectedMaisonEdition.ColumnIndex].ToString();
+                                if (!contacts.IsStringNullOrEmptyOrWhiteSpace())
+                                {
+                                    var contactVMs = DbServices.Contact.CreateViewModel(contacts, ContactType.EditorHouse, ',');
+                                    if (contactVMs != null && contactVMs.Any())
+                                    {
+                                        viewModel.Publication.Editeurs = new ObservableCollection<ContactVM>(contactVMs);
+                                    }
+                                }
+                            }
+
                             if (ViewModelPivotItem.SelectedCollection != null)
                             {
                                 List<CollectionVM> collectionViewModelList = new List<CollectionVM>();

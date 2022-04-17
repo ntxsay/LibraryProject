@@ -478,6 +478,32 @@ namespace LibraryProjectUWP.Views.Book
                                     }
                                 }
                             }
+
+                            if (newViewModel.Publication.Editeurs != null && newViewModel.Publication.Editeurs.Any())
+                            {
+                                for (int i = 0; i < newViewModel.Publication.Editeurs.Count; i++)
+                                {
+                                    using (Task<OperationStateVM> task = DbServices.Contact.CreateAsync(newViewModel.Publication.Editeurs[i]))
+                                    {
+                                        task.Wait();
+                                        _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
+                                        {
+                                            Result = task.Result,
+                                        });
+
+                                        if (!task.Result.IsSuccess)
+                                        {
+                                            newViewModel.Publication.Editeurs.RemoveAt(i);
+                                            i = 0;
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            newViewModel.Publication.Editeurs[i].Id = task.Result.Id;
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         var bookResult = new WorkerState<OperationStateVM, OperationStateVM>()

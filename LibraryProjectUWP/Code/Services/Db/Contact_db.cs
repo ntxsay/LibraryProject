@@ -430,6 +430,53 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static async Task AddContactsToBookAsync<T>(IEnumerable<ContactVM> viewModelList, long idBook) where T : class
+            {
+                try
+                {
+                    if (viewModelList != null && viewModelList.Any())
+                    {
+                        using (LibraryDbContext context = new LibraryDbContext())
+                        {
+                            foreach (ContactVM contactVM in viewModelList)
+                            {
+                                if (await context.Tcontact.AnyAsync(a => a.Id == contactVM.Id))
+                                {
+                                    if (typeof(T) == typeof(TbookAuthorConnector))
+                                    {
+                                        var itemConnector = new TbookAuthorConnector()
+                                        {
+                                            IdBook = idBook,
+                                            IdContact = contactVM.Id,
+                                        };
+                                        _ = await context.TbookAuthorConnector.AddAsync(itemConnector);
+                                        await context.SaveChangesAsync();
+                                    }
+                                    else if (typeof(T) == typeof(TbookEditeurConnector))
+                                    {
+                                        var itemConnector = new TbookEditeurConnector()
+                                        {
+                                            IdBook = idBook,
+                                            IdContact = contactVM.Id,
+                                        };
+
+                                        _ = await context.TbookEditeurConnector.AddAsync(itemConnector);
+                                        await context.SaveChangesAsync();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return;
+                }
+            }
+
+
             public static async Task<OperationStateVM> CreateAsync(ContactVM viewModel)
             {
                 try

@@ -423,10 +423,12 @@ namespace LibraryProjectUWP.Code.Services.Db
 
             public static async Task<OperationStateVM> CreateAsync(LivreVM viewModel, long idLibrary)
             {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 try
                 {
                     if (viewModel == null)
                     {
+                        Logs.Log(m, $"Le modèle de vue ne peut être null.");
                         return new OperationStateVM()
                         {
                             IsSuccess = false,
@@ -436,6 +438,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     if (viewModel.MainTitle.IsStringNullOrEmptyOrWhiteSpace())
                     {
+                        Logs.Log(m, $"Le titre du livre ne peut être null.");
                         return new OperationStateVM()
                         {
                             IsSuccess = false,
@@ -448,6 +451,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         var isExist = await IsBookExistAsync(viewModel);
                         if (isExist)
                         {
+                            Logs.Log(m, $"Le livre \"{viewModel.MainTitle}\" existe déjà.");
                             return new OperationStateVM()
                             {
                                 IsSuccess = true,
@@ -539,22 +543,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                             }
                         }
 
-                        if (viewModel.Auteurs != null && viewModel.Auteurs.Any())
-                        {
-                            foreach (ContactVM author in viewModel.Auteurs)
-                            {
-                                if (await context.Tcontact.AnyAsync(a => a.Id == author.Id))
-                                {
-                                    var authorConnector = new TbookAuthorConnector()
-                                    {
-                                        IdBook = record.Id,
-                                        IdContact = author.Id,
-                                    };
-                                    _ = await context.TbookAuthorConnector.AddAsync(authorConnector);
-                                    await context.SaveChangesAsync();
-                                }
-                            }
-                        }
+                        await Contact.AddContactsToBookAsync<TbookAuthorConnector>(viewModel.Auteurs, record.Id);
+                        await Contact.AddContactsToBookAsync<TbookEditeurConnector>(viewModel.Publication?.Editeurs, record.Id);
 
                         if (viewModel.Publication.Collections != null && viewModel.Publication.Collections.Any())
                         {
@@ -574,24 +564,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                             }
                         }
 
-                        if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
-                        {
-                            foreach (ContactVM editeur in viewModel.Publication.Editeurs)
-                            {
-                                if (await context.Tcollection.AnyAsync(a => a.Id == editeur.Id))
-                                {
-                                    var itemConnector = new TbookEditeurConnector()
-                                    {
-                                        IdBook = record.Id,
-                                        IdContact = editeur.Id,
-                                    };
-
-                                    _ = await context.TbookEditeurConnector.AddAsync(itemConnector);
-                                    await context.SaveChangesAsync();
-                                }
-                            }
-                        }
-
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
@@ -603,7 +575,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
                 catch (Exception ex)
                 {
-                    MethodBase m = MethodBase.GetCurrentMethod();
                     Logs.Log(ex, m);
                     return new OperationStateVM()
                     {
@@ -612,6 +583,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                     };
                 }
             }
+
+
 
             public static async Task<OperationStateVM<TbookExemplary>> CreateExemplaryAsync(long idBook, LivreExemplaryVM viewModel)
             {
