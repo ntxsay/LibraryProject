@@ -34,12 +34,13 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var collection = await context.Tcontact.ToListAsync();
+                        if (collection == null || !collection.Any()) return Enumerable.Empty<Tcontact>().ToList();
 
-                    var collection = await context.Tcontact.ToListAsync();
-                    if (collection == null || !collection.Any()) return Enumerable.Empty<Tcontact>().ToList();
-
-                    return collection;
+                        return collection;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -74,17 +75,58 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
             #endregion
 
+            #region Single
+            /// <summary>
+            /// Retourne un élément de la base de données avec un identifiant unique
+            /// </summary>
+            /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
+            /// <param name="id">Identifiant unique</param>
+            /// <returns></returns>
+            public static async Task<Tcontact> SingleAsync(long id)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var s = await context.Tcontact.SingleOrDefaultAsync(d => d.Id == id);
+                        if (s == null) return null;
+
+                        return s;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// Retourne un modèle de vue avec un identifiant unique
+            /// </summary>
+            /// <typeparam name="T1">Type d'entrée (Modèle)</typeparam>
+            /// <typeparam name="T2">Type sortie (Modèle de vue)</typeparam>
+            /// <param name="id"></param>
+            /// <returns></returns>
+            public static async Task<ContactVM> SingleVMAsync(long id)
+            {
+                return await ViewModelConverterAsync(await SingleAsync(id));
+            }
+            #endregion
+
             #region Multiple
             public static async Task<IList<Tcontact>> MultipleAsync(ContactType contactType)
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var collection = await context.Tcontact.Where(w => w.Type == (byte)contactType).ToListAsync();
+                        if (collection == null || !collection.Any()) return Enumerable.Empty<Tcontact>().ToList();
 
-                    var collection = await context.Tcontact.Where(w => w.Type == (byte)contactType).ToListAsync();
-                    if (collection == null || !collection.Any()) return Enumerable.Empty<Tcontact>().ToList();
-
-                    return collection;
+                        return collection;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -112,66 +154,67 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tcontact>> MultipleAsync(long idBook, ContactType contactType)
+            public static async Task<IList<Tcontact>> GetContactsInBookAsync(long idBook, ContactType contactType)
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    List<Tcontact> collection = new List<Tcontact>();
-                    if (contactType == ContactType.Author)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var preCollection = await context.TbookAuthorConnector.Where(w => w.IdBook == idBook).ToListAsync();
-                        if (preCollection.Any())
+                        List<Tcontact> collection = new List<Tcontact>();
+                        if (contactType == ContactType.Author)
                         {
-                            foreach (TbookAuthorConnector driver in preCollection)
+                            var preCollection = await context.TbookAuthorConnector.Where(w => w.IdBook == idBook).ToListAsync();
+                            if (preCollection.Any())
                             {
-                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdContact);
-                                if (model != null)
+                                foreach (TbookAuthorConnector driver in preCollection)
                                 {
-                                    collection.Add(model);
+                                    Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdContact);
+                                    if (model != null)
+                                    {
+                                        collection.Add(model);
+                                    }
                                 }
-                            }
 
-                            return collection;
+                                return collection;
+                            }
                         }
-                    }
-                    else if (contactType == ContactType.EditorHouse)
-                    {
-                        var preCollection = await context.TbookEditeurConnector.Where(w => w.IdBook == idBook).ToListAsync();
-                        if (preCollection.Any())
+                        else if (contactType == ContactType.EditorHouse)
                         {
-                            foreach (TbookEditeurConnector driver in preCollection)
+                            var preCollection = await context.TbookEditeurConnector.Where(w => w.IdBook == idBook).ToListAsync();
+                            if (preCollection.Any())
                             {
-                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdContact);
-                                if (model != null)
+                                foreach (TbookEditeurConnector driver in preCollection)
                                 {
-                                    collection.Add(model);
+                                    Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdContact);
+                                    if (model != null)
+                                    {
+                                        collection.Add(model);
+                                    }
                                 }
-                            }
 
-                            return collection;
+                                return collection;
+                            }
                         }
-                    }
-                    else if (contactType == ContactType.Translator)
-                    {
-                        var preCollection = await context.TbookTranslatorConnector.Where(w => w.IdBook == idBook).ToListAsync();
-                        if (preCollection.Any())
+                        else if (contactType == ContactType.Translator)
                         {
-                            foreach (TbookTranslatorConnector driver in preCollection)
+                            var preCollection = await context.TbookTranslatorConnector.Where(w => w.IdBook == idBook).ToListAsync();
+                            if (preCollection.Any())
                             {
-                                Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdContact);
-                                if (model != null)
+                                foreach (TbookTranslatorConnector driver in preCollection)
                                 {
-                                    collection.Add(model);
+                                    Tcontact model = await context.Tcontact.SingleOrDefaultAsync(w => w.Id == driver.IdContact);
+                                    if (model != null)
+                                    {
+                                        collection.Add(model);
+                                    }
                                 }
+
+                                return collection;
                             }
-
-                            return collection;
                         }
-                    }
 
-                    return collection;
+                        return collection;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -181,11 +224,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<ContactVM>> MultipleVMAsync(long idBook, ContactType contactType)
+            public static async Task<IList<ContactVM>> GetContactsVmInBookAsync(long idBook, ContactType contactType)
             {
                 try
                 {
-                    var collection = await MultipleAsync(idBook, contactType);
+                    var collection = await GetContactsInBookAsync(idBook, contactType);
                     if (!collection.Any()) return Enumerable.Empty<ContactVM>().ToList();
 
                     var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
@@ -340,46 +383,6 @@ namespace LibraryProjectUWP.Code.Services.Db
 
             #endregion
 
-
-            #region Single
-            /// <summary>
-            /// Retourne un élément de la base de données avec un identifiant unique
-            /// </summary>
-            /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
-            /// <param name="id">Identifiant unique</param>
-            /// <returns></returns>
-            public static async Task<Tcontact> SingleAsync(long id)
-            {
-                try
-                {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var s = await context.Tcontact.SingleOrDefaultAsync(d => d.Id == id);
-                    if (s == null) return null;
-
-                    return s;
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Debug.WriteLine(Logs.GetLog(ex, m));
-                    return null;
-                }
-            }
-
-            /// <summary>
-            /// Retourne un modèle de vue avec un identifiant unique
-            /// </summary>
-            /// <typeparam name="T1">Type d'entrée (Modèle)</typeparam>
-            /// <typeparam name="T2">Type sortie (Modèle de vue)</typeparam>
-            /// <param name="id"></param>
-            /// <returns></returns>
-            public static async Task<ContactVM> SingleVMAsync(long id)
-            {
-                return await ViewModelConverterAsync(await SingleAsync(id));
-            }
-            #endregion
-
             public static IEnumerable<ContactVM> CreateViewModel(string value, ContactType contactType, char separator = ',')
             {
                 try
@@ -402,12 +405,12 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                                 if (split.Length == 1)
                                 {
-                                    authorVm.Prenom = split[0];
+                                    authorVm.Prenom = split[0].Trim();
                                 }
                                 else if (split.Length >= 2)
                                 {
-                                    authorVm.Prenom = split[0];
-                                    authorVm.NomNaissance = split[1];
+                                    authorVm.Prenom = split[0].Trim();
+                                    authorVm.NomNaissance = split[1].Trim();
                                 }
 
                                 contactVMs.Add(authorVm);
@@ -440,22 +443,34 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-                    if (viewModel.ContactType == ContactType.Adherant || viewModel.ContactType == ContactType.Author)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        if (viewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ||
-                        viewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ||
-                        viewModel.Prenom.IsStringNullOrEmptyOrWhiteSpace())
+                        if (viewModel.ContactType == ContactType.Adherant || viewModel.ContactType == ContactType.Author)
                         {
-                            return new OperationStateVM()
+                            if (viewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ||
+                            viewModel.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ||
+                            viewModel.Prenom.IsStringNullOrEmptyOrWhiteSpace())
                             {
-                                IsSuccess = false,
-                                Message = NameEmptyMessage,
-                            };
+                                return new OperationStateVM()
+                                {
+                                    IsSuccess = false,
+                                    Message = NameEmptyMessage,
+                                };
+                            }
+                        }
+                        else if (viewModel.ContactType == ContactType.EditorHouse || viewModel.ContactType == ContactType.Enterprise)
+                        {
+                            if (viewModel.SocietyName.IsStringNullOrEmptyOrWhiteSpace())
+                            {
+                                return new OperationStateVM()
+                                {
+                                    IsSuccess = false,
+                                    Message = NameEmptyMessage,
+                                };
+                            }
                         }
 
-                        var isExist = await context.Tcontact.AnyAsync(c => c.TitreCivilite.ToLower() == viewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
-                                                                          c.NomUsage.ToLower() == viewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == viewModel.AutresPrenoms.Trim().ToLower());
+                        var isExist = await IsContactExistAsync(viewModel);
                         if (isExist)
                         {
                             return new OperationStateVM()
@@ -464,82 +479,59 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 Message = DbServices.RecordAlreadyExistMessage
                             };
                         }
-                    }
-                    else if (viewModel.ContactType == ContactType.EditorHouse || viewModel.ContactType == ContactType.Enterprise)
-                    {
-                        if (viewModel.SocietyName.IsStringNullOrEmptyOrWhiteSpace())
-                        {
-                            return new OperationStateVM()
-                            {
-                                IsSuccess = false,
-                                Message = NameEmptyMessage,
-                            };
-                        }
 
-                        var isExist = await context.Tcontact.AnyAsync(c => c.SocietyName.ToLower() == viewModel.SocietyName.Trim().ToLower());
-                        if (isExist)
+                        var record = new Tcontact()
                         {
-                            return new OperationStateVM()
+                            Guid = viewModel.Guid.ToString(),
+                            DateAjout = viewModel.DateAjout.ToString(),
+                            DateEdition = null,
+                            Observation = viewModel.Observation,
+                            TitreCivilite = viewModel.TitreCivilite,
+                            NomNaissance = viewModel.NomNaissance,
+                            NomUsage = viewModel.NomUsage,
+                            Prenom = viewModel.Prenom,
+                            AutresPrenoms = viewModel.AutresPrenoms,
+                            AdressPostal = viewModel.AdressePostal,
+                            CodePostal = viewModel.CodePostal,
+                            Ville = viewModel.Ville,
+                            NoMobile = viewModel.NoMobile,
+                            NoTelephone = viewModel.NoTelephone,
+                            MailAdress = viewModel.AdresseMail,
+                            DateDeces = viewModel.DateDeces?.ToString(),
+                            LieuDeces = viewModel.LieuDeces,
+                            DateNaissance = viewModel.DateNaissance?.ToString(),
+                            LieuNaissance = viewModel.LieuNaissance,
+                            Biographie = viewModel.Biographie,
+                            Nationality = viewModel.Nationality,
+                            SocietyName = viewModel.SocietyName,
+                            Type = (long)viewModel.ContactType,
+                        };
+
+                        _ = await context.Tcontact.AddAsync(record);
+                        await context.SaveChangesAsync();
+
+                        await CreateFolderAsync(viewModel.Guid);
+
+                        if (viewModel.ContactType == ContactType.Adherant || viewModel.ContactType == ContactType.Author)
+                        {
+                            var result = new OperationStateVM()
                             {
                                 IsSuccess = true,
-                                Message = DbServices.RecordAlreadyExistMessage
+                                Id = record.Id,
+                                Message = $"Le contact \"{record.NomNaissance} {record.Prenom}\" a été créé avec succès."
                             };
+                            return result;
                         }
-                    }
-                    
-
-                    
-                    var record = new Tcontact()
-                    {
-                        Guid = viewModel.Guid.ToString(),
-                        DateAjout = viewModel.DateAjout.ToString(),
-                        DateEdition = null,
-                        Observation = viewModel.Observation,
-                        TitreCivilite = viewModel.TitreCivilite,
-                        NomNaissance = viewModel.NomNaissance,
-                        NomUsage = viewModel.NomUsage,
-                        Prenom = viewModel.Prenom,
-                        AutresPrenoms = viewModel.AutresPrenoms,
-                        AdressPostal = viewModel.AdressePostal,
-                        CodePostal = viewModel.CodePostal,
-                        Ville = viewModel.Ville,
-                        NoMobile = viewModel.NoMobile,
-                        NoTelephone = viewModel.NoTelephone,
-                        MailAdress = viewModel.AdresseMail,
-                        DateDeces = viewModel.DateDeces?.ToString(),
-                        LieuDeces = viewModel.LieuDeces,
-                        DateNaissance = viewModel.DateNaissance?.ToString(),
-                        LieuNaissance = viewModel.LieuNaissance,
-                        Biographie = viewModel.Biographie,
-                        Nationality = viewModel.Nationality,
-                        SocietyName = viewModel.SocietyName,
-                        Type = (long)viewModel.ContactType,
-                    };
-
-                    await context.Tcontact.AddAsync(record);
-                    await context.SaveChangesAsync();
-
-                    await CreateFolderAsync(viewModel.Guid);
-
-                    if (viewModel.ContactType == ContactType.Adherant || viewModel.ContactType == ContactType.Author)
-                    {
-                        var result = new OperationStateVM()
+                        else
                         {
-                            IsSuccess = true,
-                            Id = record.Id,
-                            Message = $"Le contact \"{record.TitreCivilite} {record.NomNaissance} {record.Prenom}\" a été créé avec succès."
-                        };
-                        return result;
-                    }
-                    else
-                    {
-                        var result = new OperationStateVM()
-                        {
-                            IsSuccess = true,
-                            Id = record.Id,
-                            Message = $"La société \"{record.SocietyName}\" a été créé avec succès."
-                        };
-                        return result;
+                            var result = new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Id = record.Id,
+                                Message = $"La société \"{record.SocietyName}\" a été créé avec succès."
+                            };
+                            return result;
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -625,59 +617,59 @@ namespace LibraryProjectUWP.Code.Services.Db
                         }
                     }
 
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var record = await context.Tcontact.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
-                    if (record == null)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        return new OperationStateVM()
+                        var record = await context.Tcontact.SingleOrDefaultAsync(a => a.Id == viewModel.Id);
+                        if (record == null)
                         {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage,
-                        };
-                    }
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage,
+                            };
+                        }
 
-                    var isExist = await context.Tcontact.AnyAsync(c => c.Id != record.Id && c.TitreCivilite.ToLower() == viewModel.TitreCivilite.Trim().ToLower() && c.NomNaissance.ToLower() == viewModel.NomNaissance.Trim().ToLower() && c.Prenom.ToLower() == viewModel.Prenom.Trim().ToLower() &&
-                                                                  c.NomUsage.ToLower() == viewModel.NomUsage.Trim().ToLower() && c.AutresPrenoms.ToLower() == viewModel.AutresPrenoms.Trim().ToLower());
-                    if (isExist)
-                    {
+                        var isExist = await IsContactExistAsync(viewModel, true, record.Id);
+                        if (isExist)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = NameAlreadyExistMessage
+                            };
+                        }
+
+                        record.DateEdition = viewModel.DateEdition?.ToString();
+                        record.Observation = viewModel.Observation;
+                        record.TitreCivilite = viewModel.TitreCivilite;
+                        record.NomNaissance = viewModel.NomNaissance;
+                        record.NomUsage = viewModel.NomUsage;
+                        record.Prenom = viewModel.Prenom;
+                        record.AutresPrenoms = viewModel.AutresPrenoms;
+                        record.AdressPostal = viewModel.AdressePostal;
+                        record.CodePostal = viewModel.CodePostal;
+                        record.Ville = viewModel.Ville;
+                        record.NoTelephone = viewModel.NoTelephone;
+                        record.NoMobile = viewModel.NoMobile;
+                        record.MailAdress = viewModel.AdresseMail;
+                        record.Biographie = viewModel.Biographie;
+                        record.DateDeces = viewModel.DateDeces?.ToString();
+                        record.LieuDeces = viewModel.LieuDeces;
+                        record.DateNaissance = viewModel.DateNaissance?.ToString();
+                        record.LieuNaissance = viewModel.LieuNaissance;
+                        record.Type = (long)viewModel.ContactType;
+                        record.Nationality = viewModel.Nationality;
+                        record.SocietyName = viewModel.SocietyName;
+
+                        context.Tcontact.Update(record);
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
-                            Message = NameAlreadyExistMessage
+                            Id = record.Id,
                         };
                     }
-
-                    record.DateEdition = viewModel.DateEdition?.ToString();
-                    record.Observation = viewModel.Observation;
-                    record.TitreCivilite = viewModel.TitreCivilite;
-                    record.NomNaissance = viewModel.NomNaissance;
-                    record.NomUsage = viewModel.NomUsage;
-                    record.Prenom = viewModel.Prenom;
-                    record.AutresPrenoms = viewModel.AutresPrenoms;
-                    record.AdressPostal = viewModel.AdressePostal;
-                    record.CodePostal = viewModel.CodePostal;
-                    record.Ville = viewModel.Ville;
-                    record.NoTelephone = viewModel.NoTelephone;
-                    record.NoMobile = viewModel.NoMobile;
-                    record.MailAdress = viewModel.AdresseMail;
-                    record.Biographie = viewModel.Biographie;
-                    record.DateDeces = viewModel.DateDeces?.ToString();
-                    record.LieuDeces = viewModel.LieuDeces;
-                    record.DateNaissance = viewModel.DateNaissance?.ToString();
-                    record.LieuNaissance = viewModel.LieuNaissance;
-                    record.Type = (long)viewModel.ContactType;
-                    record.Nationality = viewModel.Nationality;
-                    record.SocietyName = viewModel.SocietyName;
-
-                    context.Tcontact.Update(record);
-                    await context.SaveChangesAsync();
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                        Id = record.Id,
-                    };
                 }
                 catch (Exception ex)
                 {
@@ -702,25 +694,26 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-                    LibraryDbContext context = new LibraryDbContext();
-
-                    var record = await context.Tcontact.SingleOrDefaultAsync(a => a.Id == Id);
-                    if (record == null)
+                    using (LibraryDbContext context = new LibraryDbContext())
                     {
+                        var record = await context.Tcontact.SingleOrDefaultAsync(a => a.Id == Id);
+                        if (record == null)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = false,
+                                Message = DbServices.RecordNotExistMessage
+                            };
+                        }
+
+                        context.Tcontact.Remove(record);
+                        await context.SaveChangesAsync();
+
                         return new OperationStateVM()
                         {
-                            IsSuccess = false,
-                            Message = DbServices.RecordNotExistMessage
+                            IsSuccess = true,
                         };
                     }
-
-                    context.Tcontact.Remove(record);
-                    await context.SaveChangesAsync();
-
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = true,
-                    };
                 }
                 catch (Exception ex)
                 {
@@ -736,6 +729,65 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
+            private static async Task<bool> IsContactExistAsync(ContactVM viewModel, bool isEdit = false, long? modelId = null)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        List<Tcontact> existingItemList = null;
+                        
+                        if (!isEdit || modelId == null)
+                        {
+                            existingItemList = await context.Tcontact.ToListAsync();
+                        }
+                        else
+                        {
+                            existingItemList = await context.Tcontact.Where(c => c.Id != (long)modelId).ToListAsync();
+                        }
+
+                        if (existingItemList != null && existingItemList.Any())
+                        {
+                            string titreCivilite = viewModel.TitreCivilite?.Trim()?.ToLower();
+                            string nomNaissance = viewModel.NomNaissance?.Trim()?.ToLower();
+                            string prenom = viewModel.Prenom?.Trim()?.ToLower();
+                            string autrePrenom = viewModel.AutresPrenoms?.Trim()?.ToLower();
+                            string nomUsage = viewModel.NomUsage?.Trim()?.ToLower();
+                            string societyName = viewModel.SocietyName?.Trim()?.ToLower();
+                            
+                            foreach (var item in existingItemList)
+                            {
+                                //Si personne Physique
+                                if (viewModel.ContactType == ContactType.Adherant || viewModel.ContactType == ContactType.Author)
+                                {
+                                    if (item.TitreCivilite?.ToLower() == titreCivilite && item.NomNaissance?.ToLower() == nomNaissance &&
+                                    item.Prenom?.ToLower() == prenom && item.AutresPrenoms?.ToLower() == autrePrenom &&
+                                    item.NomUsage?.ToLower() == nomUsage)
+                                    {
+                                        return true;
+                                    }
+                                }
+                                //Si personne Morale
+                                else if (viewModel.ContactType == ContactType.EditorHouse || viewModel.ContactType == ContactType.Enterprise)
+                                {
+                                    if (item.SocietyName?.ToLower() == societyName)
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return true;
+                }
+            }
 
             /// <summary>
             /// Convertit un modèle en modèle de vue

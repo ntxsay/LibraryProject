@@ -438,16 +438,27 @@ namespace LibraryProjectUWP.Views.Book
                         List<WorkerState<OperationStateVM, OperationStateVM>> _subWorkerStates = new List<WorkerState<OperationStateVM, OperationStateVM>>();
                         if (newViewModel.Auteurs != null && newViewModel.Auteurs.Any())
                         {
-                            foreach (var author in newViewModel.Auteurs)
+                            for (int i = 0; i < newViewModel.Auteurs.Count; i++)
                             {
-                                using (Task<OperationStateVM> task = DbServices.Contact.CreateAsync(author))
+                                using (Task<OperationStateVM> task = DbServices.Contact.CreateAsync(newViewModel.Auteurs[i]))
                                 {
                                     task.Wait();
                                     _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
                                     {
                                         Result = task.Result,
                                     });
-                                }                                
+
+                                    if (!task.Result.IsSuccess)
+                                    {
+                                        newViewModel.Auteurs.RemoveAt(i);
+                                        i = 0;
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        newViewModel.Auteurs[i].Id = task.Result.Id;
+                                    }
+                                }
                             }
                         }
 

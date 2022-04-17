@@ -122,7 +122,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             #endregion
 
             #region Multiple
-            public static async Task<IList<Tcollection>> MultipleInBookAsync(long idBook, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
+            public static async Task<IList<Tcollection>> GetCollectionsInBookAsync(long idBook, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
             {
                 try
                 {
@@ -166,11 +166,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<CollectionVM>> MultipleVmInBookAsync(long idBook, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
+            public static async Task<IList<CollectionVM>> GetCollectionsVmInBookAsync(long idBook, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
             {
                 try
                 {
-                    var collection = await MultipleInBookAsync(idBook, collectionType);
+                    var collection = await GetCollectionsInBookAsync(idBook, collectionType);
                     if (!collection.Any()) return Enumerable.Empty<CollectionVM>().ToList();
 
                     var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(d => d.Result).ToList();
@@ -786,7 +786,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <typeparam name="T2">Type sortie</typeparam>
             /// <param name="model">Modèle de base de données</param>
             /// <returns>Un modèle de vue</returns>
-            private static async Task<CollectionVM> ViewModelConverterAsync(Tcollection model)
+            public static async Task<CollectionVM> ViewModelConverterAsync(Tcollection model)
             {
                 try
                 {

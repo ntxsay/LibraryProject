@@ -1145,7 +1145,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                     model.TbookClassification = await context.TbookClassification.SingleOrDefaultAsync(s => s.Id == model.Id);
                     model.TbookFormat = await context.TbookFormat.SingleOrDefaultAsync(s => s.Id == model.Id);
                     model.TbookIdentification = await context.TbookIdentification.SingleOrDefaultAsync(s => s.Id == model.Id);
-                    
+                    //Facultatif
+                    //model.TbookCollections = await context.TbookCollections.Where(w => w.IdBook == model.Id).ToListAsync();
                 }
                 catch (Exception ex)
                 {
@@ -1154,6 +1155,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return;
                 }
             }
+
             private static async Task<bool> IsBookExistAsync(LivreVM viewModel, bool isEdit = false, long? modelId = null)
             {
                 try
@@ -1162,22 +1164,25 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         List<Tbook> existingItemList = null;
 
+                        string mainTitle = viewModel.MainTitle?.Trim()?.ToLower();
+
                         if (!isEdit)
                         {
-                            existingItemList = await context.Tbook.Where(c => c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower()).ToListAsync();
+                            existingItemList = await context.Tbook.Where(c => c.MainTitle.ToLower() == mainTitle).ToListAsync();
                         }
                         else
                         {
-                            existingItemList = await context.Tbook.Where(c => c.Id != (long)modelId && c.MainTitle.ToLower() == viewModel.MainTitle.Trim().ToLower()).ToListAsync();
+                            existingItemList = await context.Tbook.Where(c => c.Id != (long)modelId && c.MainTitle.ToLower() == mainTitle).ToListAsync();
                         }
 
                         if (existingItemList != null && existingItemList.Any())
                         {
                             string lang = viewModel.Publication?.Langue?.ToLower() ?? null;
+                            string format = viewModel.Format?.Format?.Trim()?.ToLower() ?? null;
                             foreach (var item in existingItemList)
                             {
-                                var isFormatExist = await context.TbookFormat.AnyAsync(c => c.Id == item.Id && c.Format.ToLower() == viewModel.Format.Format.Trim().ToLower());
-                                if (isFormatExist && item.Langue?.ToLower() == lang)
+                                item.TbookFormat = await context.TbookFormat.SingleOrDefaultAsync(c => c.Id == item.Id);
+                                if (item.TbookFormat?.Format?.ToLower() == format && item.Langue?.ToLower() == lang)
                                 {
                                     return true;
                                 }
@@ -1377,9 +1382,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                     if (viewModel == null) return null;
 
                     IList<string> titres = await GetOtherTitlesInBookAsync(model.Id);
-                    IList<ContactVM> authors = await Contact.MultipleVMAsync(model.Id, ContactType.Author);
-                    IList<ContactVM> editors = await Contact.MultipleVMAsync(model.Id, ContactType.EditorHouse);
-                    IList<CollectionVM> collections = await Collection.MultipleVmInBookAsync(model.Id, CollectionTypeEnum.Collection);
+                    IList<ContactVM> authors = await Contact.GetContactsVmInBookAsync(model.Id, ContactType.Author);
+                    IList<ContactVM> editors = await Contact.GetContactsVmInBookAsync(model.Id, ContactType.EditorHouse);
+                    IList<CollectionVM> collections = await Collection.GetCollectionsVmInBookAsync(model.Id, CollectionTypeEnum.Collection);
                     
                     viewModel.TitresOeuvre = titres != null && titres.Any() ? new ObservableCollection<string>(titres) : new ObservableCollection<string>();
                     if (viewModel.TitresOeuvre != null && viewModel.TitresOeuvre.Any())
