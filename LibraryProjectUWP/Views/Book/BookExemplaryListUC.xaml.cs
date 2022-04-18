@@ -27,9 +27,7 @@ namespace LibraryProjectUWP.Views.Book
             ItemsPath = new PropertyPath("Items")
         };
 
-
         public BookExemplaryListUCVM ViewModelPage { get; set; } = new BookExemplaryListUCVM();
-
 
         public delegate void CancelModificationEventHandler(BookExemplaryListUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
@@ -143,6 +141,10 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
+        public void Close()
+        {
+            CancelModificationRequested?.Invoke(this, null);
+        }
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -215,9 +217,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-
-       
-
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             try
@@ -236,6 +235,8 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     UpdateItemRequested = null;
                 }
+
+                ViewModelPage = null;
             }
             catch (Exception)
             {

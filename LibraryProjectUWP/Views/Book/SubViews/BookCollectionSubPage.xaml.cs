@@ -664,7 +664,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-
         private void BookExemplaryListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -672,22 +671,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    //if (PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC) is BookExemplaryListUC checkedItem)
-                    //{
-                    //    if (checkedItem._parameters.ParentBook.Id == viewModel.Id)
-                    //    {
-                    //        InitializeSearchingBookWorker(viewModel);
-                    //    }
-                    //    else
-                    //    {
-                    //        BookExemplaryListUC_CancelModificationRequested(checkedItem, args);
-                    //        InitializeSearchingBookWorker(viewModel);
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    InitializeSearchingBookWorker(viewModel);
-                    //}
+                    ParentPage.OpenBookExemplaryList(viewModel);
                 }
             }
             catch (Exception ex)

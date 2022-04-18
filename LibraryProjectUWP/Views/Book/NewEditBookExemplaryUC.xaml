@@ -181,7 +181,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <AutoSuggestBox x:Name="ASB_SearchContact" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    PlaceholderText="Rechercher un auteur" IsSuggestionListOpen="False" ItemTemplateSelector="{StaticResource contactTypeTemplateSelector}"
+                    PlaceholderText="Rechercher une personne ou une société" IsSuggestionListOpen="False" ItemTemplateSelector="{StaticResource contactTypeTemplateSelector}"
                                     TextChanged="ASB_SearchContact_TextChanged" SuggestionChosen="ASB_SearchContact_SuggestionChosen" QuerySubmitted="ASB_SearchContact_QuerySubmitted">
                                 <AutoSuggestBox.QueryIcon>
                                     <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>

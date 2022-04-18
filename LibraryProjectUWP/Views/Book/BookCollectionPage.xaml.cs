@@ -2,37 +2,24 @@
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
-using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
-using LibraryProjectUWP.ViewModels.Categorie;
-using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Categories;
 using LibraryProjectUWP.Views.Collection;
 using LibraryProjectUWP.Views.Contact;
-using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.Foundation;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using LibraryProjectUWP.Code.Extensions;
-using System.Diagnostics;
-using Windows.UI.Core;
 using Windows.UI.Xaml.Media.Animation;
 using LibraryProjectUWP.Views.Book.SubViews;
 using LibraryProjectUWP.Code.Services.Web;
@@ -1092,12 +1079,12 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void BookExemplaryListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        public void OpenBookExemplaryList(LivreVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (args.Parameter is LivreVM viewModel)
+                if (viewModel != null)
                 {
                     if (PivotRightSideBar.Items.FirstOrDefault(f => f is BookExemplaryListUC) is BookExemplaryListUC checkedItem)
                     {
@@ -1107,7 +1094,7 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         else
                         {
-                            BookExemplaryListUC_CancelModificationRequested(checkedItem, args);
+                            checkedItem.Close();
                             InitializeSearchingBookWorker(viewModel);
                         }
                     }
