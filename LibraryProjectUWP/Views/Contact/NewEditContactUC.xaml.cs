@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Contact;
 using Microsoft.UI.Xaml.Controls;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
@@ -30,8 +32,6 @@ namespace LibraryProjectUWP.Views.Contact
 {
     public sealed partial class NewEditContactUC : PivotItem
     {
-        public readonly ManageContactParametersDriverVM _parameters;
-
         public NewEditContactUCVM ViewModelPage { get; set; } = new NewEditContactUCVM();
 
         public delegate void CancelModificationEventHandler(NewEditContactUC sender, ExecuteRequestedEventArgs e);
@@ -48,13 +48,8 @@ namespace LibraryProjectUWP.Views.Contact
             this.InitializeComponent();
         }
 
-        public NewEditContactUC(ManageContactParametersDriverVM parameters)
+        private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
-            this.InitializeComponent();
-            _parameters = parameters;
-            ViewModelPage.EditMode = parameters.EditMode;
-            ViewModelPage.ViewModel = parameters?.CurrentViewModel;
-            ViewModelPage.ContactTypeVisibility = parameters.ContactTypeVisibility;
             InitializeActionInfos();
             InitializeFieldVisibility();
         }
@@ -65,42 +60,20 @@ namespace LibraryProjectUWP.Views.Contact
             {
                 string title = string.Empty;
                 string name = string.Empty;
-
-                if (_parameters.ContactTypeVisibility == Visibility.Collapsed)
+                if (ViewModelPage.ViewModel.ContactType == ContactType.Human)
                 {
-                    if (_parameters.ContactType == ContactType.Adherant)
-                    {
-                        title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un " : "d'éditer l'")}adhérant";
-                        name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
-                        ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un adhérant";
-                    }
-                    else if (_parameters.ContactType == ContactType.EditorHouse)
-                    {
-                        title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une" : "d'éditer la")} maison d'édition";
-                        name = $"{_parameters?.CurrentViewModel?.SocietyName}";
-                        ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une maison d'édition";
-                    }
-                    else if (_parameters.ContactType == ContactType.Author)
-                    {
-                        title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un auteur" : "d'éditer l'auteur")}";
-                        name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
-                        ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un auteur";
-                    }
-                    else if (_parameters.ContactType == ContactType.Enterprise)
-                    {
-                        title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une société" : "d'éditer une société")}";
-                        name = $"{_parameters?.CurrentViewModel?.SocietyName}";
-                        ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une société";
-                    }
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une personne" : "d'éditer")}";
+                    name = $"{ViewModelPage?.ViewModel?.TitreCivilite} {ViewModelPage?.ViewModel?.NomNaissance} {ViewModelPage?.ViewModel?.Prenom}";
+                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une personne";
+                    ViewModelPage.Glyph = "\ue77b";
                 }
-                else
+                else if (ViewModelPage.ViewModel.ContactType == ContactType.Society)
                 {
-                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un type de contact" : "d'éditer le contact")}";
-                    name = $"{_parameters?.CurrentViewModel?.TitreCivilite} {_parameters?.CurrentViewModel?.NomNaissance} {_parameters?.CurrentViewModel?.Prenom}";
-                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un type de contact";
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une société" : "d'éditer une société")}";
+                    name = $"{ViewModelPage?.ViewModel?.SocietyName}";
+                    ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une société";
+                    ViewModelPage.Glyph = "\uE731";
                 }
-
-
 
                 Run runTitle = new Run()
                 {
@@ -109,19 +82,15 @@ namespace LibraryProjectUWP.Views.Contact
                 };
                 TbcInfos.Inlines.Add(runTitle);
 
-                if (_parameters != null)
+                if (ViewModelPage.EditMode == EditMode.Edit)
                 {
-                    if (ViewModelPage.EditMode == EditMode.Edit)
+                    Run runName = new Run()
                     {
-                        Run runName = new Run()
-                        {
-                            Text = name,
-                            FontWeight = FontWeights.Medium,
-                        };
-                        TbcInfos.Inlines.Add(runName);
-                    }
+                        Text = name,
+                        FontWeight = FontWeights.Medium,
+                    };
+                    TbcInfos.Inlines.Add(runName);
                 }
-
             }
             catch (Exception)
             {
@@ -134,28 +103,14 @@ namespace LibraryProjectUWP.Views.Contact
         {
             try
             {
-                if (_parameters.ContactType == ContactType.Adherant)
+                if (ViewModelPage.ViewModel.ContactType == ContactType.Human)
                 {
                     ViewModelPage.AdressVisibility = Visibility.Visible;
                     ViewModelPage.CivilityVisibility = Visibility.Visible;
                     ViewModelPage.SocietyNameVisibility = Visibility.Collapsed;
                     ViewModelPage.AuthorVisibility = Visibility.Collapsed;
                 }
-                else if (_parameters.ContactType == ContactType.EditorHouse)
-                {
-                    ViewModelPage.SocietyNameVisibility = Visibility.Visible;
-                    ViewModelPage.AdressVisibility = Visibility.Visible;
-                    ViewModelPage.AuthorVisibility = Visibility.Collapsed;
-                    ViewModelPage.CivilityVisibility = Visibility.Collapsed;
-                }
-                else if (_parameters.ContactType == ContactType.Author)
-                {
-                    ViewModelPage.AdressVisibility = Visibility.Visible;
-                    ViewModelPage.CivilityVisibility = Visibility.Visible;
-                    ViewModelPage.AuthorVisibility = Visibility.Visible;
-                    ViewModelPage.SocietyNameVisibility = Visibility.Collapsed;
-                }
-                else if (_parameters.ContactType == ContactType.Enterprise)
+                else if (ViewModelPage.ViewModel.ContactType == ContactType.Society)
                 {
                     ViewModelPage.SocietyNameVisibility = Visibility.Visible;
                     ViewModelPage.AdressVisibility = Visibility.Visible;
@@ -163,10 +118,24 @@ namespace LibraryProjectUWP.Views.Contact
                     ViewModelPage.CivilityVisibility = Visibility.Collapsed;
                 }
 
-                var isExist = LibraryHelpers.Contact.ContactTypeDictionary.TryGetValue((byte)_parameters.ContactType, out string value);
-                if (isExist && (cmbxContactType.SelectedItem == null || cmbxContactType.SelectedItem is string selectedVal && selectedVal != value))
+                if (ViewModelPage.ViewModel.ContactRole == ContactRole.Adherant)
                 {
-                    cmbxContactType.SelectedItem = value;
+                    ViewModelPage.AuthorVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.ViewModel.ContactRole == ContactRole.EditorHouse)
+                {
+                   // ViewModelPage.SocietyNameVisibility = Visibility.Visible;
+                }
+                else if (ViewModelPage.ViewModel.ContactRole == ContactRole.Author)
+                {
+                    ViewModelPage.AdressVisibility = Visibility.Visible;
+                    ViewModelPage.AuthorVisibility = Visibility.Visible;
+                }
+
+                var isExist = LibraryHelpers.Contact.ContactRoleDictionary.TryGetValue((byte)ViewModelPage.ViewModel.ContactRole, out string value);
+                if (isExist && (cmbxContactRole.SelectedItem == null || cmbxContactRole.SelectedItem is string selectedVal && selectedVal != value))
+                {
+                    cmbxContactRole.SelectedItem = value;
                 }
             }
             catch (Exception ex)
@@ -177,16 +146,16 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private void CmbxContactType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CmbxContactRole_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
                 if (sender is ComboBox comboBox && comboBox.SelectedItem is string type)
                 {
-                    var typeKeyPair = LibraryHelpers.Contact.ContactTypeDictionary.SingleOrDefault(s => s.Value == type);
+                    var typeKeyPair = LibraryHelpers.Contact.ContactRoleDictionary.SingleOrDefault(s => s.Value == type);
                     if (!typeKeyPair.Equals(default(KeyValuePair<byte, string>)))
                     {
-                        _parameters.ContactType = (ContactType)typeKeyPair.Key;
+                        ViewModelPage.ViewModel.ContactRole = (ContactRole)typeKeyPair.Key;
                         InitializeFieldVisibility();
                     }
                 }
@@ -238,20 +207,17 @@ namespace LibraryProjectUWP.Views.Contact
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
-                bool isValided = IsModelValided();
+                bool isValided = await IsModelValided();
                 if (!isValided)
                 {
                     return;
                 }
 
-                if (CreateItemRequested != null)
-                {
-                    CreateItemRequested(this, args);
-                }
+                CreateItemRequested?.Invoke(this, args);
             }
             catch (Exception ex)
             {
@@ -261,11 +227,11 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
-                bool isValided = IsModelValided();
+                bool isValided = await IsModelValided();
                 if (!isValided)
                 {
                     return;
@@ -282,11 +248,11 @@ namespace LibraryProjectUWP.Views.Contact
         }
 
 
-        private bool IsModelValided()
+        private async Task<bool> IsModelValided()
         {
             try
             {
-                if (_parameters.ContactType == ContactType.Human)
+                if (ViewModelPage.ViewModel.ContactType == ContactType.Human)
                 {
                     ViewModelPage.ViewModel.SocietyName = String.Empty;
                     if (ViewModelPage.ViewModel.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace())
@@ -297,36 +263,10 @@ namespace LibraryProjectUWP.Views.Contact
                         ViewModelPage.IsResultMessageOpen = true;
                         return false;
                     }
-
-                    if (_parameters.ViewModelList != null)
-                    {
-                        var existingName = _parameters.ViewModelList.FirstOrDefault(c => !c.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() && c.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() &&
-                                                                        !c.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && c.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() &&
-                                                                        !c.Prenom.IsStringNullOrEmptyOrWhiteSpace() && c.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower());
-                        //Si le contact existe hors nom usage et autres prénoms
-                        if (existingName != null)
-                        {
-                            //Si le contact existe avec nom usage et autres prénoms
-                            if (existingName.NomUsage == ViewModelPage.ViewModel.NomUsage?.Trim()?.ToLower() && existingName.AutresPrenoms == ViewModelPage.ViewModel.AutresPrenoms?.Trim()?.ToLower())
-                            {
-                                var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel.TitreCivilite.ToLower() == ViewModelPage.ViewModel.TitreCivilite.Trim().ToLower() && _parameters.CurrentViewModel.NomNaissance.ToLower() == ViewModelPage.ViewModel.NomNaissance.Trim().ToLower() && _parameters.CurrentViewModel.Prenom.ToLower() == ViewModelPage.ViewModel.Prenom.Trim().ToLower() &&
-                                                                      _parameters.CurrentViewModel.NomUsage.ToLower() == ViewModelPage.ViewModel.NomUsage.Trim().ToLower() && _parameters.CurrentViewModel.AutresPrenoms.ToLower() == ViewModelPage.ViewModel.AutresPrenoms.Trim().ToLower());
-                                if (isError)
-                                {
-                                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                                    ViewModelPage.ResultMessage = $"Ce contact existe déjà.";
-                                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                                    ViewModelPage.IsResultMessageOpen = true;
-                                    return false;
-                                }
-                            }
-                        }
-                        
-                    }
                 }
-                else if (_parameters.ContactType == ContactType.Society)
+                else if (ViewModelPage.ViewModel.ContactType == ContactType.Society)
                 {
-                    ViewModelPage.ViewModel.TitreCivilite = String.Empty;
+                    ViewModelPage.ViewModel.TitreCivilite = string.Empty;
                     ViewModelPage.ViewModel.NomNaissance = String.Empty;
                     ViewModelPage.ViewModel.Prenom = String.Empty;
 
@@ -338,21 +278,17 @@ namespace LibraryProjectUWP.Views.Contact
                         ViewModelPage.IsResultMessageOpen = true;
                         return false;
                     }
-
-                    if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(c => !c.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && c.SocietyName.ToLower() == ViewModelPage.ViewModel.SocietyName.Trim().ToLower()))
-                    {
-                        var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel.SocietyName.ToLower() == ViewModelPage.ViewModel.SocietyName.Trim().ToLower());
-                        if (isError)
-                        {
-                            ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                            ViewModelPage.ResultMessage = $"Cette société existe déjà.";
-                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                            ViewModelPage.IsResultMessageOpen = true;
-                            return false;
-                        }
-                    }
                 }
 
+                var isExist = await DbServices.Contact.IsContactExistAsync(ViewModelPage.ViewModel, ViewModelPage.EditMode == EditMode.Edit, ViewModelPage.ViewModel.Id);
+                if (isExist.Item1)
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Ce contact existe déjà.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
 
                 ViewModelPage.IsResultMessageOpen = false;
                 return true;
@@ -396,13 +332,6 @@ namespace LibraryProjectUWP.Views.Contact
                 throw;
             }
         }
-
-        private void ToggleMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        
     }
 
     public class NewEditContactUCVM : INotifyPropertyChanged
@@ -412,7 +341,7 @@ namespace LibraryProjectUWP.Views.Contact
         public Guid ItemGuid { get; private set; } = Guid.NewGuid();
         public Guid? ParentGuid { get; set; }
 
-        public readonly IEnumerable<string> contactType = LibraryHelpers.Contact.ContactList;
+        public readonly IEnumerable<string> contactRole = LibraryHelpers.Contact.ContactRoleList;
         public readonly IEnumerable<string> nationalityList = CountryHelpers.NationalitiesList();
         public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
 
@@ -440,6 +369,20 @@ namespace LibraryProjectUWP.Views.Contact
                 {
                     _Glyph = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        private EditMode _EditMode;
+        public EditMode EditMode
+        {
+            get => this._EditMode;
+            set
+            {
+                if (this._EditMode != value)
+                {
+                    this._EditMode = value;
+                    this.OnPropertyChanged();
                 }
             }
         }
@@ -580,20 +523,6 @@ namespace LibraryProjectUWP.Views.Contact
                 if (this._ViewModel != value)
                 {
                     this._ViewModel = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private EditMode _EditMode;
-        public EditMode EditMode
-        {
-            get => this._EditMode;
-            set
-            {
-                if (this._EditMode != value)
-                {
-                    this._EditMode = value;
                     this.OnPropertyChanged();
                 }
             }

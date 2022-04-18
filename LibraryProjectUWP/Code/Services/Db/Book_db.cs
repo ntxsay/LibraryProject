@@ -133,14 +133,14 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<long>> GetListOfIdBooksFromContactListAsync(IEnumerable<long> idContactList, ContactType contactType)
+            public static async Task<IList<long>> GetListOfIdBooksFromContactListAsync(IEnumerable<long> idContactList, ContactRole contactRole)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
                         List<long> Ncollection = new List<long>();
-                        if (contactType == ContactType.Author)
+                        if (contactRole == ContactRole.Author)
                         {
                             foreach (var idContact in idContactList)
                             {
@@ -151,7 +151,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 }
                             }
                         }
-                        else if (contactType == ContactType.EditorHouse)
+                        else if (contactRole == ContactRole.EditorHouse)
                         {
                             foreach (var idContact in idContactList)
                             {

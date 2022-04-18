@@ -15,7 +15,7 @@
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
     d:DesignHeight="800"
-    d:DesignWidth="510" Unloaded="UserControl_Unloaded">
+    d:DesignWidth="510" Loaded="PivotItem_Loaded" Unloaded="UserControl_Unloaded">
     <PivotItem.Resources>
         <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
         <XamlUICommand x:Name="CancelModificationXUiCommand" 
@@ -61,25 +61,6 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="TbcInfos" Grid.Column="0" TextWrapping="Wrap"/>
-            <!--<Button x:Name="BtnDateParution" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Grid.Column="1" ToolTipService.ToolTip="Personnaliser la date" MTUUi:FrameworkElementExtensions.Cursor="Hand"
-                                        VerticalAlignment="Center" VerticalContentAlignment="Center">
-                <Border CornerRadius="14" Height="20" Width="20" BorderThickness="1" HorizontalAlignment="Center">
-                    <Border.BorderBrush>
-                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                            <GradientStop Color="Yellow" Offset="0.0" />
-                            <GradientStop Color="Red" Offset="0.25" />
-                            <GradientStop Color="Blue" Offset="0.75" />
-                            <GradientStop Color="LimeGreen" Offset="1.0" />
-                        </LinearGradientBrush>
-                    </Border.BorderBrush>
-                    <FontIcon FontSize="12" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE712;"  />
-                </Border>
-                <Button.Flyout>
-                    <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                        <ToggleMenuFlyoutItem Text="Ajouter le champs civilité" Click="ToggleMenuFlyoutItem_Click"/>
-                    </MenuFlyout>
-                </Button.Flyout>
-            </Button>-->
         </Grid>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
             <Grid RowSpacing="16" Margin="0 8 0 0" VerticalAlignment="Top">
@@ -98,10 +79,10 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ComboBox x:Name="cmbxContactType" Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.contactType}" Visibility="{x:Bind ViewModelPage.ContactTypeVisibility, Mode=OneWay}" PlaceholderText="Type de contact" SelectionChanged="CmbxContactType_SelectionChanged"
+                <ComboBox x:Name="cmbxContactRole" Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.contactRole}" PlaceholderText="Role de contact" SelectionChanged="CmbxContactRole_SelectionChanged"
                               HorizontalAlignment="Stretch">
                     <ComboBox.Header>
-                        <TextBlock Text="Type de contact" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        <TextBlock Text="Role de contact" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </ComboBox.Header>
                 </ComboBox>
                 <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.SocietyName, Mode=TwoWay}" PlaceholderText="Nom de la société" TextWrapping="Wrap" AcceptsReturn="True"

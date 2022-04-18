@@ -216,7 +216,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-
         private void GridViewItems_Loaded(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -511,7 +510,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
         #endregion
-
 
         #region Context Menu Item
         private async void ChangeJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)

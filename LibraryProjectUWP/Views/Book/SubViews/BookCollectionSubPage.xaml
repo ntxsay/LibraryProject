@@ -127,14 +127,14 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Emprunts" Command="{StaticResource NewBookPretXUiCmd}" CommandParameter="{x:Bind }">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE748;"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
                                 <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xF5ED;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Emprunts" Command="{StaticResource NewBookPretXUiCmd}" CommandParameter="{x:Bind }">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE748;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />

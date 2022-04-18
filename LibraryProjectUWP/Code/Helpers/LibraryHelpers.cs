@@ -95,30 +95,51 @@ namespace LibraryProjectUWP.Code.Helpers
             };
         }
         
-
-        
-
         public struct Contact
         {
-            public const string Adherant = "Adhérant";
-            public const string Author = "Auteur";
-            public const string HouseEditor = "Maison d'édition";
-            public const string Enterprise = "Société";
-
-            public static IEnumerable<string> ContactList => new List<string>()
+            public struct Role
             {
-                Adherant,
-                Author,
-                HouseEditor,
-                Enterprise,
+                public const string Adherant = "Adhérant";
+                public const string Author = "Auteur";
+                public const string HouseEditor = "Maison d'édition";
+                public const string Translator = "Traducteur/trice";
+                public const string Illustrator = "Illustrateur";
+            }
+
+            public struct Type
+            {
+                public const string Human = "Personne";
+                public const string Society = "Société";
+            }
+
+            public static IEnumerable<string> ContactTypeList => new List<string>()
+            {
+                Type.Human,
+                Type.Society,
             };
 
-            public static Dictionary<byte, string> ContactTypeDictionary = new Dictionary<byte, string>()
+            public static IEnumerable<string> ContactRoleList => new List<string>()
             {
-                {(byte)ContactType.Adherant, Adherant },
-                {(byte)ContactType.Author, Author },
-                {(byte)ContactType.EditorHouse, HouseEditor },
-                {(byte)ContactType.Enterprise, Enterprise }
+                Role.Adherant,
+                Role.Author,
+                Role.HouseEditor,
+                Role.Translator,
+                Role.Illustrator,
+            };
+
+            public static Dictionary<byte, string> ContactTypeDictionary => new Dictionary<byte, string>()
+            {
+                {(byte)ContactType.Human, Type.Human },
+                {(byte)ContactType.Society, Type.Society },
+            };
+
+            public static Dictionary<byte, string> ContactRoleDictionary => new Dictionary<byte, string>()
+            {
+                {(byte)ContactRole.Adherant, Role.Adherant },
+                {(byte)ContactRole.Author, Role.Author },
+                {(byte)ContactRole.EditorHouse, Role.HouseEditor },
+                {(byte)ContactRole.Translator, Role.Translator },
+                {(byte)ContactRole.Illustrator, Role.Illustrator },
             };
         }
     }

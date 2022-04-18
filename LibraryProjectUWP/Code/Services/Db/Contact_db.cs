@@ -689,7 +689,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
-            private static async Task<Tuple<bool, long>> IsContactExistAsync(ContactVM viewModel, bool isEdit = false, long? modelId = null)
+            public static async Task<Tuple<bool, long>> IsContactExistAsync(ContactVM viewModel, bool isEdit = false, long? modelId = null)
             {
                 try
                 {

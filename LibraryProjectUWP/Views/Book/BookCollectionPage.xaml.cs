@@ -37,6 +37,7 @@ using Windows.UI.Xaml.Media.Animation;
 using LibraryProjectUWP.Views.Book.SubViews;
 using LibraryProjectUWP.Code.Services.Web;
 using LibraryProjectUWP.Views.UserControls;
+using LibraryProjectUWP.Code;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -1575,151 +1576,48 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Contact
-        internal async Task NewFreeContactAsync(string prenom, string nomNaissance, Guid? guid = null)
+        private void MFI_NewPersonne_Click(object sender, RoutedEventArgs e)
+        {
+            this.NewContact(ContactType.Human, ContactRole.Adherant, string.Empty, string.Empty);
+        }
+
+        private void MFI_NewSociety_Click(object sender, RoutedEventArgs e)
+        {
+            this.NewContact(ContactType.Society, ContactRole.EditorHouse, string.Empty, string.Empty);
+        }
+
+        internal void NewContact(ContactType contactType, ContactRole contactRole, string prenom = null, string nomNaissance = null, string societyName = null, Guid? guid = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == EditMode.Create && item.ViewModelPage.ViewModel.ContactType == contactType);
                 if (checkedItem != null)
                 {
                     this.PivotRightSideBar.SelectedItem = checkedItem;
                 }
                 else
                 {
-                    var itemList = await DbServices.Contact.AllVMAsync();
-                    var parameters = new ManageContactParametersDriverVM()
+                    NewEditContactUC userControl = new NewEditContactUC()
                     {
-                        EditMode = Code.EditMode.Create,
-                        ContactType = Code.ContactType.Enterprise,
-                        ContactTypeVisibility = Visibility.Visible,
-                        ViewModelList = itemList,
-                        CurrentViewModel = new ContactVM()
+                        ViewModelPage = new NewEditContactUCVM()
                         {
-                            TitreCivilite = CivilityHelpers.MPoint,
-                            NomNaissance = nomNaissance,
-                            Prenom = prenom,
-                        },
+                            EditMode = EditMode.Create,
+                            ViewModel = new ContactVM()
+                            {
+                                ContactRole = contactRole,
+                                ContactType = contactType,
+                                NomNaissance = nomNaissance,
+                                Prenom = prenom,
+                                SocietyName = societyName,
+                            },
+                        }
                     };
-
-                    parameters.CurrentViewModel.ContactType = parameters.ContactType;
-
-                    NewEditContactUC userControl = new NewEditContactUC(parameters);
 
                     if (guid != null)
                     {
                         userControl.ViewModelPage.ParentGuid = guid;
                     }
-
-                    userControl.CancelModificationRequested += NewEditFreeContactUC_Create_CancelModificationRequested;
-                    userControl.CreateItemRequested += NewEditFreeContactUC_Create_CreateItemRequested;
-
-                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                    {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
-                    });
-                }
-                this.ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void NewEditFreeContactUC_Create_CreateItemRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender._parameters != null)
-                {
-                    ContactVM newViewModel = sender.ViewModelPage.ViewModel;
-
-                    var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
-                    if (creationResult.IsSuccess)
-                    {
-                        newViewModel.Id = creationResult.Id;
-                        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-
-                        if (sender.ViewModelPage.ParentGuid != null)
-                        {
-                            var bookManager = GetBookExemplarySideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
-                            if (bookManager != null)
-                            {
-                                bookManager.ViewModelPage.ViewModel.ContactSource = newViewModel;
-                                NewEditFreeContactUC_Create_CancelModificationRequested(sender, e);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                        return;
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void NewEditFreeContactUC_Create_CancelModificationRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                sender.CancelModificationRequested -= NewEditFreeContactUC_Create_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditFreeContactUC_Create_CreateItemRequested;
-
-                this.RemoveItemToSideBar(sender);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void NewContactXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == Code.EditMode.Create && item._parameters.ContactType == Code.ContactType.Adherant);
-                if (checkedItem != null)
-                {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
-                }
-                else
-                {
-                    var contactsList = await DbServices.Contact.AllVMAsync();
-                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactRole.Adherant);
-                    var parameters = new ManageContactParametersDriverVM()
-                    {
-                        EditMode = Code.EditMode.Create,
-                        ContactType = Code.ContactType.Adherant,
-                        ViewModelList = itemList,
-                        CurrentViewModel = new ContactVM() { TitreCivilite = CivilityHelpers.MPoint },
-                    };
-
-                    parameters.CurrentViewModel.ContactType = parameters.CurrentViewModel.ContactType;
-
-                    NewEditContactUC userControl = new NewEditContactUC(parameters);
-
 
                     userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
                     userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
@@ -1745,31 +1643,36 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (sender._parameters != null)
-                {
-                    ContactVM newViewModel = sender.ViewModelPage.ViewModel;
+                ContactVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                    var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
-                    if (creationResult.IsSuccess)
+                var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
+                if (creationResult.IsSuccess)
+                {
+                    newViewModel.Id = creationResult.Id;
+                    sender.ViewModelPage.ResultMessageTitle = "Succès";
+                    sender.ViewModelPage.ResultMessage = creationResult.Message;
+                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                    sender.ViewModelPage.IsResultMessageOpen = true;
+
+                    if (sender.ViewModelPage.ParentGuid != null)
                     {
-                        newViewModel.Id = creationResult.Id;
-                        //ViewModelPage.ContactViewModelList.Add(newViewModel);
-                        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                        return;
+                        var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
+                        if (bookManager != null)
+                        {
+                            bookManager.ViewModelPage.ViewModel.Auteurs.Add(newViewModel);
+                            NewEditContactUC_CancelModificationRequested(sender, e);
+                        }
                     }
                 }
-
+                else
+                {
+                    //Erreur
+                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    sender.ViewModelPage.ResultMessage = creationResult.Message;
+                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                    sender.ViewModelPage.IsResultMessageOpen = true;
+                    return;
+                }
             }
             catch (Exception ex)
             {
@@ -1838,267 +1741,17 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
         #endregion
 
+
         #region Author
-        private async void NewAuthorXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            await this.NewAuthorAsync(string.Empty, string.Empty);
-        }
-
-        internal async Task NewAuthorAsync(string prenom, string nomNaissance, Guid? guid = null)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == Code.EditMode.Create && item._parameters.ContactType == Code.ContactType.Author);
-                if (checkedItem != null)
-                {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
-                }
-                else
-                {
-                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactRole.Author);
-                    ViewModelPage.AuthorViewModelList = itemList?.ToList();
-                    var parameters = new ManageContactParametersDriverVM()
-                    {
-                        EditMode = Code.EditMode.Create,
-                        ContactType = Code.ContactType.Author,
-                        ViewModelList = itemList,
-                        CurrentViewModel = new ContactVM()
-                        {
-                            TitreCivilite = CivilityHelpers.MPoint,
-                            NomNaissance = nomNaissance,
-                            Prenom = prenom,
-                        },
-                    };
-
-                    parameters.CurrentViewModel.ContactType = parameters.ContactType;
-
-                    NewEditContactUC userControl = new NewEditContactUC(parameters);
-
-                    if (guid != null)
-                    {
-                        userControl.ViewModelPage.ParentGuid = guid;
-                    }
-
-                    userControl.CancelModificationRequested += NewEditAuthorUC_CancelModificationRequested;
-                    userControl.CreateItemRequested += NewEditAuthorUC_CreateItemRequested;
-
-                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                    {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
-                    });
-                }
-                this.ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void NewEditAuthorUC_CreateItemRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender._parameters != null)
-                {
-                    ContactVM newViewModel = sender.ViewModelPage.ViewModel;
-
-                    var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
-                    if (creationResult.IsSuccess)
-                    {
-                        newViewModel.Id = creationResult.Id;
-                        //ViewModelPage.AuthorViewModelList.Add(newViewModel);
-                        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-
-                        if (sender.ViewModelPage.ParentGuid != null)
-                        {
-                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
-                            if (bookManager != null)
-                            {
-                                bookManager.ViewModelPage.ViewModel.Auteurs.Add(newViewModel);
-                                NewEditAuthorUC_CancelModificationRequested(sender, e);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                        return;
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void NewEditAuthorUC_CancelModificationRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                sender.CancelModificationRequested -= NewEditAuthorUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditAuthorUC_CreateItemRequested;
-
-                this.RemoveItemToSideBar(sender);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         private void DisplayAuthorListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
         }
-
-
         #endregion
 
         #region Editeurs
-        private async void NewEditorXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            await NewEditorAsync(string.Empty);
-        }
-
-        internal async Task NewEditorAsync(string partName, Guid? guid = null)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == Code.EditMode.Create && item._parameters.ContactType == Code.ContactType.EditorHouse);
-                if (checkedItem != null)
-                {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
-                }
-                else
-                {
-                    var itemList = await DbServices.Contact.MultipleVMAsync(Code.ContactRole.EditorHouse);
-                    var parameters = new ManageContactParametersDriverVM()
-                    {
-                        EditMode = Code.EditMode.Create,
-                        ContactType = Code.ContactType.EditorHouse,
-                        ViewModelList = itemList,
-                        CurrentViewModel = new ContactVM() { ContactType = Code.ContactType.EditorHouse },
-                    };
-
-                    if (parameters.ContactType == Code.ContactType.EditorHouse)
-                    {
-                        parameters.CurrentViewModel.SocietyName = partName;
-                    }
-
-                    NewEditContactUC userControl = new NewEditContactUC(parameters);
-
-
-                    if (guid != null)
-                    {
-                        userControl.ViewModelPage.ParentGuid = guid;
-                    }
-
-                    userControl.CancelModificationRequested += NewEditEditorUC_Create_CancelModificationRequested;
-                    userControl.CreateItemRequested += NewEditEditorUC_Create_CreateItemRequested;
-
-                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                    {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
-                    });
-                }
-                this.ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void NewEditEditorUC_Create_CreateItemRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender._parameters != null)
-                {
-                    ContactVM newViewModel = sender.ViewModelPage.ViewModel;
-
-                    var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
-                    if (creationResult.IsSuccess)
-                    {
-                        newViewModel.Id = creationResult.Id;
-                        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-
-                        if (sender.ViewModelPage.ParentGuid != null)
-                        {
-                            var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
-                            if (bookManager != null)
-                            {
-                                bookManager.ViewModelPage.ViewModel.Publication.Editeurs.Add(newViewModel);
-                                NewEditEditorUC_Create_CancelModificationRequested(sender, e);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                        return;
-                    }
-                }
-
-                sender.ViewModelPage.ViewModel = new ContactVM();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void NewEditEditorUC_Create_CancelModificationRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                sender.CancelModificationRequested -= NewEditEditorUC_Create_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditEditorUC_Create_CreateItemRequested;
-
-                this.RemoveItemToSideBar(sender);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         private void DisplayEditorListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
@@ -2739,5 +2392,7 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        
     }
 }

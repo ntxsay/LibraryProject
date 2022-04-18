@@ -281,7 +281,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ASB_SearchAuthor_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private void ASB_SearchAuthor_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             try
             {
@@ -314,16 +314,16 @@ namespace LibraryProjectUWP.Views.Book
                                 var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                 if (split.Length == 1)
                                 {
-                                    await _parameters.ParentPage.NewAuthorAsync(split[0], string.Empty, ViewModelPage.ItemGuid);
+                                    _parameters.ParentPage.NewContact(ContactType.Human, ContactRole.Author, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
                                 }
                                 else if (split.Length >= 2)
                                 {
-                                    await _parameters.ParentPage.NewAuthorAsync(split[0], split[1], ViewModelPage.ItemGuid);
+                                    _parameters.ParentPage.NewContact(ContactType.Human, ContactRole.Author, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
                                 }
                             }
                             else
                             {
-                                await _parameters.ParentPage.NewAuthorAsync(string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                _parameters.ParentPage.NewContact(ContactType.Human, ContactRole.Author, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
                             }
                             sender.Text = String.Empty;
                         }
@@ -652,7 +652,7 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (_parameters.ParentPage != null)
                         {
-                            await _parameters.ParentPage.NewEditorAsync(sender.Text, ViewModelPage.ItemGuid);
+                            _parameters.ParentPage.NewContact(ContactType.Society, ContactRole.EditorHouse, string.Empty, string.Empty, sender.Text, ViewModelPage.ItemGuid);
                             sender.Text = String.Empty;
                         }
                     }

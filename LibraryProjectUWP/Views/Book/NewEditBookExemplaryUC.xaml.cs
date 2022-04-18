@@ -235,7 +235,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ASB_SearchContact_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private void ASB_SearchContact_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             try
             {
@@ -257,16 +257,16 @@ namespace LibraryProjectUWP.Views.Book
                                 var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                 if (split.Length == 1)
                                 {
-                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], string.Empty, ViewModelPage.ItemGuid);
+                                    _parameters.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
                                 }
                                 else if (split.Length >= 2)
                                 {
-                                    await _parameters.ParentPage.NewFreeContactAsync(split[0], split[1], ViewModelPage.ItemGuid);
+                                    _parameters.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
                                 }
                             }
                             else
                             {
-                                await _parameters.ParentPage.NewFreeContactAsync(string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                _parameters.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
                             }
                             sender.Text = String.Empty;
                         }

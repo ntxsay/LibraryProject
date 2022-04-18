@@ -469,7 +469,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         List<Tbook> tbooks = new List<Tbook>();
                         TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
-
+                        var termToLower = parameters.Term.ToLower();
                         foreach (Search.Book.In _searchin in parameters.SearchIn)
                         {
                             switch (_searchin)
@@ -523,52 +523,65 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     }
                                     break;
                                 case Search.Book.In.Author:
-                                    if (await context.Tcontact.AnyAsync())
+                                    List<Tcontact> existingItemList = await context.Tcontact.ToListAsync();
+                                    List<Tcontact> tcontactsAuthor = null;
+
+                                    if (existingItemList != null && existingItemList.Any())
                                     {
-                                        List<Tcontact> tcontactsAuthor = null;
-                                        switch (parameters.TermParameter)
+                                        foreach (var item in existingItemList)
                                         {
-                                            case Search.Book.Terms.Equals:
-                                                tcontactsAuthor = await context.Tcontact.Where(w => (!w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && w.NomNaissance.ToUpperInvariant() == parameters.Term.ToUpperInvariant()) ||
-                                                (!w.Prenom.IsStringNullOrEmptyOrWhiteSpace() && w.Prenom == parameters.Term) || 
-                                                (!w.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() && w.AutresPrenoms.ToUpperInvariant() == parameters.Term.ToUpperInvariant()) || 
-                                                (!w.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && w.SocietyName.ToUpperInvariant() == parameters.Term.ToUpperInvariant())).ToListAsync(cancellationToken);
-                                                break;
-                                            case Search.Book.Terms.Contains:
-                                                var nomNaissance = await context.Tcontact.Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace()).Select(s => s.NomNaissance.Contains(parameters.Term)).ToListAsync();
-
-                                                //tcontactsAuthor = await context.Tcontact.Where(w => (!w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && w.NomNaissance.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant())) || 
-                                                //(!w.Prenom.IsStringNullOrEmptyOrWhiteSpace() && w.Prenom.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant())) || 
-                                                //(!w.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() && w.AutresPrenoms.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant())) || 
-                                                //(!w.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && w.SocietyName.ToUpperInvariant().Contains(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
-                                                break;
-                                            case Search.Book.Terms.StartWith:
-                                                tcontactsAuthor = await context.Tcontact.Where(w => (!w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && w.NomNaissance.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant())) || 
-                                                (!w.Prenom.IsStringNullOrEmptyOrWhiteSpace() && w.Prenom.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant())) || 
-                                                (!w.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() && w.AutresPrenoms.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant())) || 
-                                                (!w.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && w.SocietyName.ToUpperInvariant().StartsWith(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
-                                                break;
-                                            case Search.Book.Terms.EndWith:
-                                                tcontactsAuthor = await context.Tcontact.Where(w => (!w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && w.NomNaissance.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant())) || 
-                                                (!w.Prenom.IsStringNullOrEmptyOrWhiteSpace() && w.Prenom.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant())) || 
-                                                (!w.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() && w.AutresPrenoms.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant())) || 
-                                                (!w.SocietyName.IsStringNullOrEmptyOrWhiteSpace() && w.SocietyName.ToUpperInvariant().EndsWith(parameters.Term.ToUpperInvariant()))).ToListAsync(cancellationToken);
-                                                break;
-                                            default:
-                                                break;
-                                        }
-
-                                        if (tcontactsAuthor != null && tcontactsAuthor.Any())
-                                        {
-                                            var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontactsAuthor.Select(s => s.Id), ContactType.Author);
-                                            List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
-                                            if (_tbooks != null && _tbooks.Any())
+                                            switch (parameters.TermParameter)
                                             {
-                                                tbooks.AddRange(_tbooks);
+                                                case Search.Book.Terms.Equals:
+                                                    if (item.TitreCivilite?.ToLower() == termToLower || item.NomNaissance?.ToLower() == termToLower ||
+                                                        item.Prenom?.ToLower() == termToLower || item.AutresPrenoms?.ToLower() == termToLower ||
+                                                        item.NomUsage?.ToLower() == termToLower)
+                                                    {
+                                                        tcontactsAuthor.Add(item);
+                                                    }
+                                                    break;
+                                                case Search.Book.Terms.Contains:
+                                                    if (item.TitreCivilite?.ToLower().Contains(termToLower) == true || item.NomNaissance?.ToLower().Contains(termToLower) == true ||
+                                                        item.Prenom?.ToLower().Contains(termToLower) == true || item.AutresPrenoms?.ToLower().Contains(termToLower) == true ||
+                                                        item.NomUsage?.ToLower().Contains(termToLower) == true)
+                                                    {
+                                                        tcontactsAuthor.Add(item);
+                                                    }
+                                                    
+                                                    break;
+                                                case Search.Book.Terms.StartWith:
+                                                    if (item.TitreCivilite?.ToLower().StartsWith(termToLower) == true || item.NomNaissance?.ToLower().StartsWith(termToLower) == true ||
+                                                        item.Prenom?.ToLower().StartsWith(termToLower) == true || item.AutresPrenoms?.ToLower().StartsWith(termToLower) == true ||
+                                                        item.NomUsage?.ToLower().StartsWith(termToLower) == true)
+                                                    {
+                                                        tcontactsAuthor.Add(item);
+                                                    }
+                                                    break;
+                                                case Search.Book.Terms.EndWith:
+                                                    if (item.TitreCivilite?.ToLower().EndsWith(termToLower) == true || item.NomNaissance?.ToLower().EndsWith(termToLower) == true ||
+                                                        item.Prenom?.ToLower().EndsWith(termToLower) == true || item.AutresPrenoms?.ToLower().EndsWith(termToLower) == true ||
+                                                        item.NomUsage?.ToLower().EndsWith(termToLower) == true)
+                                                    {
+                                                        tcontactsAuthor.Add(item);
+                                                    }
+                                                    break;
+                                                default:
+                                                    break;
                                             }
+                                            
+
                                         }
                                     }
 
+                                    if (tcontactsAuthor != null && tcontactsAuthor.Any())
+                                    {
+                                        var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontactsAuthor.Select(s => s.Id), ContactRole.Author);
+                                        List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
+                                        if (_tbooks != null && _tbooks.Any())
+                                        {
+                                            tbooks.AddRange(_tbooks);
+                                        }
+                                    }
                                     break;
                                 case Search.Book.In.Collection:
                                     break;

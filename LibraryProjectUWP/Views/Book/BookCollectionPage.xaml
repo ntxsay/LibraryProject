@@ -67,20 +67,10 @@
                        ExecuteRequested="ImportBookFromExcelFileXamlUICommand_ExecuteRequested"
                        Description="Importe un livre existant">
         </XamlUICommand>
-        <XamlUICommand x:Name="NewContactXamlUICommand" 
-                       ExecuteRequested="NewContactXamlUICommand_ExecuteRequested"
-                       Description="Ajoute un nouvel adhérant" 
-                       Label="Ajouter un adhérant">
-        </XamlUICommand>
         <XamlUICommand x:Name="DisplayContactListXamlUICommand" 
                        ExecuteRequested="DisplayContactListXamlUICommand_ExecuteRequested"
                        Description="Affiche la liste des adhérants" 
                        Label="Afficher les adhérants">
-        </XamlUICommand>
-        <XamlUICommand x:Name="NewAuthorXamlUICommand" 
-                       ExecuteRequested="NewAuthorXamlUICommand_ExecuteRequested"
-                       Description="Ajoute un nouvel auteur" 
-                       Label="Ajouter un auteur">
         </XamlUICommand>
         <XamlUICommand x:Name="DisplayAuthorListXamlUICommand" 
                        ExecuteRequested="DisplayAuthorListXamlUICommand_ExecuteRequested"
@@ -95,11 +85,6 @@
                        ExecuteRequested="NewCollectionXUiCmd_ExecuteRequested"
                        Description="Ajoute une nouvelle collection" 
                        Label="Ajouter une collection">
-        </XamlUICommand>
-        <XamlUICommand x:Name="NewEditorXUiCmd" 
-                       ExecuteRequested="NewEditorXUiCmd_ExecuteRequested"
-                       Description="Ajoute un nouvel éditeur" 
-                       Label="Ajouter un éditeur">
         </XamlUICommand>
         <XamlUICommand x:Name="DisplayEditorListXUiCmd" 
                        ExecuteRequested="DisplayEditorListXUiCmd_ExecuteRequested"
@@ -425,27 +410,21 @@
                             </MenuFlyoutItem>
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Ajouter un auteur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewAuthorXamlUICommand}">
+                        <MenuFlyoutItem Text="Ajouter une personne" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_NewPersonne_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Ajouter un adhérant" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewContactXamlUICommand}">
+                        <MenuFlyoutItem Text="Ajouter une société" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_NewSociety_Click">
                             <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE731;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Text="Ajouter une collection" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewCollectionXUiCmd}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Ajouter un éditeur" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewEditorXUiCmd}">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE731;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                     </MenuFlyout>

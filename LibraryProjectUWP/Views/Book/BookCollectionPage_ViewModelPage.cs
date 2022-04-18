@@ -387,6 +387,8 @@ namespace LibraryProjectUWP.Views.Book
             }
 
             private List<ContactVM> _AuthorViewModelList;
+            
+            [Obsolete]
             public List<ContactVM> AuthorViewModelList
             {
                 get => this._AuthorViewModelList;
