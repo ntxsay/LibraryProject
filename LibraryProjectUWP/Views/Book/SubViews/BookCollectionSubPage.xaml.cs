@@ -36,7 +36,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
     /// </summary>
     public sealed partial class BookCollectionSubPage : Page
     {
-        readonly MainControlsUI mainControlsUI = new MainControlsUI();
+        public IEnumerable<LivreVM> GetItems => ViewModelPage.GroupedRelatedViewModel.Collection.SelectMany(s => s.ToList()).Select(q => q).ToList();
+        public int CountItems => GetItems?.Count() ?? 0;
         public BookCollectionSubPageVM ViewModelPage { get; set; } = new BookCollectionSubPageVM();
         readonly EsBook esBook = new EsBook();
         readonly UiServices uiServices = new UiServices();

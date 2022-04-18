@@ -23,6 +23,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         private BackgroundWorker WorkerBackground;
         CancellationTokenSource cancellationTokenSource;
         public bool UseBusyLoader { get; set; } = true;
+        public bool CloseBusyLoaderAfterFinish { get; set; } = true;
         public bool UseIntervalAfterFinish { get; set; } = true;
         public bool WorkerReportsProgress { get; set; } = true;
         public TimeSpan IntervalAfterFinish { get; set; } = new TimeSpan(0, 0, 0, 1);
@@ -35,6 +36,42 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         public ExportAllBooksTask(MainPage mainPage)
         {
             MainPage = mainPage;
+        }
+
+        public void DisposeWorker()
+        {
+            try
+            {
+                if (WorkerBackground != null && !WorkerBackground.IsBusy)
+                {
+                    WorkerBackground.Dispose();
+                    WorkerBackground = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void CancelWorker()
+        {
+            try
+            {
+                if (WorkerBackground != null && WorkerBackground.IsBusy)
+                {
+                    WorkerBackground.CancelAsync();
+                    DisposeWorker();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         #region Delete Books
@@ -85,10 +122,11 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
 
@@ -254,18 +292,20 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                     dispatcherTimer.Tick += (t, f) =>
                     {
                         AfterTaskCompletedRequested?.Invoke(this, e);
-
-                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                        if (CloseBusyLoaderAfterFinish)
                         {
-                            Interval = new TimeSpan(0, 0, 0, 2),
-                        };
+                            DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                            {
+                                Interval = new TimeSpan(0, 0, 0, 2),
+                            };
 
-                        dispatcherTimer2.Tick += (s, i) =>
-                        {
-                            MainPage.CloseBusyLoader();
-                            dispatcherTimer2.Stop();
-                        };
-                        dispatcherTimer2.Start();
+                            dispatcherTimer2.Tick += (s, i) =>
+                            {
+                                MainPage.CloseBusyLoader();
+                                dispatcherTimer2.Stop();
+                            };
+                            dispatcherTimer2.Start();
+                        }
 
                         dispatcherTimer.Stop();
                     };
@@ -274,7 +314,10 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 }
                 else
                 {
-                    MainPage.CloseBusyLoader();
+                    if (CloseBusyLoaderAfterFinish)
+                    {
+                        MainPage.CloseBusyLoader();
+                    }
                     AfterTaskCompletedRequested?.Invoke(this, e);
                 }
 

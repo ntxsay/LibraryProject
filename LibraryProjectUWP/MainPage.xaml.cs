@@ -264,7 +264,7 @@ namespace LibraryProjectUWP
             {
                 if (this.MainFrameContainer.CanGoBack)
                 {
-                    if (this.MainFrameContainer.Content is BookCollectionPage bookCollection && bookCollection.Parameters.ParentLibrary.Books.Count > 100)
+                    if (this.MainFrameContainer.Content is BookCollectionPage bookCollection && bookCollection.ViewModelPage.NbBooks > 100)
                     {
                         var dialog = new BookBeforeGoBackCD()
                         {

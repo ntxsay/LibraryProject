@@ -782,9 +782,11 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                var viewModels = await esBook.OpenBooksFromFileAsync(storageFile);
+                var viewModels = (await esBook.OpenBooksFromFileAsync(storageFile))?.ToList();
                 if (viewModels != null && viewModels.Any())
                 {
+                    viewModels.ForEach((book) => this.CompleteBookInfos(book));
+
                     if (viewModels.Count() == 1)
                     {
                         NewBook(viewModels.First());
@@ -847,7 +849,9 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 List<LivreVM> newViewModelList = sender.ViewModelPage.NewViewModel;
-                InitializeImportBooksWorker(newViewModelList);
+                ImportBooksTask importBooksTask = new ImportBooksTask(Parameters.MainPage, Parameters.ParentLibrary.Id);
+                importBooksTask.AfterTaskCompletedRequested += ImportBooksTask_AfterTaskCompletedRequested;
+                importBooksTask.InitializeWorker(newViewModelList);
 
                 sender.CancelModificationRequested -= ImportBookFromFileUC_CancelModificationRequested;
                 sender.ImportDataRequested -= ImportBookFromFileUC_ImportDataRequested;
@@ -860,6 +864,7 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
 
         private void ImportBookFromFileUC_CancelModificationRequested(ImportBookFromFileUC sender, ExecuteRequestedEventArgs e)
         {
@@ -925,8 +930,10 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 List<LivreVM> newViewModelList = sender.ViewModelPivotItem.NewViewModel;
-                InitializeImportBooksWorker(newViewModelList);
-                
+                ImportBooksTask importBooksTask = new ImportBooksTask(Parameters.MainPage, Parameters.ParentLibrary.Id);
+                importBooksTask.AfterTaskCompletedRequested += ImportBooksTask_AfterTaskCompletedRequested;
+                importBooksTask.InitializeWorker(newViewModelList);
+
                 sender.CancelModificationRequested -= ImportBookFromExcelUC_CancelModificationRequested;
                 sender.ImportDataRequested -= ImportBookFromExcelUC_ImportDataRequested;
 
@@ -956,6 +963,21 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        private void ImportBooksTask_AfterTaskCompletedRequested(ImportBooksTask sender, object e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.OpenBookCollection();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #endregion
 
         #region Book Exemplary
@@ -1513,12 +1535,43 @@ namespace LibraryProjectUWP.Views.Book
                     var result = await dialog.ShowAsync();
                     if (result == ContentDialogResult.Primary || result == ContentDialogResult.Secondary)
                     {
+                        DeleteManyBooksTask deleteManyBooksTask = new DeleteManyBooksTask(Parameters.MainPage)
+                        {
+                            CloseBusyLoaderAfterFinish = false,
+                        };
+
+                        deleteManyBooksTask.AfterTaskCompletedRequested += async (s, e) =>
+                        {
+                            ViewModelPage.SelectedItems.Clear();
+                            ViewModelPage.SelectedItems = new List<LivreVM>();
+
+                            var busyLoader = Parameters.MainPage.GetBusyLoader ;
+                            if (busyLoader != null)
+                            {
+                                busyLoader.TbcTitle.Text = "Actualisation du catalogue des livres en cours...";
+                            }
+
+                            await this.RefreshItemsGrouping(true, 1, true, ViewModelPage.ResearchBook);
+
+                            DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                            {
+                                Interval = new TimeSpan(0, 0, 0, 2),
+                            };
+
+                            dispatcherTimer2.Tick += (f, i) =>
+                            {
+                                Parameters.MainPage.CloseBusyLoader();
+                                dispatcherTimer2.Stop();
+                            };
+                            dispatcherTimer2.Start();
+                        };
+
                         if (result == ContentDialogResult.Primary)
                         {
                             bool isSaved = await esBook.SaveBookViewModelAsAsync(viewModelList);
                             if (isSaved)
                             {
-                                InitializeDeleteBooksWorker(viewModelList);
+                                deleteManyBooksTask.InitializeWorker(viewModelList);
                             }
                             else
                             {
@@ -1527,7 +1580,7 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         else
                         {
-                            InitializeDeleteBooksWorker(viewModelList);
+                            deleteManyBooksTask.InitializeWorker(viewModelList);
                         }
                     }
                     else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
@@ -1765,42 +1818,6 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Functions
-        public void GotoPage(int page)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                //foreach (var pageVm in ViewModelPage.PagesList)
-                //{
-                //    if (pageVm.CurrentPage != page && pageVm.IsPageSelected == true)
-                //    {
-                //        pageVm.IsPageSelected = false;
-                //        pageVm.BackgroundColor = Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush;
-                //    }
-                //    else if (pageVm.CurrentPage == page && pageVm.IsPageSelected == false)
-                //    {
-                //        pageVm.IsPageSelected = true;
-                //        pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
-                //    }
-                //}
-                //this.RefreshItemsGrouping(_parameters.ParentLibrary.Books, page, false);
-                //var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
-                //if (buttonsPage != null && buttonsPage.Any())
-                //{
-                //    var buttonPage = buttonsPage.FirstOrDefault(f => f.CommandParameter is int commandPage && commandPage == page);
-                //    if (buttonPage != null)
-                //    {
-                //        scrollVPages.ScrollToElement(buttonPage, false);
-                //    }
-                //}
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         private int GetSelectedPage
         {
             get
@@ -1818,22 +1835,6 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
         }
-
-        private IEnumerable<LivreVM> GetPaginatedItems()
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var selectedPage = ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
-                return GetPaginatedItems(Parameters.ParentLibrary.Books, selectedPage);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return Enumerable.Empty<LivreVM>();
-            }
-        }
-
 
         private void CompleteBookInfos(LivreVM viewModel)
         {

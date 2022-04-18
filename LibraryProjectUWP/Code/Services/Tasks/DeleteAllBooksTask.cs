@@ -19,13 +19,14 @@ namespace LibraryProjectUWP.Code.Services.Tasks
     public class DeleteAllBooksTask
     {
         public MainPage MainPage { get; private set; }
-        private BackgroundWorker WorkerDeleteBooks;
+        private BackgroundWorker WorkerBackground;
         public bool UseBusyLoader { get; set; } = true;
+        public bool CloseBusyLoaderAfterFinish { get; set; } = true;
         public bool UseIntervalAfterFinish { get; set; } = true;
         public bool WorkerReportsProgress { get; set; } = true;
         public TimeSpan IntervalAfterFinish { get; set; } = new TimeSpan(0, 0, 0, 1);
-        public bool IsWorkerRunning => WorkerDeleteBooks != null && WorkerDeleteBooks.IsBusy;
-        public bool IsWorkerCancelResquested => WorkerDeleteBooks != null && WorkerDeleteBooks.CancellationPending;
+        public bool IsWorkerRunning => WorkerBackground != null && WorkerBackground.IsBusy;
+        public bool IsWorkerCancelResquested => WorkerBackground != null && WorkerBackground.CancellationPending;
 
         public delegate void AfterTaskCompletedEventHandler(DeleteAllBooksTask sender, object e);
         public event AfterTaskCompletedEventHandler AfterTaskCompletedRequested;
@@ -35,27 +36,63 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             MainPage = mainPage;
         }
 
-        #region Delete Books
-        public void InitializeDeleteBooksWorker(BibliothequeVM viewModel)
+        public void DisposeWorker()
         {
             try
             {
-                if (WorkerDeleteBooks == null)
+                if (WorkerBackground != null && !WorkerBackground.IsBusy)
                 {
-                    WorkerDeleteBooks = new BackgroundWorker()
+                    WorkerBackground.Dispose();
+                    WorkerBackground = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void CancelWorker()
+        {
+            try
+            {
+                if (WorkerBackground != null && WorkerBackground.IsBusy)
+                {
+                    WorkerBackground.CancelAsync();
+                    DisposeWorker();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #region Delete Books
+        public void InitializeWorker(BibliothequeVM viewModel)
+        {
+            try
+            {
+                if (WorkerBackground == null)
+                {
+                    WorkerBackground = new BackgroundWorker()
                     {
                         WorkerReportsProgress = WorkerReportsProgress,
                         WorkerSupportsCancellation = true,
                     };
 
-                    WorkerDeleteBooks.ProgressChanged += WorkerDeleteBooks_ProgressChanged;
-                    WorkerDeleteBooks.DoWork += WorkerDeleteBooks_DoWork;
-                    WorkerDeleteBooks.RunWorkerCompleted += WorkerDeleteBooks_RunWorkerCompleted;
+                    WorkerBackground.ProgressChanged += WorkerBackground_ProgressChanged;
+                    WorkerBackground.DoWork += WorkerBackground_DoWork;
+                    WorkerBackground.RunWorkerCompleted += WorkerBackground_RunWorkerCompleted;
                 }
 
-                if (WorkerDeleteBooks != null)
+                if (WorkerBackground != null)
                 {
-                    if (!WorkerDeleteBooks.IsBusy)
+                    if (!WorkerBackground.IsBusy)
                     {
                         if (UseBusyLoader)
                         {
@@ -66,29 +103,30 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                                 CancelButtonVisibility = Visibility.Visible,
                                 CancelButtonCallback = () =>
                                 {
-                                    if (WorkerDeleteBooks.IsBusy)
+                                    if (WorkerBackground.IsBusy)
                                     {
-                                        WorkerDeleteBooks.CancelAsync();
+                                        WorkerBackground.CancelAsync();
                                     }
                                 },
-                                OpenedLoaderCallback = () => WorkerDeleteBooks.RunWorkerAsync(viewModel),
+                                OpenedLoaderCallback = () => WorkerBackground.RunWorkerAsync(viewModel),
                             });
                         }
                         else
                         {
-                            WorkerDeleteBooks.RunWorkerAsync(viewModel);
+                            WorkerBackground.RunWorkerAsync(viewModel);
                         }
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
 
-        private void WorkerDeleteBooks_DoWork(object sender, DoWorkEventArgs e)
+        private void WorkerBackground_DoWork(object sender, DoWorkEventArgs e)
         {
             try
             {
@@ -131,7 +169,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                                 }
                             }
                         }
-                        e.Result = workerStates.ToArray();
+                        e.Result = workerStates?.ToArray();
                     }
                 }
             }
@@ -144,7 +182,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
 
         }
 
-        private void WorkerDeleteBooks_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void WorkerBackground_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             try
             {
@@ -168,51 +206,39 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             }
         }
 
-        private void WorkerDeleteBooks_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void WorkerBackground_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             try
             {
+                string message = string.Empty;
+                var viewModelList = e.Result as OperationStateVM[];
+
+                // Si erreur
+                if (e.Error != null)
+                {
+                    message = $"Une erreur s'est produite.\n{viewModelList?.Count(w => w.IsSuccess == true) ?? 0} {((viewModelList?.Count(w => w.IsSuccess == true) ?? 0) > 1 ? "livres" : "livre")} sur {viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "ont été supprimés" : "a été supprimé")}";
+                }
+                else if (e.Cancelled)
+                {
+                    message = $"La suppression a été annulée par l'utilisateur.\n{viewModelList?.Count(w => w.IsSuccess == true) ?? 0} {((viewModelList?.Count(w => w.IsSuccess == true) ?? 0) > 1 ? "livres" : "livre")} sur {viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "ont été supprimés" : "a été supprimé")}";
+                }
+                else
+                {
+                    message = $"{viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "livres ont été supprimés" : "livre a été supprimé")}.";
+                }
+
                 if (UseBusyLoader)
                 {
                     var busyLoader = MainPage.GetBusyLoader;
                     if (busyLoader != null)
                     {
-                        // Si erreur
-                        if (e.Error != null)
-                        {
-                            if (e.Result != null && e.Result is OperationStateVM[] workerUserState)
-                            {
-                                busyLoader.TbcTitle.Text = $"{workerUserState.Count(w => w.IsSuccess == true)} {(workerUserState.Count(w => w.IsSuccess == true) > 1 ? "livres" : "livre")} sur {workerUserState.Count()} {(workerUserState.Count() > 1 ? "ont été supprimés" : "a été supprimé")}, une erreur s'est produite lors de la suppresion.\nActualisation du catalogue des livres en cours...";
-                            }
-                            else
-                            {
-                                busyLoader.TbcTitle.Text = $"Une erreur s'est produite lors de la suppresion.\nActualisation du catalogue des livres en cours...";
-                            }
-                        }
-                        else if (e.Cancelled)
-                        {
-                            if (e.Result != null && e.Result is OperationStateVM[] workerUserState)
-                            {
-                                busyLoader.TbcTitle.Text = $"La suppression a été annulée par l'utilisateur. {workerUserState.Count(w => w.IsSuccess == true)} {(workerUserState.Count(w => w.IsSuccess == true) > 1 ? "livres ont été supprimés" : "livre a été supprimé")}.\nActualisation du catalogue des livres en cours...";
-                            }
-                            else
-                            {
-                                busyLoader.TbcTitle.Text = $"La suppression a été annulée par l'utilisateur.\nActualisation du catalogue des livres en cours...";
-                            }
-                        }
-                        else
-                        {
-                            if (e.Result != null && e.Result is OperationStateVM[] workerUserState)
-                            {
-                                busyLoader.TbcTitle.Text = $"{workerUserState.Count(w => w.IsSuccess == true)} {(workerUserState.Count(w => w.IsSuccess == true) > 1 ? "livres" : "livre")} sur {workerUserState.Count()} {(workerUserState.Count() > 1 ? "ont été supprimés" : "a été supprimé")}.\nActualisation du catalogue des livres en cours...";
-                            }
-                        }
+                        busyLoader.TbcTitle.Text = message;
 
                         if (busyLoader.BtnCancel.Visibility != Visibility.Collapsed)
                             busyLoader.BtnCancel.Visibility = Visibility.Collapsed;
                     }
                 }
-                
+
                 if (UseIntervalAfterFinish)
                 {
                     DispatcherTimer dispatcherTimer = new DispatcherTimer()
@@ -223,18 +249,20 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                     dispatcherTimer.Tick += (t, f) =>
                     {
                         AfterTaskCompletedRequested?.Invoke(this, e);
-
-                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                        if (CloseBusyLoaderAfterFinish)
                         {
-                            Interval = new TimeSpan(0, 0, 0, 2),
-                        };
+                            DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                            {
+                                Interval = new TimeSpan(0, 0, 0, 2),
+                            };
 
-                        dispatcherTimer2.Tick += (s, i) =>
-                        {
-                            MainPage.CloseBusyLoader();
-                            dispatcherTimer2.Stop();
-                        };
-                        dispatcherTimer2.Start();
+                            dispatcherTimer2.Tick += (s, i) =>
+                            {
+                                MainPage.CloseBusyLoader();
+                                dispatcherTimer2.Stop();
+                            };
+                            dispatcherTimer2.Start();
+                        }
 
                         dispatcherTimer.Stop();
                     };
@@ -243,12 +271,15 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 }
                 else
                 {
-                    MainPage.CloseBusyLoader();
+                    if (CloseBusyLoaderAfterFinish)
+                    {
+                        MainPage.CloseBusyLoader();
+                    }
                     AfterTaskCompletedRequested?.Invoke(this, e);
                 }
 
-                WorkerDeleteBooks.Dispose();
-                WorkerDeleteBooks = null;
+                WorkerBackground.Dispose();
+                WorkerBackground = null;
             }
             catch (Exception ex)
             {

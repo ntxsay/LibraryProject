@@ -474,14 +474,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                     viewModel.DateAjout = viewModelToCopy.DateAjout;
                     viewModel.Guid = viewModelToCopy.Guid;
 
-                    if (viewModelToCopy.Books != null && viewModelToCopy.Books.Any())
-                    {
-                        if (viewModel.Books == null)
-                        {
-                            viewModel.Books = new List<LivreVM>(viewModelToCopy.Books);
-                        }
-                    }
-
                     if (viewModelToCopy.Collections != null && viewModelToCopy.Collections.Any())
                     {
                         if (viewModel.Collections == null)
