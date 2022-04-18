@@ -1601,6 +1601,8 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     };
 
+                    userControl.LoadControl();
+
                     if (guid != null)
                     {
                         userControl.ViewModelPage.ParentGuid = guid;
@@ -1729,7 +1731,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
         #endregion
-
 
         #region Author
         private void DisplayAuthorListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)

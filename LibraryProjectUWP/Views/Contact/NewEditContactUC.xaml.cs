@@ -50,6 +50,12 @@ namespace LibraryProjectUWP.Views.Contact
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
+            //InitializeActionInfos();
+            //InitializeFieldVisibility();
+        }
+
+        public void LoadControl()
+        {
             InitializeActionInfos();
             InitializeFieldVisibility();
         }

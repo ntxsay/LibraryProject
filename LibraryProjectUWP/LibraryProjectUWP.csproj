@@ -187,7 +187,9 @@
     <Compile Include="Code\Services\ES\Folders.cs" />
     <Compile Include="Code\Services\Excel\SyncfusionXlsServices.cs" />
     <Compile Include="Code\Services\Logging\Logs.cs" />
-    <Compile Include="Code\Services\Tasks\BookBackgroundTask.cs" />
+    <Compile Include="Code\Services\Tasks\ExportAllBooksTask.cs" />
+    <Compile Include="Code\Services\Tasks\DeleteAllBooksTask.cs" />
+    <Compile Include="Code\Services\Tasks\DeleteManyBooksTask.cs" />
     <Compile Include="Code\Services\UI\UiServices.cs" />
     <Compile Include="Code\Services\Web\htmlServices.cs" />
     <Compile Include="MainPage.xaml.cs">

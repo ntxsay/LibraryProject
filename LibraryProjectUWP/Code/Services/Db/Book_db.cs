@@ -173,7 +173,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tbook>> MultipleWithIdLibraryAsync(long idLibrary, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> GetListOfBooksInLibraryAsync(long idLibrary, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -197,11 +197,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<LivreVM>> MultipleVmWithIdLibraryAsync(long idLibrary, CancellationToken cancellationToken = default)
+            public static async Task<IList<LivreVM>> GetListOfBooksVmInLibraryAsync(long idLibrary, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    var collection = await MultipleWithIdLibraryAsync(idLibrary, cancellationToken);
+                    var collection = await GetListOfBooksInLibraryAsync(idLibrary, cancellationToken);
                     if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
 
                     var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
