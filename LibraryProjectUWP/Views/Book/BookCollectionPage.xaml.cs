@@ -25,6 +25,7 @@ using LibraryProjectUWP.Views.Book.SubViews;
 using LibraryProjectUWP.Code.Services.Web;
 using LibraryProjectUWP.Views.UserControls;
 using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Services.Tasks;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -1382,34 +1383,16 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
         #endregion
-        private async void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (Parameters.ParentLibrary.Books != null)
-                {
-                    var suggestedFileName = $"Rostalotheque_Livres_All_{DateTime.Now:yyyyMMddHHmmss}";
-
-                    var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
-                    {
-                        {"JavaScript Object Notation", new List<string>() { ".json" } }
-                    }, suggestedFileName);
-
-                    if (savedFile == null)
-                    {
-                        Logs.Log(m, "Le fichier n'a pas pû être créé.");
-                        return;
-                    }
-
-                    //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
-                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(Parameters.ParentLibrary.Books, savedFile);// savedFile.Path
-                    if (isFileSaved == false)
-                    {
-                        Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
-                        return;
-                    }
-                }
+                ExportAllBooksTask exportAllBooksTask = new ExportAllBooksTask(Parameters.MainPage) 
+                { 
+                    UseIntervalAfterFinish = false
+                };
+                exportAllBooksTask.InitializeWorker(Parameters.ParentLibrary);
             }
             catch (Exception ex)
             {

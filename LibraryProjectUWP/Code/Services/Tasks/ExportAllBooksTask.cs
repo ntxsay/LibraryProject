@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
@@ -20,7 +21,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
     {
         public MainPage MainPage { get; private set; }
         private BackgroundWorker WorkerBackground;
-        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationTokenSource cancellationTokenSource;
         public bool UseBusyLoader { get; set; } = true;
         public bool UseIntervalAfterFinish { get; set; } = true;
         public bool WorkerReportsProgress { get; set; } = true;
@@ -37,7 +38,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         }
 
         #region Delete Books
-        public void InitializeExportAllBooksWorker(BibliothequeVM viewModel)
+        public void InitializeWorker(BibliothequeVM viewModel)
         {
             try
             {
@@ -63,7 +64,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                         {
                             MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                             {
-                                ProgessText = $"Export en cours de l'ensemble des livres de la bibliothèque {viewModel.Name}.",
+                                ProgessText = $"Export en cours de l'ensemble des livres de la bibliothèque « {viewModel.Name} ».",
                                 CancelButtonText = "Annuler l'export",
                                 CancelButtonVisibility = Visibility.Visible,
                                 CancelButtonCallback = () =>
@@ -97,7 +98,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             {
                 if (sender is BackgroundWorker worker && e.Argument is BibliothequeVM viewModel)
                 {
-                    using (Task<IList<LivreVM>> task = DbServices.Book.GetListOfBooksVmInLibraryAsync(viewModel.Id, cancellationTokenSource))
+                    using (Task<IList<LivreVM>> task = DbServices.Book.GetListOfBooksVmInLibraryAsync(viewModel.Id, cancellationTokenSource.Token))
                     {
                         task.Wait();
 
@@ -108,43 +109,48 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                                 cancellationTokenSource.Cancel();
                             }
 
+                            e.Result = task.Result?.ToArray();
                             e.Cancel = true;
                             return;
                         }
 
-                        int ModelCount = task.Result.Count();
-                        double progressPercentage;
-                        int count = 0;
+                        //int ModelCount = task.Result.Count();
+                        //double progressPercentage;
+                        //int count = 0;
 
-                        foreach (var idBook in task.Result)
-                        {
-                            using (Task<OperationStateVM> taskDelete = DbServices.Book.DeleteAsync(idBook))
-                            {
-                                taskDelete.Wait();
-                                workerStates.Add(taskDelete.Result);
+                        //foreach (var livreVM in task.Result)
+                        //{
+                        //    using (Task<OperationStateVM> taskDelete = DbServices.Book.DeleteAsync(idBook))
+                        //    {
+                        //        taskDelete.Wait();
 
-                                if (worker.CancellationPending == true)
-                                {
-                                    e.Cancel = true;
-                                    break;
-                                }
-                                else
-                                {
-                                    if (WorkerReportsProgress)
-                                    {
-                                        var NumberModel = count + 1;
-                                        double Operation = (double)NumberModel / (double)ModelCount;
-                                        progressPercentage = Operation * 100;
-                                        int ProgressValue = Convert.ToInt32(progressPercentage);
+                        //        if (worker.CancellationPending || cancellationTokenSource.IsCancellationRequested)
+                        //        {
+                        //            if (!cancellationTokenSource.IsCancellationRequested)
+                        //            {
+                        //                cancellationTokenSource.Cancel();
+                        //            }
 
-                                        Thread.Sleep(100);
-                                        worker.ReportProgress(ProgressValue, null);
-                                        count++;
-                                    }
-                                }
-                            }
-                        }
-                        e.Result = workerStates.ToArray();
+                        //            e.Cancel = true;
+                        //            break;
+                        //        }
+                        //        else
+                        //        {
+                        //            if (WorkerReportsProgress)
+                        //            {
+                        //                var NumberModel = count + 1;
+                        //                double Operation = (double)NumberModel / (double)ModelCount;
+                        //                progressPercentage = Operation * 100;
+                        //                int ProgressValue = Convert.ToInt32(progressPercentage);
+
+                        //                Thread.Sleep(100);
+                        //                worker.ReportProgress(ProgressValue, null);
+                        //                count++;
+                        //            }
+                        //        }
+                        //    }
+                        //}
+                        e.Result = task.Result?.ToArray();
                     }
                 }
             }
@@ -181,51 +187,63 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             }
         }
 
-        private void WorkerBackground_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private async void WorkerBackground_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                string message = string.Empty;
+                var viewModelList = e.Result as LivreVM[];
+
+                // Si erreur
+                if (e.Error != null)
+                {
+                    message = $"Une erreur s'est produite, {viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "livres ont été exportés" : "livre a été exporté")}.";
+                }
+                else if (e.Cancelled)
+                {
+                    message = $"L'export a été annulé par l'utilisateur, {viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "livres ont été exportés" : "livre a été exporté")}.";
+                }
+                else
+                {
+                    message = $"{viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "livres ont été exportés" : "livre a été exporté")}.";
+                }
+
                 if (UseBusyLoader)
                 {
                     var busyLoader = MainPage.GetBusyLoader;
                     if (busyLoader != null)
                     {
-                        // Si erreur
-                        if (e.Error != null)
-                        {
-                            if (e.Result != null && e.Result is OperationStateVM[] workerUserState)
-                            {
-                                busyLoader.TbcTitle.Text = $"{workerUserState.Count(w => w.IsSuccess == true)} {(workerUserState.Count(w => w.IsSuccess == true) > 1 ? "livres" : "livre")} sur {workerUserState.Count()} {(workerUserState.Count() > 1 ? "ont été supprimés" : "a été supprimé")}, une erreur s'est produite lors de la suppresion.\nActualisation du catalogue des livres en cours...";
-                            }
-                            else
-                            {
-                                busyLoader.TbcTitle.Text = $"Une erreur s'est produite lors de la suppresion.\nActualisation du catalogue des livres en cours...";
-                            }
-                        }
-                        else if (e.Cancelled)
-                        {
-                            if (e.Result != null && e.Result is OperationStateVM[] workerUserState)
-                            {
-                                busyLoader.TbcTitle.Text = $"La suppression a été annulée par l'utilisateur. {workerUserState.Count(w => w.IsSuccess == true)} {(workerUserState.Count(w => w.IsSuccess == true) > 1 ? "livres ont été supprimés" : "livre a été supprimé")}.\nActualisation du catalogue des livres en cours...";
-                            }
-                            else
-                            {
-                                busyLoader.TbcTitle.Text = $"La suppression a été annulée par l'utilisateur.\nActualisation du catalogue des livres en cours...";
-                            }
-                        }
-                        else
-                        {
-                            if (e.Result != null && e.Result is OperationStateVM[] workerUserState)
-                            {
-                                busyLoader.TbcTitle.Text = $"{workerUserState.Count(w => w.IsSuccess == true)} {(workerUserState.Count(w => w.IsSuccess == true) > 1 ? "livres" : "livre")} sur {workerUserState.Count()} {(workerUserState.Count() > 1 ? "ont été supprimés" : "a été supprimé")}.\nActualisation du catalogue des livres en cours...";
-                            }
-                        }
+                        busyLoader.TbcTitle.Text = message;
 
                         if (busyLoader.BtnCancel.Visibility != Visibility.Collapsed)
                             busyLoader.BtnCancel.Visibility = Visibility.Collapsed;
                     }
                 }
-                
+
+                if (viewModelList != null && viewModelList.Any())
+                {
+                    var suggestedFileName = $"Rostalotheque_Livres_All_{DateTime.Now:yyyyMMddHHmmss}";
+
+                    var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
+                                                        {
+                                                            {"JavaScript Object Notation", new List<string>() { ".json" } }
+                                                        }, suggestedFileName);
+                    if (savedFile == null)
+                    {
+                        Logs.Log(m, "Le fichier n'a pas pû être créé.");
+                        return;
+                    }
+
+                    //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
+                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModelList, savedFile);// savedFile.Path
+                    if (isFileSaved == false)
+                    {
+                        Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
+                        return;
+                    }
+                }
+
                 if (UseIntervalAfterFinish)
                 {
                     DispatcherTimer dispatcherTimer = new DispatcherTimer()
@@ -235,7 +253,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
 
                     dispatcherTimer.Tick += (t, f) =>
                     {
-                        AfterTaskCompletedRequested?.Invoke(this, null);
+                        AfterTaskCompletedRequested?.Invoke(this, e);
 
                         DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                         {
@@ -256,6 +274,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 }
                 else
                 {
+                    MainPage.CloseBusyLoader();
                     AfterTaskCompletedRequested?.Invoke(this, e);
                 }
 
@@ -264,11 +283,9 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             }
             catch (Exception ex)
             {
-                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
             }
-
         }
         #endregion
     }

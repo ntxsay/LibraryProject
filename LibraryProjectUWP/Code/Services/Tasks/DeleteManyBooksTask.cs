@@ -224,7 +224,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
 
                     dispatcherTimer.Tick += (t, f) =>
                     {
-                        AfterTaskCompletedRequested?.Invoke(this, null);
+                        AfterTaskCompletedRequested?.Invoke(this, e);
 
                         DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                         {
@@ -245,6 +245,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 }
                 else
                 {
+                    MainPage.CloseBusyLoader();
                     AfterTaskCompletedRequested?.Invoke(this, e);
                 }
 
