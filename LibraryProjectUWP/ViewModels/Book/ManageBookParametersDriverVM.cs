@@ -66,8 +66,6 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreVM CurrentViewModel { get; set; }
     }
 
-    
-
     public class BookExemplaryListParametersDriverVM
     {
         [Obsolete]

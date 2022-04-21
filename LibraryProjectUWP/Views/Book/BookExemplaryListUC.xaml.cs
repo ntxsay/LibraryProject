@@ -39,7 +39,6 @@ namespace LibraryProjectUWP.Views.Book
         public delegate void CreateItemEventHandler(BookExemplaryListUC sender, ExecuteRequestedEventArgs e);
         public event CreateItemEventHandler CreateItemRequested;
 
-
         public BookExemplaryListUC()
         {
             this.InitializeComponent();
@@ -94,7 +93,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
 
         #region Group-Orders
         private IEnumerable<LivreExemplaryVM> OrderItems(IEnumerable<LivreExemplaryVM> Collection, LivreExemplaryGroupVM.OrderBy OrderBy = LivreExemplaryGroupVM.OrderBy.Croissant, LivreExemplaryGroupVM.SortBy SortBy = LivreExemplaryGroupVM.SortBy.DateAjout)
@@ -360,6 +358,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        public IEnumerable<LivreExemplaryVM> ViewModelList { get; set; }
 
         private ObservableCollection<LivreExemplaryVMCastVM> _ViewModelListGroup = new ObservableCollection<LivreExemplaryVMCastVM>();
         public ObservableCollection<LivreExemplaryVMCastVM> ViewModelListGroup
