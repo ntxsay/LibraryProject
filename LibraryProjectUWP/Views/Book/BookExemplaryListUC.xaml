@@ -39,7 +39,6 @@
             <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
             <MTUUConverters:BoolToObjectConverter x:Key="invertBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
             <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModelPage.ViewModelListGroup, Mode=OneWay}" IsSourceGrouped="True" ItemsPath="Items"/>
-            <!--Source="{x:Bind ViewModelPage.ViewModelListGroup, Mode=OneWay}"-->
 
             <XamlUICommand x:Name="CancelModificationXUiCommand" 
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
@@ -129,6 +128,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -151,7 +151,15 @@
                 </AppBarButton>
             </CommandBar.SecondaryCommands>-->
         </CommandBar>
-        <SemanticZoom Grid.Row="2">
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="tbcStatus" />
+            <ProgressBar x:Name="pbStatus" Grid.Row="1" />
+        </Grid>
+        <SemanticZoom Grid.Row="3">
             <SemanticZoom.ZoomedInView>
                 <ListView ItemsSource="{x:Bind CollectionViewSource.View, Mode=OneWay}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
                     <ListView.GroupStyle>
@@ -168,8 +176,8 @@
                 <ListView ItemsSource="{x:Bind CollectionViewSource.View.CollectionGroups, Mode=OneWay}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
             </SemanticZoom.ZoomedOutView>
         </SemanticZoom>
-        <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
-        <Grid Grid.Row="4">
+        <TextBlock x:Name="TbxErrorMessage" Grid.Row="4" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
+        <Grid Grid.Row="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
