@@ -211,7 +211,6 @@
                             <TextBlock TextWrapping="Wrap">
                                 <Run Text="Cet exemplaire a été acquis chez" />
                                 <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.SocietyName, Mode=OneWay}" FontWeight="Medium"/>
-                                <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.TitreCivilite, Mode=OneWay}" FontWeight="Medium" />
                                 <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.NomNaissance, Mode=OneWay}" FontWeight="Medium" />
                                 <Run Text="{x:Bind ViewModelPage.ViewModel.ContactSource.Prenom, Mode=OneWay}" FontWeight="Medium" />
                             </TextBlock>

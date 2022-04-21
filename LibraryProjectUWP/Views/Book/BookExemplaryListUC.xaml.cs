@@ -1,6 +1,7 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -155,7 +156,11 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                _parameters.ParentPage.NewBookExemplary(_parameters.ParentBook, ViewModelPage.ItemGuid);
+                _parameters.ParentPage.NewBookExemplary(_parameters.ParentBook, new SideBarInterLinkVM() 
+                {
+                    ParentGuid = ViewModelPage.ItemGuid,
+                    ParentType = typeof(BookExemplaryListUC)
+                });
             }
             catch (Exception ex)
             {

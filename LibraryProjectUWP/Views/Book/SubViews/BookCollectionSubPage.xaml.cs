@@ -689,22 +689,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    //if (PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC) is BookPretListUC checkedItem)
-                    //{
-                    //    if (checkedItem._parameters.ParentBook.Id == viewModel.Id)
-                    //    {
-                    //        InitializeSearchingBookPretsWorker(viewModel);
-                    //    }
-                    //    else
-                    //    {
-                    //        BookPretListUC_CancelModificationRequested(checkedItem, args);
-                    //        InitializeSearchingBookPretsWorker(viewModel);
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    InitializeSearchingBookPretsWorker(viewModel);
-                    //}
+                    ParentPage.OpenBookPretList(viewModel);
                 }
             }
             catch (Exception ex)

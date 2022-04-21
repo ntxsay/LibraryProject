@@ -69,6 +69,11 @@ namespace LibraryProjectUWP.Views.Book
             InitializeData();
         }
 
+        public void Close()
+        {
+            CancelModificationRequested?.Invoke(this, null);
+        }
+
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
         }

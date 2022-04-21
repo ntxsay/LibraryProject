@@ -26,6 +26,7 @@ using LibraryProjectUWP.Code.Services.Web;
 using LibraryProjectUWP.Views.UserControls;
 using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Services.Tasks;
+using LibraryProjectUWP.Code.Services.UI;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -39,6 +40,7 @@ namespace LibraryProjectUWP.Views.Book
         public BookCollectionPageVM ViewModelPage { get; set; } = new BookCollectionPageVM();
         public LibraryToBookNavigationDriverVM Parameters { get; private set; }
         readonly EsBook esBook = new EsBook();
+        readonly UiServices uiServices = new UiServices();
 
         public BookCollectionPage()
         {
@@ -981,7 +983,7 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Book Exemplary
-        public void NewBookExemplary(LivreVM viewModel, Guid? guid = null)
+        public void NewBookExemplary(LivreVM viewModel, SideBarInterLinkVM parentReferences = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1007,9 +1009,9 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     });
 
-                    if (guid != null)
+                    if (parentReferences != null)
                     {
-                        userControl.ViewModelPage.ParentGuid = guid;
+                        userControl.ViewModelPage.ParentReferences = parentReferences;
                     }
 
                     userControl.CancelModificationRequested += NewEditBookExemplaryUC_Create_CancelModificationRequested;
@@ -1049,20 +1051,22 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.ParentGuid != null)
+                        if (sender.ViewModelPage.ParentReferences != null)
                         {
                             this.InitializeSearchingBookWorker(sender._parameters.ParentBook);
-                            NewEditBookExemplaryUC_Create_CancelModificationRequested(sender, e);
-                            //var bookExemplariesList = GetBookExemplariesSideBarByGuid((Guid)sender.ViewModelPage.Guid);
-                            //if (bookExemplariesList != null)
-                            //{
-                            //    var getModelList = bookExemplariesList._parameters.ViewModelList.ToList();
-                            //    getModelList.Add(newViewModel);
-                            //    bookExemplariesList._parameters.ViewModelList = getModelList;
-                            //    //bookExemplariesList._parameters.ViewModelList.Publication.Collections.Add(newViewModel);
-                            //    NewEditBookExemplaryUC_Create_CancelModificationRequested(sender, e);
-                            //    //InitializeSearchingBookWorker(bookExemplariesList._parameters.);
-                            //}
+                            sender.Close();
+                            if (sender.ViewModelPage.ParentReferences.ParentType == typeof(BookExemplaryListUC))
+                            {
+
+                            }
+                            else if (sender.ViewModelPage.ParentReferences.ParentType == typeof(NewEditBookPretUC))
+                            {
+                                var item = uiServices.GetNewEditBookPretUCSideBarByGuid(PivotRightSideBar, sender.ViewModelPage.ParentReferences.ParentGuid);
+                                if (item != null)
+                                {
+
+                                }
+                            }
                         }
                     }
                     else
@@ -1193,12 +1197,12 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Book Pret
-        private void NewBookPretXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        public void OpenBookPretList(LivreVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (args.Parameter is LivreVM viewModel)
+                if (viewModel != null)
                 {
                     if (PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC) is BookPretListUC checkedItem)
                     {
@@ -1208,7 +1212,7 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         else
                         {
-                            BookPretListUC_CancelModificationRequested(checkedItem, args);
+                            checkedItem.Close();
                             InitializeSearchingBookPretsWorker(viewModel);
                         }
                     }
@@ -1300,17 +1304,7 @@ namespace LibraryProjectUWP.Views.Book
                         if (sender.ViewModelPage.ParentGuid != null)
                         {
                             this.InitializeSearchingBookPretsWorker(sender._parameters.ParentBook);
-                            NewEditBookPretUC_CancelModificationRequested(sender, e);
-                            //var bookExemplariesList = GetBookExemplariesSideBarByGuid((Guid)sender.ViewModelPage.Guid);
-                            //if (bookExemplariesList != null)
-                            //{
-                            //    var getModelList = bookExemplariesList._parameters.ViewModelList.ToList();
-                            //    getModelList.Add(newViewModel);
-                            //    bookExemplariesList._parameters.ViewModelList = getModelList;
-                            //    //bookExemplariesList._parameters.ViewModelList.Publication.Collections.Add(newViewModel);
-                            //    NewEditBookExemplaryUC_Create_CancelModificationRequested(sender, e);
-                            //    //InitializeSearchingBookWorker(bookExemplariesList._parameters.);
-                            //}
+                            sender.Close();
                         }
                     }
                     else

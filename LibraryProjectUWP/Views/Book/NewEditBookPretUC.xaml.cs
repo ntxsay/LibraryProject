@@ -4,6 +4,7 @@ using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.General;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,11 @@ namespace LibraryProjectUWP.Views.Book
             await LoadDataAsync();
         }
 
+        public void Close()
+        {
+            CancelModificationRequested?.Invoke(this, null);
+        }
+
         private void InitializeActionInfos()
         {
             try
@@ -85,6 +91,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void HyperlinkBtn_AddNew_Exemplary_Click(object sender, RoutedEventArgs e)
+        {
+            _parameters.ParentPage.NewBookExemplary(_parameters.ParentBook, new SideBarInterLinkVM()
+            {
+                ParentGuid = ViewModelPage.ItemGuid,
+                ParentType = typeof(NewEditBookPretUC)
+            });
+        }
 
         #region Contact Source
         private async Task LoadDataAsync()
@@ -423,7 +437,6 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
-
     }
 
     public class NewEditBookPretUCVM : INotifyPropertyChanged

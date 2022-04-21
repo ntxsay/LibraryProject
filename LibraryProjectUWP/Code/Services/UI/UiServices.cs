@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Views.Book;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,62 @@ namespace LibraryProjectUWP.Code.Services.UI
 {
     internal class UiServices
     {
+        public BookExemplaryListUC GetBookExemplariesSideBarByGuid(Pivot pivot, Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (pivot == null)
+                {
+                    return null;
+                }
+
+                if (pivot.Items.Count > 0)
+                {
+                    object itemPivot = pivot.Items.FirstOrDefault(f => f is BookExemplaryListUC item && item.ViewModelPage.ItemGuid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as BookExemplaryListUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        public NewEditBookPretUC GetNewEditBookPretUCSideBarByGuid(Pivot pivot, Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (pivot == null)
+                {
+                    return null;
+                }
+
+                if (pivot.Items.Count > 0)
+                {
+                    object itemPivot = pivot.Items.FirstOrDefault(f => f is NewEditBookPretUC item && item.ViewModelPage.ItemGuid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as NewEditBookPretUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
         public GridView GetSelectedGridViewFromPivotTemplate(Pivot pivot, string gridViewName = "GridViewItems")
         {
             try

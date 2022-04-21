@@ -265,12 +265,19 @@
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
             <StackPanel Orientation="Vertical" Spacing="16" Margin="0 8 0 0" VerticalAlignment="Top">
-                <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind _parameters.AvailableExemplariesViewModelList}"
+                <Grid RowSpacing="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind _parameters.AvailableExemplariesViewModelList}"
                           ItemTemplate="{StaticResource exemplaryItemDataTemplate}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Exemplary, Mode=TwoWay}">
-                    <ComboBox.Header>
-                        <TextBlock Text="Exemplaires disponible" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </ComboBox.Header>
-                </ComboBox>
+                        <ComboBox.Header>
+                            <TextBlock Text="Exemplaires disponible" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        </ComboBox.Header>
+                    </ComboBox>
+                    <HyperlinkButton Grid.Row="1" Content="Ajouter un exemplaire" HorizontalAlignment="Right" Click="HyperlinkBtn_AddNew_Exemplary_Click"/>
+                </Grid>
                 <Grid Grid.Row="4" RowSpacing="8" Visibility="{x:Bind ViewModelPage.ContactSourceVisibility, Mode=OneWay}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />

@@ -4,6 +4,7 @@ using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.General;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,11 @@ namespace LibraryProjectUWP.Views.Book
         private async void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
             await LoadDataAsync();
+        }
+
+        public void Close()
+        {
+            CancelModificationRequested?.Invoke(this, null);
         }
 
         private void InitializeActionInfos()
@@ -592,7 +598,7 @@ namespace LibraryProjectUWP.Views.Book
         public IEnumerable<string> chooseMonths = DatesHelpers.ChooseMonth();
         public List<string> chooseYear = new List<string>();
         public Guid ItemGuid { get; private set; } = Guid.NewGuid();
-        public Guid? ParentGuid { get; set; }
+        public SideBarInterLinkVM ParentReferences { get; set; }
 
         private string _Header;
         public string Header
