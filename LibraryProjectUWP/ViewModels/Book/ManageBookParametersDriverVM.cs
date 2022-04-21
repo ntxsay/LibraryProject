@@ -55,6 +55,7 @@ namespace LibraryProjectUWP.ViewModels.Book
     public class BookPretListParametersDriverVM
     {
         public LivreVM ParentBook { get; set; }
+        [Obsolete]
         public IEnumerable<LivrePretVM> ViewModelList { get; set; }
         public BookCollectionPage ParentPage { get; set; }
     }
@@ -73,6 +74,7 @@ namespace LibraryProjectUWP.ViewModels.Book
         [Obsolete]
         public string BookTitle { get; set; }
         public LivreVM ParentBook { get; set; }
+        [Obsolete]
         public IEnumerable<LivreExemplaryVM> ViewModelList { get; set; }
         public BookCollectionPage ParentPage { get; set; }
     }

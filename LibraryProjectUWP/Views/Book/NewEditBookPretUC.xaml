@@ -270,7 +270,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind _parameters.AvailableExemplariesViewModelList}"
+                    <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind _parameters.AvailableExemplariesViewModelList, Mode=OneWay}"
                           ItemTemplate="{StaticResource exemplaryItemDataTemplate}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Exemplary, Mode=TwoWay}">
                         <ComboBox.Header>
                             <TextBlock Text="Exemplaires disponible" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>

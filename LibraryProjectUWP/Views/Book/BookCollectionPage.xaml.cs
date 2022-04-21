@@ -1053,7 +1053,6 @@ namespace LibraryProjectUWP.Views.Book
 
                         if (sender.ViewModelPage.ParentReferences != null)
                         {
-                            this.InitializeSearchingBookWorker(sender._parameters.ParentBook);
                             sender.Close();
                             if (sender.ViewModelPage.ParentReferences.ParentType == typeof(BookExemplaryListUC))
                             {
@@ -1064,7 +1063,7 @@ namespace LibraryProjectUWP.Views.Book
                                 var item = uiServices.GetNewEditBookPretUCSideBarByGuid(PivotRightSideBar, sender.ViewModelPage.ParentReferences.ParentGuid);
                                 if (item != null)
                                 {
-
+                                    item._parameters.AvailableExemplariesViewModelList = await DbServices.BookExemplary.GetAvailableBookExemplaryVMAsync(sender._parameters.ParentBook.Id);
                                 }
                             }
                         }
@@ -1117,17 +1116,17 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         if (checkedItem._parameters.ParentBook.Id == viewModel.Id)
                         {
-                            InitializeSearchingBookWorker(viewModel);
+                            BookExemplaryList(viewModel);
                         }
                         else
                         {
                             checkedItem.Close();
-                            InitializeSearchingBookWorker(viewModel);
+                            BookExemplaryList(viewModel);
                         }
                     }
                     else
                     {
-                        InitializeSearchingBookWorker(viewModel);
+                        BookExemplaryList(viewModel);
                     }
                 }
             }
@@ -1138,7 +1137,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void BookExemplaryList(LivreVM viewModel, IEnumerable<LivreExemplaryVM> modelList)
+        private void BookExemplaryList(LivreVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1149,7 +1148,6 @@ namespace LibraryProjectUWP.Views.Book
                     this.PivotRightSideBar.SelectedItem = checkedItem;
                     if (checkedItem is BookExemplaryListUC item)
                     {
-                        item._parameters.ViewModelList = modelList;
                         item.InitializeData();
                     }
                 }
@@ -1159,7 +1157,6 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         ParentBook = viewModel,
-                        ViewModelList = modelList,
                     });
 
                     userControl.CancelModificationRequested += BookExemplaryListUC_CancelModificationRequested;
@@ -1208,19 +1205,59 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         if (checkedItem._parameters.ParentBook.Id == viewModel.Id)
                         {
-                            InitializeSearchingBookPretsWorker(viewModel);
+                            BookPretList(viewModel);
                         }
                         else
                         {
                             checkedItem.Close();
-                            InitializeSearchingBookPretsWorker(viewModel);
+                            BookPretList(viewModel);
                         }
                     }
                     else
                     {
-                        InitializeSearchingBookPretsWorker(viewModel);
+                        BookPretList(viewModel);
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void BookPretList(LivreVM viewModel)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC);
+                if (checkedItem != null)
+                {
+                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                    if (checkedItem is BookPretListUC item)
+                    {
+                        item.InitializeData();
+                    }
+                }
+                else
+                {
+                    BookPretListUC userControl = new BookPretListUC(new BookPretListParametersDriverVM()
+                    {
+                        ParentPage = this,
+                        ParentBook = viewModel,
+                    });
+
+                    userControl.CancelModificationRequested += BookPretListUC_CancelModificationRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -1303,7 +1340,6 @@ namespace LibraryProjectUWP.Views.Book
 
                         if (sender.ViewModelPage.ParentGuid != null)
                         {
-                            this.InitializeSearchingBookPretsWorker(sender._parameters.ParentBook);
                             sender.Close();
                         }
                     }
@@ -1342,47 +1378,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void BookPretList(LivreVM viewModel, IEnumerable<LivrePretVM> modelList)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC);
-                if (checkedItem != null)
-                {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
-                    if (checkedItem is BookPretListUC item)
-                    {
-                        item._parameters.ViewModelList = modelList;
-                        item.InitializeData();
-                    }
-                }
-                else
-                {
-                    BookPretListUC userControl = new BookPretListUC(new BookPretListParametersDriverVM()
-                    {
-                        ParentPage = this,
-                        ParentBook = viewModel,
-                        ViewModelList = modelList,
-                    });
-
-                    userControl.CancelModificationRequested += BookPretListUC_CancelModificationRequested;
-
-                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                    {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
-                    });
-                }
-                this.ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
 
         private void BookPretListUC_CancelModificationRequested(BookPretListUC sender, ExecuteRequestedEventArgs e)
         {

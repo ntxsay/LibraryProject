@@ -1,5 +1,7 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
 using System;
@@ -39,6 +41,9 @@ namespace LibraryProjectUWP.Views.Book
         public delegate void CreateItemEventHandler(BookExemplaryListUC sender, ExecuteRequestedEventArgs e);
         public event CreateItemEventHandler CreateItemRequested;
 
+        readonly GetBookExemplariesTask getBookExemplariesTask = new GetBookExemplariesTask();
+
+
         public BookExemplaryListUC()
         {
             this.InitializeComponent();
@@ -60,31 +65,43 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (_parameters.ViewModelList == null || !_parameters.ViewModelList.Any())
+                ViewModelPage.WorkerTextVisibility = Visibility.Visible;
+                ViewModelPage.DataListVisibility = Visibility.Collapsed;
+                if (getBookExemplariesTask.IsWorkerRunning)
                 {
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(_parameters.ViewModelList).Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.OrderByDescending(q => q.DateAjout).GroupBy(s => s.DateAjout.ToString("dddd dd MMMM yyyy")).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
+                getBookExemplariesTask.InitializeWorker(_parameters.ParentBook);
+                getBookExemplariesTask.AfterTaskCompletedRequested += (j, e) =>
                 {
-                    if (this.CollectionViewSource.View == null)
+                    if (e.Result is Tuple<LivreVM, WorkerState<LivreExemplaryVM, LivreExemplaryVM>> result && result.Item2.ResultList != null && result.Item2.ResultList.Any())
                     {
-                        this.CollectionViewSource.Source = ViewModelPage.ViewModelListGroup;
+                        var GroupingItems = this.OrderItems(result.Item2.ResultList)?.Where(w => !w.NoGroup.IsStringNullOrEmptyOrWhiteSpace())?.OrderByDescending(q => q.DateAjout).GroupBy(s => s.DateAjout.ToString("dddd dd MMMM yyyy")).Select(s => s);
+                        if (GroupingItems != null && GroupingItems.Count() > 0)
+                        {
+                            if (this.CollectionViewSource.View == null)
+                            {
+                                this.CollectionViewSource.Source = ViewModelPage.ViewModelListGroup;
+                            }
+
+                            List<LivreExemplaryVMCastVM> LivreExemplaryVMCastVMs = GroupingItems.Select(groupingItem => new LivreExemplaryVMCastVM()
+                            {
+                                GroupName = groupingItem.Key,
+                                Items = new ObservableCollection<LivreExemplaryVM>(groupingItem),
+                            }).ToList();
+
+                            ViewModelPage.ViewModelListGroup.Clear();
+                            foreach (var item in LivreExemplaryVMCastVMs)
+                            {
+                                ViewModelPage.ViewModelListGroup.Add(item);
+                            }
+                        }
                     }
 
-                    List<LivreExemplaryVMCastVM> LivreExemplaryVMCastVMs = GroupingItems.Select(groupingItem => new LivreExemplaryVMCastVM()
-                    {
-                        GroupName = groupingItem.Key,
-                        Items = new ObservableCollection<LivreExemplaryVM>(groupingItem),
-                    }).ToList();
-
-                    ViewModelPage.ViewModelListGroup.Clear();
-                    foreach (var item in LivreExemplaryVMCastVMs)
-                    {
-                        ViewModelPage.ViewModelListGroup.Add(item);
-                    }
-                }
+                    ViewModelPage.WorkerTextVisibility = Visibility.Collapsed;
+                    ViewModelPage.DataListVisibility = Visibility.Visible;
+                };
             }
             catch (Exception ex)
             {
@@ -143,6 +160,11 @@ namespace LibraryProjectUWP.Views.Book
         public void Close()
         {
             CancelModificationRequested?.Invoke(this, null);
+        }
+
+        private void ABBtn_Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeData();
         }
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -239,6 +261,7 @@ namespace LibraryProjectUWP.Views.Book
                     UpdateItemRequested = null;
                 }
 
+                getBookExemplariesTask?.DisposeWorker();
                 ViewModelPage = null;
             }
             catch (Exception)
@@ -292,8 +315,10 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
+
+        
     }
-    
+
     public class BookExemplaryListUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
@@ -358,7 +383,33 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public IEnumerable<LivreExemplaryVM> ViewModelList { get; set; }
+        private Visibility _DataListVisibility;
+        public Visibility DataListVisibility
+        {
+            get => this._DataListVisibility;
+            set
+            {
+                if (this._DataListVisibility != value)
+                {
+                    this._DataListVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _WorkerTextVisibility;
+        public Visibility WorkerTextVisibility
+        {
+            get => this._WorkerTextVisibility;
+            set
+            {
+                if (this._WorkerTextVisibility != value)
+                {
+                    this._WorkerTextVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private ObservableCollection<LivreExemplaryVMCastVM> _ViewModelListGroup = new ObservableCollection<LivreExemplaryVMCastVM>();
         public ObservableCollection<LivreExemplaryVMCastVM> ViewModelListGroup

@@ -154,31 +154,35 @@
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBRenameCategorie" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource UpdateItemXUiCommand}"/>
             <AppBarButton Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DeleteItemXUiCommand}"/>
-            <!--<CommandBar.SecondaryCommands>
-                <AppBarButton Label="Exporter au format JSON" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportTreeToJsonXamlUICommand}">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xE74E;"/>
-                    </AppBarButton.Icon>
-                </AppBarButton>
-            </CommandBar.SecondaryCommands>-->
+            <AppBarButton Label="Actualiser" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="ABBtn_Refresh_Click">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE895;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
         </CommandBar>
-        <SemanticZoom Grid.Row="2">
-            <SemanticZoom.ZoomedInView>
-                <ListView ItemsSource="{x:Bind CollectionViewSource.View, Mode=OneWay}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
-                    <ListView.GroupStyle>
-                        <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
-                    </ListView.GroupStyle>
-                    <ListView.ContextFlyout>
-                        <MenuFlyout>
-                            <MenuFlyoutItem Text="Supprimer"/>
-                        </MenuFlyout>
-                    </ListView.ContextFlyout>
-                </ListView>
-            </SemanticZoom.ZoomedInView>
-            <SemanticZoom.ZoomedOutView>
-                <ListView ItemsSource="{x:Bind CollectionViewSource.View.CollectionGroups, Mode=OneWay}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
-            </SemanticZoom.ZoomedOutView>
-        </SemanticZoom>
+        <Grid Grid.Row="2" RowSpacing="2">
+            <StackPanel Orientation="Vertical" Spacing="4" Visibility="{x:Bind ViewModelPage.WorkerTextVisibility, Mode=OneWay}">
+                <ProgressRing IsActive="True" Height="40" Width="40"/>
+                <TextBlock x:Name="tbcStatus" Grid.Row="1" TextAlignment="Center" Text="Recherche en cours d'exemplaires empruntés, veuillez patienter quelques instants." Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <SemanticZoom Visibility="{x:Bind ViewModelPage.DataListVisibility, Mode=OneWay}">
+                <SemanticZoom.ZoomedInView>
+                    <ListView ItemsSource="{x:Bind CollectionViewSource.View, Mode=OneWay}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
+                        <ListView.GroupStyle>
+                            <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
+                        </ListView.GroupStyle>
+                        <ListView.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Supprimer"/>
+                            </MenuFlyout>
+                        </ListView.ContextFlyout>
+                    </ListView>
+                </SemanticZoom.ZoomedInView>
+                <SemanticZoom.ZoomedOutView>
+                    <ListView ItemsSource="{x:Bind CollectionViewSource.View.CollectionGroups, Mode=OneWay}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
+                </SemanticZoom.ZoomedOutView>
+            </SemanticZoom>
+        </Grid>
         <TextBlock x:Name="TbxErrorMessage" Grid.Row="3" Foreground="{x:Bind ViewModelPage.ResultMessageForeGround, Mode=OneWay}" TextWrapping="Wrap" Text="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}"/>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>

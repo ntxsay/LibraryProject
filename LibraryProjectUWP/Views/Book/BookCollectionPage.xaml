@@ -99,9 +99,6 @@
                        ExecuteRequested="DisplayCollectionListXUiCmd_ExecuteRequested"
                        Description="Affiche les collections">
         </XamlUICommand>
-        <XamlUICommand x:Name="CancelTaskXUiCmd" 
-                       ExecuteRequested="CancelTaskXUiCmd_ExecuteRequested">
-        </XamlUICommand>
         <ThemeShadow x:Name="BackgroundGridShadow"/>
 
         <DataTemplate x:DataType="booktVm:LivreVM" x:Key="ItemAutoSuggestDataTemplate">

@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
@@ -42,9 +43,7 @@ namespace LibraryProjectUWP.Views.Book
             ItemsPath = new PropertyPath("Items")
         };
 
-
         public BookPretListUCVM ViewModelPage { get; set; } = new BookPretListUCVM();
-
 
         public delegate void CancelModificationEventHandler(BookPretListUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
@@ -55,6 +54,7 @@ namespace LibraryProjectUWP.Views.Book
         public delegate void CreateItemEventHandler(BookPretListUC sender, ExecuteRequestedEventArgs e);
         public event CreateItemEventHandler CreateItemRequested;
 
+        readonly GetBookPretsTask getBookPretsTask = new GetBookPretsTask();
 
         public BookPretListUC()
         {
@@ -82,31 +82,43 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (_parameters.ViewModelList == null || !_parameters.ViewModelList.Any())
+                ViewModelPage.WorkerTextVisibility = Visibility.Visible;
+                ViewModelPage.DataListVisibility = Visibility.Collapsed;
+                if (getBookPretsTask.IsWorkerRunning)
                 {
                     return;
                 }
 
-                var GroupingItems = this.OrderItems(_parameters.ViewModelList)?.OrderByDescending(q => q.DateRemise).GroupBy(s => s.PretStatus()).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
+                getBookPretsTask.InitializeWorker(_parameters.ParentBook);
+                getBookPretsTask.AfterTaskCompletedRequested += (j, e) =>
                 {
-                    if (this.CollectionViewSource.View == null)
+                    if (e.Result is Tuple<LivreVM, WorkerState<LivrePretVM, LivrePretVM>> result && result.Item2.ResultList != null && result.Item2.ResultList.Any())
                     {
-                        this.CollectionViewSource.Source = ViewModelPage.ViewModelListGroup;
-                    }
+                        var GroupingItems = this.OrderItems(result.Item2.ResultList)?.OrderByDescending(q => q.DateRemise).GroupBy(s => s.PretStatus()).Select(s => s);
+                        if (GroupingItems != null && GroupingItems.Count() > 0)
+                        {
+                            if (this.CollectionViewSource.View == null)
+                            {
+                                this.CollectionViewSource.Source = ViewModelPage.ViewModelListGroup;
+                            }
 
-                    List<LivrePretVMCastVM> LivrePretVMCastVMs = GroupingItems.Select(groupingItem => new LivrePretVMCastVM()
-                    {
-                        GroupName = groupingItem.Key,
-                        Items = new ObservableCollection<LivrePretVM>(groupingItem),
-                    }).ToList();
+                            List<LivrePretVMCastVM> LivrePretVMCastVMs = GroupingItems.Select(groupingItem => new LivrePretVMCastVM()
+                            {
+                                GroupName = groupingItem.Key,
+                                Items = new ObservableCollection<LivrePretVM>(groupingItem),
+                            }).ToList();
 
-                    ViewModelPage.ViewModelListGroup.Clear();
-                    foreach (var item in LivrePretVMCastVMs)
-                    {
-                        ViewModelPage.ViewModelListGroup.Add(item);
+                            ViewModelPage.ViewModelListGroup.Clear();
+                            foreach (var item in LivrePretVMCastVMs)
+                            {
+                                ViewModelPage.ViewModelListGroup.Add(item);
+                            }
+                        }
+
                     }
-                }
+                    ViewModelPage.WorkerTextVisibility = Visibility.Collapsed;
+                    ViewModelPage.DataListVisibility = Visibility.Visible;
+                };
             }
             catch (Exception ex)
             {
@@ -153,6 +165,10 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
+        private void ABBtn_Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeData();
+        }
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -246,6 +262,9 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     UpdateItemRequested = null;
                 }
+
+                getBookPretsTask?.DisposeWorker();
+                ViewModelPage = null;
             }
             catch (Exception)
             {
@@ -364,6 +383,33 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private Visibility _DataListVisibility;
+        public Visibility DataListVisibility
+        {
+            get => this._DataListVisibility;
+            set
+            {
+                if (this._DataListVisibility != value)
+                {
+                    this._DataListVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _WorkerTextVisibility;
+        public Visibility WorkerTextVisibility
+        {
+            get => this._WorkerTextVisibility;
+            set
+            {
+                if (this._WorkerTextVisibility != value)
+                {
+                    this._WorkerTextVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
         private ObservableCollection<LivrePretVMCastVM> _ViewModelListGroup = new ObservableCollection<LivrePretVMCastVM>();
         public ObservableCollection<LivrePretVMCastVM> ViewModelListGroup

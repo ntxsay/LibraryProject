@@ -187,6 +187,8 @@
     <Compile Include="Code\Services\ES\Folders.cs" />
     <Compile Include="Code\Services\Excel\SyncfusionXlsServices.cs" />
     <Compile Include="Code\Services\Logging\Logs.cs" />
+    <Compile Include="Code\Services\Tasks\GetBookPretsTask.cs" />
+    <Compile Include="Code\Services\Tasks\GetBookExemplariesTask.cs" />
     <Compile Include="Code\Services\Tasks\ImportBooksTask.cs" />
     <Compile Include="Code\Services\Tasks\ExportAllBooksTask.cs" />
     <Compile Include="Code\Services\Tasks\DeleteAllBooksTask.cs" />
