@@ -265,30 +265,43 @@
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
             <StackPanel Orientation="Vertical" Spacing="16" Margin="0 8 0 0" VerticalAlignment="Top">
-                <Grid RowSpacing="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind _parameters.AvailableExemplariesViewModelList, Mode=OneWay}"
-                          ItemTemplate="{StaticResource exemplaryItemDataTemplate}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Exemplary, Mode=TwoWay}">
-                        <ComboBox.Header>
-                            <TextBlock Text="Exemplaires disponible" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                        </ComboBox.Header>
-                    </ComboBox>
-                    <HyperlinkButton Grid.Row="1" Content="Ajouter un exemplaire" HorizontalAlignment="Right" Click="HyperlinkBtn_AddNew_Exemplary_Click" Visibility="{x:Bind ViewModelPage.AddExemplaryBtnVisibility, Mode=OneWay}"/>
-                    <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="4" Visibility="{x:Bind ViewModelPage.WorkerTextVisibility, Mode=OneWay}">
-                        <TextBlock x:Name="tbcStatus" Grid.Row="1" TextAlignment="Center" Text="Recherche d'exemplaires disponible en cours, veuillez patienter quelques instants." Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" TextWrapping="Wrap"/>
-                        <ProgressBar IsIndeterminate="True"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="4" RowSpacing="8" Visibility="{x:Bind ViewModelPage.ContactSourceVisibility, Mode=OneWay}">
+                <Grid RowSpacing="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Civilité de l'emprunteur" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    <TextBlock Grid.Row="0" Text="Exemplaires de disponible" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    <Grid Grid.Row="1" RowSpacing="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" ColumnSpacing="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind ViewModelPage.AvailableExemplaries, Mode=OneWay}"
+                          ItemTemplate="{StaticResource exemplaryItemDataTemplate}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Exemplary, Mode=TwoWay}"/>
+                            <Button Grid.Column="1" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" CornerRadius="22" MTUUi:FrameworkElementExtensions.Cursor="Hand" Height="28" Width="28" Padding="0"
+                                    Click="BtnRefresh_AvailableExemplaries_Click">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE895;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>
+                            </Button>
+                        </Grid>
+                        <HyperlinkButton Grid.Row="1" Content="Ajouter un exemplaire" HorizontalAlignment="Right" Click="HyperlinkBtn_AddNew_Exemplary_Click" Visibility="{x:Bind ViewModelPage.AddExemplaryBtnVisibility, Mode=OneWay}"/>
+                        <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="4" Visibility="{x:Bind ViewModelPage.WorkerTextVisibility, Mode=OneWay}">
+                            <TextBlock x:Name="tbcStatus" Grid.Row="1" TextAlignment="Left" Text="Recherche d'exemplaires disponible en cours, veuillez patienter quelques instants." Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" TextWrapping="Wrap"/>
+                            <ProgressBar IsIndeterminate="True"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                <Grid RowSpacing="8" Visibility="{x:Bind ViewModelPage.ContactSourceVisibility, Mode=OneWay}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="L'emprunteur" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     <Grid Grid.Row="1" RowSpacing="4">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -300,7 +313,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <AutoSuggestBox x:Name="ASB_SearchContact" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    PlaceholderText="Rechercher un contact" IsSuggestionListOpen="False" ItemTemplateSelector="{StaticResource contactTypeTemplateSelector}"
+                    PlaceholderText="Rechercher une personne ou une société" IsSuggestionListOpen="False" ItemTemplateSelector="{StaticResource contactTypeTemplateSelector}"
                                     TextChanged="ASB_SearchContact_TextChanged" SuggestionChosen="ASB_SearchContact_SuggestionChosen" QuerySubmitted="ASB_SearchContact_QuerySubmitted">
                                 <AutoSuggestBox.QueryIcon>
                                     <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>

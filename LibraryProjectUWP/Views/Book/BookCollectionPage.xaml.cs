@@ -1062,7 +1062,7 @@ namespace LibraryProjectUWP.Views.Book
                                 var item = uiServices.GetNewEditBookPretUCSideBarByGuid(PivotRightSideBar, sender.ViewModelPage.ParentReferences.ParentGuid);
                                 if (item != null)
                                 {
-                                    item._parameters.AvailableExemplariesViewModelList = await DbServices.BookExemplary.GetAvailableBookExemplaryVMAsync(sender._parameters.ParentBook.Id);
+                                    item.LoadDataAsync();
                                     SelectItemSideBar(item);
                                 }
                             }

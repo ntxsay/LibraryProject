@@ -59,7 +59,7 @@ namespace LibraryProjectUWP
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (PrincipalNaviguation.MenuItems[2] is Microsoft.UI.Xaml.Controls.NavigationViewItem first)
+                if (PrincipalNaviguation.MenuItems[0] is Microsoft.UI.Xaml.Controls.NavigationViewItem first)
                 {
                     PrincipalNaviguation.SelectedItem = first;
                 }

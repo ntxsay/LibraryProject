@@ -26,33 +26,33 @@
                 </Viewbox>
             </MUIXC:NavigationView.PaneHeader>
             <MUIXC:NavigationView.MenuItems>
-                <MUIXC:NavigationViewItem Content="Rechercher">
+                <!--<MUIXC:NavigationViewItem Content="Rechercher">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xe721;"/>
                     </MUIXC:NavigationViewItem.Icon>
-                </MUIXC:NavigationViewItem>
-                <MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.NewElementMenuItem.Text}" ToolTipService.ToolTip="Crée ou importe un élément" Tag="{x:Bind ViewModelPage.NewElementMenuItem.Tag}">
+                </MUIXC:NavigationViewItem>-->
+                <!--<MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.NewElementMenuItem.Text}" ToolTipService.ToolTip="Crée ou importe un élément" Tag="{x:Bind ViewModelPage.NewElementMenuItem.Tag}">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xe710;"/>
                     </MUIXC:NavigationViewItem.Icon>
-                </MUIXC:NavigationViewItem>
+                </MUIXC:NavigationViewItem>-->
                 <MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.LibraryCollectionMenuItem.Text}" ToolTipService.ToolTip="Affiche la liste des bibliothèques de disponible" Tag="{x:Bind ViewModelPage.LibraryCollectionMenuItem.Tag}">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8F1;"/>
                     </MUIXC:NavigationViewItem.Icon>
                 </MUIXC:NavigationViewItem>
-                <MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.ContactCollectionMenuItem.Text}" ToolTipService.ToolTip="Affiche la liste des adhérants" Tag="{x:Bind ViewModelPage.ContactCollectionMenuItem.Tag}">
+                <!--<MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.ContactCollectionMenuItem.Text}" ToolTipService.ToolTip="Affiche la liste des adhérants" Tag="{x:Bind ViewModelPage.ContactCollectionMenuItem.Tag}">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xe779;"/>
                     </MUIXC:NavigationViewItem.Icon>
-                </MUIXC:NavigationViewItem>
+                </MUIXC:NavigationViewItem>-->
             </MUIXC:NavigationView.MenuItems>
             <MUIXC:NavigationView.FooterMenuItems>
-                <MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.SettingsMenuItem.Text}" Tag="{x:Bind ViewModelPage.SettingsMenuItem.Tag}">
+                <!--<MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.SettingsMenuItem.Text}" Tag="{x:Bind ViewModelPage.SettingsMenuItem.Tag}">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE713;"/>
                     </MUIXC:NavigationViewItem.Icon>
-                </MUIXC:NavigationViewItem>
+                </MUIXC:NavigationViewItem>-->
                 <MUIXC:NavigationViewItem Content="{x:Bind ViewModelPage.AboutMenuItem.Text}" Tag="{x:Bind ViewModelPage.AboutMenuItem.Tag}">
                     <MUIXC:NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE946;"/>

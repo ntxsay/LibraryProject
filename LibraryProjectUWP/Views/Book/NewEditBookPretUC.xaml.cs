@@ -2,12 +2,14 @@
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -37,6 +39,9 @@ namespace LibraryProjectUWP.Views.Book
 
         public delegate void CreateItemEventHandler(NewEditBookPretUC sender, ExecuteRequestedEventArgs e);
         public event CreateItemEventHandler CreateItemRequested;
+
+        readonly GetAvailableBookExemplariesForPretTask getAvailableBookExemplariesForPretTask = new GetAvailableBookExemplariesForPretTask();
+
         public NewEditBookPretUC()
         {
             this.InitializeComponent();
@@ -52,9 +57,9 @@ namespace LibraryProjectUWP.Views.Book
             InitializeActionInfos();
         }
 
-        private async void PivotItem_Loaded(object sender, RoutedEventArgs e)
+        private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadDataAsync();
+            LoadDataAsync();
         }
 
         public void Close()
@@ -117,14 +122,38 @@ namespace LibraryProjectUWP.Views.Book
             });
         }
 
+        private void BtnRefresh_AvailableExemplaries_Click(object sender, RoutedEventArgs e)
+        {
+            LoadDataAsync();
+        }
+
         #region Contact Source
-        private async Task LoadDataAsync()
+        public void LoadDataAsync()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                IList<ContactVM> itemList = await DbServices.Contact.AllVMAsync();
-                ViewModelPage.ContactViewModelList = itemList?.ToList() ?? new List<ContactVM>(); ;
+                ViewModelPage.WorkerTextVisibility = Visibility.Visible;
+                ViewModelPage.AddExemplaryBtnVisibility = Visibility.Collapsed;
+                if (getAvailableBookExemplariesForPretTask.IsWorkerRunning)
+                {
+                    return;
+                }
+
+                getAvailableBookExemplariesForPretTask.InitializeWorker(_parameters.ParentBook);
+                getAvailableBookExemplariesForPretTask.AfterTaskCompletedRequested += async (j, e) =>
+                {
+                    if (e.Result is Tuple<LivreVM, WorkerState<LivreExemplaryVM, LivreExemplaryVM>> result && result.Item2.ResultList != null && result.Item2.ResultList.Any())
+                    {
+                        ViewModelPage.AvailableExemplaries = new ObservableCollection<LivreExemplaryVM>(result.Item2.ResultList);
+                    }
+
+                    IList<ContactVM> itemList = await DbServices.Contact.AllVMAsync();
+                    ViewModelPage.ContactViewModelList = itemList?.ToList() ?? new List<ContactVM>();
+
+                    ViewModelPage.WorkerTextVisibility = Visibility.Collapsed;
+                    ViewModelPage.AddExemplaryBtnVisibility = Visibility.Visible;
+                };
             }
             catch (Exception ex)
             {
@@ -336,10 +365,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                if (CreateItemRequested != null)
-                {
-                    CreateItemRequested(this, args);
-                }
+                CreateItemRequested?.Invoke(this, args);
             }
             catch (Exception ex)
             {
@@ -454,6 +480,8 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
+
+        
     }
 
     public class NewEditBookPretUCVM : INotifyPropertyChanged
@@ -651,6 +679,20 @@ namespace LibraryProjectUWP.Views.Book
                 if (this._EditMode != value)
                 {
                     this._EditMode = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<LivreExemplaryVM> _AvailableExemplaries = new ObservableCollection<LivreExemplaryVM>();
+        public ObservableCollection<LivreExemplaryVM> AvailableExemplaries
+        {
+            get => this._AvailableExemplaries;
+            set
+            {
+                if (_AvailableExemplaries != value)
+                {
+                    this._AvailableExemplaries = value;
                     this.OnPropertyChanged();
                 }
             }
