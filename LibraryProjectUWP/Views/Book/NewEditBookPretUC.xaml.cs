@@ -62,6 +62,23 @@ namespace LibraryProjectUWP.Views.Book
             CancelModificationRequested?.Invoke(this, null);
         }
 
+        public void Select()
+        {
+            try
+            {
+                if (this.Parent != null && this.Parent is Pivot pivot)
+                {
+                    pivot.SelectedItem = this;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void InitializeActionInfos()
         {
             try
@@ -480,6 +497,34 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     _Glyph = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _AddExemplaryBtnVisibility;
+        public Visibility AddExemplaryBtnVisibility
+        {
+            get => this._AddExemplaryBtnVisibility;
+            set
+            {
+                if (this._AddExemplaryBtnVisibility != value)
+                {
+                    this._AddExemplaryBtnVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _WorkerTextVisibility;
+        public Visibility WorkerTextVisibility
+        {
+            get => this._WorkerTextVisibility;
+            set
+            {
+                if (this._WorkerTextVisibility != value)
+                {
+                    this._WorkerTextVisibility = value;
+                    this.OnPropertyChanged();
                 }
             }
         }

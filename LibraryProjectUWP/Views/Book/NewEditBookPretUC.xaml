@@ -269,6 +269,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind _parameters.AvailableExemplariesViewModelList, Mode=OneWay}"
                           ItemTemplate="{StaticResource exemplaryItemDataTemplate}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Exemplary, Mode=TwoWay}">
@@ -276,7 +277,11 @@
                             <TextBlock Text="Exemplaires disponible" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </ComboBox.Header>
                     </ComboBox>
-                    <HyperlinkButton Grid.Row="1" Content="Ajouter un exemplaire" HorizontalAlignment="Right" Click="HyperlinkBtn_AddNew_Exemplary_Click"/>
+                    <HyperlinkButton Grid.Row="1" Content="Ajouter un exemplaire" HorizontalAlignment="Right" Click="HyperlinkBtn_AddNew_Exemplary_Click" Visibility="{x:Bind ViewModelPage.AddExemplaryBtnVisibility, Mode=OneWay}"/>
+                    <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="4" Visibility="{x:Bind ViewModelPage.WorkerTextVisibility, Mode=OneWay}">
+                        <TextBlock x:Name="tbcStatus" Grid.Row="1" TextAlignment="Center" Text="Recherche d'exemplaires disponible en cours, veuillez patienter quelques instants." Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" TextWrapping="Wrap"/>
+                        <ProgressBar IsIndeterminate="True"/>
+                    </StackPanel>
                 </Grid>
                 <Grid Grid.Row="4" RowSpacing="8" Visibility="{x:Bind ViewModelPage.ContactSourceVisibility, Mode=OneWay}">
                     <Grid.RowDefinitions>

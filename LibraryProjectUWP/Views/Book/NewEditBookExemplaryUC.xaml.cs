@@ -71,6 +71,23 @@ namespace LibraryProjectUWP.Views.Book
             CancelModificationRequested?.Invoke(this, null);
         }
 
+        public void Select()
+        {
+            try
+            {
+                if (this.Parent != null && this.Parent is Pivot pivot)
+                {
+                    pivot.SelectedItem = this;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void InitializeActionInfos()
         {
             try
@@ -93,10 +110,11 @@ namespace LibraryProjectUWP.Views.Book
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
 

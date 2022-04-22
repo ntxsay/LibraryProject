@@ -1053,7 +1053,6 @@ namespace LibraryProjectUWP.Views.Book
 
                         if (sender.ViewModelPage.ParentReferences != null)
                         {
-                            sender.Close();
                             if (sender.ViewModelPage.ParentReferences.ParentType == typeof(BookExemplaryListUC))
                             {
 
@@ -1064,9 +1063,11 @@ namespace LibraryProjectUWP.Views.Book
                                 if (item != null)
                                 {
                                     item._parameters.AvailableExemplariesViewModelList = await DbServices.BookExemplary.GetAvailableBookExemplaryVMAsync(sender._parameters.ParentBook.Id);
+                                    SelectItemSideBar(item);
                                 }
                             }
                         }
+                        sender.Close();
                     }
                     else
                     {
@@ -1933,6 +1934,44 @@ namespace LibraryProjectUWP.Views.Book
                 else
                 {
                     this.CmbxSideBarItemTitle.Visibility = Visibility.Visible;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SelectItemSideBar(PivotItem item)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (!this.PivotRightSideBar.Items.Contains(item))
+                {
+                    return;
+                }
+
+                this.PivotRightSideBar.SelectedItem = item;
+
+                if (this.CmbxSideBarItemTitle.Items.Count > 0)
+                {
+                    if (item.Header is Grid grid && grid.Children[0] is SideBarItemHeader itemHeader)
+                    {
+                        foreach (var cmbxItem in this.CmbxSideBarItemTitle.Items)
+                        {
+                            if (cmbxItem is SideBarItemHeaderVM headerVM)
+                            {
+                                if (itemHeader.Guid == headerVM.IdItem)
+                                {
+                                    this.CmbxSideBarItemTitle.SelectedItem = headerVM;
+                                    return;
+                                }
+                            }
+                        }
+
+                    }
                 }
             }
             catch (Exception ex)
