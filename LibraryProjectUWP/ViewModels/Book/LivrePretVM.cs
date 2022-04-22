@@ -37,7 +37,7 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private DateTimeOffset _DatePret = DateTime.UtcNow;
+        private DateTimeOffset _DatePret = DateTime.Now;
         public DateTimeOffset DatePret
         {
             get => _DatePret;

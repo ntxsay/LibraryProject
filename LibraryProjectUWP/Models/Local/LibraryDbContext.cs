@@ -29,8 +29,10 @@ namespace LibraryProjectUWP.Models.Local
         public virtual DbSet<TbookExemplary> TbookExemplary { get; set; }
         public virtual DbSet<TbookFormat> TbookFormat { get; set; }
         public virtual DbSet<TbookIdentification> TbookIdentification { get; set; }
+        public virtual DbSet<TbookIllustratorConnector> TbookIllustratorConnector { get; set; }
         public virtual DbSet<TbookOtherTitle> TbookOtherTitle { get; set; }
         public virtual DbSet<TbookPret> TbookPret { get; set; }
+        public virtual DbSet<TbookReading> TbookReading { get; set; }
         public virtual DbSet<TbookTranslatorConnector> TbookTranslatorConnector { get; set; }
         public virtual DbSet<Tcollection> Tcollection { get; set; }
         public virtual DbSet<Tcontact> Tcontact { get; set; }
@@ -233,6 +235,24 @@ namespace LibraryProjectUWP.Models.Local
                     .HasForeignKey<TbookIdentification>(d => d.Id);
             });
 
+            modelBuilder.Entity<TbookIllustratorConnector>(entity =>
+            {
+                entity.ToTable("TBookIllustratorConnector");
+
+                entity.HasIndex(e => e.Id)
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(d => d.IdBookNavigation)
+                    .WithMany(p => p.TbookIllustratorConnector)
+                    .HasForeignKey(d => d.IdBook);
+
+                entity.HasOne(d => d.IdContactNavigation)
+                    .WithMany(p => p.TbookIllustratorConnector)
+                    .HasForeignKey(d => d.IdContact);
+            });
+
             modelBuilder.Entity<TbookOtherTitle>(entity =>
             {
                 entity.ToTable("TBookOtherTitle");
@@ -279,6 +299,20 @@ namespace LibraryProjectUWP.Models.Local
                 entity.HasOne(d => d.IdEtatBeforeNavigation)
                     .WithMany(p => p.TbookPretIdEtatBeforeNavigation)
                     .HasForeignKey(d => d.IdEtatBefore);
+            });
+
+            modelBuilder.Entity<TbookReading>(entity =>
+            {
+                entity.ToTable("TBookReading");
+
+                entity.HasIndex(e => e.Id)
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(d => d.IdNavigation)
+                    .WithOne(p => p.TbookReading)
+                    .HasForeignKey<TbookReading>(d => d.Id);
             });
 
             modelBuilder.Entity<TbookTranslatorConnector>(entity =>

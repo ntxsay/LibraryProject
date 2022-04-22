@@ -1267,7 +1267,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task NewBookPret(LivreVM viewModel, Guid? guid = null)
+        public async Task NewBookPret(LivreVM viewModel, SideBarInterLinkVM parentReferences = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1298,9 +1298,9 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     });
 
-                    if (guid != null)
+                    if (parentReferences != null)
                     {
-                        userControl.ViewModelPage.ParentGuid = guid;
+                        userControl.ViewModelPage.ParentReferences = parentReferences;
                     }
 
                     userControl.CancelModificationRequested += NewEditBookPretUC_CancelModificationRequested;
@@ -1339,10 +1339,19 @@ namespace LibraryProjectUWP.Views.Book
                         sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                         sender.ViewModelPage.IsResultMessageOpen = true;
 
-                        if (sender.ViewModelPage.ParentGuid != null)
+                        if (sender.ViewModelPage.ParentReferences != null)
                         {
-                            sender.Close();
+                            if (sender.ViewModelPage.ParentReferences.ParentType == typeof(BookPretListUC))
+                            {
+                                var item = uiServices.GetNewEditBookPretUCSideBarByGuid(PivotRightSideBar, sender.ViewModelPage.ParentReferences.ParentGuid);
+                                if (item != null)
+                                {
+                                    item.LoadDataAsync();
+                                    SelectItemSideBar(item);
+                                }
+                            }
                         }
+                        sender.Close();
                     }
                     else
                     {

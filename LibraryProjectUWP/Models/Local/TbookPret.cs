@@ -15,7 +15,9 @@ namespace LibraryProjectUWP.Models.Local
         public long IdEtatBefore { get; set; }
         public long? IdEtatAfter { get; set; }
         public string DatePret { get; set; }
+        public string TimePret { get; set; }
         public string DateRemise { get; set; }
+        public string TimeRemise { get; set; }
         public string DateRemiseUser { get; set; }
         public string Observation { get; set; }
 

@@ -432,6 +432,29 @@ namespace LibraryProjectUWP.Code.Helpers
                 }
             }
 
+            public static TimeSpan? GetNullableTimeSpanFromString(string value)
+            {
+                try
+                {
+                    if (value.IsStringNullOrEmptyOrWhiteSpace() == true)
+                    {
+                        return null;
+                    }
+
+                    if (TimeSpan.TryParse(value, out TimeSpan timeSpan))
+                    {
+                        return timeSpan;
+                    }
+
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    throw;
+                }
+            }
+
             public static string DoubleToDurationMinutesHours(double value)
             {
                 try

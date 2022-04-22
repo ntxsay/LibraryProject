@@ -168,6 +168,22 @@ CREATE TABLE IF NOT EXISTS "TBookFormat" (
 	PRIMARY KEY("Id" AUTOINCREMENT)
     FOREIGN KEY("Id") REFERENCES "TBook"("Id") ON DELETE CASCADE
 );
+
+----------------------------------------------------------------------------------------------------
+-- status -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TBookReading";
+--Cree la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TBookReading" (
+	"Id" INTEGER NOT NULL UNIQUE,
+    "Status" INTEGER NULL, -- Terminé, En pause, En cours de lecture, Abandonné, Non lu, A lire
+    "LastPageReaded" INTEGER NULL,
+    "LastDateReaded" TEXT NULL,
+    "Note10" REAL NULL,
+	PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("Id") REFERENCES "TBook"("Id") ON DELETE CASCADE
+);
+
 ----------------------------------------------------------------------------------------------------
 -- Titres Livres -- 
 --Supprime la Table si existe
@@ -250,6 +266,20 @@ CREATE TABLE IF NOT EXISTS "TBookTranslatorConnector" (
 );
 
 ----------------------------------------------------------------------------------------------------
+-- Connecteur Illustrateur/Livres -- 
+--Supprime la Table si existe
+DROP TABLE IF EXISTS "TBookIllustratorConnector";
+--Cree la Table si n'existe pas
+CREATE TABLE IF NOT EXISTS "TBookIllustratorConnector" (
+	"Id" INTEGER NOT NULL UNIQUE,
+	"IdBook" INTEGER NOT NULL,
+	"IdContact" INTEGER NOT NULL,
+	PRIMARY KEY("Id" AUTOINCREMENT)
+    FOREIGN KEY("IdBook") REFERENCES "TBook"("Id") ON DELETE CASCADE
+    FOREIGN KEY("IdContact") REFERENCES "TContact"("Id") ON DELETE CASCADE
+);
+
+----------------------------------------------------------------------------------------------------
 -- Connecteur Editeur/Livres -- 
 --Supprime la Table si existe
 DROP TABLE IF EXISTS "TBookEditeurConnector";
@@ -291,7 +321,9 @@ CREATE TABLE IF NOT EXISTS "TBookPret" (
 	"IdEtatBefore" INTEGER NOT NULL,
 	"IdEtatAfter" INTEGER NULL,
     "DatePret" TEXT NOT NULL,
+    "TimePret" TEXT NULL,
     "DateRemise" TEXT NULL,
+    "TimeRemise" TEXT NULL,
     "DateRemiseUser" TEXT NULL, --new
     "Observation" TEXT NULL,
 

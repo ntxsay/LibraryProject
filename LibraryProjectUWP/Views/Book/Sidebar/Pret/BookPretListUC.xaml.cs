@@ -179,7 +179,11 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                await _parameters.ParentPage.NewBookPret(_parameters.ParentBook, ViewModelPage.ItemGuid);
+                await _parameters.ParentPage.NewBookPret(_parameters.ParentBook, new SideBarInterLinkVM() 
+                { 
+                    ParentType = typeof(BookPretListUC), 
+                    ParentGuid = ViewModelPage.ItemGuid 
+                });
             }
             catch (Exception ex)
             {

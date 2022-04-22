@@ -327,7 +327,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         var recordEtatAvantPret = new TbookEtat()
                         {
-                            IdBookExemplary = viewModel.Emprunteur.Id,
+                            IdBookExemplary = viewModel.IdBookExemplary,
                             DateAjout = viewModel.EtatAvantPret.DateAjout.ToUniversalTime().ToString(),
                             Etat = viewModel.EtatAvantPret.Etat,
                             Observations = viewModel.EtatAvantPret.Observations,
@@ -341,9 +341,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                         {
                             IdBookExemplary = viewModel.IdBookExemplary,
                             DatePret = viewModel.DatePret.ToUniversalTime().ToString(),
+                            TimePret = !viewModel.TimePret.HasValue ? null : viewModel.TimePret.Value.ToString(),
                             IdContact = viewModel.Emprunteur.Id,
                             IdEtatBefore = recordEtatAvantPret.Id,
                             DateRemise = viewModel.DateRemise.HasValue ? viewModel.DateRemise.Value.ToUniversalTime().ToString() : null,
+                            TimeRemise = !viewModel.TimeRemise.HasValue ? null : viewModel.TimeRemise.Value.ToString(),
                         };
 
                         await context.TbookPret.AddAsync(record);
@@ -557,7 +559,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                         IdEmprunteur = model.IdContact,
                         Emprunteur = emprunteur,
                         DatePret = DatesHelpers.Converter.GetDateFromString(model.DatePret),
+                        TimePret = DatesHelpers.Converter.GetNullableTimeSpanFromString(model.TimePret),
                         DateRemise = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemise),
+                        TimeRemise = DatesHelpers.Converter.GetNullableTimeSpanFromString(model.TimeRemise),
                     };
 
                     if (model.IdEtatBeforeNavigation != null)

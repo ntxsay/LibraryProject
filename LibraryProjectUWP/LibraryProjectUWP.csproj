@@ -209,8 +209,10 @@
     <Compile Include="Models\Local\TbookExemplary.cs" />
     <Compile Include="Models\Local\TbookFormat.cs" />
     <Compile Include="Models\Local\TbookIdentification.cs" />
+    <Compile Include="Models\Local\TbookIllustratorConnector.cs" />
     <Compile Include="Models\Local\TbookOtherTitle.cs" />
     <Compile Include="Models\Local\TbookPret.cs" />
+    <Compile Include="Models\Local\TbookReading.cs" />
     <Compile Include="Models\Local\TbookTranslatorConnector.cs" />
     <Compile Include="Models\Local\Tcollection.cs" />
     <Compile Include="Models\Local\Tcontact.cs" />
@@ -272,10 +274,10 @@
     <Compile Include="Views\Book\BookCollectionPage_Search.cs" />
     <Compile Include="Views\Book\BookCollectionPage_ViewModelPage.cs" />
     <Compile Include="Views\Book\BookCollectionPage_Tasks.cs" />
-    <Compile Include="Views\Book\BookPretListUC.xaml.cs">
+    <Compile Include="Views\Book\Sidebar\Pret\BookPretListUC.xaml.cs">
       <DependentUpon>BookPretListUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\BookExemplaryListUC.xaml.cs">
+    <Compile Include="Views\Book\Sidebar\Exemplary\BookExemplaryListUC.xaml.cs">
       <DependentUpon>BookExemplaryListUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\DeleteBookCD.xaml.cs">
@@ -290,10 +292,10 @@
     <Compile Include="Views\Book\ImportBookFromUrlCD.xaml.cs">
       <DependentUpon>ImportBookFromUrlCD.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\NewEditBookPretUC.xaml.cs">
+    <Compile Include="Views\Book\Sidebar\Pret\NewEditBookPretUC.xaml.cs">
       <DependentUpon>NewEditBookPretUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\NewEditBookExemplaryUC.xaml.cs">
+    <Compile Include="Views\Book\Sidebar\Exemplary\NewEditBookExemplaryUC.xaml.cs">
       <DependentUpon>NewEditBookExemplaryUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\BookCollectionPage.xaml.cs">
@@ -463,11 +465,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Book\BookPretListUC.xaml">
+    <Page Include="Views\Book\Sidebar\Pret\BookPretListUC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Book\BookExemplaryListUC.xaml">
+    <Page Include="Views\Book\Sidebar\Exemplary\BookExemplaryListUC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -487,11 +489,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Book\NewEditBookPretUC.xaml">
+    <Page Include="Views\Book\Sidebar\Pret\NewEditBookPretUC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Book\NewEditBookExemplaryUC.xaml">
+    <Page Include="Views\Book\Sidebar\Exemplary\NewEditBookExemplaryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

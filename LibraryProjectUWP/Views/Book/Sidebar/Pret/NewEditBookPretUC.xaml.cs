@@ -349,6 +349,28 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
+        #region Date
+        private void HyperlinkBtn_ClearDatePret_Click(object sender, RoutedEventArgs e)
+        {
+             ViewModelPage.ViewModel.DatePret = DateTime.Now;
+        }
+
+        private void HyperlinkBtn_ClearTimePret_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModelPage.ViewModel.TimePret = null;
+        }
+
+        private void HyperlinkBtn_ClearDateRemise_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModelPage.ViewModel.DateRemise = null;
+        }
+
+        private void HyperlinkBtn_ClearTimeRemise_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModelPage.ViewModel.TimeRemise = null;
+        }
+        #endregion
+
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -395,7 +417,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-
         private bool IsModelValided()
         {
             try
@@ -418,22 +439,32 @@ namespace LibraryProjectUWP.Views.Book
                     return false;
                 }
 
-                if (ViewModelPage.ViewModel.TimePret != null)
+                if (ViewModelPage.ViewModel.DateRemise.HasValue)
                 {
-                    var date = new DateTimeOffset(new DateTime(ViewModelPage.ViewModel.DatePret.Year, ViewModelPage.ViewModel.DatePret.Month,
-                                                    ViewModelPage.ViewModel.DatePret.Month, ViewModelPage.ViewModel.DatePret.Day,
-                                                    ViewModelPage.ViewModel.TimePret.Value.Hours, ViewModelPage.ViewModel.TimePret.Value.Minutes, ViewModelPage.ViewModel.TimePret.Value.Seconds));
-                    
-                    ViewModelPage.ViewModel.DatePret = date.ToUniversalTime();
-                }
-
-                if (ViewModelPage.ViewModel.TimeRemise.HasValue && ViewModelPage.ViewModel.DateRemise.HasValue)
-                {
-                    var date = new DateTimeOffset(new DateTime(ViewModelPage.ViewModel.DateRemise.Value.Year, ViewModelPage.ViewModel.DateRemise.Value.Month,
-                                                    ViewModelPage.ViewModel.DateRemise.Value.Month, ViewModelPage.ViewModel.DateRemise.Value.Day,
-                                                    ViewModelPage.ViewModel.TimeRemise.Value.Hours, ViewModelPage.ViewModel.TimeRemise.Value.Minutes, ViewModelPage.ViewModel.TimeRemise.Value.Seconds));
-
-                    ViewModelPage.ViewModel.DateRemise = date;
+                    var result = DateTimeOffset.Compare(ViewModelPage.ViewModel.DatePret, ViewModelPage.ViewModel.DateRemise.Value);
+                    if (result > 0)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                        ViewModelPage.ResultMessage = $"La date de prêt ne peut pas être supérieure à la date de remise.";
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return false;
+                    }
+                    else if (result == 0)
+                    {
+                        if (ViewModelPage.ViewModel.TimePret.HasValue && ViewModelPage.ViewModel.TimeRemise.HasValue)
+                        {
+                            var timeResult = TimeSpan.Compare(ViewModelPage.ViewModel.TimePret.Value, ViewModelPage.ViewModel.TimeRemise.Value);
+                            if (timeResult > 0 || timeResult == 0)
+                            {
+                                ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                                ViewModelPage.ResultMessage = $"L'heure à laquelle le livre a été prêté ne peut pas être supérieure ou identique à l'heure à laquelle le livre sera remis.";
+                                ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                                ViewModelPage.IsResultMessageOpen = true;
+                                return false;
+                            }
+                        }
+                    }
                 }
 
                 ViewModelPage.ViewModel.NoExemplary = ViewModelPage.ViewModel.Exemplary.NoExemplaire;
@@ -499,7 +530,7 @@ namespace LibraryProjectUWP.Views.Book
         public IEnumerable<string> chooseMonths = DatesHelpers.ChooseMonth();
         public List<string> chooseYear = new List<string>();
         public Guid ItemGuid { get; private set; } = Guid.NewGuid();
-        public Guid? ParentGuid { get; set; }
+        public SideBarInterLinkVM ParentReferences { get; set; }
 
         private string _Header;
         public string Header

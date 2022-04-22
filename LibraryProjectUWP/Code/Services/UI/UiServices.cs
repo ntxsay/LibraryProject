@@ -42,6 +42,34 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
+        public BookPretListUC GetBookPretListUCSideBarByGuid(Pivot pivot, Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (pivot == null)
+                {
+                    return null;
+                }
+
+                if (pivot.Items.Count > 0)
+                {
+                    object itemPivot = pivot.Items.FirstOrDefault(f => f is BookPretListUC item && item.ViewModelPage.ItemGuid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as BookPretListUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
         public NewEditBookPretUC GetNewEditBookPretUCSideBarByGuid(Pivot pivot, Guid guid)
         {
             MethodBase m = MethodBase.GetCurrentMethod();

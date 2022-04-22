@@ -634,7 +634,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         var MaxNoExemplary = MinNoExemplary + viewModel.NbExemplaire;
                         
                         List<TbookExemplary> recordCollection = new List<TbookExemplary>();
-                        for (int i = MinNoExemplary; i <= MaxNoExemplary; i++)
+                        for (int i = MinNoExemplary; i < MaxNoExemplary; i++)
                         {
                             var record = new TbookExemplary()
                             {
