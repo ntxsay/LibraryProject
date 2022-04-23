@@ -86,11 +86,13 @@
                     <Border Height="301" Width="192" Background="WhiteSmoke" BorderThickness="0" CornerRadius="8">
                         <Grid Height="301" Width="192">
                             <Image Source="{x:Bind JaquettePath, Mode=OneWay}" Tag="{x:Bind JaquettePath, Mode=OneWay}" Stretch="UniformToFill" Loaded="Image_Loaded_1"/>
-                            <Grid Height="150" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left" Visibility="{x:Bind NbExemplaires, Converter={StaticResource intToVisibilityConverter}, Mode=OneWay}">
+                            <Grid Height="150" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left" Visibility="{x:Bind NbPrets, Converter={StaticResource intToVisibilityConverter}, Mode=OneWay}">
                                 <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="LightBlue" Points="0,110, 0,70, 70,0, 110,0"/>
                                 <Polygon HorizontalAlignment="Left" VerticalAlignment="Top" Fill="BlueViolet" Points="0,110, 0,71, 71,0, 110,0"/>
-                                <TextBlock Text="1 prêt(s)" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Margin="-28,35,0,0" 
+                                <TextBlock TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Margin="-28,35,0,0" 
                                                    UseLayoutRounding="False" d:LayoutRounding="Auto" Width="140" FontSize="16" FontWeight="Bold" Foreground="White">
+                                    <Run Text="{x:Bind NbPrets, Mode=OneWay}" />
+                                    <Run Text="prêt(s)" />
                                     <TextBlock.RenderTransform>
                                         <CompositeTransform Rotation="-45.15"/>
                                     </TextBlock.RenderTransform>

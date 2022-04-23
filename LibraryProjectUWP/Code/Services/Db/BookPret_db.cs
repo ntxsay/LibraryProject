@@ -19,6 +19,58 @@ namespace LibraryProjectUWP.Code.Services.Db
 {
     internal partial class DbServices
     {
+        public partial struct Book
+        {
+            public static async Task<int> CountPretInBookAsync(long idBook, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var exemplariesListId = await GetBookExemplaryListOfIdAsync(idBook, cancellationToken);
+                        List<TbookPret> tbookPrets = new List<TbookPret>();
+                        foreach (var idExemplary in exemplariesListId)
+                        {
+                            List<TbookPret> _tbookPrets = await context.TbookPret.Where(w => w.IdBookExemplary == idExemplary).ToListAsync(cancellationToken);
+                            if (_tbookPrets != null && _tbookPrets.Any())
+                            {
+                                for (int i = 0; i < _tbookPrets.Count; i++)
+                                {
+                                    var dateRemise = DatesHelpers.Converter.GetNullableDateFromString(_tbookPrets[i].DateRemise);
+                                    var timeRemise = DatesHelpers.Converter.GetNullableTimeSpanFromString(_tbookPrets[i].TimeRemise);
+                                    
+                                    if (dateRemise.HasValue)
+                                    {
+                                        var compare = dateRemise.Value.CompareDate(DateTime.UtcNow);
+                                        if (compare != DateCompare.DateSuperieur && compare != DateCompare.DateEgal)
+                                        {
+                                            _tbookPrets.RemoveAt(i);
+                                            i = 0;
+                                        }
+                                    }
+                                    
+                                }
+
+                                if (_tbookPrets != null && _tbookPrets.Any())
+                                {
+                                    tbookPrets.AddRange(_tbookPrets);
+                                }
+                            }
+                        }
+
+                        return tbookPrets.Count;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return 0;
+                }
+            }
+        }
+        
+        [Obsolete]
         public partial struct BookPret
         {
             static string NameEmptyMessage = "Le nom du livre doit être renseigné avant l'enregistrement.";

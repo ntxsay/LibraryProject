@@ -183,6 +183,20 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
+        private long _NbPrets;
+        public long NbPrets
+        {
+            get => _NbPrets;
+            set
+            {
+                if (_NbPrets != value)
+                {
+                    _NbPrets = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public LivreDescriptionVM Description { get; set; } = new LivreDescriptionVM();
         public LivreClassificationAgeVM ClassificationAge { get; set; } = new LivreClassificationAgeVM();
         

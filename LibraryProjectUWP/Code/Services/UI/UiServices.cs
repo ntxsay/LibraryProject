@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.Views.Book;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
@@ -97,6 +98,58 @@ namespace LibraryProjectUWP.Code.Services.UI
                 return null;
             }
         }
+
+        public LivreVM SearchViewModelInCurrentGridView(Pivot pivot, long idBook, string gridViewName = "GridViewItems", bool selectAfterFinded = false)
+        {
+            try
+            {
+                if (pivot == null || pivot.SelectedItem == null)
+                {
+                    return null;
+                }
+
+                foreach (var pivotItem in pivot.Items)
+                {
+                    if (pivotItem is IGrouping<string, LivreVM> group && group.Any(f => f.Id == idBook))
+                    {
+                        if (pivot.SelectedItem != pivotItem)
+                        {
+                            pivot.SelectedItem = pivotItem;
+                        }
+
+                        var _container = pivot.ContainerFromItem(pivotItem);
+                        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container, gridViewName);
+                        if (gridView != null)
+                        {
+                            foreach (var gridViewItem in gridView.Items)
+                            {
+                                if (gridViewItem is LivreVM _viewModel && _viewModel.Id == idBook)
+                                {
+                                    if (selectAfterFinded)
+                                    {
+                                        if (gridView.SelectedItem != gridViewItem)
+                                        {
+                                            gridView.SelectedItem = gridViewItem;
+                                        }
+                                    }
+
+                                    return _viewModel;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
 
         public GridView GetSelectedGridViewFromPivotTemplate(Pivot pivot, string gridViewName = "GridViewItems")
         {

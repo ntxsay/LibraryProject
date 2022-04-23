@@ -375,6 +375,10 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     long countExemplaries = await DbServices.Book.CountExemplaryInBookAsync(book.Id);
                     book.NbExemplaires = countExemplaries;
 
+                    long countPrets = await DbServices.Book.CountPretInBookAsync(book.Id);
+                    book.NbPrets = countPrets;
+
+
                     var jaquettes = await esBook.GetBookItemJaquettePathAsync(book);
                     string combinedPath = jaquettes;
                     string jaquetteFile = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : EsGeneral.BookDefaultJaquette;
