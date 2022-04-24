@@ -1232,14 +1232,10 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC);
-                if (checkedItem != null)
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is BookPretListUC) is BookPretListUC checkedItem)
                 {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
-                    if (checkedItem is BookPretListUC item)
-                    {
-                        item.InitializeData();
-                    }
+                    this.SelectItemSideBar(checkedItem);
+                    checkedItem.InitializeData();
                 }
                 else
                 {
@@ -1267,36 +1263,20 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task NewBookPret(LivreVM viewModel, SideBarInterLinkVM parentReferences = null)
+        public void NewBookPret(LivreVM viewModel, LivrePretVM livrePretVM = null, EditMode editMode = EditMode.Create, SideBarInterLinkVM parentReferences = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookPretUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
-                if (checkedItem != null)
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookPretUC item && item.ViewModelPage.EditMode == editMode) is NewEditBookPretUC checkedItem)
                 {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                    checkedItem.InitializeSideBar(this, viewModel, livrePretVM, editMode);
+                    this.SelectItemSideBar(checkedItem);
                 }
                 else
                 {
-                    NewEditBookPretUC userControl = new NewEditBookPretUC(new ManageBookPretParametersDriverVM()
-                    {
-                        ParentPage = this,
-                        EditMode = Code.EditMode.Create,
-                        ParentBook = viewModel,
-                        AvailableExemplariesViewModelList = await DbServices.BookExemplary.GetAvailableBookExemplaryVMAsync(viewModel.Id),
-                        CurrentViewModel = new LivrePretVM()
-                        {
-                            EtatAvantPret = new LivreEtatVM()
-                            {
-                                TypeVerification = Code.BookTypeVerification.AvantPret,
-                            },
-                            EtatApresPret = new LivreEtatVM()
-                            {
-                                TypeVerification = Code.BookTypeVerification.ApresPret,
-                            },
-                        }
-                    });
+                    NewEditBookPretUC userControl = new NewEditBookPretUC();
+                    userControl.InitializeSideBar(this, viewModel, livrePretVM , editMode);
 
                     if (parentReferences != null)
                     {
@@ -1327,7 +1307,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (sender._parameters != null)
+                if (sender.ViewModelPage != null)
                 {
                     LivrePretVM newViewModel = sender.ViewModelPage.ViewModel;
 

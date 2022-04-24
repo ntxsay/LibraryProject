@@ -27,7 +27,6 @@ namespace LibraryProjectUWP.Views.Book
 {
     public sealed partial class NewEditBookPretUC : PivotItem
     {
-        public readonly ManageBookPretParametersDriverVM _parameters;
 
         public NewEditBookPretUCVM ViewModelPage { get; set; } = new NewEditBookPretUCVM();
 
@@ -45,16 +44,6 @@ namespace LibraryProjectUWP.Views.Book
         public NewEditBookPretUC()
         {
             this.InitializeComponent();
-        }
-
-        public NewEditBookPretUC(ManageBookPretParametersDriverVM parameters)
-        {
-            this.InitializeComponent();
-            _parameters = parameters;
-            ViewModelPage.EditMode = parameters.EditMode;
-            ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Prêter un livre" : "Editer un livre")}";
-            ViewModelPage.ViewModel = parameters?.CurrentViewModel;
-            InitializeActionInfos();
         }
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
@@ -84,10 +73,46 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        public void InitializeSideBar(BookCollectionPage bookCollectionPage, LivreVM livreVM, LivrePretVM livrePretVm, EditMode editMode)
+        {
+            try
+            {
+                ViewModelPage = new NewEditBookPretUCVM()
+                {
+                    ParentPage = bookCollectionPage,
+                    EditMode = editMode,
+                    ParentBook = livreVM,
+                    ViewModel = livrePretVm ?? new LivrePretVM()
+                    {
+                        EtatAvantPret = new LivreEtatVM()
+                        {
+                            TypeVerification = BookTypeVerification.AvantPret,
+                        },
+                        EtatApresPret = new LivreEtatVM()
+                        {
+                            TypeVerification = BookTypeVerification.ApresPret,
+                        },
+                    },
+                };
+
+                ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Prêter un livre" : "Editer un livre")}";
+
+                InitializeActionInfos();
+                LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void InitializeActionInfos()
         {
             try
             {
+                TbcInfos.Inlines.Clear();
                 Run runTitle = new Run()
                 {
                     Text = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter un ou plusieurs" : "d'éditer le")} exemplaire(s) au livre",
@@ -95,27 +120,24 @@ namespace LibraryProjectUWP.Views.Book
                 };
                 TbcInfos.Inlines.Add(runTitle);
 
-                if (_parameters != null)
+                Run runName = new Run()
                 {
-                    Run runName = new Run()
-                    {
-                        Text = " " + _parameters?.ParentBook?.MainTitle,
-                        FontWeight = FontWeights.Medium,
-                    };
-                    TbcInfos.Inlines.Add(runName);
-                }
-
+                    Text = " " + ViewModelPage?.ParentBook?.MainTitle,
+                    FontWeight = FontWeights.Medium,
+                };
+                TbcInfos.Inlines.Add(runName);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
 
         private void HyperlinkBtn_AddNew_Exemplary_Click(object sender, RoutedEventArgs e)
         {
-            _parameters.ParentPage.NewBookExemplary(_parameters.ParentBook, new SideBarInterLinkVM()
+            ViewModelPage.ParentPage.NewBookExemplary(ViewModelPage.ParentBook, new SideBarInterLinkVM()
             {
                 ParentGuid = ViewModelPage.ItemGuid,
                 ParentType = typeof(NewEditBookPretUC)
@@ -140,7 +162,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                getAvailableBookExemplariesForPretTask.InitializeWorker(_parameters.ParentBook);
+                getAvailableBookExemplariesForPretTask.InitializeWorker(ViewModelPage.ParentBook);
                 getAvailableBookExemplariesForPretTask.AfterTaskCompletedRequested += async (j, e) =>
                 {
                     if (e.Result is Tuple<LivreVM, WorkerState<LivreExemplaryVM, LivreExemplaryVM>> result && result.Item2.ResultList != null && result.Item2.ResultList.Any())
@@ -301,23 +323,23 @@ namespace LibraryProjectUWP.Views.Book
                     else
                     {
                         //Ajoute un nouvel auteur
-                        if (_parameters.ParentPage != null)
+                        if (ViewModelPage.ParentPage != null)
                         {
                             if (!sender.Text.IsStringNullOrEmptyOrWhiteSpace())
                             {
                                 var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                 if (split.Length == 1)
                                 {
-                                    _parameters.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                    ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
                                 }
                                 else if (split.Length >= 2)
                                 {
-                                    _parameters.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
+                                    ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
                                 }
                             }
                             else
                             {
-                                _parameters.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
                             }
                             sender.Text = String.Empty;
                         }
@@ -710,6 +732,34 @@ namespace LibraryProjectUWP.Views.Book
                 if (this._EditMode != value)
                 {
                     this._EditMode = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private BookCollectionPage _ParentPage;
+        public BookCollectionPage ParentPage
+        {
+            get => this._ParentPage;
+            set
+            {
+                if (this._ParentPage != value)
+                {
+                    this._ParentPage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private LivreVM _ParentBook;
+        public LivreVM ParentBook
+        {
+            get => this._ParentBook;
+            set
+            {
+                if (this._ParentBook != value)
+                {
+                    this._ParentBook = value;
                     this.OnPropertyChanged();
                 }
             }

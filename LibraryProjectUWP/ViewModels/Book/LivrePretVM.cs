@@ -149,7 +149,10 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private LivreEtatVM _EtatAvantPret = new LivreEtatVM();
+        private LivreEtatVM _EtatAvantPret = new LivreEtatVM()
+        {
+            TypeVerification = Code.BookTypeVerification.AvantPret,
+        };
         public LivreEtatVM EtatAvantPret
         {
             get => _EtatAvantPret;
@@ -163,7 +166,11 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private LivreEtatVM _EtatApresPret = new LivreEtatVM();
+        private LivreEtatVM _EtatApresPret = new LivreEtatVM()
+        {
+            TypeVerification = Code.BookTypeVerification.ApresPret,
+        };
+
         public LivreEtatVM EtatApresPret
         {
             get => _EtatApresPret;
@@ -176,7 +183,6 @@ namespace LibraryProjectUWP.ViewModels.Book
                 }
             }
         }
-
 
         public string PretStatus()
         {

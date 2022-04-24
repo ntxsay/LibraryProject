@@ -170,16 +170,40 @@ namespace LibraryProjectUWP.Views.Book
             InitializeData();
         }
 
+        private async void ListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            try
+            {
+                var dialog = new ReturnBookExemplaryCD();
+
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    
+                }
+                else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private async void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
-                await _parameters.ParentPage.NewBookPret(_parameters.ParentBook, new SideBarInterLinkVM() 
+                _parameters.ParentPage.NewBookPret(_parameters.ParentBook, null, EditMode.Create, new SideBarInterLinkVM() 
                 { 
                     ParentType = typeof(BookPretListUC), 
                     ParentGuid = ViewModelPage.ItemGuid 
@@ -322,7 +346,7 @@ namespace LibraryProjectUWP.Views.Book
 
         }
     }
-    
+
     public class BookPretListUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };

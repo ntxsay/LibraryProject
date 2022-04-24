@@ -82,14 +82,13 @@
                 </Grid>
                 <Grid Grid.Column="1" ColumnSpacing="8" VerticalAlignment="Center">
                     <TextBlock HorizontalAlignment="Left" FontSize="12" TextWrapping="Wrap">
-                                <Run Text="Etat du livre"/>
+                                <Run Text="En provenance de"/>
+                        <Run Text="{x:Bind ContactSource.SocietyName}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="{x:Bind ContactSource.NomNaissance}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="{x:Bind ContactSource.Prenom}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/><LineBreak /><Run Text="Etat du livre"/>
                                 <Run Text="{x:Bind Etat.Etat}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                                 <Run Text="au"/>
                                 <Run Text="{x:Bind Etat.DateVerification, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='dddd dd MMMM yyyy'}"/>
-                                <LineBreak /><Run Text="En provenance de"/>
-                                <Run Text="{x:Bind ContactSource.SocietyName}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
-                                <Run Text="{x:Bind ContactSource.NomNaissance}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
-                                <Run Text="{x:Bind ContactSource.Prenom}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                     </TextBlock>
                 </Grid>
             </Grid>

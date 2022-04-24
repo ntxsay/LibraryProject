@@ -28,7 +28,6 @@
             <RowDefinition Height="1" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Foreground="{ThemeResource SystemAccentColor}">
                                     <Run Text="Remettre l'exemplaire N°" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
@@ -52,8 +51,8 @@
                        IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}">
             </MUIXC:InfoBar>
         </Grid>
-        <Button Grid.Row="4" Click="Button_Click">
+        <!--<Button Grid.Row="4" Click="Button_Click">
             <TextBlock Text="Remettre" />
-        </Button>
+        </Button>-->
     </Grid>
 </ContentDialog>

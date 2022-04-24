@@ -167,7 +167,8 @@
             </StackPanel>
             <SemanticZoom Visibility="{x:Bind ViewModelPage.DataListVisibility, Mode=OneWay}">
                 <SemanticZoom.ZoomedInView>
-                    <ListView ItemsSource="{x:Bind CollectionViewSource.View, Mode=OneWay}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
+                    <ListView ItemsSource="{x:Bind CollectionViewSource.View, Mode=OneWay}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" 
+                              Background="Transparent" ItemClick="ListView_ItemClick">
                         <ListView.GroupStyle>
                             <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
                         </ListView.GroupStyle>
