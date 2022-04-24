@@ -1323,10 +1323,10 @@ namespace LibraryProjectUWP.Views.Book
                         {
                             if (sender.ViewModelPage.ParentReferences.ParentType == typeof(BookPretListUC))
                             {
-                                var item = uiServices.GetNewEditBookPretUCSideBarByGuid(PivotRightSideBar, sender.ViewModelPage.ParentReferences.ParentGuid);
+                                var item = uiServices.GetBookPretListUCSideBarByGuid(PivotRightSideBar, sender.ViewModelPage.ParentReferences.ParentGuid);
                                 if (item != null)
                                 {
-                                    item.LoadDataAsync();
+                                    item.InitializeData();
                                     SelectItemSideBar(item);
                                 }
                             }

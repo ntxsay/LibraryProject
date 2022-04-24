@@ -656,11 +656,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                         //IdBook = model.IdBook,
                         IdEmprunteur = model.IdContact,
                         Emprunteur = emprunteur,
-                        DatePret = DatesHelpers.Converter.GetDateFromString(model.DatePret),
+                        DatePret = DatesHelpers.Converter.GetDateFromString(model.DatePret).ToLocalTime(),
                         TimePret = DatesHelpers.Converter.GetNullableTimeSpanFromString(model.TimePret),
-                        DateRemise = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemise),
+                        DateRemise = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemise)?.ToLocalTime(),
                         TimeRemise = DatesHelpers.Converter.GetNullableTimeSpanFromString(model.TimeRemise),
-                        DateRealRemise = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemiseUser),
+                        DateRealRemise = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemiseUser)?.ToLocalTime(),
                     };
 
                     if (model.IdEtatBeforeNavigation != null)
