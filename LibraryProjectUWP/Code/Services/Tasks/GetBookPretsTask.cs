@@ -148,7 +148,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             {
                 if (sender is BackgroundWorker worker && e.Argument is LivreVM viewModel)
                 {
-                    using (Task<IList<LivrePretVM>> task = DbServices.BookPret.GetBookPretVMAsync(viewModel.Id, BookPretFrom.Book, cancellationTokenSource.Token))
+                    using (Task<IList<LivrePretVM>> task = DbServices.Book.GetBookPretVMAsync(viewModel.Id, BookPretFrom.Book, cancellationTokenSource.Token))
                     {
                         task.Wait();
 

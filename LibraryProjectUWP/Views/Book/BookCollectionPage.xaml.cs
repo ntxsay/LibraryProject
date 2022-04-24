@@ -1311,7 +1311,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     LivrePretVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                    var creationResult = await DbServices.BookPret.CreateAsync(sender.ViewModelPage.ViewModel.IdBookExemplary, newViewModel);
+                    var creationResult = await DbServices.Book.CreatePretAsync(sender.ViewModelPage.ViewModel.IdBookExemplary, newViewModel);
                     if (creationResult.IsSuccess)
                     {
                         sender.ViewModelPage.ResultMessageTitle = "Succès";

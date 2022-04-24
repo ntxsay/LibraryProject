@@ -32,6 +32,7 @@
                     <SolidColorBrush x:Key="ListViewBg" Color="{ThemeResource SystemRevealChromeBlackLowColor}"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+            <customConverters:DateTimeToStringDisplay x:Key="dateTimeToStringDisplay"/>
             <customConverters:SizeDiviserConverter x:Key="sizeDiviverConverter"/>
             <customConverters:NullableBooleanToVisibility x:Key="NullableBoolToVisibilityConverterVOD" />
             <customConverters:NullableBooleanToInvertBoolean x:Key="NullableBoolToInvertBooleanConverter" />
@@ -62,7 +63,7 @@
                 <Setter Property="VerticalAlignment" Value="Top" />
             </Style>
             <DataTemplate x:Key="ZoomedInTemplate" x:DataType="booktVm:LivrePretVM">
-                <ListViewItem>
+                <ListViewItem IsDoubleTapEnabled="True" DoubleTapped="ListViewItem_DoubleTapped" Tag="{x:Bind Mode=OneWay}">
                     <Grid ColumnSpacing="2" HorizontalAlignment="Stretch" Padding="0 10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -92,7 +93,7 @@
                                 <Run Text="Etat du livre avant prêt"/>
                                 <Run Text="{x:Bind EtatAvantPret.Etat}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                                 <Run Text="Retour prévu le"/>
-                                <Run Text="{x:Bind DateRemise.Value.ToString(), Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                <Run Text="{x:Bind DateRemise.Value, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='ddd dd MMM yyyy', Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
                             </TextBlock>
                             <!--<TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Left" FontSize="12">
                                 <Run Text="Prix :"/>
@@ -101,11 +102,6 @@
                         </TextBlock>-->
                         </Grid>
                     </Grid>
-                    <ListViewItem.ContextFlyout>
-                        <Flyout Placement="BottomEdgeAlignedRight">
-                            <local:ReturnBookExemplaryUC ViewModel="{x:Bind}" />
-                        </Flyout>
-                    </ListViewItem.ContextFlyout>
                 </ListViewItem>
             </DataTemplate>
             <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="booktVm:LivrePretVMCastVM">
@@ -168,7 +164,7 @@
             <SemanticZoom Visibility="{x:Bind ViewModelPage.DataListVisibility, Mode=OneWay}">
                 <SemanticZoom.ZoomedInView>
                     <ListView ItemsSource="{x:Bind CollectionViewSource.View, Mode=OneWay}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" 
-                              Background="Transparent" ItemClick="ListView_ItemClick">
+                              Background="Transparent">
                         <ListView.GroupStyle>
                             <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
                         </ListView.GroupStyle>

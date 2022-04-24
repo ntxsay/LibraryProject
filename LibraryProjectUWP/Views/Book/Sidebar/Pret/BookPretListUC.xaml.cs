@@ -170,20 +170,26 @@ namespace LibraryProjectUWP.Views.Book
             InitializeData();
         }
 
-        private async void ListView_ItemClick(object sender, ItemClickEventArgs e)
+        private async void ListViewItem_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             try
             {
-                var dialog = new ReturnBookExemplaryCD();
+                if (sender is ListViewItem listViewItem && listViewItem.Tag is LivrePretVM viewModel)
+                {
+                    var dialog = new ReturnBookExemplaryCD(viewModel)
+                    {
+                        Title = viewModel.Exemplary.NoExemplaire,
+                    };
 
-                var result = await dialog.ShowAsync();
-                if (result == ContentDialogResult.Primary)
-                {
-                    
-                }
-                else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                {
-                    return;
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        InitializeData();
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return;
+                    }
                 }
             }
             catch (Exception ex)
@@ -345,6 +351,8 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
+
+        
     }
 
     public class BookPretListUCVM : INotifyPropertyChanged

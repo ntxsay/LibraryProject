@@ -71,7 +71,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                var state = await DbServices.BookPret.ReturnBookAsync(ViewModelPage.ViewModel.Id, ViewModelPage.ViewModel.Exemplary.Id, ViewModelPage.ViewModel.EtatApresPret.Etat, ViewModelPage.ViewModel.EtatApresPret.Observations);
+                var state = await DbServices.Book.ReturnBookAsync(ViewModelPage.ViewModel.Id, ViewModelPage.ViewModel.Exemplary.Id, ViewModelPage.ViewModel.EtatApresPret.Etat, ViewModelPage.ViewModel.EtatApresPret.Observations);
                 if (state.IsSuccess)
                 {
                     ViewModelPage.ResultMessageTitle = "Succès";

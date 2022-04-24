@@ -21,68 +21,13 @@ namespace LibraryProjectUWP.Code.Services.Db
     {
         public partial struct Book
         {
-            public static async Task<int> CountPretInBookAsync(long idBook, CancellationToken cancellationToken = default)
-            {
-                try
-                {
-                    using (LibraryDbContext context = new LibraryDbContext())
-                    {
-                        var exemplariesListId = await GetBookExemplaryListOfIdAsync(idBook, cancellationToken);
-                        List<TbookPret> tbookPrets = new List<TbookPret>();
-                        foreach (var idExemplary in exemplariesListId)
-                        {
-                            List<TbookPret> _tbookPrets = await context.TbookPret.Where(w => w.IdBookExemplary == idExemplary).ToListAsync(cancellationToken);
-                            if (_tbookPrets != null && _tbookPrets.Any())
-                            {
-                                for (int i = 0; i < _tbookPrets.Count; i++)
-                                {
-                                    var dateRemise = DatesHelpers.Converter.GetNullableDateFromString(_tbookPrets[i].DateRemise);
-                                    var timeRemise = DatesHelpers.Converter.GetNullableTimeSpanFromString(_tbookPrets[i].TimeRemise);
-                                    
-                                    if (dateRemise.HasValue)
-                                    {
-                                        var compare = dateRemise.Value.CompareDate(DateTime.UtcNow);
-                                        if (compare != DateCompare.DateSuperieur && compare != DateCompare.DateEgal)
-                                        {
-                                            _tbookPrets.RemoveAt(i);
-                                            i = 0;
-                                        }
-                                    }
-                                    
-                                }
-
-                                if (_tbookPrets != null && _tbookPrets.Any())
-                                {
-                                    tbookPrets.AddRange(_tbookPrets);
-                                }
-                            }
-                        }
-
-                        return tbookPrets.Count;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Logs.Log(ex, m);
-                    return 0;
-                }
-            }
-        }
-        
-        [Obsolete]
-        public partial struct BookPret
-        {
-            static string NameEmptyMessage = "Le nom du livre doit être renseigné avant l'enregistrement.";
-            static readonly string NameAlreadyExistMessage = "Ce livre existe déjà.";
-
             #region All
             /// <summary>
             /// Retourne tous les objets de la base de données
             /// </summary>
             /// <typeparam name="T">Modèle de base de données</typeparam>
             /// <returns></returns>
-            public static async Task<IList<TbookPret>> AllAsync()
+            public static async Task<IList<TbookPret>> AllPretsAsync()
             {
                 try
                 {
@@ -113,11 +58,11 @@ namespace LibraryProjectUWP.Code.Services.Db
             /// <typeparam name="T1">Type d'entrée (Modèle)</typeparam>
             /// <typeparam name="T2">Type sortie (Modèle de vue)</typeparam>
             /// <returns></returns>
-            public static async Task<IList<LivrePretVM>> AllVMAsync()
+            public static async Task<IList<LivrePretVM>> AllPretsVMAsync()
             {
                 try
                 {
-                    var collection = await AllAsync();
+                    var collection = await AllPretsAsync();
                     if (!collection.Any()) return Enumerable.Empty<LivrePretVM>().ToList();
 
                     var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
@@ -131,13 +76,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<long>> AllIdAsync()
+            public static async Task<IList<long>> AllPretsIdAsync()
             {
                 try
                 {
-                    using (LibraryDbContext context = new LibraryDbContext()) 
-                    { 
-                        return await context.TbookPret.Select(s => s.Id).ToListAsync(); 
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        return await context.TbookPret.Select(s => s.Id).ToListAsync();
                     }
                 }
                 catch (Exception ex)
@@ -218,6 +163,68 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+
+
+            #endregion
+
+            #region Single
+            public static async Task<long?> GetParentIdAsync(long idExemplary, LibraryDbContext _context = null)
+            {
+                try
+                {
+                    using (LibraryDbContext context = _context ?? new LibraryDbContext())
+                    {
+                        var id = (await context.TbookExemplary.SingleOrDefaultAsync(w => w.Id == idExemplary))?.IdBook;
+                        return id;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// Retourne un élément de la base de données avec un identifiant unique
+            /// </summary>
+            /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
+            /// <param name="id">Identifiant unique</param>
+            /// <returns></returns>
+            public static async Task<TbookPret> SinglePretAsync(long id)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var s = await context.TbookPret.SingleOrDefaultAsync(d => d.Id == id);
+                        await CompleteModelInfos(s);
+                        if (s == null) return null;
+
+                        return s;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// Retourne un modèle de vue avec un identifiant unique
+            /// </summary>
+            /// <typeparam name="T1">Type d'entrée (Modèle)</typeparam>
+            /// <typeparam name="T2">Type sortie (Modèle de vue)</typeparam>
+            /// <param name="id"></param>
+            /// <returns></returns>
+            public static async Task<LivrePretVM> SinglePretVMAsync(long id)
+            {
+                return await ViewModelConverterAsync(await SinglePretAsync(id));
+            }
+            #endregion
             public static async Task<IList<TbookPret>> GetBookPretAsync(long idItem, BookPretFrom bookFrom = BookPretFrom.BookExemplaire, CancellationToken cancellationToken = default)
             {
                 try
@@ -228,7 +235,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         switch (bookFrom)
                         {
                             case BookPretFrom.Emprunteur:
-                                preCollection = await context.TbookPret.Where(w => w.IdContact == idItem).ToListAsync(cancellationToken); 
+                                preCollection = await context.TbookPret.Where(w => w.IdContact == idItem).ToListAsync(cancellationToken);
                                 break;
                             case BookPretFrom.BookExemplaire:
                                 preCollection = await context.TbookPret.Where(w => w.IdBookExemplary == idItem).ToListAsync(cancellationToken);
@@ -238,7 +245,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 var exemplaries = await BookExemplary.AllIdInBookAsync(idItem);
                                 if (exemplaries != null && exemplaries.Any())
                                 {
-                                    foreach(var idExemplary in exemplaries)
+                                    foreach (var idExemplary in exemplaries)
                                     {
                                         var items = await context.TbookPret.Where(w => w.IdBookExemplary == idExemplary).ToListAsync(cancellationToken);
                                         if (items != null && items.Any())
@@ -291,68 +298,56 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return null;
                 }
             }
-            #endregion
 
-            #region Single
-            public static async Task<long?> GetParentIdAsync(long idExemplary, LibraryDbContext _context = null)
-            {
-                try
-                {
-                    using (LibraryDbContext context = _context ?? new LibraryDbContext())
-                    {
-                        var id = (await context.TbookExemplary.SingleOrDefaultAsync(w => w.Id == idExemplary))?.IdBook;
-                        return id;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Logs.Log(ex, m);
-                    return null;
-                }
-            }
-
-            /// <summary>
-            /// Retourne un élément de la base de données avec un identifiant unique
-            /// </summary>
-            /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
-            /// <param name="id">Identifiant unique</param>
-            /// <returns></returns>
-            public static async Task<TbookPret> SingleAsync(long id)
+            public static async Task<int> CountPretInBookAsync(long idBook, CancellationToken cancellationToken = default)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var s = await context.TbookPret.SingleOrDefaultAsync(d => d.Id == id);
-                        await CompleteModelInfos(s);
-                        if (s == null) return null;
+                        var exemplariesListId = await GetBookExemplaryListOfIdAsync(idBook, cancellationToken);
+                        List<TbookPret> tbookPrets = new List<TbookPret>();
+                        foreach (var idExemplary in exemplariesListId)
+                        {
+                            List<TbookPret> _tbookPrets = await context.TbookPret.Where(w => w.IdBookExemplary == idExemplary).ToListAsync(cancellationToken);
+                            if (_tbookPrets != null && _tbookPrets.Any())
+                            {
+                                for (int i = 0; i < _tbookPrets.Count; i++)
+                                {
+                                    var dateRemise = DatesHelpers.Converter.GetNullableDateFromString(_tbookPrets[i].DateRemise);
+                                    var timeRemise = DatesHelpers.Converter.GetNullableTimeSpanFromString(_tbookPrets[i].TimeRemise);
+                                    
+                                    if (dateRemise.HasValue)
+                                    {
+                                        var compare = dateRemise.Value.CompareDate(DateTime.UtcNow);
+                                        if (compare != DateCompare.DateSuperieur && compare != DateCompare.DateEgal)
+                                        {
+                                            _tbookPrets.RemoveAt(i);
+                                            i = 0;
+                                        }
+                                    }
+                                    
+                                }
 
-                        return s;
+                                if (_tbookPrets != null && _tbookPrets.Any())
+                                {
+                                    tbookPrets.AddRange(_tbookPrets);
+                                }
+                            }
+                        }
+
+                        return tbookPrets.Count;
                     }
                 }
                 catch (Exception ex)
                 {
                     MethodBase m = MethodBase.GetCurrentMethod();
                     Logs.Log(ex, m);
-                    return null;
+                    return 0;
                 }
             }
 
-            /// <summary>
-            /// Retourne un modèle de vue avec un identifiant unique
-            /// </summary>
-            /// <typeparam name="T1">Type d'entrée (Modèle)</typeparam>
-            /// <typeparam name="T2">Type sortie (Modèle de vue)</typeparam>
-            /// <param name="id"></param>
-            /// <returns></returns>
-            public static async Task<LivrePretVM> SingleVMAsync(long id)
-            {
-                return await ViewModelConverterAsync(await SingleAsync(id));
-            }
-            #endregion
-
-            public static async Task<OperationStateVM> CreateAsync(long idExemplary, LivrePretVM viewModel)
+            public static async Task<OperationStateVM> CreatePretAsync(long idExemplary, LivrePretVM viewModel)
             {
                 try
                 {
@@ -367,20 +362,20 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var bookRecord = await context.TbookExemplary.SingleOrDefaultAsync(c => c.Id == idExemplary);
-                        if (bookRecord == null)
+                        TbookExemplary bookExemplaryRecord = await context.TbookExemplary.SingleOrDefaultAsync(c => c.Id == idExemplary);
+                        if (bookExemplaryRecord == null)
                         {
                             return new OperationStateVM()
                             {
                                 IsSuccess = true,
-                                Message = DbServices.RecordNotExistMessage
+                                Message = RecordNotExistMessage
                             };
                         }
 
                         var recordEtatAvantPret = new TbookEtat()
                         {
-                            IdBookExemplary = viewModel.IdBookExemplary,
-                            DateAjout = viewModel.EtatAvantPret.DateAjout.ToUniversalTime().ToString(),
+                            IdBookExemplary = bookExemplaryRecord.Id,
+                            DateAjout = DateTime.UtcNow.ToString(),
                             Etat = viewModel.EtatAvantPret.Etat,
                             Observations = viewModel.EtatAvantPret.Observations,
                             TypeVerification = (byte)viewModel.EtatAvantPret.TypeVerification,
@@ -391,7 +386,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         var record = new TbookPret()
                         {
-                            IdBookExemplary = viewModel.IdBookExemplary,
+                            IdBookExemplary = bookExemplaryRecord.Id,
                             DatePret = viewModel.DatePret.ToUniversalTime().ToString(),
                             TimePret = !viewModel.TimePret.HasValue ? null : viewModel.TimePret.Value.ToString(),
                             IdContact = viewModel.Emprunteur.Id,
@@ -410,7 +405,100 @@ namespace LibraryProjectUWP.Code.Services.Db
                             Message = $"Le prêt a été accordé avec succès."
                         };
                     }
-                        
+
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Exception : {ex.Message}",
+                    };
+                }
+            }
+
+            public static async Task<OperationStateVM> EditPretAsync(long idExemplary, LivrePretVM viewModel)
+            {
+                try
+                {
+                    if (viewModel == null)
+                    {
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = false,
+                            Message = ViewModelNullOrEmptyMessage,
+                        };
+                    }
+
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        TbookExemplary bookExemplaryRecord = await context.TbookExemplary.SingleOrDefaultAsync(c => c.Id == idExemplary);
+                        if (bookExemplaryRecord == null)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = RecordNotExistMessage
+                            };
+                        }
+
+                        TbookPret bookPretRecord = await context.TbookPret.SingleOrDefaultAsync(c => c.Id == viewModel.Id);
+                        if (bookPretRecord == null)
+                        {
+                            return new OperationStateVM()
+                            {
+                                IsSuccess = true,
+                                Message = RecordNotExistMessage
+                            };
+                        }
+
+                        bookPretRecord.IdBookExemplary = bookExemplaryRecord.Id;
+                        bookPretRecord.DatePret = viewModel.DatePret.ToUniversalTime().ToString();
+                        bookPretRecord.TimePret = !viewModel.TimePret.HasValue ? null : viewModel.TimePret.Value.ToString();
+                        bookPretRecord.IdContact = viewModel.Emprunteur.Id;
+                        bookPretRecord.DateRemise = viewModel.DateRemise.HasValue ? viewModel.DateRemise.Value.ToUniversalTime().ToString() : null;
+                        bookPretRecord.TimeRemise = !viewModel.TimeRemise.HasValue ? null : viewModel.TimeRemise.Value.ToString();
+                        context.TbookPret.Update(bookPretRecord);
+
+                        TbookEtat recordEtatAvantPret = await context.TbookEtat.SingleOrDefaultAsync(c => c.Id == bookPretRecord.IdEtatBefore);
+                        if (recordEtatAvantPret == null)
+                        {
+                            recordEtatAvantPret = new TbookEtat()
+                            {
+                                IdBookExemplary = bookExemplaryRecord.Id,
+                                DateAjout = viewModel.EtatAvantPret.DateAjout.ToUniversalTime().ToString(),
+                                Etat = viewModel.EtatAvantPret.Etat,
+                                Observations = viewModel.EtatAvantPret.Observations,
+                                TypeVerification = (byte)viewModel.EtatAvantPret.TypeVerification,
+                            };
+
+                            await context.TbookEtat.AddAsync(recordEtatAvantPret);
+                            await context.SaveChangesAsync();
+
+                            bookPretRecord.IdEtatBefore = recordEtatAvantPret.Id;
+                        }
+                        else
+                        {
+                            recordEtatAvantPret.IdBookExemplary = bookExemplaryRecord.Id;
+                            //recordEtatAvantPret.DateAjout = viewModel.EtatAvantPret.DateAjout.ToUniversalTime().ToString();
+                            recordEtatAvantPret.Etat = viewModel.EtatAvantPret.Etat;
+                            recordEtatAvantPret.Observations = viewModel.EtatAvantPret.Observations;
+                            recordEtatAvantPret.TypeVerification = (byte)viewModel.EtatAvantPret.TypeVerification;
+                            context.TbookEtat.Update(recordEtatAvantPret);
+                        }
+
+                        await context.SaveChangesAsync();
+
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = true,
+                            //Id = record.Id,
+                            Message = $"Le prêt a été mis à jour avec succès."
+                        };
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -433,13 +521,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                         return new OperationStateVM()
                         {
                             IsSuccess = false,
-                            Message = DbServices.ViewModelNullOrEmptyMessage,
+                            Message = "L'état du livre au retour doit être renseigné.",
                         };
                     }
 
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var isBookExemplary = await context.TbookExemplary.AnyAsync(c => c.Id == idExemplary);
+                        bool isBookExemplary = await context.TbookExemplary.AnyAsync(c => c.Id == idExemplary);
                         if (!isBookExemplary)
                         {
                             return new OperationStateVM()
@@ -449,8 +537,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                             };
                         }
 
-                        var bookRecord = await context.TbookPret.SingleOrDefaultAsync(c => c.Id == idPret);
-                        if (bookRecord == null)
+                        TbookPret bookPretRecord = await context.TbookPret.SingleOrDefaultAsync(c => c.Id == idPret);
+                        if (bookPretRecord == null)
                         {
                             return new OperationStateVM()
                             {
@@ -459,21 +547,36 @@ namespace LibraryProjectUWP.Code.Services.Db
                             };
                         }
 
-                        var recordEtatApresPret = new TbookEtat()
+                        TbookEtat recordEtatApresPret = await context.TbookEtat.SingleOrDefaultAsync(c => c.Id == bookPretRecord.IdEtatAfter);
+                        if (recordEtatApresPret == null)
                         {
-                            IdBookExemplary = idExemplary,
-                            DateAjout = DateTime.UtcNow.ToString(),
-                            Etat = etat,
-                            Observations = observations,
-                            TypeVerification = (byte)BookTypeVerification.ApresPret,
-                        };
+                            recordEtatApresPret = new TbookEtat()
+                            {
+                                IdBookExemplary = idExemplary,
+                                DateAjout = DateTime.UtcNow.ToString(),
+                                Etat = etat,
+                                Observations = observations,
+                                TypeVerification = (byte)BookTypeVerification.ApresPret,
+                            };
 
-                        await context.TbookEtat.AddAsync(recordEtatApresPret);
-                        await context.SaveChangesAsync();
+                            await context.TbookEtat.AddAsync(recordEtatApresPret);
+                            await context.SaveChangesAsync();
 
-                        bookRecord.IdEtatAfter = recordEtatApresPret.Id;
-                        
-                        context.TbookPret.Update(bookRecord);
+                            bookPretRecord.IdEtatAfter = recordEtatApresPret.Id;
+                        }
+                        else
+                        {
+                            recordEtatApresPret.IdBookExemplary = idExemplary;
+                            recordEtatApresPret.DateAjout = DateTime.UtcNow.ToString();
+                            recordEtatApresPret.Etat = etat;
+                            recordEtatApresPret.Observations = observations;
+                            recordEtatApresPret.TypeVerification = (byte)BookTypeVerification.ApresPret;
+                            context.TbookEtat.Update(recordEtatApresPret);
+                        }
+
+                        bookPretRecord.DateRemiseUser = DateTime.UtcNow.ToString();
+
+                        context.TbookPret.Update(bookPretRecord);
                         await context.SaveChangesAsync();
 
                         return new OperationStateVM()
@@ -489,63 +592,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                 {
                     MethodBase m = MethodBase.GetCurrentMethod();
                     Logs.Log(ex, m);
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = false,
-                        Message = $"Exception : {ex.Message}",
-                    };
-                }
-            }
-
-
-            /// <summary>
-            /// Supprime un élément de la base de données
-            /// </summary>
-            /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
-            /// <param name="Id"></param>
-            /// <returns></returns>
-            public static async Task<OperationStateVM> DeleteAsync(long Id)
-            {
-                try
-                {
-                    using (LibraryDbContext context = new LibraryDbContext())
-                    {
-                        TbookExemplary record = await context.TbookExemplary.SingleOrDefaultAsync(a => a.Id == Id);
-                        if (record == null)
-                        {
-                            return new OperationStateVM()
-                            {
-                                IsSuccess = false,
-                                Message = DbServices.RecordNotExistMessage
-                            };
-                        }
-
-                        List<TbookEtat> etats = await context.TbookEtat.Where(w => w.IdBookExemplary == record.Id).ToListAsync();
-                        if (etats.Any())
-                        {
-                            context.TbookEtat.RemoveRange(etats);
-                        }
-
-                        List<TbookPret> prets = await context.TbookPret.Where(w => w.IdBookExemplary == record.Id).ToListAsync();
-                        if (prets.Any())
-                        {
-                            context.TbookPret.RemoveRange(prets);
-                        }
-
-                        context.TbookExemplary.Remove(record);
-                        await context.SaveChangesAsync();
-
-                        return new OperationStateVM()
-                        {
-                            IsSuccess = true,
-                        };
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Logs.Log(ex, m);
-
                     return new OperationStateVM()
                     {
                         IsSuccess = false,
@@ -614,11 +660,17 @@ namespace LibraryProjectUWP.Code.Services.Db
                         TimePret = DatesHelpers.Converter.GetNullableTimeSpanFromString(model.TimePret),
                         DateRemise = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemise),
                         TimeRemise = DatesHelpers.Converter.GetNullableTimeSpanFromString(model.TimeRemise),
+                        DateRealRemise = DatesHelpers.Converter.GetNullableDateFromString(model.DateRemiseUser),
                     };
 
                     if (model.IdEtatBeforeNavigation != null)
                     {
                         viewModel.EtatAvantPret = BookEtat.ViewModelConverter(model.IdEtatBeforeNavigation);
+                    }
+
+                    if (model.IdEtatAfterNavigation != null)
+                    {
+                        viewModel.EtatApresPret = BookEtat.ViewModelConverter(model.IdEtatAfterNavigation);
                     }
 
                     return viewModel;
@@ -704,10 +756,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                     Logs.Log(ex, m);
                     return null;
                 }
-            }
-
+            } 
             #endregion
         }
     }
-
 }

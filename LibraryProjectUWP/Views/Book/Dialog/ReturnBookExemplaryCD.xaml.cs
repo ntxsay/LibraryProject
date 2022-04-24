@@ -32,7 +32,16 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
         }
 
-        private ReturnBookExemplaryCDVM ViewModelPage = new ReturnBookExemplaryCDVM();
+        public ReturnBookExemplaryCD(LivrePretVM viewModel)
+        {
+            ViewModelPage = new ReturnBookExemplaryCDVM()
+            {
+                ViewModel = viewModel
+            };
+            this.InitializeComponent();
+        }
+
+        public ReturnBookExemplaryCDVM ViewModelPage { get; set; }
         
 
         public string ResultMessage { get; set; }
@@ -43,24 +52,8 @@ namespace LibraryProjectUWP.Views.Book
 
         public string ResultMessageTitle { get; set; }
 
-        public LivrePretVM ViewModel
-        {
-            get { return (LivrePretVM)GetValue(ViewModelProperty); }
-            set { SetValue(ViewModelProperty, value); }
-        }
 
-        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(nameof(ViewModel), typeof(LivrePretVM),
-                                                                typeof(ReturnBookExemplaryUC), new PropertyMetadata(null, new PropertyChangedCallback(OnViewModelChanged)));
-
-        private static void OnViewModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is ReturnBookExemplaryCD parent && e.NewValue is LivrePretVM _viewModel)
-            {
-                parent.ViewModelPage.ViewModel = _viewModel;
-            }
-        }
-
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             try
             {
@@ -70,10 +63,11 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.ResultMessage = $"L'état du livre après le prêt n'est pas renseigné.";
                     ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
                     ViewModelPage.IsResultMessageOpen = true;
+                    args.Cancel = true;
                     return;
                 }
 
-                var state = await DbServices.BookPret.ReturnBookAsync(ViewModelPage.ViewModel.Id, ViewModelPage.ViewModel.Exemplary.Id, ViewModelPage.ViewModel.EtatApresPret.Etat, ViewModelPage.ViewModel.EtatApresPret.Observations);
+                var state = await DbServices.Book.ReturnBookAsync(ViewModelPage.ViewModel.Id, ViewModelPage.ViewModel.Exemplary.Id, ViewModelPage.ViewModel.EtatApresPret.Etat, ViewModelPage.ViewModel.EtatApresPret.Observations);
                 if (state.IsSuccess)
                 {
                     ViewModelPage.ResultMessageTitle = "Succès";
@@ -88,6 +82,7 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.ResultMessage = state.Message;
                     ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
                     ViewModelPage.IsResultMessageOpen = true;
+                    args.Cancel = true;
                     return;
                 }
             }
@@ -97,10 +92,6 @@ namespace LibraryProjectUWP.Views.Book
                 Logs.Log(ex, m);
                 return;
             }
-        }
-
-        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
         }
 
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
