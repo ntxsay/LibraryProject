@@ -120,7 +120,7 @@
                         <Run Text="{x:Bind NbExemplaires, Mode=OneWay}" />
                         <Run Text="exemplaire(s)" />
                         <Run Text="&#x000B7;" FontSize="16" FontWeight="Bold"/>
-                        <Run Text="0" />
+                        <Run Text="{x:Bind NbPrets, Mode=OneWay}" />
                         <Run Text="prêt(s)" />
                     </TextBlock>
                 </StackPanel>

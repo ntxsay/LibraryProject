@@ -99,9 +99,22 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await LoadDataAsync(false);
+            try
+            {
+                var bookCollectionSpage = this.BookCollectionSubPage;
+                if (bookCollectionSpage != null)
+                {
+                    bookCollectionSpage.InitializeData(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private async void Image_Loaded(object sender, RoutedEventArgs e)

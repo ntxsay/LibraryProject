@@ -309,13 +309,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                         List<TbookPret> tbookPrets = new List<TbookPret>();
                         foreach (var idExemplary in exemplariesListId)
                         {
-                            List<TbookPret> _tbookPrets = await context.TbookPret.Where(w => w.IdBookExemplary == idExemplary).ToListAsync(cancellationToken);
+                            List<TbookPret> _tbookPrets = await context.TbookPret.Where(w => w.IdBookExemplary == idExemplary && !w.DateRemiseUser.IsStringNullOrEmptyOrWhiteSpace()).ToListAsync(cancellationToken);
                             if (_tbookPrets != null && _tbookPrets.Any())
                             {
                                 for (int i = 0; i < _tbookPrets.Count; i++)
                                 {
-                                    var dateRemise = DatesHelpers.Converter.GetNullableDateFromString(_tbookPrets[i].DateRemise);
-                                    var timeRemise = DatesHelpers.Converter.GetNullableTimeSpanFromString(_tbookPrets[i].TimeRemise);
+                                    DateTime? dateRemise = DatesHelpers.Converter.GetNullableDateFromString(_tbookPrets[i].DateRemise);
+                                    TimeSpan? timeRemise = DatesHelpers.Converter.GetNullableTimeSpanFromString(_tbookPrets[i].TimeRemise);
                                     
                                     if (dateRemise.HasValue)
                                     {

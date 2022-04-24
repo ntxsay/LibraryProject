@@ -2298,12 +2298,7 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is Viewbox viewbox && viewbox.Tag is BibliothequeVM viewModel)
                 {
-                    VisualViewHelpers.MainControlsUI mainControlsUI = new VisualViewHelpers.MainControlsUI();
-                    var mainPage = mainControlsUI.GetMainPage;
-                    if (mainPage != null)
-                    {
-                        mainPage.BookCollectionNavigationAsync(viewModel, null);
-                    }
+                    MainPage.BookCollectionNavigationAsync(viewModel, null);
                 }
             }
             catch (Exception ex)
@@ -2313,6 +2308,24 @@ namespace LibraryProjectUWP.Views.Library
                 return;
             }
         }
+
+        private void DataGridItems_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is DataGrid dataGrid && dataGrid.SelectedItem is BibliothequeVM viewModel)
+                {
+                    MainPage.BookCollectionNavigationAsync(viewModel, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         #region Loading BacKGroundWorker
         private BackgroundWorker WorkerLoadLibraries;

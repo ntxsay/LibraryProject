@@ -330,6 +330,23 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
+        private void DataGridItems_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is DataGrid dataGrid && dataGrid.SelectedItem is LivreVM viewModel)
+                {
+                    ParentPage.EditBook(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void GridViewItems_Unloaded(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1237,7 +1254,5 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 return null;
             }
         }
-
-
     }
 }

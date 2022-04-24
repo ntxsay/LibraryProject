@@ -155,7 +155,7 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Catégories" Tag="{x:Bind Mode=OneWay}"  Command="{StaticResource CategorieListXUiCmd}" CommandParameter="{x:Bind }">
+                                <!--<MenuFlyoutItem Text="Catégories" Tag="{x:Bind Mode=OneWay}"  Command="{StaticResource CategorieListXUiCmd}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE81E;"/>
                                     </MenuFlyoutItem.Icon>
@@ -165,7 +165,7 @@
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE8A7;"/>
                                     </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
+                                </MenuFlyoutItem>-->
                                 <MenuFlyoutItem Text="Exporter la bibliothèque" Command="{StaticResource ExportLibraryXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xEDE1;"/>
@@ -224,7 +224,7 @@
                                         MaxColumnWidth="500" FrozenColumnCount="2" GridLinesVisibility="None" HeadersVisibility="Column"
                                         IsReadOnly="True" BorderThickness="0"
                                         RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
-                                        RowGroupHeaderPropertyNameAlternative="Range">
+                                        RowGroupHeaderPropertyNameAlternative="Range" IsDoubleTapEnabled="True" DoubleTapped="DataGridItems_DoubleTapped">
                 <MTUUControls:DataGrid.Columns>
                     <MTUUControls:DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
                     <MTUUControls:DataGridTextColumn Header="Nom" Binding="{Binding Name}"/>
@@ -241,22 +241,22 @@
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Text="Catégories" Tag="{Binding Mode=OneWay}" Command="{StaticResource CategorieListXUiCmd}" CommandParameter="{Binding }">
+                                    <!--<MenuFlyoutItem Text="Catégories" Tag="{Binding Mode=OneWay}" Command="{StaticResource CategorieListXUiCmd}" CommandParameter="{Binding }">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE81E;"/>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutSeparator />-->
                                     <MenuFlyoutItem Text="Exporter la bibliothèque" Command="{StaticResource ExportLibraryXamlUICommand}" CommandParameter="{Binding }">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xEDE1;"/>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="Ouvrir la bibliothèque">
+                                    <!--<MenuFlyoutItem Text="Ouvrir la bibliothèque">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE8A7;"/>
                                         </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
+                                    </MenuFlyoutItem>-->
                                     <MenuFlyoutItem Text="Editer la bibliothèque" Command="{StaticResource EditLibraryInfosXamlUICommand}" CommandParameter="{Binding }">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE70F;"/>

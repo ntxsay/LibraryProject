@@ -140,11 +140,11 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Text="Ouvrir ce livre">
+                                <!--<MenuFlyoutItem Text="Ouvrir ce livre">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE8A7;"/>
                                     </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
+                                </MenuFlyoutItem>-->
                                 <MenuFlyoutItem Text="Exporter ce livre" Command="{StaticResource ExportThisBookXamlUICommand}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xEDE1;"/>
@@ -203,7 +203,7 @@
                                         MaxColumnWidth="500" FrozenColumnCount="2" GridLinesVisibility="None" HeadersVisibility="Column"
                                         IsReadOnly="True" BorderThickness="0"
                                         RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
-                                        RowGroupHeaderPropertyNameAlternative="Range">
+                                        RowGroupHeaderPropertyNameAlternative="Range" IsDoubleTapEnabled="True" DoubleTapped="DataGridItems_DoubleTapped">
                 <MTUUControls:DataGrid.Columns>
                     <MTUUControls:DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
                     <MTUUControls:DataGridTextColumn Header="Titre" Binding="{Binding MainTitle}"/>
@@ -248,22 +248,22 @@
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Text="Emprunts" Command="{StaticResource NewBookPretXUiCmd}" CommandParameter="{Binding }">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon Glyph="&#xE748;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
                                     <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{Binding }">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xF5ED;"/>
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
+                                    <MenuFlyoutItem Text="Emprunts" Command="{StaticResource NewBookPretXUiCmd}" CommandParameter="{Binding }">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE748;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Text="Ouvrir ce livre">
+                                    <!--<MenuFlyoutItem Text="Ouvrir ce livre">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE8A7;"/>
                                         </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
+                                    </MenuFlyoutItem>-->
                                     <MenuFlyoutItem Text="Exporter ce livre" Command="{StaticResource ExportThisBookXamlUICommand}" CommandParameter="{Binding }">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xEDE1;"/>

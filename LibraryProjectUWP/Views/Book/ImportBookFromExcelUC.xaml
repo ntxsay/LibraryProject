@@ -131,7 +131,7 @@
                         </Button>
                     </Grid>
                     <!--Langue-->
-                    <Grid ColumnSpacing="8">
+                    <!--<Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -146,9 +146,9 @@
                                 Height="28" Width="28" Padding="0" Click="Btn_RemoveSelectedData_Click">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>
                         </Button>
-                    </Grid>
+                    </Grid>-->
                     <!--Date parution-->
-                    <Grid ColumnSpacing="8">
+                    <!--<Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -163,9 +163,9 @@
                                 Height="28" Width="28" Padding="0" Click="Btn_RemoveSelectedData_Click">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>
                         </Button>
-                    </Grid>
+                    </Grid>-->
                     <!--Format-->
-                    <Grid ColumnSpacing="8">
+                    <!--<Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -180,9 +180,9 @@
                                 Height="28" Width="28" Padding="0" Click="Btn_RemoveSelectedData_Click">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>
                         </Button>
-                    </Grid>
+                    </Grid>-->
                     <!--Nb de pages-->
-                    <Grid ColumnSpacing="8">
+                    <!--<Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -197,7 +197,7 @@
                                 Height="28" Width="28" Padding="0" Click="Btn_RemoveSelectedData_Click">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>
                         </Button>
-                    </Grid>
+                    </Grid>-->
                     <!--Collection-->
                     <Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
