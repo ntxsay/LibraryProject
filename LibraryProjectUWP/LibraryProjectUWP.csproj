@@ -265,7 +265,7 @@
     <Compile Include="Views\About\AboutUsPivotItem.xaml.cs">
       <DependentUpon>AboutUsPivotItem.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\BookBeforeGoBackCD.xaml.cs">
+    <Compile Include="Views\Book\Dialog\BookBeforeGoBackCD.xaml.cs">
       <DependentUpon>BookBeforeGoBackCD.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\BookCollectionPage_Categories.cs" />
@@ -274,13 +274,16 @@
     <Compile Include="Views\Book\BookCollectionPage_Search.cs" />
     <Compile Include="Views\Book\BookCollectionPage_ViewModelPage.cs" />
     <Compile Include="Views\Book\BookCollectionPage_Tasks.cs" />
+    <Compile Include="Views\Book\Dialog\ReturnBookExemplaryCD.xaml.cs">
+      <DependentUpon>ReturnBookExemplaryCD.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\Sidebar\Pret\BookPretListUC.xaml.cs">
       <DependentUpon>BookPretListUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\Sidebar\Exemplary\BookExemplaryListUC.xaml.cs">
       <DependentUpon>BookExemplaryListUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\DeleteBookCD.xaml.cs">
+    <Compile Include="Views\Book\Dialog\DeleteBookCD.xaml.cs">
       <DependentUpon>DeleteBookCD.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\ImportBookFromFileUC.xaml.cs">
@@ -289,7 +292,7 @@
     <Compile Include="Views\Book\ImportBookFromExcelUC.xaml.cs">
       <DependentUpon>ImportBookFromExcelUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\ImportBookFromUrlCD.xaml.cs">
+    <Compile Include="Views\Book\Dialog\ImportBookFromUrlCD.xaml.cs">
       <DependentUpon>ImportBookFromUrlCD.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\Sidebar\Pret\NewEditBookPretUC.xaml.cs">
@@ -461,9 +464,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Book\BookBeforeGoBackCD.xaml">
+    <Page Include="Views\Book\Dialog\BookBeforeGoBackCD.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\Dialog\ReturnBookExemplaryCD.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Book\Sidebar\Pret\BookPretListUC.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -473,7 +480,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Book\DeleteBookCD.xaml">
+    <Page Include="Views\Book\Dialog\DeleteBookCD.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -485,7 +492,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Book\ImportBookFromUrlCD.xaml">
+    <Page Include="Views\Book\Dialog\ImportBookFromUrlCD.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
