@@ -635,7 +635,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         ParentPage = this,
                         EditMode = Code.EditMode.Edit,
-                        CurrentViewModel = DbServices.Book.DeepCopy(viewModel),
+                        CurrentViewModel = viewModel,
                     });
 
                     userControl.CancelModificationRequested += NewEditBookUC_Edit_CancelModificationRequested;
@@ -688,7 +688,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         sender._parameters.CurrentViewModel.Copy(updatedViewModel);
                         CompleteBookInfos(sender._parameters.CurrentViewModel);
-                        await esBook.SaveBookViewModelAsync(sender._parameters.CurrentViewModel);
+                        await esBook.SaveBookViewModelAsync(updatedViewModel);
 
                         sender.ViewModelPage.ResultMessageTitle = "Succès";
                         sender.ViewModelPage.ResultMessage = updateResult.Message;
@@ -1825,6 +1825,24 @@ namespace LibraryProjectUWP.Views.Book
                     Logs.Log(ex, m);
                     return 1;
                 }
+            }
+        }
+
+        private void CompleteBookInfos(long IdBook)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var bookCollectionSpage = this.BookCollectionSubPage;
+                if (bookCollectionSpage != null)
+                {
+                    bookCollectionSpage.CompleteBookInfos(IdBook);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
             }
         }
 

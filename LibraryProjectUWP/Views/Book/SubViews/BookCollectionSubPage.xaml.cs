@@ -1156,6 +1156,54 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         }
         #endregion
 
+        public void CompleteBookInfos(long idBook)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var viewModel = uiServices.SearchViewModelInCurrentDataGrid(this.PivotItems, idBook, "DataGridItems", false);
+                if (viewModel == null)
+                {
+                    return;
+                }
+
+                if (viewModel.TitresOeuvre != null && viewModel.TitresOeuvre.Any())
+                {
+                    viewModel.TitresOeuvreStringList = StringHelpers.JoinStringArray(viewModel.TitresOeuvre?.Select(s => s)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                }
+
+                if (viewModel.Auteurs != null && viewModel.Auteurs.Any())
+                {
+                    viewModel.AuteursStringList = StringHelpers.JoinStringArray(viewModel.Auteurs?.Select(s => $"{s.NomNaissance} {s.Prenom}")?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                }
+
+                if (viewModel.Publication != null)
+                {
+                    if (viewModel.Publication.Editeurs != null && viewModel.Publication.Editeurs.Any())
+                    {
+                        viewModel.Publication.EditeursStringList = StringHelpers.JoinStringArray(viewModel.Publication.Editeurs?.Select(s => s.SocietyName)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    }
+
+                    if (viewModel.Publication.Collections != null && viewModel.Publication.Collections.Any())
+                    {
+                        viewModel.Publication.CollectionsStringList = StringHelpers.JoinStringArray(viewModel.Publication.Collections?.Select(s => s.Name)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
+                    }
+                }
+
+                if (viewModel.Format != null)
+                {
+                    viewModel.Format.Dimensions = LibraryHelpers.Book.GetDimensionsInCm(viewModel.Format.Hauteur, viewModel.Format.Largeur, viewModel.Format.Epaisseur);
+                }
+                viewModel.ClassificationAge.GetClassificationAge();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
         private Image GetSelectedThumbnailImage(LivreVM viewModel)
         {
             try

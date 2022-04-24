@@ -1362,6 +1362,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                     viewModel.MainTitle = viewModelToCopy.MainTitle;
                     viewModel.CountOpening = viewModelToCopy.CountOpening;
                     viewModel.JaquettePath = viewModelToCopy.JaquettePath;
+                    viewModel.NbExemplaires = viewModelToCopy.NbExemplaires;
+                    viewModel.NbPrets = viewModelToCopy.NbPrets;
 
                     if (viewModelToCopy.TitresOeuvre != null && viewModelToCopy.TitresOeuvre.Any())
                     {

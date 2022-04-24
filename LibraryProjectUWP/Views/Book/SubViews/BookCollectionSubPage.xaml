@@ -218,6 +218,7 @@
                     <MTUUControls:DataGridTextColumn Header="Pages" Binding="{Binding Format.NbOfPages,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Langue" Binding="{Binding Publication.Langue,  Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Nombre d'exemplaires" Binding="{Binding NbExemplaires, Mode=OneWay}" Width="Auto"/>
+                    <MTUUControls:DataGridTextColumn Header="Nombre de prêts" Binding="{Binding NbPrets, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="Cotation" Binding="{Binding Identification.Cotation, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="ISBN" Binding="{Binding Identification.ISBN, Mode=OneWay}" Width="Auto"/>
                     <MTUUControls:DataGridTextColumn Header="ISBN-10" Binding="{Binding Identification.ISBN10, Mode=OneWay}" Width="Auto"/>
