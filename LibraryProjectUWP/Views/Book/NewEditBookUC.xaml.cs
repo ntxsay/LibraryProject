@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
@@ -65,7 +66,7 @@ namespace LibraryProjectUWP.Views.Book
             _parameters = parameters;
             ViewModelPage.EditMode = parameters.EditMode;
             ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} un livre";
-            ViewModelPage.ViewModel = parameters.EditMode == Code.EditMode.Create ? parameters?.CurrentViewModel : DbServices.Book.DeepCopy(parameters?.CurrentViewModel);
+            ViewModelPage.ViewModel = parameters.EditMode == Code.EditMode.Create ? parameters?.CurrentViewModel : EqualityComparerExtentions.CopyProperties(parameters.CurrentViewModel, new LivreVM()) ;// DbServices.Book.DeepCopy(parameters?.CurrentViewModel);
             InitializeActionInfos();
         }
 

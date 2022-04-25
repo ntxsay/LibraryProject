@@ -27,6 +27,7 @@ using LibraryProjectUWP.Views.UserControls;
 using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.Code.Services.UI;
+using LibraryProjectUWP.Code.Extensions;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -662,6 +663,11 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                var viewModelsEqual = EqualityComparerExtentions.GetChangedProperties(sender.ViewModelPage.ViewModel, sender._parameters.CurrentViewModel);
+                if (viewModelsEqual.Any())
+                {
+
+                }
                 sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
                 sender.UpdateItemRequested -= NewEditBookUC_Edit_UpdateItemRequested;
 
