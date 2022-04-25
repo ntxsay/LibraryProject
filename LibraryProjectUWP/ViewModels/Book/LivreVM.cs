@@ -25,6 +25,8 @@ namespace LibraryProjectUWP.ViewModels.Book
         public long CountOpening { get; set; }
 
         private string _MainTitle;
+        
+        [DisplayName("Titre du livre")]
         public string MainTitle
         {
             get => _MainTitle;
@@ -39,6 +41,8 @@ namespace LibraryProjectUWP.ViewModels.Book
         }
 
         private ObservableCollection<string> _TitresOeuvre = new ObservableCollection<string>();
+        
+        [DisplayName("Autre(s) titre(s)")]
         public ObservableCollection<string> TitresOeuvre
         {
             get => _TitresOeuvre;

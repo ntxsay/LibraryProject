@@ -23,6 +23,8 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreVM Parent { get; set; }
 
         private string _Resume;
+        
+        [DisplayName("Résumé")]
         public string Resume
         {
             get => _Resume;

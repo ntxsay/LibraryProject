@@ -154,12 +154,14 @@
     <Compile Include="Code\Extensions\EqualityComparerExtensions.cs" />
     <Compile Include="Code\Extensions\LinqExtensions.cs" />
     <Compile Include="Code\Extensions\ScrollViewerExtensions.cs" />
+    <Compile Include="Code\Helpers\book_Helpers.cs" />
     <Compile Include="Code\Helpers\CivilityHelpers.cs" />
     <Compile Include="Code\Helpers\CountryHelpers.cs" />
     <Compile Include="Code\Helpers\CultureHelpers.cs" />
     <Compile Include="Code\Helpers\DatesHelpers.cs" />
     <Compile Include="Code\Helpers\IdHelpers.cs" />
     <Compile Include="Code\Helpers\LibraryHelpers.cs" />
+    <Compile Include="Code\Helpers\PropertyHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers.cs" />
     <Compile Include="Code\Helpers\StringHelpers_Converters.cs" />
     <Compile Include="Code\Helpers\VisualViewHelpers.cs" />
@@ -248,6 +250,7 @@
     <Compile Include="ViewModels\General\ManageCategorieParametersVM.cs" />
     <Compile Include="ViewModels\General\PageSystemVM.cs" />
     <Compile Include="ViewModels\General\PriceVM.cs" />
+    <Compile Include="ViewModels\General\PropertiesChangedVM.cs" />
     <Compile Include="ViewModels\General\SideBarInterLinkVM.cs" />
     <Compile Include="ViewModels\General\SideBarItemHeaderVM.cs" />
     <Compile Include="ViewModels\General\TaskVM.cs" />
@@ -274,6 +277,9 @@
     <Compile Include="Views\Book\BookCollectionPage_Search.cs" />
     <Compile Include="Views\Book\BookCollectionPage_ViewModelPage.cs" />
     <Compile Include="Views\Book\BookCollectionPage_Tasks.cs" />
+    <Compile Include="Views\Book\Dialog\BookEditedCD.xaml.cs">
+      <DependentUpon>BookEditedCD.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\Dialog\ReturnBookExemplaryCD.xaml.cs">
       <DependentUpon>ReturnBookExemplaryCD.xaml</DependentUpon>
     </Compile>
@@ -467,6 +473,10 @@
     <Page Include="Views\Book\Dialog\BookBeforeGoBackCD.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Book\Dialog\BookEditedCD.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Book\Dialog\ReturnBookExemplaryCD.xaml">
       <Generator>MSBuild:Compile</Generator>

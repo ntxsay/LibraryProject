@@ -1,5 +1,7 @@
-﻿using LibraryProjectUWP.Code.Services.Logging;
+﻿using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Models.Local;
+using LibraryProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,69 +75,6 @@ namespace LibraryProjectUWP.Code.Extensions
             }
         }
 
-        public static List<string> GetChangedProperties<T>(T A, T B)
-        {
-            try
-            {
-                if (A != null && B != null)
-                {
-                    Type type = typeof(T);
-                    PropertyInfo[] allProperties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                    PropertyInfo[] allSimpleProperties = allProperties;//.Where(pi => pi.PropertyType.IsSimpleType());
-                    IEnumerable<string> enumerable()
-                    {
-                        foreach (var pi in allSimpleProperties)
-                        {
-                            var AValue = type.GetProperty(pi.Name).GetValue(A, null);
-                            var BValue = type.GetProperty(pi.Name).GetValue(B, null);
-                            if (AValue != BValue && (AValue == null || !AValue.Equals(BValue)))
-                            {
-                                yield return pi.Name;
-                            }
-                        }
-                    }
-
-                    var unequalProperties = enumerable();
-                    return unequalProperties.ToList();
-                }
-                else
-                {
-                    throw new ArgumentNullException("Les objets A et B ne doivent pas être null.");
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        public static T CopyProperties<T>(T A, T B)
-        {
-            try
-            {
-                if (A != null && B != null)
-                {
-                    Type type = typeof(T);
-                    PropertyInfo[] allProperties = type.GetProperties();
-                    foreach (var pi in allProperties)
-                    {
-                        var AValue = type.GetProperty(pi.Name).GetValue(A, null);
-                        type.GetProperty(pi.Name).SetValue(B, AValue);
-                    }
-
-                    return B;
-                }
-                else
-                {
-                    throw new ArgumentNullException("Les objets A et B ne doivent pas être null.");
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
+        
     }
 }

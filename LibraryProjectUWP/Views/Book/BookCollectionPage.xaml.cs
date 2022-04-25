@@ -658,15 +658,50 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void NewEditBookUC_Edit_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        private async void NewEditBookUC_Edit_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var viewModelsEqual = EqualityComparerExtentions.GetChangedProperties(sender.ViewModelPage.ViewModel, sender._parameters.CurrentViewModel);
+                var viewModelsEqual = BookHelpers.GetPropertiesChanged(sender._parameters.CurrentViewModel, sender.ViewModelPage.ViewModel);
                 if (viewModelsEqual.Any())
                 {
+                    var dialog = new BookEditedCD(sender._parameters.CurrentViewModel, viewModelsEqual)
+                    {
+                        Title = "Enregistrer vos modifications"
+                    };
 
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        var updatedViewModel = sender.ViewModelPage.ViewModel;
+
+                        var updateResult = await DbServices.Book.UpdateAsync(updatedViewModel);
+                        if (updateResult.IsSuccess)
+                        {
+                            sender._parameters.CurrentViewModel = PropertyHelpers.CopyProperties(updatedViewModel);
+                            CompleteBookInfos(sender._parameters.CurrentViewModel);
+                            await esBook.SaveBookViewModelAsync(updatedViewModel);
+
+                            sender.ViewModelPage.ResultMessageTitle = "Succès";
+                            sender.ViewModelPage.ResultMessage = updateResult.Message;
+                            sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                            sender.ViewModelPage.IsResultMessageOpen = true;
+                        }
+                        else
+                        {
+                            //Erreur
+                            sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                            sender.ViewModelPage.ResultMessage = updateResult.Message;
+                            sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                            sender.ViewModelPage.IsResultMessageOpen = true;
+                            return;
+                        }
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return;
+                    }
                 }
                 sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
                 sender.UpdateItemRequested -= NewEditBookUC_Edit_UpdateItemRequested;
@@ -723,6 +758,51 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        private async void UpdateBookAsync(NewEditBookUC sender)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender._parameters != null)
+                {
+                    var updatedViewModel = sender.ViewModelPage.ViewModel;
+
+                    var updateResult = await DbServices.Book.UpdateAsync(updatedViewModel);
+                    if (updateResult.IsSuccess)
+                    {
+                        sender._parameters.CurrentViewModel = PropertyHelpers.CopyProperties(updatedViewModel);
+                        CompleteBookInfos(sender._parameters.CurrentViewModel);
+                        await esBook.SaveBookViewModelAsync(updatedViewModel);
+
+                        sender.ViewModelPage.ResultMessageTitle = "Succès";
+                        sender.ViewModelPage.ResultMessage = updateResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                    }
+                    else
+                    {
+                        //Erreur
+                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        sender.ViewModelPage.ResultMessage = updateResult.Message;
+                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                        sender.ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+
+                sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
+                sender.UpdateItemRequested -= NewEditBookUC_Edit_UpdateItemRequested;
+
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #endregion
 
         #region Import Book
