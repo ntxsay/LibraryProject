@@ -151,6 +151,7 @@
     <Compile Include="Code\DataTemplatesSelector\DataViewModeTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\CategoriesDataTemplateSelector.cs" />
     <Compile Include="Code\Enums.cs" />
+    <Compile Include="Code\Extensions\CustomExtensions.cs" />
     <Compile Include="Code\Extensions\EqualityComparerExtensions.cs" />
     <Compile Include="Code\Extensions\LinqExtensions.cs" />
     <Compile Include="Code\Extensions\ScrollViewerExtensions.cs" />

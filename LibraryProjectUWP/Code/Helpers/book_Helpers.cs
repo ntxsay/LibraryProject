@@ -30,9 +30,9 @@ namespace LibraryProjectUWP.Code.Helpers
                     });
                 }
 
-                if (viewModelA.TitresOeuvre != viewModelB.TitresOeuvre)
+                if (viewModelA.TitresOeuvre != null && viewModelB.TitresOeuvre != null)
                 {
-                    if (viewModelB.TitresOeuvre == null || !viewModelB.TitresOeuvre.Any() || viewModelB.TitresOeuvre.Count < viewModelA.TitresOeuvre.Count)
+                    if (viewModelA.TitresOeuvre.Count > viewModelB.TitresOeuvre.Count)
                     {
                         list.Add(new PropertiesChangedVM()
                         {
@@ -40,7 +40,27 @@ namespace LibraryProjectUWP.Code.Helpers
                             Message = "Les titres ont été effacés"
                         });
                     }
-                    else if (viewModelA.TitresOeuvre == null || !viewModelA.TitresOeuvre.Any() || viewModelA.TitresOeuvre.Count < viewModelB.TitresOeuvre.Count)
+                    else if (viewModelA.TitresOeuvre.Count < viewModelB.TitresOeuvre.Count)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Autre(s) titre(s)",
+                            Message = "De nouveaux titres ont été ajoutés"
+                        });
+                    }
+                }
+                else
+                {
+                    if (viewModelB.TitresOeuvre == null || !viewModelB.TitresOeuvre.Any())
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Autre(s) titre(s)",
+                            Message = "Les titres ont été effacés"
+                        });
+                    }
+
+                    if (viewModelA.TitresOeuvre == null || !viewModelA.TitresOeuvre.Any())
                     {
                         list.Add(new PropertiesChangedVM()
                         {
@@ -50,9 +70,9 @@ namespace LibraryProjectUWP.Code.Helpers
                     }
                 }
 
-                if (viewModelA.Auteurs != viewModelB.Auteurs)
+                if (viewModelA.Auteurs != null && viewModelB.Auteurs != null)
                 {
-                    if (viewModelB.Auteurs == null || !viewModelB.Auteurs.Any() || viewModelB.Auteurs.Count < viewModelA.Auteurs.Count)
+                    if (viewModelA.Auteurs.Count > viewModelB.Auteurs.Count)
                     {
                         list.Add(new PropertiesChangedVM()
                         {
@@ -60,7 +80,27 @@ namespace LibraryProjectUWP.Code.Helpers
                             Message = "Des auteurs ont été effacés"
                         });
                     }
-                    else if (viewModelA.Auteurs == null || !viewModelA.Auteurs.Any() || viewModelA.Auteurs.Count < viewModelB.Auteurs.Count)
+                    else if (viewModelA.Auteurs.Count < viewModelB.Auteurs.Count)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Auteur(s)",
+                            Message = "Des auteurs ont été ajoutés"
+                        });
+                    }
+                }
+                else
+                {
+                    if (viewModelB.Auteurs == null || !viewModelB.Auteurs.Any())
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Auteur(s)",
+                            Message = "Des auteurs ont été effacés"
+                        });
+                    }
+
+                    if (viewModelA.Auteurs == null || !viewModelA.Auteurs.Any())
                     {
                         list.Add(new PropertiesChangedVM()
                         {
@@ -70,112 +110,396 @@ namespace LibraryProjectUWP.Code.Helpers
                     }
                 }
 
+                if (viewModelA.Identification != viewModelB.Identification)
+                {
+                    if (viewModelB.Identification == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Identification",
+                            Message = "Des informations d'identification ont été effacées"
+                        });
+                    }
+                    else if (viewModelA.Identification == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Identification",
+                            Message = "Des informations d'identification ont été ajoutées"
+                        });
+                    }
+                    else
+                    {
+                        if (viewModelA.Identification.ISBN != viewModelB.Identification.ISBN)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "ISBN",
+                                Message = "L'ISBN du livre a été changé"
+                            });
+                        }
 
-                //if (viewModelB.Identification != null)
-                //{
-                //    if (viewModelA.Identification == null)
-                //    {
-                //        viewModelA.Identification = new LivreIdentificationVM();
-                //    }
+                        if (viewModelA.Identification.ISBN10 != viewModelB.Identification.ISBN10)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "ISBN-10",
+                                Message = "L'ISBN-10 du livre a été changé"
+                            });
+                        }
 
-                //    viewModelA.Identification.Id = viewModelB.Identification.Id;
-                //    viewModelA.Identification.ISBN = viewModelB.Identification.ISBN;
-                //    viewModelA.Identification.ISBN10 = viewModelB.Identification.ISBN10;
-                //    viewModelA.Identification.ISBN13 = viewModelB.Identification.ISBN13;
-                //    viewModelA.Identification.ISSN = viewModelB.Identification.ISSN;
-                //    viewModelA.Identification.ASIN = viewModelB.Identification.ASIN;
-                //    viewModelA.Identification.CodeBarre = viewModelB.Identification.CodeBarre;
-                //    viewModelA.Identification.Cotation = viewModelB.Identification.Cotation;
-                //}
+                        if (viewModelA.Identification.ISBN13 != viewModelB.Identification.ISBN13)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "ISBN-13",
+                                Message = "L'ISBN-13 du livre a été changé"
+                            });
+                        }
 
-                //if (viewModelB.ClassificationAge != null)
-                //{
-                //    if (viewModelA.ClassificationAge == null)
-                //    {
-                //        viewModelA.ClassificationAge = new LivreClassificationAgeVM();
-                //    }
+                        if (viewModelA.Identification.ISSN != viewModelB.Identification.ISSN)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "ISSN",
+                                Message = "L'ISSN du livre a été changé"
+                            });
+                        }
 
-                //    viewModelA.ClassificationAge.TypeClassification = viewModelB.ClassificationAge.TypeClassification;
-                //    viewModelA.ClassificationAge.ApartirDe = viewModelB.ClassificationAge.ApartirDe;
-                //    viewModelA.ClassificationAge.Jusqua = viewModelB.ClassificationAge.Jusqua;
-                //    viewModelA.ClassificationAge.DeTelAge = viewModelB.ClassificationAge.DeTelAge;
-                //    viewModelA.ClassificationAge.ATelAge = viewModelB.ClassificationAge.ATelAge;
-                //}
+                        if (viewModelA.Identification.ASIN != viewModelB.Identification.ASIN)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "ASIN",
+                                Message = "L'ASIN du livre a été changé"
+                            });
+                        }
 
-                //if (viewModelB.Publication != null)
-                //{
-                //    if (viewModelA.Publication == null)
-                //    {
-                //        viewModelA.Publication = new LivrePublicationVM();
-                //    }
+                        if (viewModelA.Identification.CodeBarre != viewModelB.Identification.CodeBarre)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "CodeBarre",
+                                Message = "Le Code barre du livre a été changé"
+                            });
+                        }
 
-                //    viewModelA.Publication.Pays = viewModelB.Publication.Pays;
-                //    viewModelA.Publication.Langue = viewModelB.Publication.Langue;
-                //    viewModelA.Publication.DateParution = viewModelB.Publication.DateParution;
-                //    viewModelA.Publication.DayParution = viewModelB.Publication.DayParution;
-                //    viewModelA.Publication.MonthParution = viewModelB.Publication.MonthParution;
-                //    viewModelA.Publication.YearParution = viewModelB.Publication.YearParution;
+                        if (viewModelA.Identification.Cotation != viewModelB.Identification.Cotation)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Cotation",
+                                Message = "La cotation du livre a été changé"
+                            });
+                        }
+                    }
+                }
 
-                //    if (viewModelB.Publication.Editeurs != null && viewModelB.Publication.Editeurs.Any())
-                //    {
-                //        if (viewModelA.Publication.Editeurs == null)
-                //        {
-                //            viewModelA.Publication.Editeurs = new ObservableCollection<ContactVM>();
-                //        }
+                if (viewModelA.ClassificationAge != viewModelB.ClassificationAge)
+                {
+                    if (viewModelB.ClassificationAge == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Classification Age",
+                            Message = "Des informations concernant la classification de l'âge ont été effacées"
+                        });
+                    }
+                    else if (viewModelA.ClassificationAge == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Classification Age",
+                            Message = "Des informations concernant la classification de l'âge ont été ajoutées"
+                        });
+                    }
+                    else
+                    {
+                        if (viewModelA.ClassificationAge.TypeClassification != viewModelB.ClassificationAge.TypeClassification)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Type de classification",
+                                Message = "Le type de classification du livre a été changé"
+                            });
+                        }
 
-                //        viewModelA.Publication.Editeurs.Clear();
-                //        foreach (var editeur in viewModelB.Publication.Editeurs)
-                //        {
-                //            viewModelA.Publication.Editeurs.Add(editeur);
-                //        }
+                        if (viewModelA.ClassificationAge.ApartirDe != viewModelB.ClassificationAge.ApartirDe ||
+                            viewModelA.ClassificationAge.Jusqua != viewModelB.ClassificationAge.Jusqua ||
+                            viewModelA.ClassificationAge.DeTelAge != viewModelB.ClassificationAge.DeTelAge ||
+                            viewModelA.ClassificationAge.ATelAge != viewModelB.ClassificationAge.ATelAge)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Classification de l'âge",
+                                Message = "L'âge de lecture du livre a été changé"
+                            });
+                        }
+                    }
+                }
 
-                //        viewModelA.Publication.EditeursStringList = StringHelpers.JoinStringArray(viewModelA.Publication.Editeurs?.Select(s => s.SocietyName)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
-                //    }
+                if (viewModelA.Publication != viewModelB.Publication)
+                {
+                    if (viewModelB.Publication == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Publication",
+                            Message = "Des informations concernant la publication du livre ont été effacées"
+                        });
+                    }
+                    else if (viewModelA.Publication == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Publication",
+                            Message = "Des informations concernant la publication du livre ont été ajoutées"
+                        });
+                    }
+                    else
+                    {
+                        if (viewModelA.Publication.Pays != viewModelB.Publication.Pays)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Pays",
+                                Message = "Le pays de publication du livre a été changé"
+                            });
+                        }
 
-                //    if (viewModelB.Publication.Collections != null && viewModelB.Publication.Collections.Any())
-                //    {
-                //        if (viewModelA.Publication.Collections == null)
-                //        {
-                //            viewModelA.Publication.Collections = new ObservableCollection<CollectionVM>();
-                //        }
+                        if (viewModelA.Publication.Langue != viewModelB.Publication.Langue)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Langue",
+                                Message = "La langue de publication du livre a été changé"
+                            });
+                        }
 
-                //        viewModelA.Publication.Collections.Clear();
-                //        foreach (var collection in viewModelB.Publication.Collections)
-                //        {
-                //            viewModelA.Publication.Collections.Add(collection);
-                //        }
+                        if (viewModelA.Publication.DayParution != viewModelB.Publication.DayParution)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Date de parution",
+                                Message = "Le jour de parution a été changé"
+                            });
+                        }
 
-                //        viewModelA.Publication.CollectionsStringList = StringHelpers.JoinStringArray(viewModelA.Publication.Collections?.Select(s => s.Name)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
-                //    }
-                //}
+                        if (viewModelA.Publication.MonthParution != viewModelB.Publication.MonthParution)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Date de parution",
+                                Message = "Le mois de parution a été changé"
+                            });
+                        }
 
-                //if (viewModelB.Format != null)
-                //{
-                //    if (viewModelA.Format == null)
-                //    {
-                //        viewModelA.Format = new LivreFormatVM();
-                //    }
+                        if (viewModelA.Publication.YearParution != viewModelB.Publication.YearParution)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Date de parution",
+                                Message = "L'année de parution a été changé"
+                            });
+                        }
 
-                //    viewModelA.Format.Format = viewModelB.Format.Format;
-                //    viewModelA.Format.NbOfPages = viewModelB.Format.NbOfPages;
-                //    viewModelA.Format.Epaisseur = viewModelB.Format.Epaisseur;
-                //    viewModelA.Format.Poids = viewModelB.Format.Poids;
-                //    viewModelA.Format.Hauteur = viewModelB.Format.Hauteur;
-                //    viewModelA.Format.Largeur = viewModelB.Format.Largeur;
-                //    viewModelA.Format.Dimensions = viewModelB.Format.Dimensions;
-                //    viewModelA.Format.Id = viewModelB.Format.Id;
-                //}
+                        if (viewModelA.Publication.Editeurs != null && viewModelB.Publication.Editeurs != null)
+                        {
+                            if (viewModelA.Publication.Editeurs.Count > viewModelB.Publication.Editeurs.Count)
+                            {
+                                list.Add(new PropertiesChangedVM()
+                                {
+                                    PropertyName = "Editeurs",
+                                    Message = "Des éditeurs/maisons d'édition ont été effacés"
+                                });
+                            }
+                            else if (viewModelA.Publication.Editeurs.Count < viewModelB.Publication.Editeurs.Count)
+                            {
+                                list.Add(new PropertiesChangedVM()
+                                {
+                                    PropertyName = "Editeurs",
+                                    Message = "Des éditeurs/maisons d'édition ont été ajoutés"
+                                });
+                            }
+                        }
+                        else
+                        {
+                            if (viewModelB.Publication.Editeurs == null || !viewModelB.Publication.Editeurs.Any())
+                            {
+                                list.Add(new PropertiesChangedVM()
+                                {
+                                    PropertyName = "Editeurs",
+                                    Message = "Des éditeurs/maisons d'édition ont été effacés"
+                                });
+                            }
 
-                //if (viewModelB.Description != null)
-                //{
-                //    if (viewModelA.Description == null)
-                //    {
-                //        viewModelA.Description = new LivreDescriptionVM();
-                //    }
+                            if (viewModelA.Publication.Editeurs == null || !viewModelA.Publication.Editeurs.Any())
+                            {
+                                list.Add(new PropertiesChangedVM()
+                                {
+                                    PropertyName = "Editeurs",
+                                    Message = "Des éditeurs/maisons d'édition ont été ajoutés"
+                                });
+                            }
+                        }
 
-                //    viewModelA.Description.Resume = viewModelB.Description.Resume;
-                //    viewModelA.Description.Notes = viewModelB.Description.Notes;
-                //}
+                        if (viewModelA.Publication.Collections != null && viewModelB.Publication.Collections != null)
+                        {
+                            if (viewModelA.Publication.Collections.Count > viewModelB.Publication.Collections.Count)
+                            {
+                                list.Add(new PropertiesChangedVM()
+                                {
+                                    PropertyName = "Collections",
+                                    Message = "Des collections ont été effacés"
+                                });
+                            }
+                            else if (viewModelA.Publication.Collections.Count < viewModelB.Publication.Collections.Count)
+                            {
+                                list.Add(new PropertiesChangedVM()
+                                {
+                                    PropertyName = "Collections",
+                                    Message = "Des collections ont été ajoutés"
+                                });
+                            }
+                        }
+                        else
+                        {
+                            if (viewModelB.Publication.Collections == null || !viewModelB.Publication.Collections.Any())
+                            {
+                                list.Add(new PropertiesChangedVM()
+                                {
+                                    PropertyName = "Collections",
+                                    Message = "Des collections ont été effacés"
+                                });
+                            }
+
+                            if (viewModelA.Publication.Collections == null || !viewModelA.Publication.Collections.Any())
+                            {
+                                list.Add(new PropertiesChangedVM()
+                                {
+                                    PropertyName = "Collections",
+                                    Message = "Des collections ont été ajoutés"
+                                });
+                            }
+                        }
+                    }
+                }
+
+                if (viewModelA.Format != viewModelB.Format)
+                {
+                    if (viewModelB.Format == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Format",
+                            Message = "Des informations concernant le format du livre ont été effacées"
+                        });
+                    }
+                    else if (viewModelA.Format == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Format",
+                            Message = "Des informations concernant le format du livre ont été ajoutées"
+                        });
+                    }
+                    else
+                    {
+                        if (viewModelA.Format.Format != viewModelB.Format.Format)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Format",
+                                Message = "Le format du livre a été changé"
+                            });
+                        }
+
+                        if (viewModelA.Format.NbOfPages != viewModelB.Format.NbOfPages)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Format",
+                                Message = "Le nombre de page du livre a été changé"
+                            });
+                        }
+
+                        if (viewModelA.Format.Epaisseur != viewModelB.Format.Epaisseur)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Format",
+                                Message = "L'épaisseur du livre a été changé"
+                            });
+                        }
+
+                        if (viewModelA.Format.Poids != viewModelB.Format.Poids)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Format",
+                                Message = "Le poids du livre a été changé"
+                            });
+                        }
+
+                        if (viewModelA.Format.Hauteur != viewModelB.Format.Hauteur)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Format",
+                                Message = "La hauteur du livre a été changé"
+                            });
+                        }
+
+                        if (viewModelA.Format.Largeur != viewModelB.Format.Largeur)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Format",
+                                Message = "La largeur du livre a été changé"
+                            });
+                        }
+                    }
+                }
+
+                if (viewModelA.Description != viewModelB.Description)
+                {
+                    if (viewModelB.Description == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Description",
+                            Message = "Des informations concernant la description du livre ont été effacées"
+                        });
+                    }
+                    else if (viewModelA.Description == null)
+                    {
+                        list.Add(new PropertiesChangedVM()
+                        {
+                            PropertyName = "Description",
+                            Message = "Des informations concernant la description du livre ont été ajoutées"
+                        });
+                    }
+                    else
+                    {
+                        if (viewModelA.Description.Resume != viewModelB.Description.Resume)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Description",
+                                Message = "Le résumé du livre a été changé"
+                            });
+                        }
+
+                        if (viewModelA.Description.Notes != viewModelB.Description.Notes)
+                        {
+                            list.Add(new PropertiesChangedVM()
+                            {
+                                PropertyName = "Description",
+                                Message = "Les notes concernant le livre a été changé"
+                            });
+                        }
+                    }
+                }
 
                 return list;
             }

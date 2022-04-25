@@ -65,8 +65,11 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
             _parameters = parameters;
             ViewModelPage.EditMode = parameters.EditMode;
-            ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} un livre";
-            ViewModelPage.ViewModel = parameters.EditMode == Code.EditMode.Create ? parameters?.CurrentViewModel : PropertyHelpers.CopyProperties(parameters.CurrentViewModel, new LivreVM());
+            ViewModelPage.Header = $"{(parameters.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un livre";
+            if (parameters.EditMode == EditMode.Edit)
+            {
+                ViewModelPage.ViewModel = parameters.CurrentViewModel.DeepCopy();
+            }
             InitializeActionInfos();
         }
 
@@ -737,14 +740,44 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            CancelModificationRequested?.Invoke(this, args);
-        }
+            try
+            {
+                var viewModelsEqual = BookHelpers.GetPropertiesChanged(this._parameters.CurrentViewModel, this.ViewModelPage.ViewModel);
+                if (viewModelsEqual.Any())
+                {
+                    var dialog = new BookEditedCD(this._parameters.CurrentViewModel, viewModelsEqual)
+                    {
+                        Title = "Enregistrer vos modifications"
+                    };
 
-        private void ImportBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        if (_parameters.EditMode == EditMode.Create)
+                        {
+                            CreateItemXUiCommand_ExecuteRequested(sender, args);
+                        }
+                        else if (_parameters.EditMode == EditMode.Edit)
+                        {
+                            UpdateItemXUiCommand_ExecuteRequested(sender, args);
+                        }
+                        return;
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return;
+                    }
+                }
+                CancelModificationRequested?.Invoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -1023,7 +1056,7 @@ namespace LibraryProjectUWP.Views.Book
         public readonly IEnumerable<string> languagesList = CountryHelpers.LanguagesList();
         //public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
 
-        private LivreVM _ViewModel;
+        private LivreVM _ViewModel = new LivreVM();
         public LivreVM ViewModel
         {
             get => this._ViewModel;
