@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.Code.Extensions;
+﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
@@ -336,7 +337,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (sender is DataGrid dataGrid && dataGrid.SelectedItem is LivreVM viewModel)
                 {
-                    ParentPage.EditBook(viewModel);
+                    ParentPage.NewEditBook(viewModel, EditMode.Edit);
                 }
             }
             catch (Exception ex)
@@ -565,7 +566,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    ParentPage.EditBook(viewModel);
+                    ParentPage.NewEditBook(viewModel, EditMode.Edit);
                 }
             }
             catch (Exception ex)

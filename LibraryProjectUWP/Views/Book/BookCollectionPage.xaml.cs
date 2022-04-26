@@ -481,7 +481,10 @@ namespace LibraryProjectUWP.Views.Book
         #region New Book
         private void NewBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            NewBook(null);
+            NewEditBook(new LivreVM()
+            {
+                IdLibrary = Parameters.ParentLibrary.Id,
+            }, EditMode.Create);
         }
 
         private async void NewEditBookUC_Create_CreateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
@@ -489,58 +492,55 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (sender._parameters != null)
+                LivreVM newViewModel = sender.ViewModelPage.ViewModel;
+
+                var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
+                if (creationResult.IsSuccess)
                 {
-                    LivreVM newViewModel = sender.ViewModelPage.ViewModel;
-
-                    var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
-                    if (creationResult.IsSuccess)
+                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                     {
-                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                        {
-                            ProgessText = $"Actualisation du catalogue des livres en cours...",
-                        });
+                        ProgessText = $"Actualisation du catalogue des livres en cours...",
+                    });
 
-                        DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 1),
+                    };
+
+                    dispatcherTimer.Tick += async (t, f) =>
+                    {
+                        await this.RefreshItemsGrouping(true, GetSelectedPage);
+
+                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                         {
-                            Interval = new TimeSpan(0, 0, 0, 1),
+                            Interval = new TimeSpan(0, 0, 0, 2),
                         };
 
-                        dispatcherTimer.Tick += async (t, f) =>
+                        dispatcherTimer2.Tick += (s, i) =>
                         {
-                            await this.RefreshItemsGrouping(true, GetSelectedPage);
-
-                            DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                            {
-                                Interval = new TimeSpan(0, 0, 0, 2),
-                            };
-
-                            dispatcherTimer2.Tick += (s, i) =>
-                            {
-                                Parameters.MainPage.CloseBusyLoader();
-                                dispatcherTimer2.Stop();
-                            };
-                            dispatcherTimer2.Start();
-
-                            dispatcherTimer.Stop();
+                            Parameters.MainPage.CloseBusyLoader();
+                            dispatcherTimer2.Stop();
                         };
+                        dispatcherTimer2.Start();
 
-                        dispatcherTimer.Start();
+                        dispatcherTimer.Stop();
+                    };
 
-                        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                        return;
-                    }
+                    dispatcherTimer.Start();
+
+                    sender.ViewModelPage.ResultMessageTitle = "Succès";
+                    sender.ViewModelPage.ResultMessage = creationResult.Message;
+                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                    sender.ViewModelPage.IsResultMessageOpen = true;
+                }
+                else
+                {
+                    //Erreur
+                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    sender.ViewModelPage.ResultMessage = creationResult.Message;
+                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                    sender.ViewModelPage.IsResultMessageOpen = true;
+                    return;
                 }
 
                 sender.ViewModelPage.ViewModel = new LivreVM()
@@ -572,72 +572,79 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void NewBook(LivreVM viewModel = null)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
-                if (checkedItem != null)
-                {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
-                }
-                else
-                {
-                    if (viewModel != null)
-                    {
-                        viewModel.IdLibrary = Parameters.ParentLibrary.Id;
-                    }
+        //private void NewBook(LivreVM viewModel = null)
+        //{
+        //    MethodBase m = MethodBase.GetCurrentMethod();
+        //    try
+        //    {
+        //        var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == Code.EditMode.Create);
+        //        if (checkedItem != null)
+        //        {
+        //            this.PivotRightSideBar.SelectedItem = checkedItem;
+        //        }
+        //        else
+        //        {
+        //            if (viewModel != null)
+        //            {
+        //                viewModel.IdLibrary = Parameters.ParentLibrary.Id;
+        //            }
 
-                    NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
-                    {
-                        ParentPage = this,
-                        EditMode = Code.EditMode.Create,
-                        CurrentViewModel = viewModel ?? new LivreVM()
-                        {
-                            IdLibrary = Parameters.ParentLibrary.Id,
-                        }
-                    });
+        //            NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
+        //            {
+        //                ParentPage = this,
+        //                EditMode = Code.EditMode.Create,
+        //                CurrentViewModel = viewModel ?? new LivreVM()
+        //                {
+        //                    IdLibrary = Parameters.ParentLibrary.Id,
+        //                }
+        //            });
 
-                    userControl.CancelModificationRequested += NewEditBookUC_Create_CancelModificationRequested;
-                    userControl.CreateItemRequested += NewEditBookUC_Create_CreateItemRequested;
+        //            userControl.CancelModificationRequested += NewEditBookUC_Create_CancelModificationRequested;
+        //            userControl.CreateItemRequested += NewEditBookUC_Create_CreateItemRequested;
 
-                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                    {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
-                    });
-                }
-                this.ViewModelPage.IsSplitViewOpen = true;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        //            this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+        //            {
+        //                Glyph = userControl.ViewModelPage.Glyph,
+        //                Title = userControl.ViewModelPage.Header,
+        //                IdItem = userControl.ViewModelPage.ItemGuid,
+        //            });
+        //        }
+        //        this.ViewModelPage.IsSplitViewOpen = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
         #endregion
 
         #region Edit Book
-        public void EditBook(LivreVM viewModel)
+        public void NewEditBook(LivreVM viewModel, EditMode editMode = EditMode.Create)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == Code.EditMode.Edit);
-                if (checkedItem != null)
+                if (viewModel == null)
                 {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                    return;
+                }
+
+                if (viewModel.IdLibrary == null || viewModel.IdLibrary < 1)
+                {
+                    viewModel.IdLibrary = Parameters.ParentLibrary.Id;
+                }
+
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == editMode) is NewEditBookUC checkedItem)
+                {
+                    checkedItem.InitializeSideBar(Parameters.ParentLibrary.Id, this, viewModel, editMode);
+                    this.SelectItemSideBar(checkedItem);
                 }
                 else
                 {
-                    NewEditBookUC userControl = new NewEditBookUC(new ManageBookParametersDriverVM()
-                    {
-                        ParentPage = this,
-                        EditMode = Code.EditMode.Edit,
-                        CurrentViewModel = viewModel,
-                    });
+                    NewEditBookUC userControl = new NewEditBookUC();
+                    userControl.InitializeSideBar(Parameters.ParentLibrary.Id, this, viewModel, editMode);
+
 
                     userControl.CancelModificationRequested += NewEditBookUC_Edit_CancelModificationRequested;
                     userControl.UpdateItemRequested += NewEditBookUC_Edit_UpdateItemRequested;
@@ -680,31 +687,28 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (sender._parameters != null)
+                var updatedViewModel = sender.ViewModelPage.ViewModel;
+
+                var updateResult = await DbServices.Book.UpdateAsync(updatedViewModel);
+                if (updateResult.IsSuccess)
                 {
-                    var updatedViewModel = sender.ViewModelPage.ViewModel;
+                    sender.OriginalViewModel.Copy(updatedViewModel);
+                    CompleteBookInfos(sender.OriginalViewModel);
+                    await esBook.SaveBookViewModelAsync(updatedViewModel);
 
-                    var updateResult = await DbServices.Book.UpdateAsync(updatedViewModel);
-                    if (updateResult.IsSuccess)
-                    {
-                        sender._parameters.CurrentViewModel.Copy(updatedViewModel);
-                        CompleteBookInfos(sender._parameters.CurrentViewModel);
-                        await esBook.SaveBookViewModelAsync(updatedViewModel);
-
-                        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                        sender.ViewModelPage.ResultMessage = updateResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                        sender.ViewModelPage.ResultMessage = updateResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                        return;
-                    }
+                    sender.ViewModelPage.ResultMessageTitle = "Succès";
+                    sender.ViewModelPage.ResultMessage = updateResult.Message;
+                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+                    sender.ViewModelPage.IsResultMessageOpen = true;
+                }
+                else
+                {
+                    //Erreur
+                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    sender.ViewModelPage.ResultMessage = updateResult.Message;
+                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+                    sender.ViewModelPage.IsResultMessageOpen = true;
+                    return;
                 }
 
                 sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
@@ -746,7 +750,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         htmlServices htmlservices = new htmlServices();
                         var viewModel = await htmlservices.GetBookFromAmazonAsync(new Uri(url), new LivreVM());
-                        NewBook(viewModel);
+                        NewEditBook(viewModel, EditMode.Create);
                     }
                     else
                     {
@@ -806,7 +810,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     if (viewModels.Count() == 1)
                     {
-                        NewBook(viewModels.First());
+                        NewEditBook(viewModels.First(), EditMode.Create);
                     }
                     else
                     {
