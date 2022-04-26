@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.ES;
 using System;
 using System.Collections.Generic;
@@ -354,7 +355,71 @@ namespace LibraryProjectUWP.ViewModels.Contact
 
         public string DisplayName
         {
-            get => $"{NomNaissance} {Prenom}";
+            get
+            {
+                try
+                {
+                    switch (ContactType)
+                    {
+                        case ContactType.Human:
+                            return $"{(!TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ? TitreCivilite + " " : "")}{(!NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ? NomNaissance + " " : "")}{(!NomUsage.IsStringNullOrEmptyOrWhiteSpace() ? NomUsage + " " : "")}{(!Prenom.IsStringNullOrEmptyOrWhiteSpace() ? Prenom + " " : "")}{(!AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() ? AutresPrenoms : "")}";
+                        case ContactType.Society:
+                            return SocietyName;
+                        default:
+                            return string.Empty;
+                    }
+                }
+                catch (Exception)
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        public string DisplayName2
+        {
+            get
+            {
+                try
+                {
+                    switch (ContactType)
+                    {
+                        case ContactType.Human:
+                            return $"{(!TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ? TitreCivilite + " " : "")}{(!Prenom.IsStringNullOrEmptyOrWhiteSpace() ? Prenom + " " : "")}{(!AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() ? AutresPrenoms + " " : "")}{(!NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ? NomNaissance + " " : "")}{(!NomUsage.IsStringNullOrEmptyOrWhiteSpace() ? NomUsage : "")}";
+                        case ContactType.Society:
+                            return SocietyName;
+                        default:
+                            return string.Empty;
+                    }
+                }
+                catch (Exception)
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        public string DisplayName3
+        {
+            get
+            {
+                try
+                {
+                    switch (ContactType)
+                    {
+                        case ContactType.Human:
+                            return $"{(!Prenom.IsStringNullOrEmptyOrWhiteSpace() ? Prenom + " " : "")}{(!AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() ? AutresPrenoms + " " : "")}{(!NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ? NomNaissance + " " : "")}{(!NomUsage.IsStringNullOrEmptyOrWhiteSpace() ? NomUsage : "")}";
+                        case ContactType.Society:
+                            return SocietyName;
+                        default:
+                            return string.Empty;
+                    }
+                }
+                catch (Exception)
+                {
+                    return string.Empty;
+                }
+            }
         }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)

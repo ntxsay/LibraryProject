@@ -74,12 +74,12 @@ namespace LibraryProjectUWP.Views.Book
         //    InitializeActionInfos();
         //}
 
-        private async void PivotItem_Loaded(object sender, RoutedEventArgs e)
+        private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
-#warning Ces méthodes ralentissent l'affichage de cette sideBar
-            await UpdateAuthorListAsync();
-            await UpdateCollectionListAsync();
-            await UpdateEditeurListAsync();
+//#warning Ces méthodes ralentissent l'affichage de cette sideBar
+//            await UpdateAuthorListAsync();
+//            await UpdateCollectionListAsync();
+//            await UpdateEditeurListAsync();
         }
 
         public void InitializeSideBar(long idLibrary, BookCollectionPage bookCollectionPage, LivreVM livreVM, EditMode editMode)
@@ -112,10 +112,13 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.ViewModel = livreVM.DeepCopy();
                 }
                 InitializeActionInfos();
+
                 if (ViewModelPage.EditMode == EditMode.Edit)
                 {
                     this.Bindings.Update();
                 }
+
+                InitializeViewModelList();
             }
             catch (Exception ex)
             {
@@ -140,12 +143,24 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (ViewModelPage.EditMode == EditMode.Edit)
                 {
-                    Run runCategorie = new Run()
+                    Run runGuillemetsO = new Run()
                     {
-                        Text = "« " + OriginalViewModel?.MainTitle + " »",
-                        FontWeight = FontWeights.Medium,
+                        Text = " « ",
                     };
-                    TbcInfos.Inlines.Add(runCategorie);
+                    TbcInfos.Inlines.Add(runGuillemetsO);
+
+                    Run runName = new Run()
+                    {
+                        Text = OriginalViewModel?.MainTitle,
+                        FontWeight = FontWeights.SemiBold,
+                    };
+                    TbcInfos.Inlines.Add(runName);
+
+                    Run runGuillemetsF = new Run()
+                    {
+                        Text = " »",
+                    };
+                    TbcInfos.Inlines.Add(runGuillemetsF);
                 }
             }
             catch (Exception)
@@ -154,6 +169,67 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
+
+        public void InitializeViewModelList()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ViewModelPage.WorkerTextVisibility = Visibility.Visible;
+
+                using (BackgroundWorker worker = new BackgroundWorker()
+                {
+                    WorkerSupportsCancellation = false,
+                    WorkerReportsProgress = false,
+                })
+                {
+                    worker.DoWork += (s, e) =>
+                    {
+                        IEnumerable<ContactVM> authorsVMs = Enumerable.Empty<ContactVM>();
+                        IEnumerable<ContactVM> editorsVMs = Enumerable.Empty<ContactVM>();
+                        IEnumerable<CollectionVM> collectionsVMs = Enumerable.Empty<CollectionVM>();
+                        using (Task<IList<ContactVM>> taskAuthors = DbServices.Contact.MultipleVMAsync(ContactRole.Author))
+                        {
+                            taskAuthors.Wait();
+                            authorsVMs = taskAuthors.Result;
+                        }
+
+                        using (Task<IList<ContactVM>> taskEditors = DbServices.Contact.MultipleVMAsync(ContactRole.EditorHouse))
+                        {
+                            taskEditors.Wait();
+                            editorsVMs = taskEditors.Result;
+                        }
+
+                        using (Task<IList<CollectionVM>> taskCollections = DbServices.Collection.MultipleVmInLibraryAsync((long)OriginalViewModel.IdLibrary))
+                        {
+                            taskCollections.Wait();
+                            collectionsVMs = taskCollections.Result;
+                        }
+
+                        e.Result = new Tuple<IEnumerable<ContactVM>, IEnumerable<ContactVM>, IEnumerable<CollectionVM>>(authorsVMs, editorsVMs, collectionsVMs);
+                    };
+
+                    worker.RunWorkerCompleted += (s, e) =>
+                    {
+                        if (e.Error == null && e.Result is Tuple<IEnumerable<ContactVM>, IEnumerable<ContactVM>, IEnumerable<CollectionVM>> tuple)
+                        {
+                            ViewModelPage.AuthorViewModelList = tuple.Item1;
+                            ViewModelPage.EditorsViewModelList = tuple.Item2;
+                            ViewModelPage.CollectionViewModelList = tuple.Item3;
+                        }
+                        ViewModelPage.WorkerTextVisibility = Visibility.Collapsed;
+                    };
+
+                    worker.RunWorkerAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         #region Titles
         private void AddTitleToBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -391,7 +467,8 @@ namespace LibraryProjectUWP.Views.Book
 
         private async void UpdateAuthorToBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await UpdateAuthorListAsync();
+            //await UpdateAuthorListAsync();
+            InitializeViewModelList();
         }
 
         private void RemoveAuthorToBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -428,9 +505,10 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void UpdateCollectionToBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void UpdateCollectionToBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await UpdateCollectionListAsync();
+            //await UpdateCollectionListAsync();
+            InitializeViewModelList();
         }
 
         private void RemoveCollectionToBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -583,7 +661,8 @@ namespace LibraryProjectUWP.Views.Book
 
         private async void UpdateEditorToBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await UpdateEditeurListAsync();
+            //await UpdateEditeurListAsync();
+            InitializeViewModelList();
         }
 
         private void RemoveEditorToBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -1344,6 +1423,20 @@ namespace LibraryProjectUWP.Views.Book
                 if (_SelectedMoneyDevise != value)
                 {
                     this._SelectedMoneyDevise = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _WorkerTextVisibility = Visibility.Collapsed;
+        public Visibility WorkerTextVisibility
+        {
+            get => this._WorkerTextVisibility;
+            set
+            {
+                if (this._WorkerTextVisibility != value)
+                {
+                    this._WorkerTextVisibility = value;
                     this.OnPropertyChanged();
                 }
             }

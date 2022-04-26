@@ -125,9 +125,9 @@
                     </Grid.ColumnDefinitions>
                     <Grid Height="24" Width="24" Grid.Column="0">
                         <Ellipse Fill="{x:Bind DisplayName, Converter={StaticResource NameToColorConverter}}" />
-                        <MUIXC:PersonPicture DisplayName="{x:Bind DisplayName, Mode=OneWay}" Height="24" Width="24"/>
+                        <MUIXC:PersonPicture DisplayName="{x:Bind DisplayName3, Mode=OneWay}" Height="24" Width="24"/>
                     </Grid>
-                    <TextBlock Grid.Column="1" Text="{x:Bind DisplayName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind DisplayName3}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:DataType="contactVm:ContactVM" x:Key="contactVMListViewDataTemplate">
@@ -141,7 +141,7 @@
                         <Ellipse Fill="{x:Bind DisplayName, Converter={StaticResource NameToColorConverter}}" />
                         <MUIXC:PersonPicture DisplayName="{x:Bind DisplayName, Mode=OneWay}" Height="24" Width="24"/>
                     </Grid>
-                    <TextBlock Grid.Column="1" Text="{x:Bind DisplayName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind DisplayName3}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <Button Grid.Column="2" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" CornerRadius="22" MTUUi:FrameworkElementExtensions.Cursor="Hand" Height="28" Width="28" Padding="0" 
                             Command="{StaticResource RemoveAuthorToBookXamlUICommand}" CommandParameter="{x:Bind }">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>
@@ -155,7 +155,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="0" Text="{x:Bind SocietyName, Mode=OneWay}" FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <TextBlock Grid.Column="0" Text="{x:Bind DisplayName3, Mode=OneWay}" FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     <TextBlock Grid.Column="1" Text="{x:Bind AdressePostal, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
                 </Grid>
             </DataTemplate>
@@ -165,7 +165,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{x:Bind SocietyName, Mode=OneWay}" FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="{x:Bind DisplayName3, Mode=OneWay}" FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <Button Grid.Column="1" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" CornerRadius="22" MTUUi:FrameworkElementExtensions.Cursor="Hand" Height="28" Width="28" Padding="0" 
                             Command="{StaticResource RemoveEditorToBookXamlUICommand}" CommandParameter="{x:Bind }">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>
@@ -211,7 +211,17 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
+        <Grid Grid.Row="0" Padding="0 20" RowSpacing="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="TbcInfos" TextWrapping="Wrap"/>
+            <StackPanel Grid.Row="1" Orientation="Vertical" Spacing="4" Visibility="{x:Bind ViewModelPage.WorkerTextVisibility, Mode=OneWay}">
+                <TextBlock x:Name="tbcStatus" TextAlignment="Center" Text="Préparation en cours des données nécessaire à la création ou l'édition de livres, veuillez patienter quelques instants." Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" TextWrapping="Wrap"/>
+                <ProgressBar IsIndeterminate="True"/>
+            </StackPanel>
+        </Grid>
         <Grid  Grid.Row="1">
             <!--Général-->
             <Grid Visibility="{x:Bind ViewModelPage.GeneralStepVisibility, Mode=OneWay}">
