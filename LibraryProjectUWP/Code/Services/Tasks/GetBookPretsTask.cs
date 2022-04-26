@@ -211,19 +211,19 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             try
             {
                 string message = string.Empty;
-                var result = e.Result as Tuple<LivreVM, WorkerState<LivrePretVM, LivrePretVM>>;
 
                 // Si erreur
                 if (e.Error != null)
                 {
-                    message = $"Une erreur s'est produite.\nLe livre {result?.Item1?.MainTitle ?? "??"} contient {result.Item2.ResultList?.Count() ?? 0} exemplaire(s) emprunté(s)";
+                    message = $"Une erreur s'est produite lors de la recherche d'exemplaire(s) emprunté(s)";
                 }
                 else if (e.Cancelled)
                 {
-                    message = $"La suppression a été annulée par l'utilisateur.\nLe livre {result?.Item1?.MainTitle ?? "??"} contient {result.Item2.ResultList?.Count() ?? 0} exemplaire(s) emprunté(s)";
+                    message = $"La recherche d'exemplaire(s) emprunté(s) a été annulée par l'utilisateur.";
                 }
                 else
                 {
+                    var result = e.Result as Tuple<LivreVM, WorkerState<LivrePretVM, LivrePretVM>>;
                     message = $"Le livre {result?.Item1?.MainTitle ?? "??"} contient {result.Item2.ResultList?.Count() ?? 0} exemplaire(s) emprunté(s)";
                 }
 

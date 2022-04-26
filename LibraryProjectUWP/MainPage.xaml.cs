@@ -494,26 +494,6 @@ namespace LibraryProjectUWP
 
         #endregion
 
-        public async Task<bool> OpenLoadingAsync()
-        {
-            try
-            {
-                return await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal,
-                () =>
-                {
-                    if (!LoadingControl.IsLoading)
-                    {
-                        LoadingControl.IsLoading = true;
-                    }
-                });
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
         public void OpenBusyLoader(BusyLoaderParametersVM parametersVM)
         {
             try

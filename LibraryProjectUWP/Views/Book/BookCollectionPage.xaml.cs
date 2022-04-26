@@ -947,7 +947,10 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 List<LivreVM> newViewModelList = sender.ViewModelPivotItem.NewViewModel;
-                ImportBooksTask importBooksTask = new ImportBooksTask(Parameters.MainPage, Parameters.ParentLibrary.Id);
+                ImportBooksTask importBooksTask = new ImportBooksTask(Parameters.MainPage, Parameters.ParentLibrary.Id)
+                {
+                    CloseBusyLoaderAfterFinish = true,
+                };
                 importBooksTask.AfterTaskCompletedRequested += ImportBooksTask_AfterTaskCompletedRequested;
                 importBooksTask.InitializeWorker(newViewModelList);
 

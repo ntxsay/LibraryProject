@@ -211,19 +211,19 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             try
             {
                 string message = string.Empty;
-                var viewModelList = e.Result as OperationStateVM[];
 
                 // Si erreur
                 if (e.Error != null)
                 {
-                    message = $"Une erreur s'est produite.\n{viewModelList?.Count(w => w.IsSuccess == true) ?? 0} {((viewModelList?.Count(w => w.IsSuccess == true) ?? 0) > 1 ? "livres" : "livre")} sur {viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "ont été supprimés" : "a été supprimé")}";
+                    message = $"Une erreur s'est produite lors de la suppresion des livres";
                 }
                 else if (e.Cancelled)
                 {
-                    message = $"La suppression a été annulée par l'utilisateur.\n{viewModelList?.Count(w => w.IsSuccess == true) ?? 0} {((viewModelList?.Count(w => w.IsSuccess == true) ?? 0) > 1 ? "livres" : "livre")} sur {viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "ont été supprimés" : "a été supprimé")}";
+                    message = $"La suppression a été annulée par l'utilisateur.";
                 }
                 else
                 {
+                    var viewModelList = e.Result as OperationStateVM[];
                     message = $"{viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "livres ont été supprimés" : "livre a été supprimé")}.";
                 }
 

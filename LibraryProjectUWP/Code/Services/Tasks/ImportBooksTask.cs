@@ -303,19 +303,19 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             try
             {
                 string message = string.Empty;
-                var viewModelList = e.Result as WorkerState<OperationStateVM, OperationStateVM>[];
 
                 // Si erreur
                 if (e.Error != null)
                 {
-                    message = $"Une erreur s'est produite.\n{viewModelList?.Count(w => w.Result.IsSuccess == false) ?? 0} erreur(s) et {viewModelList.Select(s => s.ResultList).SelectMany(w => w.ToList()).Select(q => q).Count(c => c.IsSuccess == false)} avertissement(s).";
+                    message = $"Une erreur s'est produite lors de l'export des livres.";
                 }
                 else if (e.Cancelled)
                 {
-                    message = $"L'export a été annulé par l'utilisateur.";
+                    message = $"L'import de livres a été annulé par l'utilisateur.";
                 }
                 else
                 {
+                    var viewModelList = e.Result as WorkerState<OperationStateVM, OperationStateVM>[];
                     message = $"L'import des livres s'est terminé avec {viewModelList?.Count(w => w.Result.IsSuccess == false) ?? 0} erreur(s) et {viewModelList?.Select(s => s.ResultList)?.SelectMany(w => w.ToList())?.Select(q => q)?.Count(c => c.IsSuccess == false) ?? 0} avertissement(s)";
                 }
 
@@ -341,7 +341,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                     dispatcherTimer.Tick += (t, f) =>
                     {
                         AfterTaskCompletedRequested?.Invoke(this, e);
-                        if (CloseBusyLoaderAfterFinish)
+                        if (CloseBusyLoaderAfterFinish && UseBusyLoader)
                         {
                             DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                             {
@@ -363,7 +363,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 }
                 else
                 {
-                    if (CloseBusyLoaderAfterFinish)
+                    if (CloseBusyLoaderAfterFinish && UseBusyLoader)
                     {
                         MainPage.CloseBusyLoader();
                     }

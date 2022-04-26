@@ -63,6 +63,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 if (WorkerBackground != null && WorkerBackground.IsBusy)
                 {
                     WorkerBackground.CancelAsync();
+                    cancellationTokenSource?.Cancel();
                     DisposeWorker();
                 }
             }
@@ -74,7 +75,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             }
         }
 
-        #region Delete Books
+        #region
         public void InitializeWorker(BibliothequeVM viewModel)
         {
             try
@@ -151,43 +152,6 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                             e.Cancel = true;
                             return;
                         }
-
-                        //int ModelCount = task.Result.Count();
-                        //double progressPercentage;
-                        //int count = 0;
-
-                        //foreach (var livreVM in task.Result)
-                        //{
-                        //    using (Task<OperationStateVM> taskDelete = DbServices.Book.DeleteAsync(idBook))
-                        //    {
-                        //        taskDelete.Wait();
-
-                        //        if (worker.CancellationPending || cancellationTokenSource.IsCancellationRequested)
-                        //        {
-                        //            if (!cancellationTokenSource.IsCancellationRequested)
-                        //            {
-                        //                cancellationTokenSource.Cancel();
-                        //            }
-
-                        //            e.Cancel = true;
-                        //            break;
-                        //        }
-                        //        else
-                        //        {
-                        //            if (WorkerReportsProgress)
-                        //            {
-                        //                var NumberModel = count + 1;
-                        //                double Operation = (double)NumberModel / (double)ModelCount;
-                        //                progressPercentage = Operation * 100;
-                        //                int ProgressValue = Convert.ToInt32(progressPercentage);
-
-                        //                Thread.Sleep(100);
-                        //                worker.ReportProgress(ProgressValue, null);
-                        //                count++;
-                        //            }
-                        //        }
-                        //    }
-                        //}
                         e.Result = task.Result?.ToArray();
                     }
                 }
@@ -231,20 +195,43 @@ namespace LibraryProjectUWP.Code.Services.Tasks
             try
             {
                 string message = string.Empty;
-                var viewModelList = e.Result as LivreVM[];
 
                 // Si erreur
                 if (e.Error != null)
                 {
-                    message = $"Une erreur s'est produite, {viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "livres ont été exportés" : "livre a été exporté")}.";
+                    message = $"Une erreur s'est produite lors de l'export des livres.";
                 }
                 else if (e.Cancelled)
                 {
-                    message = $"L'export a été annulé par l'utilisateur, {viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "livres ont été exportés" : "livre a été exporté")}.";
+                    message = $"L'export a été annulé par l'utilisateur.";
                 }
                 else
                 {
+                    var viewModelList = e.Result as LivreVM[];
                     message = $"{viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "livres ont été exportés" : "livre a été exporté")}.";
+                    
+                    if (viewModelList != null && viewModelList.Any())
+                    {
+                        var suggestedFileName = $"Rostalotheque_Livres_All_{DateTime.Now:yyyyMMddHHmmss}";
+
+                        var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
+                                                        {
+                                                            {"JavaScript Object Notation", new List<string>() { ".json" } }
+                                                        }, suggestedFileName);
+                        if (savedFile == null)
+                        {
+                            Logs.Log(m, "Le fichier n'a pas pû être créé.");
+                            return;
+                        }
+
+                        //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
+                        bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModelList, savedFile);// savedFile.Path
+                        if (isFileSaved == false)
+                        {
+                            Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
+                            return;
+                        }
+                    }
                 }
 
                 if (UseBusyLoader)
@@ -259,29 +246,6 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                     }
                 }
 
-                if (viewModelList != null && viewModelList.Any())
-                {
-                    var suggestedFileName = $"Rostalotheque_Livres_All_{DateTime.Now:yyyyMMddHHmmss}";
-
-                    var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
-                                                        {
-                                                            {"JavaScript Object Notation", new List<string>() { ".json" } }
-                                                        }, suggestedFileName);
-                    if (savedFile == null)
-                    {
-                        Logs.Log(m, "Le fichier n'a pas pû être créé.");
-                        return;
-                    }
-
-                    //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
-                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModelList, savedFile);// savedFile.Path
-                    if (isFileSaved == false)
-                    {
-                        Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
-                        return;
-                    }
-                }
-
                 if (UseIntervalAfterFinish)
                 {
                     DispatcherTimer dispatcherTimer = new DispatcherTimer()
@@ -292,7 +256,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                     dispatcherTimer.Tick += (t, f) =>
                     {
                         AfterTaskCompletedRequested?.Invoke(this, e);
-                        if (CloseBusyLoaderAfterFinish)
+                        if (CloseBusyLoaderAfterFinish && UseBusyLoader)
                         {
                             DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                             {
@@ -314,7 +278,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 }
                 else
                 {
-                    if (CloseBusyLoaderAfterFinish)
+                    if (CloseBusyLoaderAfterFinish && UseBusyLoader)
                     {
                         MainPage.CloseBusyLoader();
                     }
@@ -323,6 +287,11 @@ namespace LibraryProjectUWP.Code.Services.Tasks
 
                 WorkerBackground.Dispose();
                 WorkerBackground = null;
+                if (cancellationTokenSource != null)
+                {
+                    cancellationTokenSource.Dispose();
+                    cancellationTokenSource = null;
+                }
             }
             catch (Exception ex)
             {

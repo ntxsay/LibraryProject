@@ -77,7 +77,6 @@
                     <ToolTip>
                         <TextBlock MaxWidth="400" MaxHeight="500" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" IsTextSelectionEnabled="True">
                             <Run Text="{x:Bind MainTitle, Mode=OneWay}" FontWeight="Medium" FontSize="16"/>
-                            <LineBreak /><Run Text="{x:Bind NbExemplaires, Mode=OneWay}" FontSize="14"/><Run Text=" exemplaire(s)" FontSize="14"/>
                             <LineBreak /><Run Text="{x:Bind Description.Resume, Mode=OneWay}" FontSize="14"/>
                         </TextBlock>
                     </ToolTip>
