@@ -727,9 +727,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (args.Parameter is int page)
                 {
-                    
-                    
-
                     InitializeGotoPageWorker(page);
                 }
                 //var isOpened = await ParentPage.OpenLoading();
@@ -819,7 +816,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         //    }
                         //}
 
-                        await this.RefreshItemsGrouping(true, page, true);
+                        await this.RefreshItemsGrouping(true, page, true, ParentPage.ViewModelPage.ResearchBook);
                         var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
                         if (buttonsPage != null && buttonsPage.Any())
                         {

@@ -10,22 +10,7 @@ namespace LibraryProjectUWP.Code
     {
         public struct Book
         {
-            public enum Terms
-            {
-                Equals,
-                Contains,
-                StartWith,
-                EndWith,
-            }
-
-            public enum In
-            {
-                MainTitle,
-                OtherTitle,
-                Author,
-                Collection,
-                Editor,
-            }
+            
         }
     }
     public enum EditMode

@@ -1,0 +1,131 @@
+﻿<PivotItem
+    x:Class="LibraryProjectUWP.Views.Book.SearchBookUC"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views.Book"
+    xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
+    xmlns:userControls="using:LibraryProjectUWP.Views.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
+    xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    d:DesignHeight="800"
+    d:DesignWidth="510" Loaded="PivotItem_Loaded" Unloaded="UserControl_Unloaded">
+    <PivotItem.Resources>
+        <customConverters:DateTimeToStringDisplay x:Key="dateTimeToStringDisplay"/>
+        <customConverters:NameToColorConverter x:Key="NameToColorConverter"/>
+        <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
+        <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+        <MTUUConverters:BoolToObjectConverter x:Key="boolToInvertVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+        <XamlUICommand x:Name="CancelModificationXUiCommand" 
+                       ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
+                       Description="Annule toutes les modifications apportées à l'item">
+        </XamlUICommand>
+        <XamlUICommand x:Name="SearchBookXUiCommand" 
+                       ExecuteRequested="SearchBookXUiCommand_ExecuteRequested"
+                       Description="Crée un nouvel item">
+        </XamlUICommand>
+        <Style TargetType="Grid" x:Key="WrapGridChildStyle">
+            <Setter Property="Margin" Value="4 0" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+    </PivotItem.Resources>
+    <PivotItem.Header>
+        <Grid ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <userControls:SideBarItemHeader x:Name="header" Grid.Column="0" Title="{x:Bind ViewModelPage.Header, Mode=OneWay}" Glyph="{x:Bind ViewModelPage.Glyph, Mode=OneWay}" HeaderGuid="{x:Bind ViewModelPage.ItemGuid, Mode=OneWay}" />
+            <Button Grid.Column="1" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fermer cet onglet"
+                    Command="{StaticResource CancelModificationXUiCommand}">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="16"/>
+            </Button>
+        </Grid>
+    </PivotItem.Header>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap"/>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
+            <StackPanel Orientation="Vertical" Spacing="16" Margin="0 8 0 0" VerticalAlignment="Top">
+                <ComboBox x:Name="CmbxTermsParams" HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="Sélectionnez l'exemplaire à prêter" ItemsSource="{x:Bind ViewModelPage.searchOnList, Mode=OneWay}"
+                           SelectionChanged="ComboBox_SelectionChanged">
+                    <ComboBox.Header>
+                        <TextBlock Text="Le terme recherché" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    </ComboBox.Header>
+                </ComboBox>
+                <TextBox Text="{x:Bind ViewModelPage.ViewModel.Term, Mode=TwoWay}">
+                    <TextBox.Header>
+                        <TextBlock Text="Terme de la recherche" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    </TextBox.Header>
+                </TextBox>
+                <Grid RowSpacing="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Rechercher dans" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    <StackPanel Grid.Row="1" Spacing="4" Orientation="Vertical" Padding="0 0 0 0">
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInMainTitle, Mode=TwoWay}">
+                            <TextBlock Text="Titre"/>
+                        </CheckBox>
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInOtherTitles, Mode=TwoWay}">
+                            <TextBlock Text="Autre(s) titre(s)"/>
+                        </CheckBox>
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInAuthors, Mode=TwoWay}">
+                            <TextBlock Text="Auteurs"/>
+                        </CheckBox>
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInEditors, Mode=TwoWay}">
+                            <TextBlock Text="Maisons d'édition"/>
+                        </CheckBox>
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInCollections, Mode=TwoWay}">
+                            <TextBlock Text="Collections"/>
+                        </CheckBox>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="2" Margin="0 10 0 10">
+            <MUIXC:InfoBar IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+                       IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}">
+            </MUIXC:InfoBar>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+                <Button Command="{StaticResource SearchBookXUiCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE721;"/>
+                        <TextBlock Text="Rechercher" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{StaticResource CancelModificationXUiCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;"/>
+                        <TextBlock Text="Fermer la recherche" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <MUIXC:TeachingTip x:Name="MyTeachingTip"
+                                    Title="Change themes without hassle"
+                                    Subtitle="It's easier than ever to see control samples in both light and dark theme!"
+                                    PreferredPlacement="Bottom">
+            <MUIXC:TeachingTip.HeroContent>
+                <Image Source="ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg" AutomationProperties.Name="Sunset" />
+            </MUIXC:TeachingTip.HeroContent>
+        </MUIXC:TeachingTip>
+    </Grid>
+</PivotItem>

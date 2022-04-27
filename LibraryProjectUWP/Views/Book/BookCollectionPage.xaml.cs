@@ -1406,6 +1406,77 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
         #endregion
+
+        #region Book Search
+        public void SearchBook(ResearchBookVM researchBookVM)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is SearchBookUC item) is SearchBookUC checkedItem)
+                {
+                    checkedItem.InitializeSideBar(researchBookVM, Parameters.ParentLibrary.Id);
+                    this.SelectItemSideBar(checkedItem);
+                }
+                else
+                {
+                    SearchBookUC userControl = new SearchBookUC();
+                    userControl.InitializeSideBar(researchBookVM, Parameters.ParentLibrary.Id);
+
+                    userControl.CancelModificationRequested += SearchBookUC_CancelModificationRequested;
+                    userControl.SearchBookRequested += SearchBookUC_SearchBookRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SearchBookUC_SearchBookRequested(SearchBookUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ASB_SearchItem.Text = sender.ViewModelPage.ViewModel.Term;
+                GroupItemsBySearch(sender.ViewModelPage.ViewModel);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void SearchBookUC_CancelModificationRequested(SearchBookUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= SearchBookUC_CancelModificationRequested;
+                sender.SearchBookRequested -= SearchBookUC_SearchBookRequested;
+                this.RemoveItemToSideBar(sender);
+#warning Ajouter systeme d'animation avec worker ou dispatcher timer
+                ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
+                await this.RefreshItemsGrouping();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #endregion
         private void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1793,19 +1864,26 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                ViewModelPage.ResearchBook = new ResearchBookVM()
+                if (ViewModelPage.ResearchBook == null)
                 {
-                    IdLibrary = Parameters.ParentLibrary.Id,
-                    Term = sender.Text.Trim(),
-                    TermParameter = Code.Search.Book.Terms.Contains,
-                    SearchIn = new ObservableCollection<Code.Search.Book.In>()
+                    ViewModelPage.ResearchBook = new ResearchBookVM()
                     {
-                        Code.Search.Book.In.MainTitle,
-                        Code.Search.Book.In.OtherTitle,
-                        Code.Search.Book.In.Author
-                    },
-                };
+                        IdLibrary = Parameters.ParentLibrary.Id,
+                        Term = sender.Text?.Trim(),
+                        TermParameter = LibraryHelpers.Book.Search.Terms.Contains,
+                        SearchInAuthors = true,
+                        SearchInMainTitle = true,
+                        SearchInEditors = true,
+                        SearchInOtherTitles = true,
+                        SearchInCollections = false,
+                    };
+                }
+                else
+                {
+                    ViewModelPage.ResearchBook.Term = sender.Text?.Trim();
+                }                
 
+                SearchBook(ViewModelPage.ResearchBook);
                 GroupItemsBySearch(ViewModelPage.ResearchBook);
             }
             catch (Exception ex)
