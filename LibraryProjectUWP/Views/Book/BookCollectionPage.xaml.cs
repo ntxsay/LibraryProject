@@ -495,7 +495,7 @@ namespace LibraryProjectUWP.Views.Book
                         return;
                     }
 
-                    this.SortItemsBy(BookGroupVM.SortBy.Name, $"Organisation en cours des livres par date de création...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                    this.SortItemsBy(BookGroupVM.SortBy.DateCreation, $"Organisation en cours des livres par date de création...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
                 }
                 //await this.RefreshItemsGrouping(false);
             }
@@ -1974,8 +1974,6 @@ namespace LibraryProjectUWP.Views.Book
                 };
 
                 dispatcherTimer.Start();
-                //SearchBook(ViewModelPage.ResearchBook);
-                //GroupItemsBySearch(ViewModelPage.ResearchBook);
             }
             catch (Exception ex)
             {
@@ -2119,8 +2117,7 @@ namespace LibraryProjectUWP.Views.Book
                     dispatcherTimer2.Tick += (s, d) =>
                     {
                         Parameters.MainPage.CloseBusyLoader();
-                        this.ViewModelPage.IsGroupBookAppBarBtnEnabled = true;
-                        this.ViewModelPage.IsSortBookAppBarBtnEnabled = true;
+                        ASB_SearchItem.Text = String.Empty;
 
                         dispatcherTimer2.Stop();
                     };
@@ -2146,7 +2143,7 @@ namespace LibraryProjectUWP.Views.Book
                 SearchBookUC searchBookUC = uiServices.GetSearchBookUCSideBar(this.PivotRightSideBar);
                 if (searchBookUC != null)
                 {
-                    if (!(this.PivotRightSideBar.Items.FirstOrDefault() is SearchBookUC))
+                    if (!(this.PivotRightSideBar.SelectedItem is SearchBookUC))
                     {
                         this.SelectItemSideBar(searchBookUC);
                     }
@@ -2167,6 +2164,25 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        private void MFIQuitSearch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SearchBookUC searchBookUC = uiServices.GetSearchBookUCSideBar(this.PivotRightSideBar);
+                if (searchBookUC != null)
+                {
+                    SearchBookUC_CancelModificationRequested(searchBookUC, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #endregion
 
         #region Functions
@@ -2772,5 +2788,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
     }
 }

@@ -81,6 +81,17 @@ namespace LibraryProjectUWP.Code.Converters
                         return true;
                     }
                 }
+                else if (value is BookGroupVM.SortBy bookSortBy && parameter is string bookSortby)
+                {
+                    if (bookSortby == "name" && bookSortBy == BookGroupVM.SortBy.Name)
+                    {
+                        return true;
+                    }
+                    else if (bookSortby == "dateCreation" && bookSortBy == BookGroupVM.SortBy.DateCreation)
+                    {
+                        return true;
+                    }
+                }
 
                 return false;
             }

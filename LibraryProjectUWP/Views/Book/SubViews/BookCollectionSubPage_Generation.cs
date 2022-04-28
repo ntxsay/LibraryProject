@@ -22,47 +22,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 {
     public sealed partial class BookCollectionSubPage
     {
-        public async Task GroupItemsBySearch(ResearchBookVM searchParams, int goToPage = 1, bool resetPage = true)
-        {
-            try
-            {
-                var item = await this.GenerateBookGroupItemAsync(true, goToPage,searchParams);
-                if (item == null)
-                {
-                    if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
-                        ViewModelPage.PagesList.Clear();
-                    if (this.ViewModelPage.GroupedRelatedViewModel != null && this.ViewModelPage.GroupedRelatedViewModel.Collection != null
-                        && this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
-                    {
-                        this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                    }
-                    return;
-                }
-
-                IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Résultat de la recherche").OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Any())
-                {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Search;
-                }
-
-                if (resetPage || ViewModelPage.PagesList == null || !ViewModelPage.PagesList.Any())
-                {
-                    var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
-                    ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
-                }
-
-                item = null;
-                GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         public async Task GroupItemsByNone(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
@@ -312,6 +271,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                                                 ParentPage.ViewModelPage.DisplayUnCategorizedBooks, ParentPage.ViewModelPage.SelectedSCategories, ParentPage.ViewModelPage.OrderedBy, ParentPage.ViewModelPage.SortedBy);
                     if (filteredViewModelList == null || !filteredViewModelList.Any())
                     {
+                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
@@ -440,9 +400,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     case BookGroupVM.GroupBy.ParutionYear:
                         await this.GroupByParutionYear(reloadFromDb, goToPage, resetPage, searchParams);
                         break;
-                    //case BookGroupVM.GroupBy.Search:
-                    //    await this.GroupItemsBySearch(searchParams, goToPage, resetPage);
-                    //    break;
                     default:
                         await this.GroupItemsByNone(reloadFromDb, goToPage, resetPage, searchParams);
                         break;
@@ -456,9 +413,5 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 return;
             }
         }
-
-
-
-
     }
 }
