@@ -33,6 +33,50 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 this.ViewModelPage.GroupedBy = groupBy;
+                this.GenerateItemsWithBusyLoader(busyLoaderMessage, reloadFromDb, goToPage, resetPage, searchParams);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void OrderItemsBy(BookGroupVM.OrderBy orderBy, string busyLoaderMessage, bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        {
+            try
+            {
+                this.ViewModelPage.OrderedBy = orderBy;
+                this.GenerateItemsWithBusyLoader(busyLoaderMessage, reloadFromDb, goToPage, resetPage, searchParams);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void SortItemsBy(BookGroupVM.SortBy sortBy, string busyLoaderMessage, bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        {
+            try
+            {
+                this.ViewModelPage.SortedBy = sortBy;
+                this.GenerateItemsWithBusyLoader(busyLoaderMessage, reloadFromDb, goToPage, resetPage, searchParams);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void GenerateItemsWithBusyLoader(string busyLoaderMessage, bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        {
+            try
+            {
                 Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                 {
                     ProgessText = busyLoaderMessage,
@@ -71,232 +115,6 @@ namespace LibraryProjectUWP.Views.Book
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void TMFI_OrderByCroissant_Click(object sender, RoutedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender is ToggleMenuFlyoutItem item)
-                {
-                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.Croissant)
-                    {
-                        if (!item.IsChecked)
-                        {
-                            item.IsChecked = true;
-                        }
-                        return;
-                    }
-
-                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                    {
-                        ProgessText = $"Organisation en cours des livres par ordre croissant...",
-                    });
-
-                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 1),
-                    };
-
-                    dispatcherTimer.Tick += async (t, f) =>
-                    {
-                        ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
-                        await this.RefreshItemsGrouping();
-
-                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                        {
-                            Interval = new TimeSpan(0, 0, 0, 2),
-                        };
-
-                        dispatcherTimer2.Tick += (s, d) =>
-                        {
-                            Parameters.MainPage.CloseBusyLoader();
-                            dispatcherTimer2.Stop();
-                        };
-                        dispatcherTimer2.Start();
-
-                        dispatcherTimer.Stop();
-                    };
-
-                    dispatcherTimer.Start();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void TMFI_OrderByDCroissant_Click(object sender, RoutedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender is ToggleMenuFlyoutItem item)
-                {
-                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
-                    {
-                        if (!item.IsChecked)
-                        {
-                            item.IsChecked = true;
-                        }
-                        return;
-                    }
-
-                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                    {
-                        ProgessText = $"Organisation en cours des livres par ordre décroissant...",
-                    });
-
-                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 1),
-                    };
-
-                    dispatcherTimer.Tick += async (t, f) =>
-                    {
-                        ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
-                        await this.RefreshItemsGrouping();
-
-                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                        {
-                            Interval = new TimeSpan(0, 0, 0, 2),
-                        };
-
-                        dispatcherTimer2.Tick += (s, d) =>
-                        {
-                            Parameters.MainPage.CloseBusyLoader();
-                            dispatcherTimer2.Stop();
-                        };
-                        dispatcherTimer2.Start();
-
-                        dispatcherTimer.Stop();
-                    };
-
-                    dispatcherTimer.Start();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void TMFI_SortByName_Click(object sender, RoutedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender is ToggleMenuFlyoutItem item)
-                {
-                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
-                    {
-                        if (!item.IsChecked)
-                        {
-                            item.IsChecked = true;
-                        }
-                        return;
-                    }
-
-                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                    {
-                        ProgessText = $"Organisation en cours des livres par nom...",
-                    });
-
-                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 1),
-                    };
-
-                    dispatcherTimer.Tick += async (t, f) =>
-                    {
-                        ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
-                        await this.RefreshItemsGrouping();
-
-                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                        {
-                            Interval = new TimeSpan(0, 0, 0, 2),
-                        };
-
-                        dispatcherTimer2.Tick += (s, d) =>
-                        {
-                            Parameters.MainPage.CloseBusyLoader();
-                            dispatcherTimer2.Stop();
-                        };
-                        dispatcherTimer2.Start();
-
-                        dispatcherTimer.Stop();
-                    };
-
-                    dispatcherTimer.Start();
-                }
-                await this.RefreshItemsGrouping(false);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void TMFI_SortByDateCreation_Click(object sender, RoutedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender is ToggleMenuFlyoutItem item)
-                {
-                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
-                    {
-                        if (!item.IsChecked)
-                        {
-                            item.IsChecked = true;
-                        }
-                        return;
-                    }
-
-                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                    {
-                        ProgessText = $"Organisation en cours des livres par date de création...",
-                    });
-
-                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 1),
-                    };
-
-                    dispatcherTimer.Tick += async (t, f) =>
-                    {
-                        ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
-                        await this.RefreshItemsGrouping();
-
-                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                        {
-                            Interval = new TimeSpan(0, 0, 0, 2),
-                        };
-
-                        dispatcherTimer2.Tick += (s, d) =>
-                        {
-                            Parameters.MainPage.CloseBusyLoader();
-                            dispatcherTimer2.Stop();
-                        };
-                        dispatcherTimer2.Start();
-
-                        dispatcherTimer.Stop();
-                    };
-
-                    dispatcherTimer.Start();
-                }
-                await this.RefreshItemsGrouping(false);
-            }
-            catch (Exception ex)
-            {
                 Logs.Log(ex, m);
                 return;
             }

@@ -402,6 +402,110 @@ namespace LibraryProjectUWP.Views.Book
                 this.GroupItemsBy(BookGroupVM.GroupBy.None, $"Dégroupement en cours des livres...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
+
+        private void TMFI_OrderByCroissant_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is ToggleMenuFlyoutItem item)
+                {
+                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.Croissant)
+                    {
+                        if (!item.IsChecked)
+                        {
+                            item.IsChecked = true;
+                        }
+                        return;
+                    }
+                    this.OrderItemsBy(BookGroupVM.OrderBy.Croissant, $"Organisation en cours des livres par ordre croissant...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void TMFI_OrderByDCroissant_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is ToggleMenuFlyoutItem item)
+                {
+                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
+                    {
+                        if (!item.IsChecked)
+                        {
+                            item.IsChecked = true;
+                        }
+                        return;
+                    }
+
+                    this.OrderItemsBy(BookGroupVM.OrderBy.DCroissant, $"Organisation en cours des livres par ordre décroissant...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void TMFI_SortByName_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is ToggleMenuFlyoutItem item)
+                {
+                    if (this.ViewModelPage.SortedBy == BookGroupVM.SortBy.Name)
+                    {
+                        if (!item.IsChecked)
+                        {
+                            item.IsChecked = true;
+                        }
+                        return;
+                    }
+                    this.SortItemsBy(BookGroupVM.SortBy.Name, $"Organisation en cours des livres par nom...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void TMFI_SortByDateCreation_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is ToggleMenuFlyoutItem item)
+                {
+                    if (this.ViewModelPage.SortedBy == BookGroupVM.SortBy.DateCreation)
+                    {
+                        if (!item.IsChecked)
+                        {
+                            item.IsChecked = true;
+                        }
+                        return;
+                    }
+
+                    this.SortItemsBy(BookGroupVM.SortBy.Name, $"Organisation en cours des livres par date de création...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                }
+                //await this.RefreshItemsGrouping(false);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #endregion
 
         #region SideBar
