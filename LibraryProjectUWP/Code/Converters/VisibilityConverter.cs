@@ -17,7 +17,6 @@ namespace LibraryProjectUWP.Code.Converters
             try
             {
                 Visibility visibility = value == null ? Visibility.Collapsed : Visibility.Visible;
-                //Debug.WriteLine(visibility);
                 return visibility;
             }
             catch (Exception)

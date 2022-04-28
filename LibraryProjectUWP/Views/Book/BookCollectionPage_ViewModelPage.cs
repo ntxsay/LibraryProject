@@ -32,7 +32,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-            private ResearchBookVM _ResearchBook;
+            private ResearchBookVM _ResearchBook = null;
             public ResearchBookVM ResearchBook
             {
                 get => this._ResearchBook;

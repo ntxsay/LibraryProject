@@ -349,7 +349,8 @@ namespace LibraryProjectUWP.Views.Book
                     }
                     return;
                 }
-                this.GroupItemsByAlphabetic();
+
+                this.GroupItemsBy(BookGroupVM.GroupBy.Letter, $"Groupement en cours des livres par lettre...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
@@ -365,7 +366,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
                     return;
                 }
-                this.GroupByCreationYear();
+                this.GroupItemsBy(BookGroupVM.GroupBy.CreationYear, $"Groupement en cours des livres par année de création...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
@@ -381,7 +382,8 @@ namespace LibraryProjectUWP.Views.Book
                     }
                     return;
                 }
-                this.GroupByParutionYear();
+
+                this.GroupItemsBy(BookGroupVM.GroupBy.ParutionYear, $"Groupement en cours des livres par année de parution...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
@@ -397,7 +399,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
                     return;
                 }
-                this.GroupItemsByNone();
+                this.GroupItemsBy(BookGroupVM.GroupBy.None, $"Dégroupement en cours des livres...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
         #endregion
@@ -1407,84 +1409,6 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
-        #region Book Search
-        public void SearchBook(ResearchBookVM researchBookVM)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is SearchBookUC item) is SearchBookUC checkedItem)
-                {
-                    checkedItem.InitializeSideBar(researchBookVM, Parameters.ParentLibrary.Id);
-                    this.SelectItemSideBar(checkedItem);
-                }
-                else
-                {
-                    SearchBookUC userControl = new SearchBookUC();
-                    userControl.InitializeSideBar(researchBookVM, Parameters.ParentLibrary.Id);
-
-                    userControl.CancelModificationRequested += SearchBookUC_CancelModificationRequested;
-                    userControl.SearchBookRequested += SearchBookUC_SearchBookRequested;
-
-                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-                    {
-                        Glyph = userControl.ViewModelPage.Glyph,
-                        Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
-                    });
-                }
-
-                this.ViewModelPage.IsSplitViewOpen = true;
-                this.ViewModelPage.IsGroupBookAppBarBtnEnabled = false;
-                this.ViewModelPage.IsSortBookAppBarBtnEnabled = false;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void SearchBookUC_SearchBookRequested(SearchBookUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                ASB_SearchItem.Text = sender.ViewModelPage.ViewModel.Term;
-                GroupItemsBySearch(sender.ViewModelPage.ViewModel);
-                this.ViewModelPage.IsGroupBookAppBarBtnEnabled = false;
-                this.ViewModelPage.IsSortBookAppBarBtnEnabled = false;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void SearchBookUC_CancelModificationRequested(SearchBookUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                sender.CancelModificationRequested -= SearchBookUC_CancelModificationRequested;
-                sender.SearchBookRequested -= SearchBookUC_SearchBookRequested;
-                this.RemoveItemToSideBar(sender);
-#warning Ajouter systeme d'animation avec worker ou dispatcher timer
-                ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
-                await this.RefreshItemsGrouping();
-                
-                this.ViewModelPage.IsGroupBookAppBarBtnEnabled = true;
-                this.ViewModelPage.IsSortBookAppBarBtnEnabled = true;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        #endregion
         private void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1912,10 +1836,42 @@ namespace LibraryProjectUWP.Views.Book
                 else
                 {
                     ViewModelPage.ResearchBook.Term = sender.Text?.Trim();
-                }                
+                }
 
-                SearchBook(ViewModelPage.ResearchBook);
-                GroupItemsBySearch(ViewModelPage.ResearchBook);
+                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                {
+                    ProgessText = $"Recherche en cours des livres avec le terme « {ViewModelPage.ResearchBook.Term} » ...",
+                });
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    await this.RefreshItemsGrouping(true, 1, true, ViewModelPage.ResearchBook);
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, d) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        SearchBook(ViewModelPage.ResearchBook);
+
+                        dispatcherTimer2.Stop();
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                };
+
+                dispatcherTimer.Start();
+                //SearchBook(ViewModelPage.ResearchBook);
+                //GroupItemsBySearch(ViewModelPage.ResearchBook);
             }
             catch (Exception ex)
             {
@@ -1925,6 +1881,188 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        public void SearchBook(ResearchBookVM researchBookVM)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is SearchBookUC item) is SearchBookUC checkedItem)
+                {
+                    checkedItem.InitializeSideBar(researchBookVM, Parameters.ParentLibrary.Id);
+                    this.SelectItemSideBar(checkedItem);
+                }
+                else
+                {
+                    SearchBookUC userControl = new SearchBookUC();
+                    userControl.InitializeSideBar(researchBookVM, Parameters.ParentLibrary.Id);
+
+                    userControl.CancelModificationRequested += SearchBookUC_CancelModificationRequested;
+                    userControl.SearchBookRequested += SearchBookUC_SearchBookRequested;
+                    userControl.HideSearchBookPanelRequested += SearchBookUC_HideSearchBookPanelRequested;
+                    
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
+                    });
+                }
+
+                this.ViewModelPage.IsSplitViewOpen = true;
+                this.ViewModelPage.IsGroupBookAppBarBtnEnabled = false;
+                this.ViewModelPage.IsSortBookAppBarBtnEnabled = false;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SearchBookUC_HideSearchBookPanelRequested(SearchBookUC sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= SearchBookUC_CancelModificationRequested;
+                sender.SearchBookRequested -= SearchBookUC_SearchBookRequested;
+                sender.HideSearchBookPanelRequested -= SearchBookUC_HideSearchBookPanelRequested;
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SearchBookUC_SearchBookRequested(SearchBookUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ASB_SearchItem.Text = sender.ViewModelPage.ViewModel.Term;
+                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                {
+                    ProgessText = $"Recherche en cours des livres avec le terme « {sender.ViewModelPage.ViewModel.Term} » ...",
+                });
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    await this.RefreshItemsGrouping(true, 1, true, sender.ViewModelPage.ViewModel);
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, d) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        dispatcherTimer2.Stop();
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                };
+
+                dispatcherTimer.Start();
+                
+                this.ViewModelPage.IsGroupBookAppBarBtnEnabled = false;
+                this.ViewModelPage.IsSortBookAppBarBtnEnabled = false;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SearchBookUC_CancelModificationRequested(SearchBookUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                sender.CancelModificationRequested -= SearchBookUC_CancelModificationRequested;
+                sender.SearchBookRequested -= SearchBookUC_SearchBookRequested;
+                this.RemoveItemToSideBar(sender);
+                ViewModelPage.ResearchBook = null;
+
+                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                {
+                    ProgessText = $"Reconstruction du catalogue des livres en cours ...",
+                });
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    await this.RefreshItemsGrouping();
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, d) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        this.ViewModelPage.IsGroupBookAppBarBtnEnabled = true;
+                        this.ViewModelPage.IsSortBookAppBarBtnEnabled = true;
+
+                        dispatcherTimer2.Stop();
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                };
+
+                dispatcherTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
+        private void SplitBtnSearch_Click(Microsoft.UI.Xaml.Controls.SplitButton sender, Microsoft.UI.Xaml.Controls.SplitButtonClickEventArgs args)
+        {
+            try
+            {
+                SearchBookUC searchBookUC = uiServices.GetSearchBookUCSideBar(this.PivotRightSideBar);
+                if (searchBookUC != null)
+                {
+                    if (!(this.PivotRightSideBar.Items.FirstOrDefault() is SearchBookUC))
+                    {
+                        this.SelectItemSideBar(searchBookUC);
+                    }
+                    else
+                    {
+                        SearchBookUC_HideSearchBookPanelRequested(searchBookUC, null);
+                    }
+                }
+                else
+                {
+                    SearchBook(ViewModelPage.ResearchBook);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         #endregion
 
         #region Functions
@@ -2530,7 +2668,5 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-        
     }
 }

@@ -16,9 +16,9 @@
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:brushes="using:Microsoft.Toolkit.Uwp.UI.Media"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls" Margin="0 38 0 0" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Page.Resources>
+        <customConverters:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
         <customConverters:ClassificationAgeToStringConverter x:Key="classificationAgeToStringConverter" />
         <customConverters:IntToBooleanConverter x:Key="intToBooleanConverter" />
         <customConverters:IntToVisibilityConverter x:Key="intToVisibilityConverter" />
@@ -242,7 +242,7 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarButton ToolTipService.ToolTip="Grouper par" IsEnabled="{x:Bind ViewModelPage.IsGroupBookAppBarBtnEnabled, Mode=OneWay}">
+            <AppBarButton ToolTipService.ToolTip="Grouper par">
                 <AppBarButton.Icon>
                     <FontIcon Glyph="&#xF168;"/>
                 </AppBarButton.Icon>
@@ -256,7 +256,7 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
-            <AppBarButton Icon="Filter" ToolTipService.ToolTip="Trier par" IsEnabled="{x:Bind ViewModelPage.IsSortBookAppBarBtnEnabled, Mode=OneWay}">
+            <AppBarButton Icon="Filter" ToolTipService.ToolTip="Trier par">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource orderbyToBooleanConverter}, ConverterParameter='croissant', Mode=OneWay}" Text="Croissant" Click="TMFI_OrderByCroissant_Click"/>
@@ -345,7 +345,7 @@
                             <MenuFlyoutItem Text="Nouvel enregistrement" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewBookXamlUICommand}">
                             </MenuFlyoutItem>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Lien Amazon" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ImportBookFromWebSiteXamlUICommand}">
+                            <MenuFlyoutItem Text="Lien Amazon (Expérimentale)" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ImportBookFromWebSiteXamlUICommand}">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xF6FA;"/>
                                 </MenuFlyoutItem.Icon>
@@ -416,7 +416,8 @@
                             <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
                         </AutoSuggestBox.QueryIcon>
                     </AutoSuggestBox>
-                    <MUIXC:SplitButton x:Name="myColorButton" BorderThickness="0" Background="Transparent" ToolTipService.ToolTip="Afficher ou masquer la recherche avancée" VerticalAlignment="Center" Margin="0 6 0 0">
+                    <MUIXC:SplitButton x:Name="splitBtnSearch" Visibility="{x:Bind ViewModelPage.ResearchBook, Converter={StaticResource nullToVisibilityConverter}, Mode=OneWay}" Click="SplitBtnSearch_Click"
+                                       BorderThickness="0" Background="Transparent" ToolTipService.ToolTip="Afficher ou masquer la recherche avancée" VerticalAlignment="Center" Margin="0 6 0 0">
                         <FontIcon Glyph="&#xE713;" FontSize="16" VerticalAlignment="Center"/>
                         <MUIXC:SplitButton.Flyout>
                             <MenuFlyout Placement="BottomEdgeAlignedLeft">

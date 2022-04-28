@@ -33,6 +33,10 @@ namespace LibraryProjectUWP.Views.Book
         public delegate void CancelModificationEventHandler(SearchBookUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
 
+        public delegate void HideSearchBookPanelEventHandler(SearchBookUC sender, RoutedEventArgs e);
+        public event HideSearchBookPanelEventHandler HideSearchBookPanelRequested;
+
+
         public delegate void SearchBookEventHandler(SearchBookUC sender, ExecuteRequestedEventArgs e);
         public event SearchBookEventHandler SearchBookRequested;
 
@@ -118,6 +122,20 @@ namespace LibraryProjectUWP.Views.Book
             CancelModificationRequested?.Invoke(this, args);
         }
 
+        private void BtnHidePanel_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                HideSearchBookPanelRequested?.Invoke(this, e);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void SearchBookXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
@@ -186,11 +204,17 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     SearchBookRequested = null;
                 }
-            }
-            catch (Exception)
-            {
 
-                throw;
+                if (HideSearchBookPanelRequested != null)
+                {
+                    HideSearchBookPanelRequested = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
 

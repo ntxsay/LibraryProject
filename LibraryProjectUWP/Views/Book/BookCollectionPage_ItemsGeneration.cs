@@ -28,13 +28,14 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
-        public void GroupItemsBySearch(ResearchBookVM searchParams, int goToPage = 1, bool resetPage = true)
+        public void GroupItemsBy(BookGroupVM.GroupBy groupBy, string busyLoaderMessage, bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
+                this.ViewModelPage.GroupedBy = groupBy;
                 Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                 {
-                    ProgessText = $"Recherche en cours des livres...",
+                    ProgessText = busyLoaderMessage,
                 });
 
                 DispatcherTimer dispatcherTimer = new DispatcherTimer()
@@ -47,7 +48,7 @@ namespace LibraryProjectUWP.Views.Book
                     var bookCollectionSpage = this.BookCollectionSubPage;
                     if (bookCollectionSpage != null)
                     {
-                        await bookCollectionSpage.GroupItemsBySearch(searchParams, goToPage, resetPage);
+                        await this.RefreshItemsGrouping(reloadFromDb, goToPage, resetPage, searchParams);
                     }
 
                     DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
@@ -55,7 +56,7 @@ namespace LibraryProjectUWP.Views.Book
                         Interval = new TimeSpan(0, 0, 0, 2),
                     };
 
-                    dispatcherTimer2.Tick += (s, e) =>
+                    dispatcherTimer2.Tick += (s, d) =>
                     {
                         Parameters.MainPage.CloseBusyLoader();
                         dispatcherTimer2.Stop();
@@ -63,202 +64,6 @@ namespace LibraryProjectUWP.Views.Book
                     dispatcherTimer2.Start();
 
                     dispatcherTimer.Stop();
-                };
-
-                dispatcherTimer.Start();
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public void GroupItemsByNone(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
-        {
-            try
-            {
-                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                {
-                    ProgessText = $"Dégroupement en cours des livres...",
-                });
-
-                DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                {
-                    Interval = new TimeSpan(0, 0, 0, 1),
-                };
-
-                dispatcherTimer.Tick += async (t, f) =>
-                {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
-                    {
-                        await bookCollectionSpage.GroupItemsByNone(reloadFromDb, goToPage, resetPage);
-                    }
-
-                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 2),
-                    };
-
-                    dispatcherTimer2.Tick += (s, e) =>
-                    {
-                        Parameters.MainPage.CloseBusyLoader();
-                        dispatcherTimer2.Stop();
-                        //dispatcherTimer2 = null;
-                    };
-                    dispatcherTimer2.Start();
-
-                    dispatcherTimer.Stop();
-                    //dispatcherTimer = null;
-                };
-
-                dispatcherTimer.Start();
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public void GroupItemsByAlphabetic(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
-        {
-            try
-            {
-                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                {
-                    ProgessText = $"Groupement en cours des livres par lettre...",
-                });
-
-                DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                {
-                    Interval = new TimeSpan(0, 0, 0, 1),
-                };
-
-                dispatcherTimer.Tick += async (t, f) =>
-                {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
-                    {
-                        await bookCollectionSpage.GroupItemsByAlphabeticAsync(reloadFromDb, goToPage, resetPage);
-                    }
-
-                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 2),
-                    };
-
-                    dispatcherTimer2.Tick += (s, e) =>
-                    {
-                        Parameters.MainPage.CloseBusyLoader();
-                        dispatcherTimer2.Stop();
-                        //dispatcherTimer2 = null;
-                    };
-                    dispatcherTimer2.Start();
-
-                    dispatcherTimer.Stop();
-                    //dispatcherTimer = null;
-                };
-
-                dispatcherTimer.Start();
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-
-        public void GroupByCreationYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
-        {
-            try
-            {
-                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                {
-                    ProgessText = $"Groupement en cours des livres par année de création...",
-                });
-
-                DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                {
-                    Interval = new TimeSpan(0, 0, 0, 1),
-                };
-
-                dispatcherTimer.Tick += async (t, f) =>
-                {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
-                    {
-                        await bookCollectionSpage.GroupByCreationYear(reloadFromDb, goToPage, resetPage);
-                    }
-
-                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 2),
-                    };
-
-                    dispatcherTimer2.Tick += (s, e) =>
-                    {
-                        Parameters.MainPage.CloseBusyLoader();
-                        dispatcherTimer2.Stop();
-                        //dispatcherTimer2 = null;
-                    };
-                    dispatcherTimer2.Start();
-
-                    dispatcherTimer.Stop();
-                    //dispatcherTimer = null;
-                };
-
-                dispatcherTimer.Start();
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        public void GroupByParutionYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
-        {
-            try
-            {
-                Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                {
-                    ProgessText = $"Groupement en cours des livres par année de parution...",
-                });
-
-                DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                {
-                    Interval = new TimeSpan(0, 0, 0, 1),
-                };
-
-                dispatcherTimer.Tick += async (t, f) =>
-                {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
-                    {
-                        await bookCollectionSpage.GroupByParutionYear(reloadFromDb, goToPage, resetPage);
-                    }
-
-                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 2),
-                    };
-
-                    dispatcherTimer2.Tick += (s, e) =>
-                    {
-                        Parameters.MainPage.CloseBusyLoader();
-                        dispatcherTimer2.Stop();
-                        //dispatcherTimer2 = null;
-                    };
-                    dispatcherTimer2.Start();
-
-                    dispatcherTimer.Stop();
-                    //dispatcherTimer = null;
                 };
 
                 dispatcherTimer.Start();
@@ -512,72 +317,6 @@ namespace LibraryProjectUWP.Views.Book
             {
                 Logs.Log(ex, m);
                 return;
-            }
-        }
-
-        private IEnumerable<LivreVM> GetPaginatedItems(IList<LivreVM> viewModelList, int goToPage = 1)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                IEnumerable<LivreVM> itemsPage = Enumerable.Empty<LivreVM>();
-                //IList<LivreVM> PreSelectedViewModelList = new List<LivreVM>(viewModelList);
-
-                //if (ViewModelPage.SelectedCollections != null && ViewModelPage.SelectedCollections.Any())
-                //{
-                //    List<LivreVM> vms = new List<LivreVM>();
-                //    foreach (LivreVM viewModel in viewModelList)
-                //    {
-                //        foreach (CollectionVM collectionVM in ViewModelPage.SelectedCollections)
-                //        {
-                //            if (viewModel.Publication.Collections.Any(s => s.Id == collectionVM.Id))
-                //            {
-                //                vms.Add(viewModel);
-                //                break;
-                //            }
-                //        }
-                //    }
-
-                //    PreSelectedViewModelList = new List<LivreVM>(vms);
-                //}
-
-                //Si la séquence contient plus d'items que le nombre max éléments par page
-                if (viewModelList.Count > ViewModelPage.MaxItemsPerPage)
-                {
-                    //Si la première page (ou moins ^^')
-                    if (goToPage <= 1)
-                    {
-                        itemsPage = viewModelList.Take(ViewModelPage.MaxItemsPerPage);
-                    }
-                    else //Si plus que la première page
-                    {
-                        var nbItemsToSkip = ViewModelPage.MaxItemsPerPage * (goToPage - 1);
-                        if (viewModelList.Count >= nbItemsToSkip)
-                        {
-                            var getRest = viewModelList.Skip(nbItemsToSkip);
-                            //Si reste de la séquence contient plus d'items que le nombre max éléments par page
-                            if (getRest.Count() > ViewModelPage.MaxItemsPerPage)
-                            {
-                                itemsPage = getRest.Take(ViewModelPage.MaxItemsPerPage);
-                            }
-                            else
-                            {
-                                itemsPage = getRest;
-                            }
-                        }
-                    }
-                }
-                else //Si la séquence contient moins ou le même nombre d'items que le nombre max éléments par page
-                {
-                    itemsPage = viewModelList;
-                }
-
-                return itemsPage;
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return Enumerable.Empty<LivreVM>();
             }
         }
     }

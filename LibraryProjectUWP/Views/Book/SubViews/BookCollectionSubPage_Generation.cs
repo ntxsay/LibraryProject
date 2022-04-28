@@ -26,7 +26,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         {
             try
             {
-                var item = await this.GenerateResearchBookGroupItemAsync(searchParams, goToPage);
+                var item = await this.GenerateBookGroupItemAsync(true, goToPage,searchParams);
                 if (item == null)
                 {
                     if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
@@ -63,11 +63,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public async Task GroupItemsByNone(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public async Task GroupItemsByNone(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage, searchParams);
                 if (item == null)
                 {
                     if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
@@ -105,11 +105,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public async Task GroupItemsByAlphabeticAsync(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public async Task GroupItemsByAlphabeticAsync(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage, searchParams);
                 if (item == null)
                 {
                     if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
@@ -147,11 +147,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public async Task GroupByCreationYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public async Task GroupByCreationYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage, searchParams);
                 if (item == null)
                 {
                     if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
@@ -188,11 +188,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public async Task GroupByParutionYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true)
+        public async Task GroupByParutionYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage, searchParams);
                 if (item == null)
                 {
                     if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
@@ -226,6 +226,27 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        public async Task<BookGroupItemVM> GenerateBookGroupItemAsync(bool reloadFromDb = true, int goToPage = 1, ResearchBookVM searchParams = null)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (searchParams != null)
+                {
+                    return await this.GenerateResearchBookGroupItemAsync(searchParams, goToPage);
+                }
+                else
+                {
+                    return await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
             }
         }
 
@@ -408,22 +429,22 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 switch (ParentPage.ViewModelPage.GroupedBy)
                 {
                     case BookGroupVM.GroupBy.None:
-                        await this.GroupItemsByNone(reloadFromDb, goToPage, resetPage);
+                        await this.GroupItemsByNone(reloadFromDb, goToPage, resetPage, searchParams);
                         break;
                     case BookGroupVM.GroupBy.Letter:
-                        await this.GroupItemsByAlphabeticAsync(reloadFromDb, goToPage, resetPage);
+                        await this.GroupItemsByAlphabeticAsync(reloadFromDb, goToPage, resetPage, searchParams);
                         break;
                     case BookGroupVM.GroupBy.CreationYear:
-                        await this.GroupByCreationYear(reloadFromDb, goToPage, resetPage);
+                        await this.GroupByCreationYear(reloadFromDb, goToPage, resetPage, searchParams);
                         break;
                     case BookGroupVM.GroupBy.ParutionYear:
-                        await this.GroupByParutionYear(reloadFromDb, goToPage, resetPage);
+                        await this.GroupByParutionYear(reloadFromDb, goToPage, resetPage, searchParams);
                         break;
-                    case BookGroupVM.GroupBy.Search:
-                        await this.GroupItemsBySearch(searchParams, goToPage, resetPage);
-                        break;
+                    //case BookGroupVM.GroupBy.Search:
+                    //    await this.GroupItemsBySearch(searchParams, goToPage, resetPage);
+                    //    break;
                     default:
-                        await this.GroupItemsByNone(reloadFromDb, goToPage, resetPage);
+                        await this.GroupItemsByNone(reloadFromDb, goToPage, resetPage, searchParams);
                         break;
                 }
 

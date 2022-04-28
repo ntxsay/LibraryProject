@@ -15,6 +15,34 @@ namespace LibraryProjectUWP.Code.Services.UI
 {
     internal class UiServices
     {
+        public SearchBookUC GetSearchBookUCSideBar(Pivot pivot)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (pivot == null)
+                {
+                    return null;
+                }
+
+                if (pivot.Items.Count > 0)
+                {
+                    object itemPivot = pivot.Items.FirstOrDefault(f => f is SearchBookUC item);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as SearchBookUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
         public BookExemplaryListUC GetBookExemplariesSideBarByGuid(Pivot pivot, Guid guid)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
