@@ -242,7 +242,7 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarButton ToolTipService.ToolTip="Grouper par">
+            <AppBarButton ToolTipService.ToolTip="Grouper par" IsEnabled="{x:Bind ViewModelPage.IsGroupBookAppBarBtnEnabled, Mode=OneWay}">
                 <AppBarButton.Icon>
                     <FontIcon Glyph="&#xF168;"/>
                 </AppBarButton.Icon>
@@ -256,7 +256,7 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
-            <AppBarButton Icon="Filter" ToolTipService.ToolTip="Trier par">
+            <AppBarButton Icon="Filter" ToolTipService.ToolTip="Trier par" IsEnabled="{x:Bind ViewModelPage.IsSortBookAppBarBtnEnabled, Mode=OneWay}">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource orderbyToBooleanConverter}, ConverterParameter='croissant', Mode=OneWay}" Text="Croissant" Click="TMFI_OrderByCroissant_Click"/>
@@ -393,6 +393,12 @@
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarSeparator/>
+                <AppBarButton x:Name="ABBOpenContentFolder" Label="Ouvrir le dossier contenant" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="ABBOpenContentFolder_Click">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE838;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarSeparator/>
                 <AppBarButton Label="Exporter tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportAllBookXamlUICommand}">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xEDE1;"/>
@@ -410,8 +416,22 @@
                             <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
                         </AutoSuggestBox.QueryIcon>
                     </AutoSuggestBox>
+                    <MUIXC:SplitButton x:Name="myColorButton" BorderThickness="0" Background="Transparent" ToolTipService.ToolTip="Afficher ou masquer la recherche avancée" VerticalAlignment="Center" Margin="0 6 0 0">
+                        <FontIcon Glyph="&#xE713;" FontSize="16" VerticalAlignment="Center"/>
+                        <MUIXC:SplitButton.Flyout>
+                            <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                <MenuFlyoutItem Text="Quitter la recherche">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="14"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </MUIXC:SplitButton.Flyout>
+                    </MUIXC:SplitButton>
                 </StackPanel>
             </CommandBar.Content>
         </CommandBar>
+        <MUIXC:TeachingTip x:Name="MyTeachingTip" PreferredPlacement="Bottom">
+        </MUIXC:TeachingTip>
     </Grid>
 </Page>

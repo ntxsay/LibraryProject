@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Search;
+using Windows.System;
 
 namespace LibraryProjectUWP.Code.Services.ES
 {
@@ -277,6 +278,44 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
             catch (Exception)
             {
+                return false;
+            }
+        }
+
+        public static async Task<bool> OpenApplicationLocalFolderAsync()
+        {
+            try
+            {
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                if (localFolder == null)
+                {
+                    return false;
+                }
+                return await OpenFolderAsync(localFolder);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}\nInner Exception : {ex.InnerException?.Message}");
+                return false;
+            }
+        }
+
+        public static async Task<bool> OpenFolderAsync(StorageFolder folder)
+        {
+            try
+            {
+                if (folder == null)
+                {
+                    return false;
+                }
+
+               return await Launcher.LaunchFolderAsync(folder);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Debug.WriteLine($"{m.ReflectedType.Name}.{m.Name} : {ex.Message}\nInner Exception : {ex.InnerException?.Message}");
                 return false;
             }
         }

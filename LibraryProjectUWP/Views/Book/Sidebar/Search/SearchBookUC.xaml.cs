@@ -142,55 +142,27 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                //if (ViewModelPage.ViewModel.Exemplary == null)
-                //{
-                //    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                //    ViewModelPage.ResultMessage = $"Vous devez sélectionner un exemplaire";
-                //    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                //    ViewModelPage.IsResultMessageOpen = true;
-                //    return false;
-                //}
+                if (ViewModelPage.ViewModel.Term.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Vous devez entrer le terme de la recherche";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
 
-                //if (ViewModelPage.ViewModel.EtatAvantPret.Etat.IsStringNullOrEmptyOrWhiteSpace())
-                //{
-                //    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                //    ViewModelPage.ResultMessage = $"L'état du livre avant le prêt n'est pas renseigné.";
-                //    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                //    ViewModelPage.IsResultMessageOpen = true;
-                //    return false;
-                //}
+                if (ViewModelPage.ViewModel.SearchInMainTitle != true && ViewModelPage.ViewModel.SearchInOtherTitles != true &&
+                    ViewModelPage.ViewModel.SearchInAuthors != true && ViewModelPage.ViewModel.SearchInCollections != true &&
+                    ViewModelPage.ViewModel.SearchInEditors != true)
+                {
+                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
+                    ViewModelPage.ResultMessage = $"Vous devez cocher le chemin dans lequel sera recherché le terme.";
+                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
+                    ViewModelPage.IsResultMessageOpen = true;
+                    return false;
+                }
 
-                //if (ViewModelPage.ViewModel.DateRemise.HasValue)
-                //{
-                //    var result = DateTimeOffset.Compare(ViewModelPage.ViewModel.DatePret, ViewModelPage.ViewModel.DateRemise.Value);
-                //    if (result > 0)
-                //    {
-                //        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                //        ViewModelPage.ResultMessage = $"La date de prêt ne peut pas être supérieure à la date de remise.";
-                //        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                //        ViewModelPage.IsResultMessageOpen = true;
-                //        return false;
-                //    }
-                //    else if (result == 0)
-                //    {
-                //        if (ViewModelPage.ViewModel.TimePret.HasValue && ViewModelPage.ViewModel.TimeRemise.HasValue)
-                //        {
-                //            var timeResult = TimeSpan.Compare(ViewModelPage.ViewModel.TimePret.Value, ViewModelPage.ViewModel.TimeRemise.Value);
-                //            if (timeResult > 0 || timeResult == 0)
-                //            {
-                //                ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                //                ViewModelPage.ResultMessage = $"L'heure à laquelle le livre a été prêté ne peut pas être supérieure ou identique à l'heure à laquelle le livre sera remis.";
-                //                ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                //                ViewModelPage.IsResultMessageOpen = true;
-                //                return false;
-                //            }
-                //        }
-                //    }
-                //}
-
-                //ViewModelPage.ViewModel.NoExemplary = ViewModelPage.ViewModel.Exemplary.NoExemplaire;
-                //ViewModelPage.ViewModel.IdBookExemplary = ViewModelPage.ViewModel.Exemplary.Id;
-                //ViewModelPage.IsResultMessageOpen = false;
+                ViewModelPage.IsResultMessageOpen = false;
                 return true;
             }
             catch (Exception ex)
@@ -199,12 +171,6 @@ namespace LibraryProjectUWP.Views.Book
                 Logs.Log(ex, m);
                 return false;
             }
-        }
-
-
-        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)

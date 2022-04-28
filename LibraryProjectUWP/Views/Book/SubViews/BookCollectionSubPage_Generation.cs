@@ -239,12 +239,14 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 var searchedBooks = await DbServices.Book.SearchBooksAsync(searchParams);
                 if (searchedBooks == null || !searchedBooks.Any())
                 {
+                    ParentPage.ViewModelPage.NbElementDisplayed = 0;
                     return null;
                 }
 
                 var orderModelList = DbServices.Book.OrderBooks(searchedBooks, ParentPage.ViewModelPage.OrderedBy, ParentPage.ViewModelPage.SortedBy);
                 if (orderModelList == null || !orderModelList.Any())
                 {
+                    ParentPage.ViewModelPage.NbElementDisplayed = 0;
                     return null;
                 }
 
@@ -252,6 +254,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                                                 ParentPage.ViewModelPage.DisplayUnCategorizedBooks, ParentPage.ViewModelPage.SelectedSCategories);
                 if (filterViewModelList == null || !filterViewModelList.Any())
                 {
+                    ParentPage.ViewModelPage.NbElementDisplayed = 0;
                     return null;
                 }
 
@@ -260,6 +263,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 filterViewModelList = Enumerable.Empty<Tbook>();
 
                 itemsPage = await this.CompleteBooksInfoAsync(itemsPage);
+                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage.Count();
+                
                 return new BookGroupItemVM()
                 {
                     CountItems = countItems,

@@ -116,20 +116,6 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
-            private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
-            public ObservableCollection<TaskVM> TaskList
-            {
-                get => this._TaskList;
-                set
-                {
-                    if (_TaskList != value)
-                    {
-                        this._TaskList = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
             private ObservableCollection<SideBarItemHeaderVM> _ItemsSideBarHeader = new ObservableCollection<SideBarItemHeaderVM>();
             public ObservableCollection<SideBarItemHeaderVM> ItemsSideBarHeader
             {
@@ -329,6 +315,34 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
+            private bool _IsGroupBookAppBarBtnEnabled = true;
+            public bool IsGroupBookAppBarBtnEnabled
+            {
+                get => this._IsGroupBookAppBarBtnEnabled;
+                set
+                {
+                    if (_IsGroupBookAppBarBtnEnabled != value)
+                    {
+                        this._IsGroupBookAppBarBtnEnabled = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
+            private bool _IsSortBookAppBarBtnEnabled = true;
+            public bool IsSortBookAppBarBtnEnabled
+            {
+                get => this._IsSortBookAppBarBtnEnabled;
+                set
+                {
+                    if (_IsSortBookAppBarBtnEnabled != value)
+                    {
+                        this._IsSortBookAppBarBtnEnabled = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
             private object _SelectedCategorie;
             public object SelectedCategorie
             {
@@ -352,51 +366,6 @@ namespace LibraryProjectUWP.Views.Book
                     if (_SelectedItems != value)
                     {
                         this._SelectedItems = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private List<LivreVM> _ViewModelList;
-            [Obsolete]
-            public List<LivreVM> ViewModelList
-            {
-                get => this._ViewModelList;
-                set
-                {
-                    if (_ViewModelList != value)
-                    {
-                        this._ViewModelList = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private List<ContactVM> _ContactViewModelList;
-            public List<ContactVM> ContactViewModelList
-            {
-                get => this._ContactViewModelList;
-                set
-                {
-                    if (_ContactViewModelList != value)
-                    {
-                        this._ContactViewModelList = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private List<ContactVM> _AuthorViewModelList;
-            
-            [Obsolete]
-            public List<ContactVM> AuthorViewModelList
-            {
-                get => this._AuthorViewModelList;
-                set
-                {
-                    if (_AuthorViewModelList != value)
-                    {
-                        this._AuthorViewModelList = value;
                         this.OnPropertyChanged();
                     }
                 }

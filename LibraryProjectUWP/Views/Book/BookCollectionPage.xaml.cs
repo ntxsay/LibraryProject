@@ -1433,7 +1433,10 @@ namespace LibraryProjectUWP.Views.Book
                         IdItem = userControl.ViewModelPage.ItemGuid,
                     });
                 }
+
                 this.ViewModelPage.IsSplitViewOpen = true;
+                this.ViewModelPage.IsGroupBookAppBarBtnEnabled = false;
+                this.ViewModelPage.IsSortBookAppBarBtnEnabled = false;
             }
             catch (Exception ex)
             {
@@ -1449,6 +1452,8 @@ namespace LibraryProjectUWP.Views.Book
             {
                 ASB_SearchItem.Text = sender.ViewModelPage.ViewModel.Term;
                 GroupItemsBySearch(sender.ViewModelPage.ViewModel);
+                this.ViewModelPage.IsGroupBookAppBarBtnEnabled = false;
+                this.ViewModelPage.IsSortBookAppBarBtnEnabled = false;
             }
             catch (Exception ex)
             {
@@ -1468,6 +1473,9 @@ namespace LibraryProjectUWP.Views.Book
 #warning Ajouter systeme d'animation avec worker ou dispatcher timer
                 ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
                 await this.RefreshItemsGrouping();
+                
+                this.ViewModelPage.IsGroupBookAppBarBtnEnabled = true;
+                this.ViewModelPage.IsSortBookAppBarBtnEnabled = true;
             }
             catch (Exception ex)
             {
@@ -1567,8 +1575,22 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private async void ABBOpenContentFolder_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                _ = await Folders.OpenApplicationLocalFolderAsync();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #region Delete Book
-        
+
         private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -1861,7 +1883,16 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender.Text.IsStringNullOrEmptyOrWhiteSpace())
                 {
+                    MyTeachingTip.Target = sender;
+                    MyTeachingTip.Title = sender.PlaceholderText;
+                    MyTeachingTip.Subtitle = "Vous devez d'abord entrer votre mot-clé avant de lancer la recherche.";
+                    MyTeachingTip.IsOpen = true;
                     return;
+                }
+
+                if (MyTeachingTip.IsOpen)
+                {
+                    MyTeachingTip.IsOpen = false;
                 }
 
                 if (ViewModelPage.ResearchBook == null)

@@ -101,26 +101,6 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private ObservableCollection<Code.Helpers.LibraryHelpers.Book.Search.In> _SearchIn = new ObservableCollection<Code.Helpers.LibraryHelpers.Book.Search.In>() 
-        {
-            Code.Helpers.LibraryHelpers.Book.Search.In.MainTitle,
-            Code.Helpers.LibraryHelpers.Book.Search.In.OtherTitle
-        };
-
-       [Obsolete] 
-        public ObservableCollection<Code.Helpers.LibraryHelpers.Book.Search.In> SearchIn
-        {
-            get => _SearchIn;
-            set
-            {
-                if (_SearchIn != value)
-                {
-                    _SearchIn = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         private Code.Helpers.LibraryHelpers.Book.Search.Terms _TermParameter = Code.Helpers.LibraryHelpers.Book.Search.Terms.Contains;
         public Code.Helpers.LibraryHelpers.Book.Search.Terms TermParameter
         {
