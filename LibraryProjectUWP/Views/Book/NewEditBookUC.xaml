@@ -9,7 +9,6 @@
     mc:Ignorable="d"
     xmlns:contactVm="using:LibraryProjectUWP.ViewModels.Contact"
     xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
-    xmlns:authorVm="using:LibraryProjectUWP.ViewModels.Author"
     xmlns:collectionVm="using:LibraryProjectUWP.ViewModels.Collection"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"

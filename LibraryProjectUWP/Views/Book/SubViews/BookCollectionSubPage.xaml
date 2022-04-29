@@ -199,7 +199,7 @@
                                         VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
                                         AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
                                         AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
-                                        MaxColumnWidth="500" FrozenColumnCount="2" GridLinesVisibility="None" HeadersVisibility="Column"
+                                        FrozenColumnCount="2" GridLinesVisibility="None" HeadersVisibility="Column"
                                         IsReadOnly="True" BorderThickness="0"
                                         RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
                                         RowGroupHeaderPropertyNameAlternative="Range" IsDoubleTapEnabled="True" DoubleTapped="DataGridItems_DoubleTapped">

@@ -252,7 +252,7 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     if (value.Id <= -1)
                     {
-                        sender.Text = value.SocietyName + " " + value.NomNaissance + " " + value.Prenom;
+                        sender.Text = value.DisplayName3;
                         return;
                     }
                 }

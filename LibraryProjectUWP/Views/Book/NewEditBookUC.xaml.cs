@@ -368,7 +368,13 @@ namespace LibraryProjectUWP.Views.Book
                     FilteredItems.Add(new ContactVM()
                     {
                         Id = -1,
-                        NomNaissance = "Ajouter un auteur",
+                        NomNaissance = "Ajouter une personne",
+                    });
+
+                    FilteredItems.Add(new ContactVM()
+                    {
+                        Id = -2,
+                        NomNaissance = "Ajouter une société",
                     });
                 }
 
@@ -388,9 +394,9 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (args.SelectedItem != null && args.SelectedItem is ContactVM value)
                 {
-                    if (value.Id != -1)
+                    if (value.Id <= -1)
                     {
-                        sender.Text = value.NomNaissance + " " + value.Prenom;
+                        sender.Text = value.DisplayName3;
                         return;
                     }
                 }
@@ -409,7 +415,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (args.ChosenSuggestion != null && args.ChosenSuggestion is ContactVM viewModel)
                 {
-                    if (viewModel.Id != -1)
+                    if (viewModel.Id > -1)
                     {
                         if (ViewModelPage.ViewModel.Auteurs.Any())
                         {
@@ -431,21 +437,39 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (ViewModelPage.ParentPage != null)
                         {
-                            if (!sender.Text.IsStringNullOrEmptyOrWhiteSpace()) 
+                            if (!sender.Text.IsStringNullOrEmptyOrWhiteSpace())
                             {
-                                var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
-                                if (split.Length == 1)
+                                //Personne
+                                if (viewModel.Id == -1)
                                 {
-                                    ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Author, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                    var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
+                                    if (split.Length == 1)
+                                    {
+                                        ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Author, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                    }
+                                    else if (split.Length >= 2)
+                                    {
+                                        ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Author, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
+                                    }
                                 }
-                                else if (split.Length >= 2)
+                                //Société
+                                else if (viewModel.Id == -2)
                                 {
-                                    ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Author, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
+                                    ViewModelPage.ParentPage.NewContact(ContactType.Society, ContactRole.Author, string.Empty, string.Empty, sender.Text.Trim(), ViewModelPage.ItemGuid);
                                 }
                             }
                             else
                             {
-                                ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Author, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                //Personne
+                                if (viewModel.Id == -1)
+                                {
+                                    ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Author, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                }
+                                //Société
+                                else if (viewModel.Id == -2)
+                                {
+                                    ViewModelPage.ParentPage.NewContact(ContactType.Society, ContactRole.Author, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                }
                             }
                             sender.Text = String.Empty;
                         }

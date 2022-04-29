@@ -412,12 +412,12 @@ namespace LibraryProjectUWP.ViewModels.Contact
                         case ContactType.Society:
                             return SocietyName;
                         default:
-                            return string.Empty;
+                            return NomNaissance;
                     }
                 }
                 catch (Exception)
                 {
-                    return string.Empty;
+                    return NomNaissance;
                 }
             }
         }
