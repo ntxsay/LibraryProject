@@ -146,7 +146,7 @@
             </Grid>
             <Grid Grid.Row="1" Padding="0 50 0 0">
                 <SplitView PaneBackground="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" 
-                IsPaneOpen="{x:Bind ViewModelPage.IsSplitViewOpen, Mode=OneWay}" PanePlacement="Right" OpenPaneLength="{x:Bind ViewModelPage.SplitViewWidth, Mode=OneWay}" CompactPaneLength="88" DisplayMode="Inline">
+                IsPaneOpen="{x:Bind ViewModelPage.IsSplitViewOpen, Mode=OneWay}" PanePlacement="Right" OpenPaneLength="{x:Bind ViewModelPage.SplitViewWidth, Mode=TwoWay}" CompactPaneLength="88" DisplayMode="Inline">
                     <Frame x:Name="FrameContainer" Background="Transparent">
                         
                     </Frame>
@@ -273,21 +273,28 @@
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <Flyout>
-                        <Grid>
+                        <Grid RowSpacing="20">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" Orientation="Vertical">
+                                <TextBlock Text="Largeur de la sidebar" Foreground="{ThemeResource SystemColorControlAccentBrush}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Slider Minimum="400" Value="{x:Bind ViewModelPage.SplitViewWidth, Mode=TwoWay}" Maximum="800" StepFrequency="1" Width="220"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="{x:Bind ViewModelPage.SplitViewWidth, Mode=OneWay}" VerticalAlignment="Top" FontSize="16" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Orientation="Vertical">
                                 <TextBlock Text="Nombre maximum d'éléments par page" Foreground="{ThemeResource SystemColorControlAccentBrush}"/>
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <Slider Minimum="10" Value="{x:Bind ViewModelPage.MaxItemsPerPage, Mode=TwoWay}" Maximum="1000" StepFrequency="10" Width="220" ManipulationCompleted="Slider_ManipulationCompleted" ManipulationMode="All"
                                             VerticalAlignment="Center"/>
                                     <TextBlock Text="{x:Bind ViewModelPage.MaxItemsPerPage, Mode=OneWay}" VerticalAlignment="Top" FontSize="16" FontWeight="SemiBold"/>
                                 </StackPanel>
+                                <TextBlock MaxWidth="250" Text="Attention : un nombre important d'élément affichés par page peut avoir un impact considérable sur les performances" TextWrapping="Wrap"/>
                             </StackPanel>
-                            <TextBlock Grid.Row="1" MaxWidth="250" Text="Attention : un nombre important d'élément affichés par page peut avoir un impact considérable sur les performances" TextWrapping="Wrap"/>
                         </Grid>
                     </Flyout>
                 </AppBarButton.Flyout>

@@ -2779,6 +2779,27 @@ namespace LibraryProjectUWP.Views.Book
         //}
         #endregion
         
+        private async void Slider_SplitviewWidth_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Slider slider)
+                {
+                    var bookCollectionSpage = this.BookCollectionSubPage;
+                    if (bookCollectionSpage != null)
+                    {
+                        await bookCollectionSpage.RefreshItemsGrouping();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private async void Slider_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
             try
