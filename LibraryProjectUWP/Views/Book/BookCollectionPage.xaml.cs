@@ -593,90 +593,90 @@ namespace LibraryProjectUWP.Views.Book
             }, EditMode.Create);
         }
 
-        private async void NewEditBookUC_Create_CreateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                LivreVM newViewModel = sender.ViewModelPage.ViewModel;
+        //private async void NewEditBookUC_Create_CreateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    MethodBase m = MethodBase.GetCurrentMethod();
+        //    try
+        //    {
+        //        LivreVM newViewModel = sender.ViewModelPage.ViewModel;
 
-                var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
-                if (creationResult.IsSuccess)
-                {
-                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                    {
-                        ProgessText = $"Actualisation du catalogue des livres en cours...",
-                    });
+        //        var creationResult = await DbServices.Book.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
+        //        if (creationResult.IsSuccess)
+        //        {
+        //            Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+        //            {
+        //                ProgessText = $"Actualisation du catalogue des livres en cours...",
+        //            });
 
-                    DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 1),
-                    };
+        //            DispatcherTimer dispatcherTimer = new DispatcherTimer()
+        //            {
+        //                Interval = new TimeSpan(0, 0, 0, 1),
+        //            };
 
-                    dispatcherTimer.Tick += async (t, f) =>
-                    {
-                        await this.RefreshItemsGrouping(true, GetSelectedPage);
+        //            dispatcherTimer.Tick += async (t, f) =>
+        //            {
+        //                await this.RefreshItemsGrouping(true, GetSelectedPage);
 
-                        DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                        {
-                            Interval = new TimeSpan(0, 0, 0, 2),
-                        };
+        //                DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+        //                {
+        //                    Interval = new TimeSpan(0, 0, 0, 2),
+        //                };
 
-                        dispatcherTimer2.Tick += (s, i) =>
-                        {
-                            Parameters.MainPage.CloseBusyLoader();
-                            dispatcherTimer2.Stop();
-                        };
-                        dispatcherTimer2.Start();
+        //                dispatcherTimer2.Tick += (s, i) =>
+        //                {
+        //                    Parameters.MainPage.CloseBusyLoader();
+        //                    dispatcherTimer2.Stop();
+        //                };
+        //                dispatcherTimer2.Start();
 
-                        dispatcherTimer.Stop();
-                    };
+        //                dispatcherTimer.Stop();
+        //            };
 
-                    dispatcherTimer.Start();
+        //            dispatcherTimer.Start();
 
-                    sender.ViewModelPage.ResultMessageTitle = "Succès";
-                    sender.ViewModelPage.ResultMessage = creationResult.Message;
-                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                    sender.ViewModelPage.IsResultMessageOpen = true;
-                }
-                else
-                {
-                    //Erreur
-                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                    sender.ViewModelPage.ResultMessage = creationResult.Message;
-                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                    sender.ViewModelPage.IsResultMessageOpen = true;
-                    return;
-                }
+        //            sender.ViewModelPage.ResultMessageTitle = "Succès";
+        //            sender.ViewModelPage.ResultMessage = creationResult.Message;
+        //            sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+        //            sender.ViewModelPage.IsResultMessageOpen = true;
+        //        }
+        //        else
+        //        {
+        //            //Erreur
+        //            sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+        //            sender.ViewModelPage.ResultMessage = creationResult.Message;
+        //            sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+        //            sender.ViewModelPage.IsResultMessageOpen = true;
+        //            return;
+        //        }
 
-                sender.ViewModelPage.ViewModel = new LivreVM()
-                {
-                    IdLibrary = Parameters.ParentLibrary.Id,
-                };
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        //        sender.ViewModelPage.ViewModel = new LivreVM()
+        //        {
+        //            IdLibrary = Parameters.ParentLibrary.Id,
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
-        private void NewEditBookUC_Create_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                sender.CancelModificationRequested -= NewEditBookUC_Create_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditBookUC_Create_CreateItemRequested;
+        //private void NewEditBookUC_Create_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        //{
+        //    MethodBase m = MethodBase.GetCurrentMethod();
+        //    try
+        //    {
+        //        sender.CancelModificationRequested -= NewEditBookUC_Create_CancelModificationRequested;
+        //        sender.CreateItemRequested -= NewEditBookUC_Create_CreateItemRequested;
 
-                this.RemoveItemToSideBar(sender);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        //        this.RemoveItemToSideBar(sender);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
         //private void NewBook(LivreVM viewModel = null)
         //{
@@ -726,7 +726,7 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Edit Book
-        public void NewEditBook(LivreVM viewModel, EditMode editMode = EditMode.Create)
+        public async void NewEditBook(LivreVM viewModel, EditMode editMode = EditMode.Create)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -743,6 +743,32 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == editMode) is NewEditBookUC checkedItem)
                 {
+                    var viewModelsEqual = BookHelpers.GetPropertiesChanged(checkedItem.OriginalViewModel, checkedItem.ViewModelPage.ViewModel);
+                    if (viewModelsEqual.Any())
+                    {
+                        var dialog = new BookEditedCD(checkedItem.OriginalViewModel, viewModelsEqual)
+                        {
+                            Title = "Enregistrer vos modifications"
+                        };
+
+                        var result = await dialog.ShowAsync();
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            //if (checkedItem.ViewModelPage.EditMode == EditMode.Create)
+                            //{
+                            //    checkedItem.CreateItemXUiCommand_ExecuteRequested(null, null);
+                            //}
+                            //else if (checkedItem.ViewModelPage.EditMode == EditMode.Edit)
+                            //{
+                            //    checkedItem.UpdateItemXUiCommand_ExecuteRequested(null, null);
+                            //}
+                            return;
+                        }
+                        else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                        {
+                            return;
+                        }
+                    }
                     checkedItem.InitializeSideBar(Parameters.ParentLibrary.Id, this, viewModel, editMode);
                     this.SelectItemSideBar(checkedItem);
                 }
@@ -752,8 +778,8 @@ namespace LibraryProjectUWP.Views.Book
                     userControl.InitializeSideBar(Parameters.ParentLibrary.Id, this, viewModel, editMode);
 
 
-                    userControl.CancelModificationRequested += NewEditBookUC_Edit_CancelModificationRequested;
-                    userControl.UpdateItemRequested += NewEditBookUC_Edit_UpdateItemRequested;
+                    userControl.CancelModificationRequested += NewEditBookUC_CancelModificationRequested;
+                    userControl.ExecuteTaskRequested += NewEditBookUC_ExecuteTaskRequested;
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
@@ -771,54 +797,23 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void NewEditBookUC_Edit_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        private void NewEditBookUC_ExecuteTaskRequested(NewEditBookUC sender, LivreVM originalViewModel, OperationStateVM e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
-                sender.UpdateItemRequested -= NewEditBookUC_Edit_UpdateItemRequested;
-
-                this.RemoveItemToSideBar(sender);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void NewEditBookUC_Edit_UpdateItemRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var updatedViewModel = sender.ViewModelPage.ViewModel;
-
-                var updateResult = await DbServices.Book.UpdateAsync(updatedViewModel);
-                if (updateResult.IsSuccess)
+                if (e.IsSuccess)
                 {
-                    sender.OriginalViewModel.Copy(updatedViewModel);
-                    CompleteBookInfos(sender.OriginalViewModel);
-                    await esBook.SaveBookViewModelAsync(updatedViewModel);
-
-                    sender.ViewModelPage.ResultMessageTitle = "Succès";
-                    sender.ViewModelPage.ResultMessage = updateResult.Message;
-                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                    sender.ViewModelPage.IsResultMessageOpen = true;
+                    if (sender.ViewModelPage.EditMode == EditMode.Edit)
+                    {
+                    }
+                    
+                    this.RemoveItemToSideBar(sender);
                 }
                 else
                 {
-                    //Erreur
-                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                    sender.ViewModelPage.ResultMessage = updateResult.Message;
-                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                    sender.ViewModelPage.IsResultMessageOpen = true;
-                    return;
-                }
 
-                sender.CancelModificationRequested -= NewEditBookUC_Edit_CancelModificationRequested;
-                sender.UpdateItemRequested -= NewEditBookUC_Edit_UpdateItemRequested;
+                }
 
                 this.RemoveItemToSideBar(sender);
             }
@@ -828,6 +823,22 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        private void NewEditBookUC_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                this.RemoveItemToSideBar(sender);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         #endregion
 
@@ -2222,7 +2233,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void CompleteBookInfos(LivreVM viewModel)
+        public void CompleteBookInfos(LivreVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try

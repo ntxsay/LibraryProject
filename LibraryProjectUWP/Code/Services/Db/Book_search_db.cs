@@ -452,6 +452,201 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            #region Search
+            private static async Task<IList<Tbook>> SearchBooksInMainTitle(ResearchBookVM parameters, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    if (parameters == null)
+                    {
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
+                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
+
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        List<Tbook> tbooks = new List<Tbook>();
+                        var termToLower = parameters.Term.ToLower();
+
+                        switch (parameters.TermParameter)
+                        {
+                            case LibraryHelpers.Book.Search.Terms.Equals:
+                                tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle == parameters.Term).ToListAsync(cancellationToken);
+                                break;
+                            case LibraryHelpers.Book.Search.Terms.Contains:
+                                tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.Contains(parameters.Term)).ToListAsync(cancellationToken);
+                                break;
+                            case LibraryHelpers.Book.Search.Terms.StartWith:
+                                tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
+                                break;
+                            case LibraryHelpers.Book.Search.Terms.EndWith:
+                                tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        return tbooks;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<Tbook>().ToList();
+                }
+            }
+
+            private static async Task<IList<Tbook>> SearchBooksInOtherTitles(ResearchBookVM parameters, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    if (parameters == null)
+                    {
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
+                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
+
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        List<Tbook> tbooks = new List<Tbook>();
+                        TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
+                        var termToLower = parameters.Term.ToLower();
+
+                        List<TbookOtherTitle> booksTitles = null;
+                        switch (parameters.TermParameter)
+                        {
+                            case LibraryHelpers.Book.Search.Terms.Equals:
+                                booksTitles = await context.TbookOtherTitle.Where(w => w.Title == parameters.Term).ToListAsync(cancellationToken);
+                                break;
+                            case LibraryHelpers.Book.Search.Terms.Contains:
+                                booksTitles = await context.TbookOtherTitle.Where(w => w.Title.Contains(parameters.Term)).ToListAsync(cancellationToken);
+                                break;
+                            case LibraryHelpers.Book.Search.Terms.StartWith:
+                                booksTitles = await context.TbookOtherTitle.Where(w => w.Title.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
+                                break;
+                            case LibraryHelpers.Book.Search.Terms.EndWith:
+                                booksTitles = await context.TbookOtherTitle.Where(w => w.Title.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (booksTitles != null && booksTitles.Any())
+                        {
+                            List<Tbook> _tbooks = booksTitles.Select(async s => await SingleAsync(s.Id, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
+                            if (_tbooks != null && _tbooks.Any())
+                            {
+                                tbooks.AddRange(_tbooks);
+                            }
+                        }
+
+                        return tbooks;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<Tbook>().ToList();
+                }
+            }
+
+            private static async Task<IList<Tbook>> SearchBooksInContacts(ResearchBookVM parameters, ContactRole contactRole, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    if (parameters == null)
+                    {
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
+                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
+
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        List<Tbook> tbooks = new List<Tbook>();
+                        var termToLower = parameters.Term.ToLower();
+                        TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
+
+                        List<Tcontact> existingItemList = (await Contact.MultipleAsync(contactRole))?.ToList();
+                        List<Tcontact> tcontacts = new List<Tcontact>();
+
+                        if (existingItemList != null && existingItemList.Any())
+                        {
+                            foreach (var item in existingItemList)
+                            {
+                                switch (parameters.TermParameter)
+                                {
+                                    case LibraryHelpers.Book.Search.Terms.Equals:
+                                        if (item.TitreCivilite?.ToLower() == termToLower || item.NomNaissance?.ToLower() == termToLower ||
+                                            item.Prenom?.ToLower() == termToLower || item.AutresPrenoms?.ToLower() == termToLower ||
+                                            item.NomUsage?.ToLower() == termToLower || item.SocietyName?.ToLower() == termToLower)
+                                        {
+                                            tcontacts.Add(item);
+                                        }
+                                        break;
+                                    case LibraryHelpers.Book.Search.Terms.Contains:
+                                        if (item.TitreCivilite?.ToLower().Contains(termToLower) == true || item.NomNaissance?.ToLower().Contains(termToLower) == true ||
+                                            item.Prenom?.ToLower().Contains(termToLower) == true || item.AutresPrenoms?.ToLower().Contains(termToLower) == true ||
+                                            item.NomUsage?.ToLower().Contains(termToLower) == true || item.SocietyName?.ToLower().Contains(termToLower) == true)
+                                        {
+                                            tcontacts.Add(item);
+                                        }
+
+                                        break;
+                                    case LibraryHelpers.Book.Search.Terms.StartWith:
+                                        if (item.TitreCivilite?.ToLower().StartsWith(termToLower) == true || item.NomNaissance?.ToLower().StartsWith(termToLower) == true ||
+                                            item.Prenom?.ToLower().StartsWith(termToLower) == true || item.AutresPrenoms?.ToLower().StartsWith(termToLower) == true ||
+                                            item.NomUsage?.ToLower().StartsWith(termToLower) == true || item.SocietyName?.ToLower().StartsWith(termToLower) == true)
+                                        {
+                                            tcontacts.Add(item);
+                                        }
+                                        break;
+                                    case LibraryHelpers.Book.Search.Terms.EndWith:
+                                        if (item.TitreCivilite?.ToLower().EndsWith(termToLower) == true || item.NomNaissance?.ToLower().EndsWith(termToLower) == true ||
+                                            item.Prenom?.ToLower().EndsWith(termToLower) == true || item.AutresPrenoms?.ToLower().EndsWith(termToLower) == true ||
+                                            item.NomUsage?.ToLower().EndsWith(termToLower) == true || item.SocietyName?.ToLower().EndsWith(termToLower) == true)
+                                        {
+                                            tcontacts.Add(item);
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+
+                        if (tcontacts != null && tcontacts.Any())
+                        {
+                            var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontacts.Select(s => s.Id), contactRole);
+                            List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
+                            if (_tbooks != null && _tbooks.Any())
+                            {
+                                tbooks.AddRange(_tbooks);
+                            }
+                        }
+
+                        return tbooks;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<Tbook>().ToList();
+                }
+            }
+
+
             public static async Task<IList<Tbook>> SearchBooksAsync(ResearchBookVM parameters, CancellationToken cancellationToken = default)
             {
                 try
@@ -473,120 +668,38 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (parameters.SearchInMainTitle == true)
                         {
-                            switch (parameters.TermParameter)
+                            IList<Tbook> _tbooks = await SearchBooksInMainTitle(parameters, cancellationToken);
+                            if (_tbooks != null && _tbooks.Any())
                             {
-                                case LibraryHelpers.Book.Search.Terms.Equals:
-                                    tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle == parameters.Term).ToListAsync(cancellationToken);
-                                    break;
-                                case LibraryHelpers.Book.Search.Terms.Contains:
-                                    tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.Contains(parameters.Term)).ToListAsync(cancellationToken);
-                                    break;
-                                case LibraryHelpers.Book.Search.Terms.StartWith:
-                                    tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
-                                    break;
-                                case LibraryHelpers.Book.Search.Terms.EndWith:
-                                    tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
-                                    break;
-                                default:
-                                    break;
+                                tbooks.AddRange(_tbooks);
                             }
                         }
 
                         if (parameters.SearchInOtherTitles == true)
                         {
-                            List<TbookOtherTitle> booksTitles = null;
-                            switch (parameters.TermParameter)
+                            IList<Tbook> _tbooks = await SearchBooksInOtherTitles(parameters, cancellationToken);
+                            if (_tbooks != null && _tbooks.Any())
                             {
-                                case LibraryHelpers.Book.Search.Terms.Equals:
-                                    booksTitles = await context.TbookOtherTitle.Where(w => w.Title == parameters.Term).ToListAsync(cancellationToken);
-                                    break;
-                                case LibraryHelpers.Book.Search.Terms.Contains:
-                                    booksTitles = await context.TbookOtherTitle.Where(w => w.Title.Contains(parameters.Term)).ToListAsync(cancellationToken);
-                                    break;
-                                case LibraryHelpers.Book.Search.Terms.StartWith:
-                                    booksTitles = await context.TbookOtherTitle.Where(w => w.Title.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
-                                    break;
-                                case LibraryHelpers.Book.Search.Terms.EndWith:
-                                    booksTitles = await context.TbookOtherTitle.Where(w => w.Title.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            if (booksTitles != null && booksTitles.Any())
-                            {
-                                List<Tbook> _tbooks = booksTitles.Select(async s => await SingleAsync(s.Id, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
-                                if (_tbooks != null && _tbooks.Any())
-                                {
-                                    tbooks.AddRange(_tbooks);
-                                }
+                                tbooks.AddRange(_tbooks);
                             }
                         }
 
                         if (parameters.SearchInAuthors == true)
                         {
-                            List<Tcontact> existingItemList = await context.Tcontact.ToListAsync();
-                            List<Tcontact> tcontactsAuthor = new List<Tcontact>();
-
-                            if (existingItemList != null && existingItemList.Any())
+                            IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, ContactRole.Author, cancellationToken);
+                            if (_tbooks != null && _tbooks.Any())
                             {
-                                foreach (var item in existingItemList)
-                                {
-                                    switch (parameters.TermParameter)
-                                    {
-                                        case LibraryHelpers.Book.Search.Terms.Equals:
-                                            if (item.TitreCivilite?.ToLower() == termToLower || item.NomNaissance?.ToLower() == termToLower ||
-                                                item.Prenom?.ToLower() == termToLower || item.AutresPrenoms?.ToLower() == termToLower ||
-                                                item.NomUsage?.ToLower() == termToLower)
-                                            {
-                                                tcontactsAuthor.Add(item);
-                                            }
-                                            break;
-                                        case LibraryHelpers.Book.Search.Terms.Contains:
-                                            if (item.TitreCivilite?.ToLower().Contains(termToLower) == true || item.NomNaissance?.ToLower().Contains(termToLower) == true ||
-                                                item.Prenom?.ToLower().Contains(termToLower) == true || item.AutresPrenoms?.ToLower().Contains(termToLower) == true ||
-                                                item.NomUsage?.ToLower().Contains(termToLower) == true)
-                                            {
-                                                tcontactsAuthor.Add(item);
-                                            }
-
-                                            break;
-                                        case LibraryHelpers.Book.Search.Terms.StartWith:
-                                            if (item.TitreCivilite?.ToLower().StartsWith(termToLower) == true || item.NomNaissance?.ToLower().StartsWith(termToLower) == true ||
-                                                item.Prenom?.ToLower().StartsWith(termToLower) == true || item.AutresPrenoms?.ToLower().StartsWith(termToLower) == true ||
-                                                item.NomUsage?.ToLower().StartsWith(termToLower) == true)
-                                            {
-                                                tcontactsAuthor.Add(item);
-                                            }
-                                            break;
-                                        case LibraryHelpers.Book.Search.Terms.EndWith:
-                                            if (item.TitreCivilite?.ToLower().EndsWith(termToLower) == true || item.NomNaissance?.ToLower().EndsWith(termToLower) == true ||
-                                                item.Prenom?.ToLower().EndsWith(termToLower) == true || item.AutresPrenoms?.ToLower().EndsWith(termToLower) == true ||
-                                                item.NomUsage?.ToLower().EndsWith(termToLower) == true)
-                                            {
-                                                tcontactsAuthor.Add(item);
-                                            }
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-
-                            if (tcontactsAuthor != null && tcontactsAuthor.Any())
-                            {
-                                var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontactsAuthor.Select(s => s.Id), ContactRole.Author);
-                                List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
-                                if (_tbooks != null && _tbooks.Any())
-                                {
-                                    tbooks.AddRange(_tbooks);
-                                }
+                                tbooks.AddRange(_tbooks);
                             }
                         }
 
                         if (parameters.SearchInEditors == true)
                         {
-
+                            IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, ContactRole.EditorHouse, cancellationToken);
+                            if (_tbooks != null && _tbooks.Any())
+                            {
+                                tbooks.AddRange(_tbooks);
+                            }
                         }
 
                         if (parameters.SearchInCollections == true)
@@ -596,7 +709,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         //if (cancellationToken.IsCancellationRequested)
                         //{
-                           
+
                         //}
 
                         if (tbooks != null && tbooks.Any())
@@ -644,6 +757,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            #endregion
         }
     }
 }

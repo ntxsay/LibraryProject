@@ -127,11 +127,63 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public LivreVM SearchViewModelInCurrentGridView(Pivot pivot, long idBook, string gridViewName = "GridViewItems", bool selectAfterFinded = false)
+        public GridViewItem GetSelectedGridViewItem(long idBook, Pivot pivot, string gridViewName = "GridViewItems", bool selectAfterFinded = false)
         {
             try
             {
-                if (pivot == null || pivot.SelectedItem == null)
+                if (pivot == null)
+                {
+                    return null;
+                }
+
+                foreach (var pivotItem in pivot.Items)
+                {
+                    if (pivotItem is IGrouping<string, LivreVM> group && group.Any(f => f.Id == idBook))
+                    {
+                        if (pivot.SelectedItem != pivotItem)
+                        {
+                            pivot.SelectedItem = pivotItem;
+                        }
+
+                        var _container = pivot.ContainerFromItem(pivotItem);
+                        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container, gridViewName);
+                        if (gridView != null)
+                        {
+                            foreach (var gridViewItem in gridView.Items)
+                            {
+                                if (gridViewItem is LivreVM _viewModel && _viewModel.Id == idBook)
+                                {
+                                    if (selectAfterFinded)
+                                    {
+                                        if (gridView.SelectedItem != gridViewItem)
+                                        {
+                                            gridView.SelectedItem = gridViewItem;
+                                        }
+                                    }
+
+                                    var _gridContainer = gridView.ContainerFromItem(gridViewItem);
+                                    return _gridContainer as GridViewItem;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        public LivreVM SearchViewModelInCurrentGridView(long idBook, Pivot pivot, string gridViewName = "GridViewItems", bool selectAfterFinded = false)
+        {
+            try
+            {
+                if (pivot == null)
                 {
                     return null;
                 }

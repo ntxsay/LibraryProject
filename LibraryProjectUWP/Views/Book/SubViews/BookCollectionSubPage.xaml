@@ -149,7 +149,7 @@
                                         <FontIcon Glyph="&#xEDE1;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Editer ce livre" Command="{StaticResource EditBookInfosXamlUICommand}" CommandParameter="{x:Bind }">
+                                <MenuFlyoutItem Text="Editer ce livre" Command="{StaticResource EditBookInfosXamlUICommand}" CommandParameter="{x:Bind Mode=OneWay}">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE70F;"/>
                                     </MenuFlyoutItem.Icon>
@@ -322,7 +322,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Pivot x:Name="PivotItems" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ParentPage.ViewModelPage.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        <Pivot x:Name="PivotItems" x:FieldModifier="public" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ParentPage.ViewModelPage.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}" SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}" PivotItemLoaded="PivotItems_PivotItemLoaded">
             <Pivot.OpacityTransition>
                 <ScalarTransition />
