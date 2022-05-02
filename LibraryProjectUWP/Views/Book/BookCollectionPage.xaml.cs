@@ -2215,24 +2215,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void CompleteBookInfos(long IdBook)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
-                {
-                    bookCollectionSpage.CompleteBookInfos(IdBook);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         public void CompleteBookInfos(LivreVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
