@@ -2,7 +2,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace LibraryProjectUnitTestProject
+namespace UTest
 {
     [TestClass]
     public class UnitTest1

@@ -3,16 +3,17 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap mp">
 
-  <Identity Name="f110df7c-4b43-4f88-b36d-bfb36c793d40"
+  <Identity Name="b509b130-6b12-4fb1-b3a9-2d656e68a4a9"
             Publisher="CN=loicbastaraud"
             Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="f110df7c-4b43-4f88-b36d-bfb36c793d40" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="b509b130-6b12-4fb1-b3a9-2d656e68a4a9" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>LibraryProjectUnitTestProject</DisplayName>
+    <DisplayName>UTest</DisplayName>
     <PublisherDisplayName>loicbastaraud</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -27,12 +28,12 @@
   <Applications>
     <Application Id="vstest.executionengine.universal.App"
         Executable="$targetnametoken$.exe"
-        EntryPoint="LibraryProjectUnitTestProject.App">
+        EntryPoint="UTest.App">
       <uap:VisualElements
-        DisplayName="LibraryProjectUnitTestProject"
+        DisplayName="UTest"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="LibraryProjectUnitTestProject"
+        Description="UTest"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
@@ -42,5 +43,9 @@
   <Capabilities>
     <Capability Name="internetClientServer" />
     <Capability Name="privateNetworkClientServer" />
+    <rescap:Capability Name="broadFileSystemAccess" />
+    <uap:Capability Name="removableStorage"/>
+    <uap:Capability Name="musicLibrary"/>
+    <uap:Capability Name="picturesLibrary"/>
   </Capabilities>
 </Package>

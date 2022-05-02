@@ -332,7 +332,7 @@
     <Compile Include="Views\Categories\CategoriesListUC.xaml.cs">
       <DependentUpon>CategoriesListUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\NewEditBookUC.xaml.cs">
+    <Compile Include="Views\Book\Sidebar\NewEditBookUC.xaml.cs">
       <DependentUpon>NewEditBookUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Collection\CollectionListUC.xaml.cs">
@@ -376,6 +376,9 @@
     </Compile>
     <Compile Include="Views\UserControls\BusyLoader.xaml.cs">
       <DependentUpon>BusyLoader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserControls\CustomDatePickerUC.xaml.cs">
+      <DependentUpon>CustomDatePickerUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UserControls\SideBarPivotItem.xaml.cs">
       <DependentUpon>SideBarPivotItem.xaml</DependentUpon>
@@ -546,7 +549,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Book\NewEditBookUC.xaml">
+    <Page Include="Views\Book\Sidebar\NewEditBookUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -603,6 +606,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\UserControls\BusyLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\CustomDatePickerUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

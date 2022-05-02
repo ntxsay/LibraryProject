@@ -332,7 +332,8 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            <Grid Grid.Row="1" ColumnSpacing="8">
+                            <userControls:CustomDatePickerUC Grid.Row="1" x:Name="CustomDatePickerParution"/>
+                            <!--<Grid Grid.Row="1" ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
@@ -354,7 +355,7 @@
                                 <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModelPage.chooseYear}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.YearParution, Mode=TwoWay}" PlaceholderText="Année" Style="{StaticResource comboxDate}">
 
                                 </ComboBox>
-                            </Grid>
+                            </Grid>-->
                         </Grid>
                         <ComboBox ItemsSource="{x:Bind ViewModelPage.languagesList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.Langue, Mode=TwoWay}" PlaceholderText="Langue" HorizontalAlignment="Stretch">
                             <ComboBox.Header>
