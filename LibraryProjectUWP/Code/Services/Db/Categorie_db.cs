@@ -15,7 +15,7 @@ using LibraryProjectUWP.ViewModels.General;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
-    internal partial class DbServices
+    public partial class DbServices
     {
         public struct Categorie
         {

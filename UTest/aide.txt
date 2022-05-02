@@ -1,0 +1,4 @@
+Vérifiez que le chemin d'accès au projet ne dépasse pas 255 caractères.
+Le fichier Default.rd du projet de test de l'app doivent être le même. vous ne pourrez pas le supprimer dans aucun des projets sous peine d'erreurs.
+Le contenu du dossier assets doit être identique en fonction de ce qui est déclaré dans le projet de test sinon exluez le fichiers
+Il semble que les méthodes async ne fonctionne pas

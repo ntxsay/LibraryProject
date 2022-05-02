@@ -18,7 +18,7 @@ using LibraryProjectUWP.ViewModels.Contact;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
-    internal partial class DbServices
+    public partial class DbServices
     {
         public struct Contact
         {

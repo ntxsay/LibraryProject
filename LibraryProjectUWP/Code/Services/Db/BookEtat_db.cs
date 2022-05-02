@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
-    internal partial class DbServices
+    public partial class DbServices
     {
         public partial struct BookEtat
         {

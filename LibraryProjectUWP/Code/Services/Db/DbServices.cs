@@ -12,7 +12,7 @@ using Windows.Storage;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
-    internal partial class DbServices
+    public partial class DbServices
     {
         internal const string DbName = "LibraryDB.db";
         internal const string RecordNotExistMessage = "Cet enregistrement n'existe pas.";

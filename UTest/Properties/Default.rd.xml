@@ -22,6 +22,8 @@
       package d'application. Les astérisques ne sont pas des caractères génériques.
     -->
     <Assembly Name="*Application*" Dynamic="Required All" />
+    
+    
     <!-- Ajoutez ici les directives runtime spécifiques à votre application. -->
 
 

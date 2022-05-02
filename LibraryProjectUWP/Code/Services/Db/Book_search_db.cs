@@ -21,7 +21,7 @@ using Windows.UI.Xaml.Media;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
-    internal partial class DbServices
+    public partial class DbServices
     {
         public partial struct Book
         {

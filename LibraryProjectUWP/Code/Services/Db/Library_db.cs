@@ -19,7 +19,7 @@ using LibraryProjectUWP.ViewModels.Book;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
-    internal partial class DbServices
+    public partial class DbServices
     {
         public struct Library
         {
