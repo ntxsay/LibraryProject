@@ -5,6 +5,7 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,7 @@ namespace LibraryProjectUWP.Views.Collection
     public sealed partial class CollectionListUC : PivotItem
     {
         public CollectionListParametersDriverVM _parameters;
+        public BookCollectionPage ParentPage { get; private set; }
 
         public CollectionListUCVM ViewModelPage { get; set; } = new CollectionListUCVM();
 
@@ -129,22 +131,26 @@ namespace LibraryProjectUWP.Views.Collection
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private async void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            await _parameters.ParentPage.NewCollectionAsync(String.Empty, ViewModelPage.ItemGuid, typeof(CollectionListUC));
+            _parameters.ParentPage.NewEditCollection(new CollectionVM(), EditMode.Create, new SideBarInterLinkVM() 
+            { 
+                ParentGuid = ViewModelPage.ItemGuid, 
+                ParentType = typeof(CollectionListUC),
+            });
         }
 
-        private async void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
                 if (args.Parameter is CollectionVM viewModel)
                 {
-                    await _parameters.ParentPage.EditCollection(viewModel, ViewModelPage.ItemGuid, typeof(CollectionListUC));
+                    _parameters.ParentPage.NewEditCollection(viewModel, EditMode.Edit, new SideBarInterLinkVM() { ParentGuid = ViewModelPage.ItemGuid, ParentType = typeof(CollectionListUC) });
                 }
                 else
                 {
-                    await _parameters.ParentPage.EditCollection(ViewModelPage.SelectedViewModel, ViewModelPage.ItemGuid, typeof(CollectionListUC));
+                    _parameters.ParentPage.NewEditCollection(ViewModelPage.SelectedViewModel, EditMode.Edit, new SideBarInterLinkVM() { ParentGuid = ViewModelPage.ItemGuid, ParentType = typeof(CollectionListUC) });
                 }
             }
             catch (Exception ex)

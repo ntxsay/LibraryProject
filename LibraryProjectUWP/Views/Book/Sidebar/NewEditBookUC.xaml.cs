@@ -606,7 +606,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ASB_SearchCollection_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private void ASB_SearchCollection_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             try
             {
@@ -634,7 +634,14 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (ParentPage != null)
                         {
-                            await ParentPage.NewCollectionAsync(sender.Text, ViewModelPage.ItemGuid, typeof(NewEditBookUC));
+                            ParentPage.NewEditCollection(new CollectionVM() 
+                                { 
+                                    Name = sender.Text,
+                                }, EditMode.Create, new SideBarInterLinkVM()
+                                { 
+                                    ParentGuid = ViewModelPage.ItemGuid, 
+                                    ParentType = typeof(NewEditBookUC) 
+                                });
                             sender.Text = String.Empty;
                         }
                     }

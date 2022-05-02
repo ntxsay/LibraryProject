@@ -1,8 +1,11 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -33,6 +36,8 @@ namespace LibraryProjectUWP.Views.Collection
     {
         public readonly ManageCollectionParametersDriverVM _parameters;
         public NewEditCollectionUCVM ViewModelPage { get; set; } = new NewEditCollectionUCVM();
+        public BookCollectionPage ParentPage { get; private set; }
+        public CollectionVM OriginalViewModel { get; private set; }
 
         public delegate void CancelModificationEventHandler(NewEditCollectionUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
@@ -48,15 +53,55 @@ namespace LibraryProjectUWP.Views.Collection
             this.InitializeComponent();
         }
 
-        public NewEditCollectionUC(ManageCollectionParametersDriverVM parameters)
+        public void InitializeSideBar(long idLibrary, BookCollectionPage bookCollectionPage, CollectionVM viewModel, EditMode editMode, SideBarInterLinkVM parentReferences)
         {
-            this.InitializeComponent();
-            _parameters = parameters;
-            ViewModelPage.EditMode = parameters.EditMode;
-            ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} une collection";
-            ViewModelPage.ViewModel = parameters?.CurrentViewModel;
-            InitializeActionInfos();
+            try
+            {
+                if (viewModel == null && editMode != EditMode.Create)
+                {
+                    return;
+                }
+
+                ParentPage = bookCollectionPage;
+                this.OriginalViewModel = viewModel;
+
+                ViewModelPage = new NewEditCollectionUCVM()
+                {
+                    EditMode = editMode,
+                    IdLibrary = idLibrary,
+                    ParentReferences = parentReferences,
+                };
+
+                ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une collection";
+                if (ViewModelPage.EditMode == EditMode.Create)
+                {
+                    ViewModelPage.ViewModel = viewModel ?? new CollectionVM()
+                    {
+                        IdLibrary = idLibrary,
+                    };
+                }
+                else if (ViewModelPage.EditMode == EditMode.Edit)
+                {
+                    ViewModelPage.ViewModel = viewModel.DeepCopy();
+                }
+
+                InitializeActionInfos();
+
+                if (ViewModelPage.EditMode == EditMode.Edit)
+                {
+                    this.Bindings.Update();
+                }
+
+                //InitializeViewModelList();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
+
 
         private void InitializeActionInfos()
         {
@@ -212,8 +257,9 @@ namespace LibraryProjectUWP.Views.Collection
     public class NewEditCollectionUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public long IdLibrary { get; set; }
         public Guid ItemGuid { get; private set; } = Guid.NewGuid();
-        public Guid? ParentGuid { get; set; }
+        public SideBarInterLinkVM ParentReferences { get; set; }
 
         private string _Header;
         public string Header
