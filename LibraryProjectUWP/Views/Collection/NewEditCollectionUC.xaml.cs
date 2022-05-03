@@ -1,7 +1,9 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Code.Services.UI;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
@@ -15,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
@@ -34,7 +37,6 @@ namespace LibraryProjectUWP.Views.Collection
 {
     public sealed partial class NewEditCollectionUC : PivotItem
     {
-        public readonly ManageCollectionParametersDriverVM _parameters;
         public NewEditCollectionUCVM ViewModelPage { get; set; } = new NewEditCollectionUCVM();
         public BookCollectionPage ParentPage { get; private set; }
         public CollectionVM OriginalViewModel { get; private set; }
@@ -42,11 +44,9 @@ namespace LibraryProjectUWP.Views.Collection
         public delegate void CancelModificationEventHandler(NewEditCollectionUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
 
-        public delegate void UpdateItemEventHandler(NewEditCollectionUC sender, ExecuteRequestedEventArgs e);
-        public event UpdateItemEventHandler UpdateItemRequested;
+        public delegate void ExecuteTaskEventHandler(NewEditCollectionUC sender, CollectionVM originalViewModel, OperationStateVM e);
+        public event ExecuteTaskEventHandler ExecuteTaskRequested;
 
-        public delegate void CreateItemEventHandler(NewEditCollectionUC sender, ExecuteRequestedEventArgs e);
-        public event CreateItemEventHandler CreateItemRequested;
 
         public NewEditCollectionUC()
         {
@@ -114,19 +114,15 @@ namespace LibraryProjectUWP.Views.Collection
                 };
                 TbcInfos.Inlines.Add(runTitle);
 
-                if (_parameters != null)
+                if (ViewModelPage.EditMode == EditMode.Edit)
                 {
-                    if (ViewModelPage.EditMode == EditMode.Edit)
+                    Run runtitle = new Run()
                     {
-                        Run runCategorie = new Run()
-                        {
-                            Text = " " + _parameters?.CurrentViewModel?.Name,
-                            FontWeight = FontWeights.Medium,
-                        };
-                        TbcInfos.Inlines.Add(runCategorie);
-                    }
+                        Text = " " + OriginalViewModel.Name,
+                        FontWeight = FontWeights.Medium,
+                    };
+                    TbcInfos.Inlines.Add(runtitle);
                 }
-
             }
             catch (Exception)
             {
@@ -140,7 +136,7 @@ namespace LibraryProjectUWP.Views.Collection
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void BtnExecuteAction_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -150,10 +146,17 @@ namespace LibraryProjectUWP.Views.Collection
                     return;
                 }
 
-                if (CreateItemRequested != null)
+                OperationStateVM result = null;
+                if (ViewModelPage.EditMode == EditMode.Create)
                 {
-                    CreateItemRequested(this, args);
+                    result = await CreateAsync();
                 }
+                else if (ViewModelPage.EditMode == EditMode.Edit)
+                {
+                    result = await UpdateAsync();
+                }
+
+                ExecuteTaskRequested?.Invoke(this, OriginalViewModel, result);
             }
             catch (Exception ex)
             {
@@ -163,23 +166,71 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
-        private void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async Task<OperationStateVM> CreateAsync()
         {
             try
             {
-                bool isValided = IsModelValided();
-                if (!isValided)
+                CollectionVM viewModel = this.ViewModelPage.ViewModel;
+
+                OperationStateVM result = await DbServices.Collection.CreateAsync(viewModel, ViewModelPage.IdLibrary);
+                if (result.IsSuccess)
                 {
-                    return;
+                    this.ViewModelPage.ResultMessageTitle = "Succès";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+                }
+                else
+                {
+                    //Erreur
+                    this.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                    this.ViewModelPage.IsResultMessageOpen = true;
                 }
 
-                UpdateItemRequested?.Invoke(this, args);
+                return result;
             }
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
-                return;
+                return null;
+            }
+        }
+
+        private async Task<OperationStateVM> UpdateAsync()
+        {
+            try
+            {
+                var viewModel = this.ViewModelPage.ViewModel;
+
+                OperationStateVM result = await DbServices.Collection.UpdateAsync(viewModel);
+                if (result.IsSuccess)
+                {
+                    OriginalViewModel.Copy(this.ViewModelPage.ViewModel);
+
+                    this.ViewModelPage.ResultMessageTitle = "Succès";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+                }
+                else
+                {
+                    //Erreur
+                    this.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
             }
         }
 
@@ -191,23 +242,10 @@ namespace LibraryProjectUWP.Views.Collection
                 if (ViewModelPage.ViewModel.Name.IsStringNullOrEmptyOrWhiteSpace())
                 {
                     ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Le nom de la collection ne peut pas être vide\nou ne contenir que des espaces blancs.";
+                    ViewModelPage.ResultMessage = $"Le nom de la collection ne peut pas être vide ou ne contenir que des espaces blancs.";
                     ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
                     ViewModelPage.IsResultMessageOpen = true;
                     return false;
-                }
-
-                if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(a => a.Name.ToLower() == ViewModelPage.ViewModel.Name.Trim().ToLower()))
-                {
-                    var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentViewModel?.Name?.Trim().ToLower() == ViewModelPage.ViewModel.Name?.Trim().ToLower());
-                    if (isError)
-                    {
-                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                        ViewModelPage.ResultMessage = $"Cette collection existe déjà.";
-                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                        ViewModelPage.IsResultMessageOpen = true; 
-                        return false;
-                    }
                 }
 
                 ViewModelPage.IsResultMessageOpen = false; 
@@ -221,12 +259,6 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
-
-        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-
-        }
-
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             try
@@ -236,14 +268,9 @@ namespace LibraryProjectUWP.Views.Collection
                     CancelModificationRequested = null;
                 }
 
-                if (CreateItemRequested != null)
+                if (ExecuteTaskRequested != null)
                 {
-                    CreateItemRequested = null;
-                }
-
-                if (UpdateItemRequested != null)
-                {
-                    UpdateItemRequested = null;
+                    ExecuteTaskRequested = null;
                 }
             }
             catch (Exception)

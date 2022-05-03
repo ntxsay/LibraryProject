@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.General;
@@ -37,11 +38,9 @@ namespace LibraryProjectUWP.Views.Collection
 {
     public sealed partial class CollectionListUC : PivotItem
     {
-        public CollectionListParametersDriverVM _parameters;
         public BookCollectionPage ParentPage { get; private set; }
-
+        readonly GetCollectionsTask getCollectionsTask = new GetCollectionsTask();
         public CollectionListUCVM ViewModelPage { get; set; } = new CollectionListUCVM();
-
 
         public delegate void CancelModificationEventHandler(CollectionListUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
@@ -52,38 +51,47 @@ namespace LibraryProjectUWP.Views.Collection
             this.InitializeComponent();
         }
 
-        public CollectionListUC(CollectionListParametersDriverVM parameters)
-        {
-            this.InitializeComponent();
-            _parameters = parameters;
-            ViewModelPage.Header = $"Collections";
-            ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
-            //if (parameters.ViewModelList != null && parameters.ViewModelList.Any())
-            //{
-            //    ViewModelPage.CollectionViewModelList = new ObservableCollection<CollectionVM>(parameters.ViewModelList);
-            //}
-            InitializeActionInfos();
-        }
-
-        private void PivotItem_Loaded(object sender, RoutedEventArgs e)
+        public void InitializeData(BookCollectionPage _parentPage)
         {
             try
             {
-                if (_parameters.ParentPage.ViewModelPage.SelectedCollections != null && 
-                    _parameters.ParentPage.ViewModelPage.SelectedCollections.Any())
+                ViewModelPage.Header = $"Collections";
+                ParentPage = _parentPage;
+                ViewModelPage.WorkerTextVisibility = Visibility.Visible;
+                ViewModelPage.DataListVisibility = Visibility.Collapsed;
+                
+                if (getCollectionsTask.IsWorkerRunning)
                 {
-                    foreach (var item in MyListView.Items)
+                    return;
+                }
+
+                getCollectionsTask.InitializeWorker(ParentPage.Parameters.ParentLibrary);
+                getCollectionsTask.AfterTaskCompletedRequested += (j, e) =>
+                {
+                    if (e.Result is Tuple<BibliothequeVM, WorkerState<CollectionVM, CollectionVM>, long> result && result.Item2.ResultList != null && result.Item2.ResultList.Any())
                     {
-                        foreach (var viewModel in _parameters.ParentPage.ViewModelPage.SelectedCollections)
+                        ViewModelPage.CountNotInCollectionBooks = result.Item3;
+                        ViewModelPage.Collections = new ObservableCollection<CollectionVM>(result.Item2.ResultList);
+
+                        if (ParentPage.ViewModelPage.SelectedCollections != null &&
+                    ParentPage.ViewModelPage.SelectedCollections.Any())
                         {
-                            if (item is CollectionVM _viewModel && _viewModel.Id == viewModel.Id && !MyListView.SelectedItems.Contains(item))
+                            foreach (var item in MyListView.Items)
                             {
-                                MyListView.SelectedItems.Add(item);
-                                break;
+                                foreach (var viewModel in ParentPage.ViewModelPage.SelectedCollections)
+                                {
+                                    if (item is CollectionVM _viewModel && _viewModel.Id == viewModel.Id && !MyListView.SelectedItems.Contains(item))
+                                    {
+                                        MyListView.SelectedItems.Add(item);
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
-                }
+                    ViewModelPage.WorkerTextVisibility = Visibility.Collapsed;
+                    ViewModelPage.DataListVisibility = Visibility.Visible;
+                };
             }
             catch (Exception ex)
             {
@@ -93,17 +101,10 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
-        private void InitializeActionInfos()
-        {
-            try
-            {
-                
-            }
-            catch (Exception)
-            {
 
-                throw;
-            }
+        private void PivotItem_Loaded(object sender, RoutedEventArgs e)
+        {
+            
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -115,8 +116,11 @@ namespace LibraryProjectUWP.Views.Collection
                     CancelModificationRequested = null;
                 }
 
+                if (getCollectionsTask != null)
+                {
+                    getCollectionsTask.DisposeWorker();
+                }
                 ViewModelPage = null;
-                _parameters = null;
             }
             catch (Exception)
             {
@@ -133,7 +137,7 @@ namespace LibraryProjectUWP.Views.Collection
 
         private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            _parameters.ParentPage.NewEditCollection(new CollectionVM(), EditMode.Create, new SideBarInterLinkVM() 
+            ParentPage.NewEditCollection(new CollectionVM(), EditMode.Create, new SideBarInterLinkVM() 
             { 
                 ParentGuid = ViewModelPage.ItemGuid, 
                 ParentType = typeof(CollectionListUC),
@@ -146,11 +150,11 @@ namespace LibraryProjectUWP.Views.Collection
             {
                 if (args.Parameter is CollectionVM viewModel)
                 {
-                    _parameters.ParentPage.NewEditCollection(viewModel, EditMode.Edit, new SideBarInterLinkVM() { ParentGuid = ViewModelPage.ItemGuid, ParentType = typeof(CollectionListUC) });
+                    ParentPage.NewEditCollection(viewModel, EditMode.Edit, new SideBarInterLinkVM() { ParentGuid = ViewModelPage.ItemGuid, ParentType = typeof(CollectionListUC) });
                 }
                 else
                 {
-                    _parameters.ParentPage.NewEditCollection(ViewModelPage.SelectedViewModel, EditMode.Edit, new SideBarInterLinkVM() { ParentGuid = ViewModelPage.ItemGuid, ParentType = typeof(CollectionListUC) });
+                    ParentPage.NewEditCollection(ViewModelPage.SelectedViewModel, EditMode.Edit, new SideBarInterLinkVM() { ParentGuid = ViewModelPage.ItemGuid, ParentType = typeof(CollectionListUC) });
                 }
             }
             catch (Exception ex)
@@ -161,39 +165,6 @@ namespace LibraryProjectUWP.Views.Collection
             }
         }
 
-
-        private bool IsModelValided()
-        {
-            try
-            {
-                //if (ViewModelPage.Value.IsStringNullOrEmptyOrWhiteSpace())
-                //{
-                //    ViewModelPage.ResultMessage = $"Le nom de la bibliothèque ne peut pas être vide\nou ne contenir que des espaces blancs.";
-                //    return false;
-                //}
-
-                //if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(a => a.Name.ToLower() == ViewModelPage.Value.Trim().ToLower()))
-                //{
-                //    var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentLibrary?.Name?.Trim().ToLower() == ViewModelPage.Value?.Trim().ToLower());
-                //    if (isError)
-                //    {
-                //        TbxErrorMessage.Text = $"Cette bibliothèque existe déjà.";
-                //        return false;
-                //    }
-                //}
-
-                //ViewModelPage.ResultMessage = string.Empty;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return false;
-            }
-        }
-
-
         private void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             try
@@ -203,7 +174,7 @@ namespace LibraryProjectUWP.Views.Collection
                 //    ViewModelPage.SearchedViewModel = null;
                 //}
 
-                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || _parameters.ParentLibrary.Books == null || !_parameters.ParentLibrary.Books.Any())
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || !ViewModelPage.Collections.Any())
                 {
                     return;
                 }
@@ -211,7 +182,7 @@ namespace LibraryProjectUWP.Views.Collection
                 var FilteredItems = new List<CollectionVM>();
                 var splitSearchTerm = sender.Text.ToLower().Split(" ");
 
-                foreach (var value in _parameters.ParentLibrary.Collections)
+                foreach (var value in ViewModelPage.Collections)
                 {
                     if (value.Name.IsStringNullOrEmptyOrWhiteSpace()) continue;
 
@@ -506,10 +477,10 @@ namespace LibraryProjectUWP.Views.Collection
                         ViewModelPage.ResultMessage = result.Message;
                         ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
                         ViewModelPage.IsResultMessageOpen = true;
-                        var item = _parameters.ParentLibrary.Collections.SingleOrDefault(s => s.Id == id);
+                        var item = ViewModelPage.Collections.SingleOrDefault(s => s.Id == id);
                         if (item != null)
                         {
-                            _parameters.ParentLibrary.Collections.Remove(item);
+                            ViewModelPage.Collections.Remove(item);
                         }
 
                         Thread.Sleep(500);
@@ -551,8 +522,8 @@ namespace LibraryProjectUWP.Views.Collection
             {
                 if (ViewModelPage.SelectedViewModels != null)
                 {
-                    _parameters.ParentPage.ViewModelPage.SelectedCollections = ViewModelPage.SelectedViewModels;
-                    await _parameters.ParentPage.RefreshItemsGrouping();
+                    ParentPage.ViewModelPage.SelectedCollections = ViewModelPage.SelectedViewModels;
+                    await ParentPage.RefreshItemsGrouping();
                 }
             }
             catch (Exception ex)
@@ -567,8 +538,8 @@ namespace LibraryProjectUWP.Views.Collection
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                _parameters.ParentPage.ViewModelPage.SelectedCollections = null;
-                await _parameters.ParentPage.RefreshItemsGrouping();
+                ParentPage.ViewModelPage.SelectedCollections = null;
+                await ParentPage.RefreshItemsGrouping();
             }
             catch (Exception ex)
             {
@@ -583,11 +554,11 @@ namespace LibraryProjectUWP.Views.Collection
             {
                 if (sender is MenuFlyout menuFlyout)
                 {
-                    if (_parameters.ParentPage.ViewModelPage.SelectedItems != null && _parameters.ParentPage.ViewModelPage.SelectedItems.Any())
+                    if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
                     {
                         if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
                         {
-                            flyoutItem.Text = $"Ajouter {_parameters.ParentPage.ViewModelPage.SelectedItems.Count} livre(s) à « {flyoutItem.Tag} »";
+                            flyoutItem.Text = $"Ajouter {ParentPage.ViewModelPage.SelectedItems.Count} livre(s) à « {flyoutItem.Tag} »";
                             flyoutItem.IsEnabled = true;
                         }
                     }
@@ -645,11 +616,11 @@ namespace LibraryProjectUWP.Views.Collection
         {
             try
             {
-                if (_parameters.ParentPage.ViewModelPage.SelectedItems != null && _parameters.ParentPage.ViewModelPage.SelectedItems.Any())
+                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
                 {
                     if (args.Parameter is CollectionVM viewModel)
                     {
-                        var creationResult = await DbServices.Collection.CreateCollectionConnectorAsync(_parameters.ParentPage.ViewModelPage.SelectedItems.Select(s => s.Id), viewModel);
+                        var creationResult = await DbServices.Collection.CreateCollectionConnectorAsync(ParentPage.ViewModelPage.SelectedItems.Select(s => s.Id), viewModel);
                         if (creationResult.IsSuccess)
                         {
                             ViewModelPage.ResultMessageTitle = "Succès";
@@ -657,7 +628,7 @@ namespace LibraryProjectUWP.Views.Collection
                             ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
                             ViewModelPage.IsResultMessageOpen = true;
 
-                            await _parameters.ParentPage.UpdateLibraryCollectionAsync();
+                            await ParentPage.UpdateLibraryCollectionAsync();
                         }
                         else
                         {
@@ -698,7 +669,7 @@ namespace LibraryProjectUWP.Views.Collection
                         ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
                         ViewModelPage.IsResultMessageOpen = true;
 
-                        await _parameters.ParentPage.UpdateLibraryCollectionAsync();
+                        await ParentPage.UpdateLibraryCollectionAsync();
                     }
                     else
                     {
@@ -741,11 +712,11 @@ namespace LibraryProjectUWP.Views.Collection
                         }
                     }
 
-                    if (_parameters.ParentPage.ViewModelPage.SelectedItems != null && _parameters.ParentPage.ViewModelPage.SelectedItems.Any())
+                    if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
                     {
                         if (menuFlyout.Items[1] is MenuFlyoutItem flyoutItem)
                         {
-                            flyoutItem.Text = $"Décatégoriser {_parameters.ParentPage.ViewModelPage.SelectedItems.Count} livre(s)";
+                            flyoutItem.Text = $"Décatégoriser {ParentPage.ViewModelPage.SelectedItems.Count} livre(s)";
                             flyoutItem.IsEnabled = true;
                         }
                     }
@@ -773,9 +744,9 @@ namespace LibraryProjectUWP.Views.Collection
         {
             try
             {
-                if (_parameters.ParentPage.ViewModelPage.SelectedItems != null && _parameters.ParentPage.ViewModelPage.SelectedItems.Any())
+                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
                 {
-                    OperationStateVM result = await DbServices.Collection.DecategorizeBooksAsync(_parameters.ParentPage.ViewModelPage.SelectedItems.Select(s => s.Id));
+                    OperationStateVM result = await DbServices.Collection.DecategorizeBooksAsync(ParentPage.ViewModelPage.SelectedItems.Select(s => s.Id));
                     if (result.IsSuccess)
                     {
                         ViewModelPage.ResultMessageTitle = "Succès";
@@ -783,7 +754,7 @@ namespace LibraryProjectUWP.Views.Collection
                         ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
                         ViewModelPage.IsResultMessageOpen = true;
 
-                        await _parameters.ParentPage.UpdateLibraryCollectionAsync();
+                        await ParentPage.UpdateLibraryCollectionAsync();
                     }
                     else
                     {
@@ -951,22 +922,7 @@ namespace LibraryProjectUWP.Views.Collection
                 }
             }
         }
-
-        private ObservableCollection<CollectionVM> _CollectionViewModelList = new ObservableCollection<CollectionVM>();
-        [Obsolete]
-        public ObservableCollection<CollectionVM> CollectionViewModelList
-        {
-            get => this._CollectionViewModelList;
-            set
-            {
-                if (_CollectionViewModelList != value)
-                {
-                    this._CollectionViewModelList = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
+        
         private ObservableCollection<CollectionVM> _SelectedViewModels = new ObservableCollection<CollectionVM>();
         public ObservableCollection<CollectionVM> SelectedViewModels
         {
@@ -976,6 +932,62 @@ namespace LibraryProjectUWP.Views.Collection
                 if (_SelectedViewModels != value)
                 {
                     this._SelectedViewModels = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _DataListVisibility;
+        public Visibility DataListVisibility
+        {
+            get => this._DataListVisibility;
+            set
+            {
+                if (this._DataListVisibility != value)
+                {
+                    this._DataListVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private long _CountNotInCollectionBooks;
+        public long CountNotInCollectionBooks
+        {
+            get => _CountNotInCollectionBooks;
+            set
+            {
+                if (_CountNotInCollectionBooks != value)
+                {
+                    _CountNotInCollectionBooks = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<CollectionVM> _Collections = new ObservableCollection<CollectionVM>();
+        public ObservableCollection<CollectionVM> Collections
+        {
+            get => _Collections;
+            set
+            {
+                if (_Collections != value)
+                {
+                    _Collections = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _WorkerTextVisibility;
+        public Visibility WorkerTextVisibility
+        {
+            get => this._WorkerTextVisibility;
+            set
+            {
+                if (this._WorkerTextVisibility != value)
+                {
+                    this._WorkerTextVisibility = value;
                     this.OnPropertyChanged();
                 }
             }

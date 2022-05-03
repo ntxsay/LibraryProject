@@ -22,55 +22,7 @@ namespace LibraryProjectUWP.Views.Book
             NewEditCollection(null, EditMode.Create);
         }
 
-
-        //internal async Task EditCollection(CollectionVM viewModel, Guid? guid = null, Type ownerType = null)
-        //{
-        //    MethodBase m = MethodBase.GetCurrentMethod();
-        //    try
-        //    {
-        //        var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditCollectionUC item && item.ViewModelPage.EditMode == Code.EditMode.Edit);
-        //        if (checkedItem != null)
-        //        {
-        //            this.PivotRightSideBar.SelectedItem = checkedItem;
-        //        }
-        //        else
-        //        {
-        //            var itemList = await DbServices.Collection.AllVMAsync();
-        //            NewEditCollectionUC userControl = new NewEditCollectionUC(new ManageCollectionParametersDriverVM()
-        //            {
-        //                ParentSideBarItemType = ownerType,
-        //                EditMode = Code.EditMode.Edit,
-        //                ViewModelList = itemList,
-        //                //ParentLibrary = _parameters.ParentLibrary,
-        //                CurrentViewModel = viewModel,
-        //            });
-
-        //            if (guid != null)
-        //            {
-        //                userControl.ViewModelPage.ParentGuid = guid;
-        //            }
-
-        //            userControl.CancelModificationRequested += NewEditCollectionUC_Create_CancelModificationRequested;
-        //            userControl.UpdateItemRequested += NewEditCollectionUC_UpdateItemRequested;
-
-        //            this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
-        //            {
-        //                Glyph = userControl.ViewModelPage.Glyph,
-        //                Title = userControl.ViewModelPage.Header,
-        //                IdItem = userControl.ViewModelPage.ItemGuid,
-        //            });
-        //        }
-        //        this.ViewModelPage.IsSplitViewOpen = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logs.Log(ex, m);
-        //        return;
-        //    }
-        //}
-
-
-        private async void DisplayCollectionListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void DisplayCollectionListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -82,14 +34,8 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    //IList<CollectionVM> itemList = await DbServices.Collection.MultipleVmInLibraryAsync(_parameters.ParentLibrary.Id, Code.CollectionTypeEnum.Collection);
-                    CollectionListUC userControl = new CollectionListUC(new CollectionListParametersDriverVM()
-                    {
-                        ParentPage = this,
-                        ParentLibrary = Parameters.ParentLibrary,
-                        //ViewModelList = itemList?.OrderBy(o => o.Name).ToList(), //ViewModelPage.ContactViewModelList,
-                    });
-
+                    CollectionListUC userControl = new CollectionListUC();
+                    userControl.InitializeData(this);
                     userControl.CancelModificationRequested += CollectionListUC_CancelModificationRequested;
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()

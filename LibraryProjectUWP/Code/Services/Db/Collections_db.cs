@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.Code.Services.Db
@@ -184,7 +185,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tcollection>> MultipleInLibraryAsync(long idLibrary, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
+            public static async Task<IList<Tcollection>> MultipleInLibraryAsync(long idLibrary, CollectionTypeEnum collectionType = CollectionTypeEnum.All, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -193,11 +194,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                         List<Tcollection> collection = null;
                         if (collectionType == CollectionTypeEnum.All)
                         {
-                            collection = await context.Tcollection.Where(w => w.IdLibrary == idLibrary).ToListAsync();
+                            collection = await context.Tcollection.Where(w => w.IdLibrary == idLibrary).ToListAsync(cancellationToken);
                         }
                         else
                         {
-                            collection = await context.Tcollection.Where(w => w.IdLibrary == idLibrary && w.CollectionType == (long)collectionType).ToListAsync();
+                            collection = await context.Tcollection.Where(w => w.IdLibrary == idLibrary && w.CollectionType == (long)collectionType).ToListAsync(cancellationToken);
                         }
 
                         return collection ?? Enumerable.Empty<Tcollection>().ToList();
@@ -211,11 +212,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<CollectionVM>> MultipleVmInLibraryAsync(long idLibrary, CollectionTypeEnum collectionType = CollectionTypeEnum.All)
+            public static async Task<IList<CollectionVM>> MultipleVmInLibraryAsync(long idLibrary, CollectionTypeEnum collectionType = CollectionTypeEnum.All, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    var collection = await MultipleInLibraryAsync(idLibrary, collectionType);
+                    var collection = await MultipleInLibraryAsync(idLibrary, collectionType, cancellationToken);
                     if (!collection.Any()) return Enumerable.Empty<CollectionVM>().ToList();
 
                     var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(d => d.Result).ToList();
@@ -534,6 +535,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
             public static async Task<OperationStateVM> CreateAsync(CollectionVM viewModel, long idLibrary)
             {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 try
                 {
                     if (viewModel == null)
@@ -565,14 +567,14 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var existingItem = await context.Tcollection.FirstOrDefaultAsync(c => c.Name.ToLower() == viewModel.Name.Trim().ToLower());
-                        if (existingItem != null)
+                        var isExist = await IsExistAsync(idLibrary,viewModel);
+                        if (isExist)
                         {
+                            Logs.Log(m, $"La collection \"{viewModel.Name}\" existe déjà.");
                             return new OperationStateVM()
                             {
                                 IsSuccess = true,
-                                Message = DbServices.RecordAlreadyExistMessage,
-                                Id = existingItem.Id,
+                                Message = $"La collection \"{viewModel.Name}\" existe déjà."
                             };
                         }
 
@@ -608,7 +610,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
                 catch (Exception ex)
                 {
-                    MethodBase m = MethodBase.GetCurrentMethod();
                     Logs.Log(ex, m);
                     return new OperationStateVM()
                     {
@@ -628,7 +629,6 @@ namespace LibraryProjectUWP.Code.Services.Db
             {
                 try
                 {
-
                     if (viewModel == null)
                     {
                         return new OperationStateVM()
@@ -659,13 +659,14 @@ namespace LibraryProjectUWP.Code.Services.Db
                             };
                         }
 
-                        var isExist = await context.Tcollection.AnyAsync(c => c.Id != record.Id && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
+                        var isExist = await IsExistAsync(record.IdLibrary, viewModel, true, record.Id);
                         if (isExist)
                         {
                             return new OperationStateVM()
                             {
                                 IsSuccess = true,
-                                Message = NameAlreadyExistMessage
+                                Message = NameAlreadyExistMessage,
+                                Id = record.Id
                             };
                         }
 
@@ -779,6 +780,33 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
+            private static async Task<bool> IsExistAsync(long idLibrary, CollectionVM viewModel, bool isEdit = false, long? modelId = null)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        string name = viewModel.Name?.Trim()?.ToLower();
+
+                        if (!isEdit)
+                        {
+                            return await context.Tcollection.AnyAsync(c => c.IdLibrary == idLibrary && c.Name.ToLower() == name);
+                        }
+                        else
+                        {
+                            return await context.Tcollection.AnyAsync(c => c.IdLibrary == idLibrary && c.Id != (long)modelId && c.Name.ToLower() == name);
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return true;
+                }
+            }
+
 
             /// <summary>
             /// Convertit un modèle en modèle de vue

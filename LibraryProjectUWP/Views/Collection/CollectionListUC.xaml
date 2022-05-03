@@ -133,7 +133,7 @@
         </Grid.RowDefinitions>
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 20" TextWrapping="Wrap">
             <Run Text="Vous naviguez parmi les collections de la bibliothèque «" />
-            <Run Text="{x:Bind ViewModelPage.ParentLibrary.Name, Mode=OneWay}" FontWeight="Bold" />
+            <Run Text="{x:Bind ParentPage.Parameters.ParentLibrary.Name, Mode=OneWay}" FontWeight="Bold" />
             <Run Text="»" />
         </TextBlock>
         <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Collapsed" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" HorizontalContentAlignment="Left">
@@ -186,18 +186,32 @@
                 <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
             </AutoSuggestBox.QueryIcon>
         </AutoSuggestBox>
-        <ListView Grid.Row="3">
-            <ListViewItem ContextRequested="ListViewItem_ContextRequested">
-                <TextBlock FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Run Text="Non catégorisé"/>
-                    <Run Text="("/><Run Text="{x:Bind _parameters.ParentLibrary.CountNotInCollectionBooks, Mode=OneWay}"/><Run Text=")"/>
-                </TextBlock>
-            </ListViewItem>
-        </ListView>
-        <ListView x:Name="MyListView" Grid.Row="4" ItemsSource="{x:Bind _parameters.ParentLibrary.Collections, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
-                  SelectedItem="{x:Bind ViewModelPage.SelectedViewModel, Mode=TwoWay}" SelectionChanged="ListView_SelectionChanged"
+        <Grid Grid.Row="3">
+            <StackPanel Orientation="Vertical" Spacing="4" Visibility="{x:Bind ViewModelPage.WorkerTextVisibility, Mode=OneWay}" Padding="0 10 0 0">
+                <ProgressRing IsActive="True" Height="40" Width="40"/>
+                <TextBlock x:Name="tbcStatus" TextAlignment="Center" Text="Recherche des collections en cours, veuillez patienter quelques instants." Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <Grid Visibility="{x:Bind ViewModelPage.DataListVisibility, Mode=OneWay}" RowSpacing="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <ListView Grid.Row="0">
+                    <ListViewItem ContextRequested="ListViewItem_ContextRequested">
+                        <TextBlock FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Run Text="Livre(s) sans collection"/>
+                    <Run Text="("/><Run Text="{x:Bind ViewModelPage.CountNotInCollectionBooks, Mode=OneWay}"/><Run Text=")"/>
+                        </TextBlock>
+                    </ListViewItem>
+                </ListView>
+                <ScrollViewer Grid.Row="1">
+                    <ListView x:Name="MyListView"  ItemsSource="{x:Bind ViewModelPage.Collections, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
+                  SelectedItem="{x:Bind ViewModelPage.SelectedViewModel, Mode=TwoWay}" SelectionChanged="ListView_SelectionChanged" ScrollViewer.IsVerticalRailEnabled="True"
                   SelectionMode="Extended">
-        </ListView>
+                    </ListView>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
         <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="5" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
                        IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}" Margin="0 10 0 5">
         </MUIXC:InfoBar>

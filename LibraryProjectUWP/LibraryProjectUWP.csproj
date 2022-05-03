@@ -191,6 +191,7 @@
     <Compile Include="Code\Services\Excel\SyncfusionXlsServices.cs" />
     <Compile Include="Code\Services\Logging\Logs.cs" />
     <Compile Include="Code\Services\Tasks\GetAvailableBookExemplariesForPretTask.cs" />
+    <Compile Include="Code\Services\Tasks\GetCollectionsTask.cs" />
     <Compile Include="Code\Services\Tasks\GetBookPretsTask.cs" />
     <Compile Include="Code\Services\Tasks\GetBookExemplariesTask.cs" />
     <Compile Include="Code\Services\Tasks\ImportBooksTask.cs" />

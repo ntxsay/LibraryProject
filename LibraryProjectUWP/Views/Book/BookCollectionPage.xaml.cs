@@ -2076,8 +2076,6 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    //var itemList = await DbServices.Collection.AllVMAsync();
-
                     NewEditCollectionUC userControl = new NewEditCollectionUC();
                     userControl.InitializeSideBar(Parameters.ParentLibrary.Id, this, viewModel, editMode, parentReferences);
 
@@ -2087,7 +2085,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
 
                     userControl.CancelModificationRequested += NewEditCollectionUC_Create_CancelModificationRequested;
-                    userControl.CreateItemRequested += NewEditCollectionUC_Create_CreateItemRequested;
+                    userControl.ExecuteTaskRequested += NewEditCollectionUC_ExecuteTaskRequested;
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
@@ -2104,91 +2102,33 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-        private async void NewEditCollectionUC_Create_CreateItemRequested(NewEditCollectionUC sender, ExecuteRequestedEventArgs e)
+
+        private void NewEditCollectionUC_ExecuteTaskRequested(NewEditCollectionUC sender, CollectionVM originalViewModel, OperationStateVM e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (sender._parameters != null)
+                if (e.IsSuccess)
                 {
-                    CollectionVM newViewModel = sender.ViewModelPage.ViewModel;
-
-                    var creationResult = await DbServices.Collection.CreateAsync(newViewModel, Parameters.ParentLibrary.Id);
-                    if (creationResult.IsSuccess)
+                    if (sender.ViewModelPage.ParentReferences != null)
                     {
-                        newViewModel.Id = creationResult.Id;
-                        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-
-                        if (sender.ViewModelPage.ParentReferences != null)
+                        if (sender.ViewModelPage.ParentReferences.ParentType == typeof(CollectionListUC))
                         {
-                            Parameters.ParentLibrary.Collections.Add(newViewModel);
-                            NewEditCollectionUC_Create_CancelModificationRequested(sender, e);
-                        }
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                        sender.ViewModelPage.ResultMessage = creationResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                        return;
+                            var item = uiServices.GetCollectionListUCSideBarByGuid(PivotRightSideBar, sender.ViewModelPage.ParentReferences.ParentGuid);
+                            if (item != null)
+                            {
+                                item.InitializeData(this);
+                                SelectItemSideBar(item);
+                            }
+                        }                        
                     }
                 }
 
-                sender.ViewModelPage.ViewModel = new CollectionVM();
+                this.RemoveItemToSideBar(sender);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-        private async void NewEditCollectionUC_UpdateItemRequested(NewEditCollectionUC sender, ExecuteRequestedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (sender._parameters != null)
-                {
-                    var updatedViewModel = sender.ViewModelPage.ViewModel;
 
-                    var updateResult = await DbServices.Collection.UpdateAsync(updatedViewModel);
-                    if (updateResult.IsSuccess)
-                    {
-                        sender._parameters.CurrentViewModel.Copy(updatedViewModel);
-                        sender.ViewModelPage.ResultMessageTitle = "Succès";
-                        sender.ViewModelPage.ResultMessage = updateResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-
-                        if (sender.ViewModelPage.ParentReferences != null)
-                        {
-
-                        }
-
-                        NewEditCollectionUC_Create_CancelModificationRequested(sender, e);
-                    }
-                    else
-                    {
-                        //Erreur
-                        sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                        sender.ViewModelPage.ResultMessage = updateResult.Message;
-                        sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                        sender.ViewModelPage.IsResultMessageOpen = true;
-                        return;
-                    }
-                }
-
-                sender.ViewModelPage.ViewModel = new CollectionVM();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
+                throw;
             }
         }
 
@@ -2197,8 +2137,6 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                sender.CancelModificationRequested -= NewEditCollectionUC_Create_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditCollectionUC_Create_CreateItemRequested;
 
                 this.RemoveItemToSideBar(sender);
             }

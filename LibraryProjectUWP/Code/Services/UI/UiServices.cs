@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.Views.Book;
+using LibraryProjectUWP.Views.Collection;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
@@ -70,6 +71,35 @@ namespace LibraryProjectUWP.Code.Services.UI
                 return null;
             }
         }
+
+        public CollectionListUC GetCollectionListUCSideBarByGuid(Pivot pivot, Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (pivot == null)
+                {
+                    return null;
+                }
+
+                if (pivot.Items.Count > 0)
+                {
+                    object itemPivot = pivot.Items.FirstOrDefault(f => f is CollectionListUC item && item.ViewModelPage.ItemGuid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as CollectionListUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
 
         public BookPretListUC GetBookPretListUCSideBarByGuid(Pivot pivot, Guid guid)
         {

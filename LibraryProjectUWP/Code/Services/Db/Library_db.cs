@@ -402,10 +402,10 @@ namespace LibraryProjectUWP.Code.Services.Db
                     if (isGuidCorrect == false) return null;
 
                     IList<CategorieLivreVM> categoriesList = await Categorie.MultipleVmAsync(model.Id);
-                    IOrderedEnumerable<CollectionVM> collectionList = (await Collection.MultipleVmInLibraryAsync(model.Id))?.OrderBy(o => o.Name);
+                    //IOrderedEnumerable<CollectionVM> collectionList = (await Collection.MultipleVmInLibraryAsync(model.Id))?.OrderBy(o => o.Name);
                     var countBooks = await Book.CountBooksInLibraryAsync(model.Id);
                     var countUnCategorizedBooks = await Categorie.CountUnCategorizedBooks(model.Id);
-                    var countNotInCollectionBooks = await Collection.CountUnCategorizedBooks(model.Id);
+                    //var countNotInCollectionBooks = await Collection.CountUnCategorizedBooks(model.Id);
 
                     var viewModel = new BibliothequeVM()
                     {
@@ -415,12 +415,14 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Description = model.Description,
                         Name = model.Name,
                         Guid = isGuidCorrect ? guid : Guid.Empty,
-                        Collections = collectionList != null && collectionList.Any() ? new ObservableCollection<CollectionVM>(collectionList) : new ObservableCollection<CollectionVM>(),
                         Categories = categoriesList != null && categoriesList.Any() ? new ObservableCollection<CategorieLivreVM>(categoriesList) : new ObservableCollection<CategorieLivreVM>(),
                         CountUnCategorizedBooks = countUnCategorizedBooks,
-                        CountNotInCollectionBooks = countNotInCollectionBooks,
                         CountBooks = countBooks,
                     };
+
+                    //Collections = collectionList != null && collectionList.Any() ? new ObservableCollection<CollectionVM>(collectionList) : new ObservableCollection<CollectionVM>(),
+                    //CountNotInCollectionBooks = countNotInCollectionBooks,
+
 
                     if (viewModel.Categories.Any())
                     {
