@@ -85,12 +85,23 @@
             </Style>
             <DataTemplate x:DataType="collectionVm:CollectionVM" x:Key="ItemAutoSuggestCollectionDataTemplate">
                 <ListViewItem ContextRequested="ListViewItem_ContextRequested">
-                    <TextBlock FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTipService.ToolTip="{x:Bind Description, Mode=OneWay}">
+                    <TextBlock FontWeight="Medium" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Run Text="{x:Bind Name, Mode=OneWay}"/>
                     <Run Text="("/><Run Text="{x:Bind BooksId.Count, Mode=OneWay}"/><Run Text=")"/>
                     </TextBlock>
+                    <ToolTipService.ToolTip>
+                        <ToolTip>
+                            <TextBlock MaxWidth="400" MaxHeight="500" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" IsTextSelectionEnabled="True">
+                                <Run Text="{x:Bind BooksId.Count, Mode=OneWay}" FontWeight="Medium" FontSize="16"/>
+                                <Run Text="livre(s)" FontWeight="Medium" FontSize="16"/>
+                                <LineBreak /><Run Text="{x:Bind Description, Mode=OneWay}" FontSize="14"/>
+                            </TextBlock>
+                        </ToolTip>
+                    </ToolTipService.ToolTip>
                     <ListViewItem.ContextFlyout>
                         <MenuFlyout Opened="MenuFlyout_Opened">
+                            <MenuFlyoutItem Tag="{x:Bind Name, Mode=OneWay}" Icon="View" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
+                            <MenuFlyoutSeparator />
                             <MenuFlyoutItem Tag="{x:Bind Name, Mode=OneWay}" Icon="Add" Command="{StaticResource AddBooksToCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
                             <MenuFlyoutItem Tag="{x:Bind Mode=OneWay}" Icon="Remove" Command="{StaticResource DecategorizeBooksFromCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
                             <MenuFlyoutSeparator />
@@ -101,11 +112,8 @@
                                             Command="{StaticResource DeleteItemXUiCommand}" CommandParameter="{x:Bind }"/>
                         </MenuFlyout>
                     </ListViewItem.ContextFlyout>
-
                 </ListViewItem>
-                
             </DataTemplate>
-
         </ResourceDictionary>
     </PivotItem.Resources>
     <PivotItem.Header>
@@ -123,7 +131,6 @@
     </PivotItem.Header>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -187,11 +194,15 @@
             </AutoSuggestBox.QueryIcon>
         </AutoSuggestBox>
         <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <StackPanel Orientation="Vertical" Spacing="4" Visibility="{x:Bind ViewModelPage.WorkerTextVisibility, Mode=OneWay}" Padding="0 10 0 0">
                 <ProgressRing IsActive="True" Height="40" Width="40"/>
                 <TextBlock x:Name="tbcStatus" TextAlignment="Center" Text="Recherche des collections en cours, veuillez patienter quelques instants." Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" TextWrapping="Wrap"/>
             </StackPanel>
-            <Grid Visibility="{x:Bind ViewModelPage.DataListVisibility, Mode=OneWay}" RowSpacing="12">
+            <Grid Grid.Row="1" Visibility="{x:Bind ViewModelPage.DataListVisibility, Mode=OneWay}" RowSpacing="12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -204,18 +215,16 @@
                         </TextBlock>
                     </ListViewItem>
                 </ListView>
-                <ScrollViewer Grid.Row="1">
-                    <ListView x:Name="MyListView"  ItemsSource="{x:Bind ViewModelPage.Collections, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
+                <ListView Grid.Row="1" x:Name="MyListView"  ItemsSource="{x:Bind ViewModelPage.Collections, Mode=OneWay}" ItemTemplate="{StaticResource ItemAutoSuggestCollectionDataTemplate}" 
                   SelectedItem="{x:Bind ViewModelPage.SelectedViewModel, Mode=TwoWay}" SelectionChanged="ListView_SelectionChanged" ScrollViewer.IsVerticalRailEnabled="True"
                   SelectionMode="Extended">
-                    </ListView>
-                </ScrollViewer>
+                </ListView>
             </Grid>
         </Grid>
-        <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="5" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
+        <MUIXC:InfoBar x:Name="resultInfoBar" Grid.Row="4" IsOpen="{x:Bind ViewModelPage.IsResultMessageOpen, Mode=TwoWay}" Title="{x:Bind ViewModelPage.ResultMessageTitle, Mode=OneWay}" 
                        IsClosable="True" Message="{x:Bind ViewModelPage.ResultMessage, Mode=OneWay}" Severity="{x:Bind ViewModelPage.ResultMessageSeverity, Mode=OneWay}" Margin="0 10 0 5">
         </MUIXC:InfoBar>
-        <Grid Grid.Row="6">
+        <Grid Grid.Row="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>

@@ -311,10 +311,10 @@
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
             <AppBarSeparator/>
-            <AppBarButton ToolTipService.ToolTip="Affiche les auteurs ou les contacts emprunteurs">
-                <AppBarButton.Icon>
+            <AppBarButton Icon="View" ToolTipService.ToolTip="Affiche les auteurs ou les contacts emprunteurs">
+                <!--<AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7BC;" FontSize="18"/>
-                </AppBarButton.Icon>
+                </AppBarButton.Icon>-->
                 <AppBarButton.Flyout>
                     <MenuFlyout>
                         <MenuFlyoutItem Text="Afficher les catégories" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayCategorieListXUiCmd}">
@@ -349,7 +349,7 @@
                             <MenuFlyoutSubItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
                             </MenuFlyoutSubItem.Icon>
-                            <MenuFlyoutItem Text="Nouvel enregistrement" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewBookXamlUICommand}">
+                            <MenuFlyoutItem Text="Nouveau livre" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NewBookXamlUICommand}">
                             </MenuFlyoutItem>
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Lien Amazon (Expérimentale)" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ImportBookFromWebSiteXamlUICommand}">

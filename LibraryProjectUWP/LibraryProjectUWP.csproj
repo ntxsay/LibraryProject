@@ -198,6 +198,7 @@
     <Compile Include="Code\Services\Tasks\ExportAllBooksTask.cs" />
     <Compile Include="Code\Services\Tasks\DeleteAllBooksTask.cs" />
     <Compile Include="Code\Services\Tasks\DeleteManyBooksTask.cs" />
+    <Compile Include="Code\Services\UI\CommonView.cs" />
     <Compile Include="Code\Services\UI\UiServices.cs" />
     <Compile Include="Code\Services\Web\htmlServices.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -357,6 +358,10 @@
     <Compile Include="Views\Library\LibraryCollectionPage.xaml.cs">
       <DependentUpon>LibraryCollectionPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Library\LibraryCollectionSubPage.xaml.cs">
+      <DependentUpon>LibraryCollectionSubPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Library\LibraryCollectionSubPage_ViewModelPage.cs" />
     <Compile Include="Views\Library\Manage\DeleteLibraryUC.xaml.cs">
       <DependentUpon>DeleteLibraryUC.xaml</DependentUpon>
     </Compile>
@@ -582,6 +587,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Library\LibraryCollectionSubPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Library\Manage\DeleteLibraryUC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -670,6 +679,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\UI\" />
+    <Folder Include="Views\Library\NewFolder1\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

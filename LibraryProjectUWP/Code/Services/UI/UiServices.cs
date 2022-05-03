@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Collection;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 namespace LibraryProjectUWP.Code.Services.UI
@@ -157,7 +159,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public GridViewItem GetSelectedGridViewItem(long idBook, Pivot pivot, string gridViewName = "GridViewItems", bool selectAfterFinded = false)
+        public GridViewItem GetSelectedGridViewItem<T>(long id, Pivot pivot, string gridViewName = "GridViewItems", bool selectAfterFinded = false) where T : class
         {
             try
             {
@@ -168,31 +170,67 @@ namespace LibraryProjectUWP.Code.Services.UI
 
                 foreach (var pivotItem in pivot.Items)
                 {
-                    if (pivotItem is IGrouping<string, LivreVM> group && group.Any(f => f.Id == idBook))
+                    if (typeof(T) == typeof(BibliothequeVM))
                     {
-                        if (pivot.SelectedItem != pivotItem)
+                        if (pivotItem is IGrouping<string, BibliothequeVM> group && group.Any(f => f.Id == id))
                         {
-                            pivot.SelectedItem = pivotItem;
+                            if (pivot.SelectedItem != pivotItem)
+                            {
+                                pivot.SelectedItem = pivotItem;
+                            }
+
+                            var _container = pivot.ContainerFromItem(pivotItem);
+                            var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container, gridViewName);
+                            if (gridView != null)
+                            {
+                                foreach (var gridViewItem in gridView.Items)
+                                {
+                                    if (gridViewItem is BibliothequeVM _viewModel && _viewModel.Id == id)
+                                    {
+                                        if (selectAfterFinded)
+                                        {
+                                            if (gridView.SelectedItem != gridViewItem)
+                                            {
+                                                gridView.SelectedItem = gridViewItem;
+                                            }
+                                        }
+
+                                        var _gridContainer = gridView.ContainerFromItem(gridViewItem);
+                                        return _gridContainer as GridViewItem;
+                                    }
+                                }
+                            }
                         }
 
-                        var _container = pivot.ContainerFromItem(pivotItem);
-                        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container, gridViewName);
-                        if (gridView != null)
+                    }
+                    else if (typeof(T) == typeof(LivreVM))
+                    {
+                        if (pivotItem is IGrouping<string, LivreVM> group && group.Any(f => f.Id == id))
                         {
-                            foreach (var gridViewItem in gridView.Items)
+                            if (pivot.SelectedItem != pivotItem)
                             {
-                                if (gridViewItem is LivreVM _viewModel && _viewModel.Id == idBook)
-                                {
-                                    if (selectAfterFinded)
-                                    {
-                                        if (gridView.SelectedItem != gridViewItem)
-                                        {
-                                            gridView.SelectedItem = gridViewItem;
-                                        }
-                                    }
+                                pivot.SelectedItem = pivotItem;
+                            }
 
-                                    var _gridContainer = gridView.ContainerFromItem(gridViewItem);
-                                    return _gridContainer as GridViewItem;
+                            var _container = pivot.ContainerFromItem(pivotItem);
+                            var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container, gridViewName);
+                            if (gridView != null)
+                            {
+                                foreach (var gridViewItem in gridView.Items)
+                                {
+                                    if (gridViewItem is LivreVM _viewModel && _viewModel.Id == id)
+                                    {
+                                        if (selectAfterFinded)
+                                        {
+                                            if (gridView.SelectedItem != gridViewItem)
+                                            {
+                                                gridView.SelectedItem = gridViewItem;
+                                            }
+                                        }
+
+                                        var _gridContainer = gridView.ContainerFromItem(gridViewItem);
+                                        return _gridContainer as GridViewItem;
+                                    }
                                 }
                             }
                         }
@@ -208,6 +246,43 @@ namespace LibraryProjectUWP.Code.Services.UI
                 return null;
             }
         }
+
+        public Image GetSelectedThumbnailImage<T>(long id, Pivot pivot, string gridViewName = "GridViewItems") where T : class
+        {
+            try
+            {
+                GridViewItem gridviewItem = GetSelectedGridViewItem<T>(id, pivot, gridViewName, false);
+                if (gridviewItem == null)
+                {
+                    return null;
+                }
+
+                var grid = VisualViewHelpers.FindVisualChild<Grid>(gridviewItem);
+                if (grid != null)
+                {
+                    if (grid.Children.FirstOrDefault(f => f is Viewbox _viewboxThumbnailContainer && _viewboxThumbnailContainer.Name == "ViewboxSimpleThumnailDatatemplate") is Viewbox viewboxThumbnailContainer)
+                    {
+                        if (viewboxThumbnailContainer.Child is Border border)
+                        {
+                            if (border.Child is Grid gridImageContainer)
+                            {
+                                Image image = gridImageContainer.Children.FirstOrDefault(f => f is Image _image) as Image;
+                                return image;
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
 
         public LivreVM SearchViewModelInCurrentGridView(long idBook, Pivot pivot, string gridViewName = "GridViewItems", bool selectAfterFinded = false)
         {
@@ -313,6 +388,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
+
         public GridView GetSelectedGridViewFromPivotTemplate(Pivot pivot, string gridViewName = "GridViewItems")
         {
             try
@@ -388,6 +464,42 @@ namespace LibraryProjectUWP.Code.Services.UI
                 }
 
                 return dataGrid;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+
+        private Image SelectImageFromContainer(DependencyObject _gridViewItemContainer)
+        {
+            try
+            {
+                if (_gridViewItemContainer == null)
+                {
+                    return null;
+                }
+
+                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
+                if (grid != null)
+                {
+                    if (grid.Children.FirstOrDefault(f => f is Viewbox _viewboxThumbnailContainer && _viewboxThumbnailContainer.Name == "ViewboxSimpleThumnailDatatemplate") is Viewbox viewboxThumbnailContainer)
+                    {
+                        if (viewboxThumbnailContainer.Child is Border border)
+                        {
+                            if (border.Child is Grid gridImageContainer)
+                            {
+                                Image image = gridImageContainer.Children.FirstOrDefault(f => f is Image _image) as Image;
+                                return image;
+                            }
+                        }
+                    }
+                }
+
+                return null;
             }
             catch (Exception ex)
             {

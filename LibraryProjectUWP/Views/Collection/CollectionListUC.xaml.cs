@@ -554,9 +554,24 @@ namespace LibraryProjectUWP.Views.Collection
             {
                 if (sender is MenuFlyout menuFlyout)
                 {
+                    if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItemOpenSelectedBooks)
+                    {
+                        if (ViewModelPage.SelectedViewModels != null && ViewModelPage.SelectedViewModels.Count > 0)
+                        {
+                            flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
+                            flyoutItemOpenSelectedBooks.IsEnabled = true;
+                        }
+                        else
+                        {
+                            flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
+                            flyoutItemOpenSelectedBooks.IsEnabled = false;
+                        }
+                    }
+                    
+
                     if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
                     {
-                        if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
+                        if (menuFlyout.Items[2] is MenuFlyoutItem flyoutItem)
                         {
                             flyoutItem.Text = $"Ajouter {ParentPage.ViewModelPage.SelectedItems.Count} livre(s) à « {flyoutItem.Tag} »";
                             flyoutItem.IsEnabled = true;
@@ -564,14 +579,14 @@ namespace LibraryProjectUWP.Views.Collection
                     }
                     else
                     {
-                        if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
+                        if (menuFlyout.Items[2] is MenuFlyoutItem flyoutItem)
                         {
                             flyoutItem.Text = $"Aucun livre à ajouter à « {flyoutItem.Tag} »";
                             flyoutItem.IsEnabled = false;
                         }
                     }
 
-                    if (menuFlyout.Items[1] is MenuFlyoutItem flyoutItemDecategorize)
+                    if (menuFlyout.Items[3] is MenuFlyoutItem flyoutItemDecategorize)
                     {
                         if (flyoutItemDecategorize.Tag is CollectionVM collectionVM)
                         {
