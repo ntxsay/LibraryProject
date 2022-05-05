@@ -366,7 +366,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     orderedBy = (byte)BookCollectionSubView.ViewModelPage.OrderedBy;
                     sortedBy = (byte)BookCollectionSubView.ViewModelPage.SortedBy;
                 }
-                else if (typeof(T).IsAssignableFrom(typeof(Tlibrary)) && LibraryCollectionSubView != null)
+                else if (typeof(T).IsAssignableFrom(typeof(Tlibrary)) || typeof(T).IsAssignableFrom(typeof(BibliothequeVM)) && LibraryCollectionSubView != null)
                 {
                     orderedBy = (byte)LibraryCollectionSubView.ViewModelPage.OrderedBy;
                     sortedBy = (byte)LibraryCollectionSubView.ViewModelPage.SortedBy;
@@ -403,7 +403,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     orderModelList = Enumerable.Empty<T>();
                 }
 
-                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage.Count();
+                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage?.Count() ?? 0;
 
                 return new CommonGroupItemVM<T>()
                 {

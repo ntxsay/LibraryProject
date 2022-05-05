@@ -1,8 +1,11 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Code.Services.UI;
 using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
@@ -11,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -33,6 +37,8 @@ namespace LibraryProjectUWP.Views.Library
     public sealed partial class LibraryCollectionSubPage : Page
     {
         public LibraryCollectionPageVM ViewModelPage { get; set; } = new LibraryCollectionPageVM();
+        public CommonView CommonView { get; private set; }
+        public BookCollectionPage ParentPage { get; private set; }
         EsLibrary esLibrary = new EsLibrary();
         UiServices uiServices = new UiServices();
         public MainPage MainPage { get; private set; }
@@ -41,6 +47,16 @@ namespace LibraryProjectUWP.Views.Library
         public LibraryCollectionSubPage()
         {
             this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            if (e.Parameter is BookCollectionPage parameters)
+            {
+                ParentPage = parameters;
+                CommonView = new CommonView(ParentPage, this);
+            }
         }
 
         #region Loading
@@ -77,7 +93,7 @@ namespace LibraryProjectUWP.Views.Library
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                //InitializeLoadingLibrariesWorker();
+                InitializeData(firstLoad);
             }
             catch (Exception ex)
             {
@@ -464,6 +480,25 @@ namespace LibraryProjectUWP.Views.Library
                 return;
             }
         }
+
+        private int GetSelectedPage
+        {
+            get
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                try
+                {
+                    var selectedPage = ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
+                    return selectedPage;
+                }
+                catch (Exception ex)
+                {
+                    Logs.Log(ex, m);
+                    return 1;
+                }
+            }
+        }
+
         #endregion
 
         #region Loading BacKGroundWorker
@@ -591,7 +626,7 @@ namespace LibraryProjectUWP.Views.Library
                         if (busyLoader.BtnCancel.Visibility != Visibility.Visible)
                             busyLoader.BtnCancel.Visibility = Visibility.Visible;
 
-                        ViewModelPage.ViewModelList.Add(bibliothequeVM);
+                        //ViewModelPage.ViewModelList.Add(bibliothequeVM);
                     }
                 }
             }
@@ -636,10 +671,10 @@ namespace LibraryProjectUWP.Views.Library
                     Interval = new TimeSpan(0, 0, 0, 1),
                 };
 
-                dispatcherTimer.Tick += (t, f) =>
+                dispatcherTimer.Tick += async (t, f) =>
                 {
                     this.MainPage.CloseBusyLoader();
-                    this.GridViewMode(true);
+                    await this.GridViewMode(true);
                     dispatcherTimer.Stop();
                 };
 
@@ -656,6 +691,130 @@ namespace LibraryProjectUWP.Views.Library
             }
 
         }
+
+        public void InitializeData(bool firstLoad)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ParentPage.Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                {
+                    ProgessText = $"Mise à jour du catalogue des bibliothèques en cours...",
+                });
+
+                using (BackgroundWorker worker = new BackgroundWorker()
+                {
+                    WorkerSupportsCancellation = false,
+                    WorkerReportsProgress = false,
+                })
+                {
+                    worker.DoWork += (s, e) =>
+                    {
+                        switch (ParentPage.ViewModelPage.DataViewMode)
+                        {
+                            case Code.DataViewModeEnum.DataGridView:
+                                using (Task task = Task.Run(() => this.DataGridViewMode(firstLoad)))
+                                {
+                                    task.Wait();
+                                }
+                                break;
+                            case Code.DataViewModeEnum.GridView:
+                                using (Task task = Task.Run(() => this.GridViewMode(firstLoad)))
+                                {
+                                    task.Wait();
+                                }
+                                break;
+                            default:
+                                using (Task task = Task.Run(() => this.GridViewMode(firstLoad)))
+                                {
+                                    task.Wait();
+                                }
+                                break;
+                        }
+                    };
+
+                    worker.RunWorkerCompleted += (s, e) =>
+                    {
+                        DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 3),
+                        };
+
+                        dispatcherTimer.Tick += (t, f) =>
+                        {
+                            ParentPage.Parameters.MainPage.CloseBusyLoader();
+                            dispatcherTimer.Stop();
+                            dispatcherTimer = null;
+                        };
+
+                        dispatcherTimer.Start();
+                    };
+
+                    worker.RunWorkerAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
+        public async Task GridViewMode(bool firstLoad)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    async () =>
+                    {
+                        this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
+
+                        if (ParentPage.ViewModelPage.DataViewMode != Code.DataViewModeEnum.GridView)
+                        {
+                            ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
+                        }
+
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
+                        this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                        this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+                    });
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public async Task DataGridViewMode(bool firstLoad)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    async () =>
+                    {
+                        this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
+
+                        if (ParentPage.ViewModelPage.DataViewMode != Code.DataViewModeEnum.DataGridView)
+                        {
+                            ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
+                        }
+
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
+                        this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                        this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+                    });
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #endregion
 
     }
