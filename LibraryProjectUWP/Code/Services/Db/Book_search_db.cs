@@ -453,7 +453,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Search
-            private static async Task<IList<Tbook>> SearchBooksInMainTitle(ResearchBookVM parameters, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInMainTitle(ResearchBookVM parameters, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -500,7 +500,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            private static async Task<IList<Tbook>> SearchBooksInOtherTitles(ResearchBookVM parameters, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInOtherTitles(ResearchBookVM parameters, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -558,7 +558,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            private static async Task<IList<Tbook>> SearchBooksInContacts(ResearchBookVM parameters, ContactRole contactRole, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInContacts(ResearchBookVM parameters, ContactRole contactRole, CancellationToken cancellationToken = default)
             {
                 try
                 {

@@ -63,8 +63,8 @@ namespace LibraryProjectUWP
                 {
                     PrincipalNaviguation.SelectedItem = first;
                 }
-                
-                LibraryCollectionNavigationAsync();
+
+                LibrariesBooksCollectionNavigationAsync();
             }
             catch (Exception ex)
             {
@@ -352,6 +352,25 @@ namespace LibraryProjectUWP
             {
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        internal bool LibrariesBooksCollectionNavigationAsync(BibliothequeVM library = null)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.ChangeAppTitle(ViewModelPage.MainTitleBar);
+                return NavigateToView("Book.BookCollectionPage", new LibraryBookNavigationDriverVM()
+                {
+                    ParentLibrary = library,
+                    MainPage = this
+                });
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return false;
             }
         }
 

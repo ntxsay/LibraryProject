@@ -78,7 +78,47 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 }
             }
 
-            
+            private BookGroupVM.GroupBy _GroupedBy = BookGroupVM.GroupBy.None;
+            public BookGroupVM.GroupBy GroupedBy
+            {
+                get => this._GroupedBy;
+                set
+                {
+                    if (this._GroupedBy != value)
+                    {
+                        this._GroupedBy = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
+            private BookGroupVM.SortBy _SortedBy = BookGroupVM.SortBy.Name;
+            public BookGroupVM.SortBy SortedBy
+            {
+                get => this._SortedBy;
+                set
+                {
+                    if (this._SortedBy != value)
+                    {
+                        this._SortedBy = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
+            private BookGroupVM.OrderBy _OrderedBy = BookGroupVM.OrderBy.Croissant;
+            public BookGroupVM.OrderBy OrderedBy
+            {
+                get => this._OrderedBy;
+                set
+                {
+                    if (this._OrderedBy != value)
+                    {
+                        this._OrderedBy = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
 
 
             private int _MaxItemsPerPage = 100;
@@ -132,6 +172,20 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     if (_SearchedViewModel != value)
                     {
                         this._SearchedViewModel = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
+            private int _NbItems;
+            public int NbItems
+            {
+                get => this._NbItems;
+                set
+                {
+                    if (_NbItems != value)
+                    {
+                        this._NbItems = value;
                         this.OnPropertyChanged();
                     }
                 }

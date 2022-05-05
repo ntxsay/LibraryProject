@@ -29,6 +29,8 @@ using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.Code.Services.UI;
 using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.ViewModels.Collection;
+using LibraryProjectUWP.Views.Library;
+using LibraryProjectUWP.ViewModels;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -40,7 +42,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
         public BookCollectionPageVM ViewModelPage { get; set; } = new BookCollectionPageVM();
-        public LibraryToBookNavigationDriverVM Parameters { get; private set; }
+        public LibraryBookNavigationDriverVM Parameters { get; private set; }
         readonly EsBook esBook = new EsBook();
         readonly UiServices uiServices = new UiServices();
 
@@ -56,7 +58,7 @@ namespace LibraryProjectUWP.Views.Book
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is LibraryToBookNavigationDriverVM parameters)
+            if (e.Parameter is LibraryBookNavigationDriverVM parameters)
             {
                 Parameters = parameters;
                 ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
@@ -70,10 +72,19 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                EsLibrary esLibrary = new EsLibrary(); 
-                ViewModelPage.BackgroundImagePath = await esLibrary.GetBookCollectionBackgroundImagePathAsync(Parameters.ParentLibrary.Guid);
-                await InitializeBackgroundImagesync();
-                OpenBookCollection();
+                if (Parameters.ParentLibrary == null)
+                {
+                    OpenLibraryCollection();
+                }
+                else
+                {
+                    OpenBookCollection(null);
+                }
+#warning A supprimer
+                //EsLibrary esLibrary = new EsLibrary();
+                //ViewModelPage.BackgroundImagePath = await esLibrary.GetBookCollectionBackgroundImagePathAsync(Parameters.ParentLibrary.Guid);
+                //await InitializeBackgroundImagesync();
+                //
             }
             catch (Exception ex)
             {
@@ -100,6 +111,53 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        public void OpenBookCollection(BibliothequeVM viewModel)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                Parameters.ParentLibrary = viewModel;
+                this.NavigateToView(typeof(BookCollectionSubPage), this);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public async void OpenBookCollection(long idLibrary)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                BibliothequeVM viewModel = await DbServices.Library.SingleVMAsync(idLibrary);
+                Parameters.ParentLibrary = viewModel;
+                this.NavigateToView(typeof(BookCollectionSubPage), this);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void OpenLibraryCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.NavigateToView(typeof(LibraryCollectionSubPage), this);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
 
         private void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -882,7 +940,8 @@ namespace LibraryProjectUWP.Views.Book
                 sender.ImportDataRequested -= ImportBookFromFileUC_ImportDataRequested;
 
                 this.RemoveItemToSideBar(sender);
-                this.OpenBookCollection();
+#warning A implémenter urgent
+                this.OpenBookCollection(1);
             }
             catch (Exception ex)
             {
@@ -964,7 +1023,8 @@ namespace LibraryProjectUWP.Views.Book
                 sender.ImportDataRequested -= ImportBookFromExcelUC_ImportDataRequested;
 
                 this.RemoveItemToSideBar(sender);
-                this.OpenBookCollection();
+#warning A implémenter urgent
+                this.OpenBookCollection(1);
             }
             catch (Exception ex)
             {
@@ -977,7 +1037,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                this.OpenBookCollection();
+                this.OpenBookCollection(sender.IdLibrary);
             }
             catch (Exception ex)
             {

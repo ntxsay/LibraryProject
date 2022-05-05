@@ -42,7 +42,9 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         public BookCollectionSubPageVM ViewModelPage { get; set; } = new BookCollectionSubPageVM();
         readonly EsBook esBook = new EsBook();
         readonly UiServices uiServices = new UiServices();
+        public CommonView CommonView { get; private set; }
         public BookCollectionPage ParentPage { get; private set; }
+        public long IdLibrary { get; set; }
         public BookCollectionSubPage()
         {
             this.InitializeComponent();
@@ -54,7 +56,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             if (e.Parameter is BookCollectionPage parameters)
             {
                 ParentPage = parameters;
-                //InitializeData(true);
+                CommonView = new CommonView(ParentPage, this);
             }
         }
 
@@ -179,7 +181,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
                         }
 
-                        await RefreshItemsGrouping(true, this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });

@@ -381,6 +381,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         }
 
 
+        [Obsolete("Implémenté dans le commonview")]
         public async Task RefreshItemsGrouping(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();

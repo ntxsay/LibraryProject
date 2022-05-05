@@ -1,9 +1,12 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Book.SubViews;
 using LibraryProjectUWP.Views.Library;
@@ -23,6 +26,7 @@ namespace LibraryProjectUWP.Code.Services.UI
         readonly BookCollectionPage ParentPage;
         readonly BookCollectionSubPage BookCollectionSubView;
         readonly LibraryCollectionSubPage LibraryCollectionSubView;
+        readonly EsBook esBook = new EsBook();
         public CommonView(BookCollectionPage parentPage, BookCollectionSubPage bookCollectionSubView)
         {
             ParentPage = parentPage;
@@ -35,64 +39,43 @@ namespace LibraryProjectUWP.Code.Services.UI
             LibraryCollectionSubView = libraryCollectionSubView;
         }
 
-        public async Task GroupItemsByNone<T>(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null) where T : class
+        public async Task GroupItemsByNone<T>(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null) where T : class
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage, searchParams);
+                var item = await this.GenerateBookGroupItemAsync<T>(goToPage, searchParams);
                 if (item == null)
                 {
-                    if (LibraryCollectionSubView != null)
-                    {
-                        if (LibraryCollectionSubView.ViewModelPage.PagesList != null && LibraryCollectionSubView.ViewModelPage.PagesList.Any())
-                            LibraryCollectionSubView.ViewModelPage.PagesList.Clear();
-                        if (LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel != null && LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection != null
-                            && LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
-                        {
-                            LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                        }
-                    }
-
-                    if (BookCollectionSubView != null)
-                    {
-                        if (BookCollectionSubView.ViewModelPage.PagesList != null && BookCollectionSubView.ViewModelPage.PagesList.Any())
-                            BookCollectionSubView.ViewModelPage.PagesList.Clear();
-                        if (BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel != null && BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection != null
-                            && BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
-                        {
-                            BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                        }
-                    }
+                    ClearPageList();
                     return;
                 }
 
                 if (typeof(T).IsAssignableFrom(typeof(BibliothequeVM)) && LibraryCollectionSubView != null)
                 {
-                    IEnumerable<IGrouping<string, BibliothequeVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
+                    IEnumerable<IGrouping<string, BibliothequeVM>> GroupingItems = item.ViewModelList.Select(q => (BibliothequeVM)(object)q).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
                     if (GroupingItems != null && GroupingItems.Any())
                     {
-                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                        ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
+                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
+                        LibraryCollectionSubView.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.None;
                     }
 
-                    if (resetPage || BookCollectionSubView.ViewModelPage.PagesList == null || !BookCollectionSubView.ViewModelPage.PagesList.Any())
+                    if (resetPage || LibraryCollectionSubView.ViewModelPage.PagesList == null || !LibraryCollectionSubView.ViewModelPage.PagesList.Any())
                     {
                         var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
-                        BookCollectionSubView.ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
+                        LibraryCollectionSubView.ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
                     }
 
-                    item = null;
-                    GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
+                    GroupingItems = Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(LivreVM)) && BookCollectionSubView != null)
                 {
-                    IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
+                    IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Select(q => (LivreVM)(object)q).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                     if (GroupingItems != null && GroupingItems.Any())
                     {
                         BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                         BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                        ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
+                        BookCollectionSubView.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
                     }
 
                     if (resetPage || BookCollectionSubView.ViewModelPage.PagesList == null || !BookCollectionSubView.ViewModelPage.PagesList.Any())
@@ -101,26 +84,10 @@ namespace LibraryProjectUWP.Code.Services.UI
                         BookCollectionSubView.ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
                     }
 
-                    item = null;
                     GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
                 }
 
-                //IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
-                //if (GroupingItems != null && GroupingItems.Any())
-                //{
-                //    this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                //    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                //    ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
-                //}
-
-                //if (resetPage || ViewModelPage.PagesList == null || !ViewModelPage.PagesList.Any())
-                //{
-                //    var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
-                //    ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
-                //}
-
-                //item = null;
-                //GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
+                item = null;
             }
             catch (Exception ex)
             {
@@ -130,39 +97,55 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task GroupItemsByAlphabeticAsync(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public async Task GroupItemsByAlphabeticAsync<T>(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null) where T : class
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage, searchParams);
+                var item = await this.GenerateBookGroupItemAsync<T>(goToPage, searchParams);
                 if (item == null)
                 {
-                    if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
-                        ViewModelPage.PagesList.Clear();
-                    if (this.ViewModelPage.GroupedRelatedViewModel != null && this.ViewModelPage.GroupedRelatedViewModel.Collection != null
-                        && this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
-                    {
-                        this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                    }
+                    ClearPageList();
                     return;
                 }
 
-                IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
+                if (typeof(T).IsAssignableFrom(typeof(BibliothequeVM)) && LibraryCollectionSubView != null)
                 {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
-                }
+                    IEnumerable<IGrouping<string, BibliothequeVM>> GroupingItems = item.ViewModelList.Select(q => (BibliothequeVM)(object)q).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.Name?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                    if (GroupingItems != null && GroupingItems.Any())
+                    {
+                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
+                        LibraryCollectionSubView.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.Letter;
+                    }
 
-                if (resetPage || ViewModelPage.PagesList == null || !ViewModelPage.PagesList.Any())
+                    if (resetPage || LibraryCollectionSubView.ViewModelPage.PagesList == null || !LibraryCollectionSubView.ViewModelPage.PagesList.Any())
+                    {
+                        var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
+                        LibraryCollectionSubView.ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
+                    }
+
+                    GroupingItems = Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
+                }
+                else if (typeof(T).IsAssignableFrom(typeof(LivreVM)) && BookCollectionSubView != null)
                 {
-                    var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
-                    ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
+                    IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Select(q => (LivreVM)(object)q).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                    if (GroupingItems != null && GroupingItems.Any())
+                    {
+                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                        BookCollectionSubView.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
+                    }
+
+                    if (resetPage || BookCollectionSubView.ViewModelPage.PagesList == null || !BookCollectionSubView.ViewModelPage.PagesList.Any())
+                    {
+                        var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
+                        BookCollectionSubView.ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
+                    }
+
+                    GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
                 }
 
                 item = null;
-                GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
             }
             catch (Exception ex)
             {
@@ -172,38 +155,55 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task GroupByCreationYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public async Task GroupByCreationYear<T>(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null) where T : class
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage, searchParams);
+                var item = await this.GenerateBookGroupItemAsync<T>(goToPage, searchParams);
                 if (item == null)
                 {
-                    if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
-                        ViewModelPage.PagesList.Clear();
-                    if (this.ViewModelPage.GroupedRelatedViewModel != null && this.ViewModelPage.GroupedRelatedViewModel.Collection != null
-                        && this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
-                    {
-                        this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                    }
+                    ClearPageList();
                     return;
                 }
 
-                IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
+                if (typeof(T).IsAssignableFrom(typeof(BibliothequeVM)) && LibraryCollectionSubView != null)
                 {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
-                }
+                    IEnumerable<IGrouping<string, BibliothequeVM>> GroupingItems = item.ViewModelList.Select(q => (BibliothequeVM)(object)q).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                    if (GroupingItems != null && GroupingItems.Any())
+                    {
+                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
+                        LibraryCollectionSubView.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
+                    }
 
-                if (resetPage || ViewModelPage.PagesList == null || !ViewModelPage.PagesList.Any())
+                    if (resetPage || LibraryCollectionSubView.ViewModelPage.PagesList == null || !LibraryCollectionSubView.ViewModelPage.PagesList.Any())
+                    {
+                        var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
+                        LibraryCollectionSubView.ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
+                    }
+
+                    GroupingItems = Enumerable.Empty<IGrouping<string, BibliothequeVM>>();
+                }
+                else if (typeof(T).IsAssignableFrom(typeof(LivreVM)) && BookCollectionSubView != null)
                 {
-                    var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
-                    ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
+                    IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Select(q => (LivreVM)(object)q).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
+                    if (GroupingItems != null && GroupingItems.Any())
+                    {
+                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                        BookCollectionSubView.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
+                    }
+
+                    if (resetPage || BookCollectionSubView.ViewModelPage.PagesList == null || !BookCollectionSubView.ViewModelPage.PagesList.Any())
+                    {
+                        var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
+                        BookCollectionSubView.ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
+                    }
+
+                    GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
                 }
 
                 item = null;
-                GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
             }
             catch (Exception ex)
             {
@@ -213,38 +213,37 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task GroupByParutionYear(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public async Task GroupByParutionYear<T>(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null) where T : class
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage, searchParams);
+                var item = await this.GenerateBookGroupItemAsync<T>(goToPage, searchParams);
                 if (item == null)
                 {
-                    if (ViewModelPage.PagesList != null && ViewModelPage.PagesList.Any())
-                        ViewModelPage.PagesList.Clear();
-                    if (this.ViewModelPage.GroupedRelatedViewModel != null && this.ViewModelPage.GroupedRelatedViewModel.Collection != null
-                        && this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
-                    {
-                        this.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                    }
+                    ClearPageList();
                     return;
                 }
 
-                IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Publication.YearParution ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
+                if (typeof(T).IsAssignableFrom(typeof(LivreVM)) && BookCollectionSubView != null)
                 {
-                    this.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
-                    ParentPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.ParutionYear;
-                }
+                    IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Select(q => (LivreVM)(object)q).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.Publication.YearParution ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
+                    if (GroupingItems != null && GroupingItems.Any())
+                    {
+                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
+                        BookCollectionSubView.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
+                    }
 
-                if (resetPage || ViewModelPage.PagesList == null || !ViewModelPage.PagesList.Any())
-                {
-                    var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
-                    ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
+                    if (resetPage || BookCollectionSubView.ViewModelPage.PagesList == null || !BookCollectionSubView.ViewModelPage.PagesList.Any())
+                    {
+                        var pagesList = DbServices.Book.InitializePages(item.CountItems, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
+                        BookCollectionSubView.ViewModelPage.PagesList = new ObservableCollection<PageSystemVM>(pagesList);
+                    }
+
+                    GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
                 }
 
                 item = null;
-                GroupingItems = Enumerable.Empty<IGrouping<string, LivreVM>>();
             }
             catch (Exception ex)
             {
@@ -254,18 +253,18 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task<BookGroupItemVM> GenerateBookGroupItemAsync(bool reloadFromDb = true, int goToPage = 1, ResearchBookVM searchParams = null)
+        public async Task<CommonGroupItemVM<T>> GenerateBookGroupItemAsync<T>(int goToPage = 1, ResearchBookVM searchParams = null) where T : class
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (searchParams != null)
                 {
-                    return await this.GenerateResearchBookGroupItemAsync(searchParams, goToPage);
+                    return await this.GenerateResearchBookGroupItemAsync<T>(searchParams, goToPage);
                 }
                 else
                 {
-                    return await this.GenerateBookGroupItemAsync(reloadFromDb, goToPage);
+                    return await this.GenerateBookGroupItemAsync<T>(goToPage);
                 }
             }
             catch (Exception ex)
@@ -275,90 +274,68 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        private async Task<BookGroupItemVM> GenerateResearchBookGroupItemAsync(ResearchBookVM searchParams, int goToPage = 1)
+        private async Task<CommonGroupItemVM<T>> GenerateResearchBookGroupItemAsync<T>(ResearchBookVM searchParams, int goToPage = 1) where T : class
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                int countItems;
-                IEnumerable<LivreVM> itemsPage = null;
-                var searchedBooks = await DbServices.Book.SearchBooksAsync(searchParams);
+                int countItems = 0;
+                IEnumerable<T> itemsPage = null;
+                var searchedBooks = await DbServices.Library.SearchAsync<T>(searchParams);
                 if (searchedBooks == null || !searchedBooks.Any())
                 {
                     ParentPage.ViewModelPage.NbElementDisplayed = 0;
                     return null;
                 }
 
-                var orderModelList = DbServices.Book.OrderBooks(searchedBooks, ParentPage.ViewModelPage.OrderedBy, ParentPage.ViewModelPage.SortedBy);
+                byte orderedBy = 0;
+                byte sortedBy = 0;
+
+                if (typeof(T).IsAssignableFrom(typeof(Tlibrary)) && LibraryCollectionSubView != null)
+                {
+                    orderedBy = (byte)LibraryCollectionSubView.ViewModelPage.OrderedBy;
+                    sortedBy = (byte)LibraryCollectionSubView.ViewModelPage.SortedBy;
+                }
+                else if (typeof(T).IsAssignableFrom(typeof(Tbook)) && BookCollectionSubView != null)
+                {
+                    orderedBy = (byte)BookCollectionSubView.ViewModelPage.OrderedBy;
+                    sortedBy = (byte)BookCollectionSubView.ViewModelPage.SortedBy;
+                }
+
+                var orderModelList = DbServices.Library.OrderLibraries(searchedBooks, orderedBy, sortedBy);
                 if (orderModelList == null || !orderModelList.Any())
                 {
                     ParentPage.ViewModelPage.NbElementDisplayed = 0;
                     return null;
                 }
 
-                var filterViewModelList = await DbServices.Book.FilterBooksAsync(orderModelList, ParentPage.ViewModelPage.SelectedCollections?.Select(s => s.Id),
+                if (typeof(T).IsAssignableFrom(typeof(Tbook)))
+                {
+                    var filterViewModelList = await DbServices.Book.FilterBooksAsync(orderModelList.Select(s => (Tbook)(object)s), ParentPage.ViewModelPage.SelectedCollections?.Select(s => s.Id),
                                                 ParentPage.ViewModelPage.DisplayUnCategorizedBooks, ParentPage.ViewModelPage.SelectedSCategories);
-                if (filterViewModelList == null || !filterViewModelList.Any())
-                {
-                    ParentPage.ViewModelPage.NbElementDisplayed = 0;
-                    return null;
-                }
-
-                countItems = filterViewModelList.Count();
-                itemsPage = DbServices.Book.GetPaginatedItemsVm(filterViewModelList, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
-                filterViewModelList = Enumerable.Empty<Tbook>();
-
-                itemsPage = await this.CompleteBooksInfoAsync(itemsPage);
-                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage.Count();
-
-                return new BookGroupItemVM()
-                {
-                    CountItems = countItems,
-                    ViewModelList = itemsPage,
-                };
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return null;
-            }
-        }
-
-        private async Task<BookGroupItemVM> GenerateBookGroupItemAsync(bool reloadFromDb = true, int goToPage = 1)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                int countItems;
-                IEnumerable<LivreVM> itemsPage = null;
-                if (reloadFromDb || this.ViewModelPage.GroupedRelatedViewModel.Collection == null || !this.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
-                {
-                    var filteredViewModelList = await DbServices.Book.FilterBooksAsync(ParentPage.Parameters.ParentLibrary.Id, ParentPage.ViewModelPage.SelectedCollections?.Select(s => s.Id),
-                                                ParentPage.ViewModelPage.DisplayUnCategorizedBooks, ParentPage.ViewModelPage.SelectedSCategories, ParentPage.ViewModelPage.OrderedBy, ParentPage.ViewModelPage.SortedBy);
-                    if (filteredViewModelList == null || !filteredViewModelList.Any())
+                    if (filterViewModelList == null || !filterViewModelList.Any())
                     {
                         ParentPage.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
-                    countItems = filteredViewModelList.Count();
-                    itemsPage = DbServices.Book.GetPaginatedItemsVm(filteredViewModelList, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
-                    filteredViewModelList = Enumerable.Empty<Tbook>();
+                    countItems = filterViewModelList.Count();
+                    var results = DbServices.Book.GetPaginatedItemsVm(filterViewModelList, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
+                    results = await this.CompleteBooksInfoAsync(results);
+                    itemsPage = results.Select(s => (T)(object)s);
+                    filterViewModelList = Enumerable.Empty<Tbook>();
+
                 }
-                else
+                else if (typeof(T).IsAssignableFrom(typeof(Tlibrary)))
                 {
-                    List<LivreVM> localViewModelList = this.ViewModelPage.GroupedRelatedViewModel.Collection.SelectMany(s => s.ToList()).Select(q => q).ToList();
-                    var orderedLocalViewModelList = this.OrderItems(localViewModelList, ParentPage.ViewModelPage.OrderedBy, ParentPage.ViewModelPage.SortedBy);
-                    itemsPage = DbServices.Book.GetPaginatedItems(orderedLocalViewModelList, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
-                    countItems = (int)await DbServices.Book.CountBooksInLibraryAsync(ParentPage.Parameters.ParentLibrary.Id);
-                    localViewModelList.Clear();
-                    orderedLocalViewModelList = Enumerable.Empty<LivreVM>();
+                    countItems = orderModelList.Count();
+                    itemsPage = DbServices.Library.GetPaginatedItemsVm(orderModelList.Select(s => (Tlibrary)(object)s), ParentPage.ViewModelPage.MaxItemsPerPage, goToPage).Select(s => (T)(object)s);
+                    orderModelList = Enumerable.Empty<T>();
                 }
 
-                itemsPage = await this.CompleteBooksInfoAsync(itemsPage);
                 ParentPage.ViewModelPage.NbElementDisplayed = itemsPage.Count();
 
-                return new BookGroupItemVM()
+                return new CommonGroupItemVM<T>()
                 {
                     CountItems = countItems,
                     ViewModelList = itemsPage,
@@ -371,45 +348,73 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        private IEnumerable<LivreVM> OrderItems(IEnumerable<LivreVM> Collection, BookGroupVM.OrderBy OrderBy = BookGroupVM.OrderBy.Croissant, BookGroupVM.SortBy SortBy = BookGroupVM.SortBy.Name)
+        private async Task<CommonGroupItemVM<T>> GenerateBookGroupItemAsync<T>(int goToPage = 1) where T : class
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (Collection == null || !Collection.Any())
+                int countItems = 0;
+                IEnumerable<T> itemsPage = null;
+
+                long? idLibrary = null;
+                byte orderedBy = 0;
+                byte sortedBy = 0;
+
+                if (typeof(T).IsAssignableFrom(typeof(Tbook)) || typeof(T).IsAssignableFrom(typeof(LivreVM)) && BookCollectionSubView != null)
                 {
+                    idLibrary = BookCollectionSubView.IdLibrary;
+                    orderedBy = (byte)BookCollectionSubView.ViewModelPage.OrderedBy;
+                    sortedBy = (byte)BookCollectionSubView.ViewModelPage.SortedBy;
+                }
+                else if (typeof(T).IsAssignableFrom(typeof(Tlibrary)) && LibraryCollectionSubView != null)
+                {
+                    orderedBy = (byte)LibraryCollectionSubView.ViewModelPage.OrderedBy;
+                    sortedBy = (byte)LibraryCollectionSubView.ViewModelPage.SortedBy;
+                }
+
+                var orderModelList = await DbServices.Library.OrderLibrariesAsync<T>(orderedBy, sortedBy);
+                if (orderModelList == null || !orderModelList.Any())
+                {
+                    ParentPage.ViewModelPage.NbElementDisplayed = 0;
                     return null;
                 }
 
-                if (SortBy == BookGroupVM.SortBy.Name)
+                if (typeof(T).IsAssignableFrom(typeof(Tbook)))
                 {
-                    if (OrderBy == BookGroupVM.OrderBy.Croissant)
+                    var filterViewModelList = await DbServices.Book.FilterBooksAsync(orderModelList.Select(s => (Tbook)(object)s), ParentPage.ViewModelPage.SelectedCollections?.Select(s => s.Id),
+                                                ParentPage.ViewModelPage.DisplayUnCategorizedBooks, ParentPage.ViewModelPage.SelectedSCategories);
+                    if (filterViewModelList == null || !filterViewModelList.Any())
                     {
-                        return Collection.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.MainTitle);
+                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        return null;
                     }
-                    else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
-                    {
-                        return Collection.Where(w => w != null && !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.MainTitle);
-                    }
+
+                    countItems = filterViewModelList.Count();
+                    var results = DbServices.Book.GetPaginatedItemsVm(filterViewModelList, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage);
+                    results = await this.CompleteBooksInfoAsync(results);
+                    itemsPage = results.Select(s => (T)(object)s);
+                    filterViewModelList = Enumerable.Empty<Tbook>();
+
                 }
-                else if (SortBy == BookGroupVM.SortBy.DateCreation)
+                else if (typeof(T).IsAssignableFrom(typeof(Tlibrary)))
                 {
-                    if (OrderBy == BookGroupVM.OrderBy.Croissant)
-                    {
-                        return Collection.OrderBy(o => o.DateAjout);
-                    }
-                    else if (OrderBy == BookGroupVM.OrderBy.DCroissant)
-                    {
-                        return Collection.OrderByDescending(o => o.DateAjout);
-                    }
+                    countItems = orderModelList.Count();
+                    itemsPage = DbServices.Library.GetPaginatedItemsVm(orderModelList.Select(s => (Tlibrary)(object)s), ParentPage.ViewModelPage.MaxItemsPerPage, goToPage).Select(s => (T)(object)s);
+                    orderModelList = Enumerable.Empty<T>();
                 }
 
-                return null;
+                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage.Count();
+
+                return new CommonGroupItemVM<T>()
+                {
+                    CountItems = countItems,
+                    ViewModelList = itemsPage,
+                };
             }
             catch (Exception ex)
             {
-                MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
-                return Enumerable.Empty<LivreVM>();
+                return null;
             }
         }
 
@@ -447,36 +452,91 @@ namespace LibraryProjectUWP.Code.Services.UI
         }
 
 
-        public async Task RefreshItemsGrouping(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                switch (ParentPage.ViewModelPage.GroupedBy)
+                if (LibraryCollectionSubView != null)
                 {
-                    case BookGroupVM.GroupBy.None:
-                        await this.GroupItemsByNone(reloadFromDb, goToPage, resetPage, searchParams);
-                        break;
-                    case BookGroupVM.GroupBy.Letter:
-                        await this.GroupItemsByAlphabeticAsync(reloadFromDb, goToPage, resetPage, searchParams);
-                        break;
-                    case BookGroupVM.GroupBy.CreationYear:
-                        await this.GroupByCreationYear(reloadFromDb, goToPage, resetPage, searchParams);
-                        break;
-                    case BookGroupVM.GroupBy.ParutionYear:
-                        await this.GroupByParutionYear(reloadFromDb, goToPage, resetPage, searchParams);
-                        break;
-                    default:
-                        await this.GroupItemsByNone(reloadFromDb, goToPage, resetPage, searchParams);
-                        break;
-                }
+                    switch (LibraryCollectionSubView.ViewModelPage.GroupedBy)
+                    {
+                        case LibraryGroupVM.GroupBy.None:
+                            await this.GroupItemsByNone<Tlibrary>(goToPage, resetPage, searchParams);
+                            break;
+                        case LibraryGroupVM.GroupBy.Letter:
+                            await this.GroupItemsByAlphabeticAsync<Tlibrary>(goToPage, resetPage, searchParams);
+                            break;
+                        case LibraryGroupVM.GroupBy.CreationYear:
+                            await this.GroupByCreationYear<Tlibrary>(goToPage, resetPage, searchParams);
+                            break;
+                        default:
+                            await this.GroupItemsByNone<Tlibrary>(goToPage, resetPage, searchParams);
+                            break;
+                    }
 
-                ParentPage.ViewModelPage.NbBooks = (int)await DbServices.Book.CountBooksInLibraryAsync(ParentPage.Parameters.ParentLibrary.Id);
+                    LibraryCollectionSubView.ViewModelPage.NbItems = await DbServices.Library.CountLibrariesAsync();
+                }
+                else if (BookCollectionSubView != null)
+                {
+                    switch (BookCollectionSubView.ViewModelPage.GroupedBy)
+                    {
+                        case BookGroupVM.GroupBy.None:
+                            await this.GroupItemsByNone<Tbook>(goToPage, resetPage, searchParams);
+                            break;
+                        case BookGroupVM.GroupBy.Letter:
+                            await this.GroupItemsByAlphabeticAsync<Tbook>(goToPage, resetPage, searchParams);
+                            break;
+                        case BookGroupVM.GroupBy.CreationYear:
+                            await this.GroupByCreationYear<Tbook>(goToPage, resetPage, searchParams);
+                            break;
+                        case BookGroupVM.GroupBy.ParutionYear:
+                            await this.GroupByParutionYear<Tbook>(goToPage, resetPage, searchParams);
+                            break;
+                        default:
+                            await this.GroupItemsByNone<Tbook>(goToPage, resetPage, searchParams);
+                            break;
+                    }
+
+                    BookCollectionSubView.ViewModelPage.NbItems = (int)await DbServices.Book.CountBooksInLibraryAsync(BookCollectionSubView.IdLibrary);
+                }
             }
             catch (Exception ex)
             {
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        private void ClearPageList()
+        {
+            try
+            {
+                if (LibraryCollectionSubView != null)
+                {
+                    if (LibraryCollectionSubView.ViewModelPage.PagesList != null && LibraryCollectionSubView.ViewModelPage.PagesList.Any())
+                        LibraryCollectionSubView.ViewModelPage.PagesList.Clear();
+                    if (LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel != null && LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection != null
+                        && LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
+                    {
+                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                    }
+                }
+                else if (BookCollectionSubView != null)
+                {
+                    if (BookCollectionSubView.ViewModelPage.PagesList != null && BookCollectionSubView.ViewModelPage.PagesList.Any())
+                        BookCollectionSubView.ViewModelPage.PagesList.Clear();
+                    if (BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel != null && BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection != null
+                        && BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Any())
+                    {
+                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
 

@@ -194,6 +194,20 @@ namespace LibraryProjectUWP.Views.Library
                 }
             }
 
+            private int _NbItems;
+            public int NbItems
+            {
+                get => this._NbItems;
+                set
+                {
+                    if (_NbItems != value)
+                    {
+                        this._NbItems = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
             private bool _IsSplitViewOpen;
             public bool IsSplitViewOpen
             {

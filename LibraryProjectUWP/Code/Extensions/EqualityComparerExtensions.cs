@@ -34,12 +34,64 @@ namespace LibraryProjectUWP.Code.Extensions
             }
         }
 
+        public bool Equals(Tlibrary m1, Tlibrary m2)
+        {
+            try
+            {
+                if (m2 == null && m1 == null)
+                    return true;
+                else if (m1 == null || m2 == null)
+                    return false;
+                else if (m1.Id == m2.Id)
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return false;
+            }
+        }
+
         public int GetHashCode(Tbook model)
         {
             int hCode =  Convert.ToInt32(model.Id);
             return hCode.GetHashCode();
         }
     }
+
+    public class TLibraryIdEqualityComparer : IEqualityComparer<Tlibrary>
+    {
+        public bool Equals(Tlibrary m1, Tlibrary m2)
+        {
+            try
+            {
+                if (m2 == null && m1 == null)
+                    return true;
+                else if (m1 == null || m2 == null)
+                    return false;
+                else if (m1.Id == m2.Id)
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return false;
+            }
+        }
+
+        public int GetHashCode(Tlibrary model)
+        {
+            int hCode = Convert.ToInt32(model.Id);
+            return hCode.GetHashCode();
+        }
+    }
+
 
     public class EqualityComparerExtentions
     {

@@ -21,7 +21,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 {
     public partial class DbServices
     {
-        public struct Library
+        public partial struct Library
         {
             static string NameEmptyMessage = "Le nom de la bibliothque doit être renseigné avant l'enregistrement.";
             static string NameAlreadyExistMessage = "Cette bibliothèque existe déjà.";

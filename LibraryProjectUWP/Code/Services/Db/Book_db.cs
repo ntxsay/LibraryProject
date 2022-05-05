@@ -1027,7 +1027,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
-            private static async Task CompleteModelInfos(LibraryDbContext context,Tbook model)
+            public static async Task CompleteModelInfos(LibraryDbContext context,Tbook model)
             {
                 try
                 {

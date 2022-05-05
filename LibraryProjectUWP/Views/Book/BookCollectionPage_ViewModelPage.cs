@@ -131,6 +131,7 @@ namespace LibraryProjectUWP.Views.Book
             }
 
             private BookGroupVM _GroupedRelatedViewModel = new BookGroupVM();
+            [Obsolete("Implémenté dans la sous vue")]
             public BookGroupVM GroupedRelatedViewModel
             {
                 get => this._GroupedRelatedViewModel;
@@ -145,6 +146,7 @@ namespace LibraryProjectUWP.Views.Book
             }
 
             private BookGroupVM.GroupBy _GroupedBy = BookGroupVM.GroupBy.None;
+            [Obsolete("Implémenté dans la sous vue")]
             public BookGroupVM.GroupBy GroupedBy
             {
                 get => this._GroupedBy;
@@ -159,6 +161,7 @@ namespace LibraryProjectUWP.Views.Book
             }
 
             private BookGroupVM.SortBy _SortedBy = BookGroupVM.SortBy.Name;
+            [Obsolete("Implémenté dans la sous vue")]
             public BookGroupVM.SortBy SortedBy
             {
                 get => this._SortedBy;
@@ -173,6 +176,7 @@ namespace LibraryProjectUWP.Views.Book
             }
 
             private BookGroupVM.OrderBy _OrderedBy = BookGroupVM.OrderBy.Croissant;
+            [Obsolete("Implémenté dans la sous vue")]
             public BookGroupVM.OrderBy OrderedBy
             {
                 get => this._OrderedBy;

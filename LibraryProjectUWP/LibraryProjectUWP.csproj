@@ -174,6 +174,7 @@
     <Compile Include="Code\Services\Db\Contact_db.cs" />
     <Compile Include="Code\Services\Db\Book_db.cs" />
     <Compile Include="Code\Services\Db\Collections_db.cs" />
+    <Compile Include="Code\Services\Db\Library_search_db.cs" />
     <Compile Include="Code\Services\Db\SubCategorie_db.cs" />
     <Compile Include="Code\Services\Db\DbServices.cs" />
     <Compile Include="Code\Services\Db\General_db..cs" />
@@ -248,7 +249,9 @@
     <Compile Include="ViewModels\Contact\ContactVM.cs" />
     <Compile Include="ViewModels\Contact\ManageContactParametersDriverVM.cs" />
     <Compile Include="ViewModels\General\BusyLoaderParametersVM.cs" />
+    <Compile Include="ViewModels\General\CommonGroupItemVM.cs" />
     <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
+    <Compile Include="ViewModels\General\LibraryBookNavigationDriverVM.cs" />
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
     <Compile Include="ViewModels\General\ManageCategorieParametersVM.cs" />
     <Compile Include="ViewModels\General\PageSystemVM.cs" />

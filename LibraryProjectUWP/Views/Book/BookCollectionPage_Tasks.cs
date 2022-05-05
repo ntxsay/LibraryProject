@@ -28,20 +28,6 @@ namespace LibraryProjectUWP.Views.Book
     {
 
 
-        public void OpenBookCollection()
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                this.NavigateToView(typeof(BookCollectionSubPage), this);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         public void OpenImportBookFromExcel()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
