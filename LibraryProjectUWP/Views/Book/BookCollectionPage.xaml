@@ -247,12 +247,12 @@
                     <FontIcon Glyph="&#xF168;"/>
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
-                    <MenuFlyout x:Name="MenuFlyoutCommandGroups" Opened="MenuFlyoutCommandGroups_Opened">
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='parution-year', Mode=OneWay}" Text="Année de parution" Click="TMFI_GroupByParutionYear_Click"/>
+                    <MenuFlyout Placement="Bottom" x:Name="MenuFlyoutCommandGroups" Opened="MenuFlyoutCommandGroups_Opened">
+                        <!--<ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='parution-year', Mode=OneWay}" Text="Année de parution" Click="TMFI_GroupByParutionYear_Click"/>
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='creation-year', Mode=OneWay}" Text="Année de création" Click="TMFI_GroupByCreationYear_Click"/>
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='letter', Mode=OneWay}" Text="Lettre" Click="TMFI_GroupByLetter_Click"/>
                         <MenuFlyoutSeparator/>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='none', Mode=OneWay}" Text="Aucun" Click="TMFI_GroupByNone_Click"/>
+                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='none', Mode=OneWay}" Text="Aucun" Click="TMFI_GroupByNone_Click"/>-->
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

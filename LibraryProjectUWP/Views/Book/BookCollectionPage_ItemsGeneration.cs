@@ -28,11 +28,10 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
-        public void GroupItemsBy(BookGroupVM.GroupBy groupBy, string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void GroupItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
-                this.ViewModelPage.GroupedBy = groupBy;
                 this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage, searchParams);
             }
             catch (Exception ex)
@@ -89,11 +88,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 dispatcherTimer.Tick += async (t, f) =>
                 {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
-                    {
-                        await this.RefreshItemsGrouping(goToPage, resetPage, searchParams);
-                    }
+                    await this.RefreshItemsGrouping(goToPage, resetPage, searchParams);
 
                     DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                     {
