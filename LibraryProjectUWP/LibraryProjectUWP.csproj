@@ -325,7 +325,6 @@
     <Compile Include="Views\Book\SubViews\BookCollectionSubPage.xaml.cs">
       <DependentUpon>BookCollectionSubPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\SubViews\BookCollectionSubPage_Generation.cs" />
     <Compile Include="Views\Book\SubViews\BookCollectionSubPage_Tasks.cs" />
     <Compile Include="Views\Book\SubViews\BookCollectionSubPage_ViewModelPage.cs" />
     <Compile Include="Views\Book\SubViews\ImportBookExcelSubPage.xaml.cs">

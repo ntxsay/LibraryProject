@@ -388,7 +388,8 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is Viewbox viewbox && viewbox.Tag is BibliothequeVM viewModel)
                 {
-                    MainPage.BookCollectionNavigationAsync(viewModel, null);
+                    ParentPage.OpenBookCollection(viewModel);
+                    //MainPage.BookCollectionNavigationAsync(viewModel, null);
                 }
             }
             catch (Exception ex)

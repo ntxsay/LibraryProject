@@ -28,12 +28,12 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
-        public void GroupItemsBy(BookGroupVM.GroupBy groupBy, string busyLoaderMessage, bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void GroupItemsBy(BookGroupVM.GroupBy groupBy, string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
                 this.ViewModelPage.GroupedBy = groupBy;
-                this.GenerateItemsWithBusyLoader(busyLoaderMessage, reloadFromDb, goToPage, resetPage, searchParams);
+                this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage, searchParams);
             }
             catch (Exception ex)
             {
@@ -43,12 +43,12 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void OrderItemsBy(BookGroupVM.OrderBy orderBy, string busyLoaderMessage, bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void OrderItemsBy(BookGroupVM.OrderBy orderBy, string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
                 this.ViewModelPage.OrderedBy = orderBy;
-                this.GenerateItemsWithBusyLoader(busyLoaderMessage, reloadFromDb, goToPage, resetPage, searchParams);
+                this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage, searchParams);
             }
             catch (Exception ex)
             {
@@ -58,12 +58,12 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void SortItemsBy(BookGroupVM.SortBy sortBy, string busyLoaderMessage, bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void SortItemsBy(BookGroupVM.SortBy sortBy, string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
                 this.ViewModelPage.SortedBy = sortBy;
-                this.GenerateItemsWithBusyLoader(busyLoaderMessage, reloadFromDb, goToPage, resetPage, searchParams);
+                this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage, searchParams);
             }
             catch (Exception ex)
             {
@@ -73,7 +73,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void GenerateItemsWithBusyLoader(string busyLoaderMessage, bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void GenerateItemsWithBusyLoader(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
@@ -92,7 +92,7 @@ namespace LibraryProjectUWP.Views.Book
                     var bookCollectionSpage = this.BookCollectionSubPage;
                     if (bookCollectionSpage != null)
                     {
-                        await this.RefreshItemsGrouping(reloadFromDb, goToPage, resetPage, searchParams);
+                        await this.RefreshItemsGrouping(goToPage, resetPage, searchParams);
                     }
 
                     DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
@@ -120,15 +120,23 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task RefreshItemsGrouping(bool reloadFromDb = true, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                var libraryCollectionSpage = this.LibraryCollectionSubPage;
+                if (libraryCollectionSpage != null)
                 {
-                    await bookCollectionSpage.RefreshItemsGrouping(reloadFromDb, goToPage, resetPage, searchParams);
+                    await libraryCollectionSpage.CommonView.RefreshItemsGrouping(goToPage, resetPage, searchParams);
+                }
+                else
+                {
+                    var bookCollectionSpage = this.BookCollectionSubPage;
+                    if (bookCollectionSpage != null)
+                    {
+                        await bookCollectionSpage.CommonView.RefreshItemsGrouping(goToPage, resetPage, searchParams);
+                    }
                 }
             }
             catch (Exception ex)

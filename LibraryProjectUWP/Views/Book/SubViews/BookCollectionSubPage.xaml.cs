@@ -804,21 +804,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 await this.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal,
                    async () =>
                     {
-                        //foreach (var pageVm in ViewModelPage.PagesList)
-                        //{
-                        //    if (pageVm.CurrentPage != page && pageVm.IsPageSelected == true)
-                        //    {
-                        //        pageVm.IsPageSelected = false;
-                        //        pageVm.BackgroundColor = Application.Current.Resources["PageNotSelectedBackground"] as SolidColorBrush;
-                        //    }
-                        //    else if (pageVm.CurrentPage == page && pageVm.IsPageSelected == false)
-                        //    {
-                        //        pageVm.IsPageSelected = true;
-                        //        pageVm.BackgroundColor = Application.Current.Resources["PageSelectedBackground"] as SolidColorBrush;
-                        //    }
-                        //}
-
-                        await this.RefreshItemsGrouping(true, page, true, ParentPage.ViewModelPage.ResearchBook);
+                        await CommonView.RefreshItemsGrouping(page, true, ParentPage.ViewModelPage.ResearchBook);
                         var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
                         if (buttonsPage != null && buttonsPage.Any())
                         {

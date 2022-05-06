@@ -135,7 +135,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Image x:Name="ImageBackground" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="1"/>
+        <Image x:Name="ImageBackground" Source="ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="1"/>
         <Grid Grid.Row="0" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -247,7 +247,7 @@
                     <FontIcon Glyph="&#xF168;"/>
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
-                    <MenuFlyout>
+                    <MenuFlyout x:Name="MenuFlyoutCommandGroups" Opened="MenuFlyoutCommandGroups_Opened">
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='parution-year', Mode=OneWay}" Text="Année de parution" Click="TMFI_GroupByParutionYear_Click"/>
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='creation-year', Mode=OneWay}" Text="Année de création" Click="TMFI_GroupByCreationYear_Click"/>
                         <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='letter', Mode=OneWay}" Text="Lettre" Click="TMFI_GroupByLetter_Click"/>

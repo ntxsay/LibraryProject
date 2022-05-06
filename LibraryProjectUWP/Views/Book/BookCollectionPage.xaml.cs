@@ -31,6 +31,7 @@ using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.Views.Library;
 using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.Views.UserControls.TitleBar;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -51,6 +52,7 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
         }
 
+        public LibraryCollectionSubPage LibraryCollectionSubPage => FrameContainer.Content as LibraryCollectionSubPage;
         public BookCollectionSubPage BookCollectionSubPage => FrameContainer.Content as BookCollectionSubPage;
         public ImportBookExcelSubPage ImportBookExcelSubPage => FrameContainer.Content as ImportBookExcelSubPage;
         public ImportBookFileSubPage ImportBookFileSubPage => FrameContainer.Content as ImportBookFileSubPage;
@@ -61,7 +63,6 @@ namespace LibraryProjectUWP.Views.Book
             if (e.Parameter is LibraryBookNavigationDriverVM parameters)
             {
                 Parameters = parameters;
-                ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
             }
         }
         
@@ -118,6 +119,13 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 Parameters.ParentLibrary = viewModel;
+                if (viewModel != null)
+                {
+                    Parameters.MainPage.ChangeAppTitle(new TitleBarLibraryName(viewModel)
+                    {
+                        Margin = new Thickness(0, 14, 0, 0),
+                    });
+                }
                 this.NavigateToView(typeof(BookCollectionSubPage), this);
             }
             catch (Exception ex)
@@ -140,6 +148,21 @@ namespace LibraryProjectUWP.Views.Book
             {
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        
+
+        private void MenuFlyoutCommandGroups_Opened(object sender, object e)
+        {
+            try
+            {
+
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
 
@@ -396,6 +419,43 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Sort - Group - Order
+        public void InitializeGroupsCmdBarItemsForBookCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                MenuFlyoutCommandGroups.Items.Clear();
+
+                //Group Letter
+                ToggleMenuFlyoutItem TMFIGroupByLetter = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Lettre"
+                };
+                TMFIGroupByLetter.Click += TMFI_GroupByLetter_Click;
+
+                //Group creation year
+                ToggleMenuFlyoutItem TMFIGroupByCreationYear = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Année de création"
+                };
+                TMFIGroupByCreationYear.Click += TMFI_GroupByCreationYear_Click;
+
+                //Group parution year
+                ToggleMenuFlyoutItem TMFIGroupByParutionYear = new ToggleMenuFlyoutItem();
+                TMFIGroupByParutionYear.Click += TMFI_GroupByCreationYear_Click;
+
+                //Group none
+                ToggleMenuFlyoutItem TMFIGroupByNone = new ToggleMenuFlyoutItem();
+                TMFIGroupByNone.Click += TMFI_GroupByNone_Click;
+
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void TMFI_GroupByLetter_Click(object sender, RoutedEventArgs e)
         {
             if (sender is ToggleMenuFlyoutItem item)
@@ -409,7 +469,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                this.GroupItemsBy(BookGroupVM.GroupBy.Letter, $"Groupement en cours des livres par lettre...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                this.GroupItemsBy(BookGroupVM.GroupBy.Letter, $"Groupement en cours des livres par lettre...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
@@ -425,7 +485,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
                     return;
                 }
-                this.GroupItemsBy(BookGroupVM.GroupBy.CreationYear, $"Groupement en cours des livres par année de création...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                this.GroupItemsBy(BookGroupVM.GroupBy.CreationYear, $"Groupement en cours des livres par année de création...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
@@ -442,7 +502,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                this.GroupItemsBy(BookGroupVM.GroupBy.ParutionYear, $"Groupement en cours des livres par année de parution...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                this.GroupItemsBy(BookGroupVM.GroupBy.ParutionYear, $"Groupement en cours des livres par année de parution...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
@@ -458,7 +518,7 @@ namespace LibraryProjectUWP.Views.Book
                     }
                     return;
                 }
-                this.GroupItemsBy(BookGroupVM.GroupBy.None, $"Dégroupement en cours des livres...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                this.GroupItemsBy(BookGroupVM.GroupBy.None, $"Dégroupement en cours des livres...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
@@ -477,7 +537,7 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         return;
                     }
-                    this.OrderItemsBy(BookGroupVM.OrderBy.Croissant, $"Organisation en cours des livres par ordre croissant...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                    this.OrderItemsBy(BookGroupVM.OrderBy.Croissant, $"Organisation en cours des livres par ordre croissant...", GetSelectedPage, true, ViewModelPage.ResearchBook);
                 }
             }
             catch (Exception ex)
@@ -503,7 +563,7 @@ namespace LibraryProjectUWP.Views.Book
                         return;
                     }
 
-                    this.OrderItemsBy(BookGroupVM.OrderBy.DCroissant, $"Organisation en cours des livres par ordre décroissant...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                    this.OrderItemsBy(BookGroupVM.OrderBy.DCroissant, $"Organisation en cours des livres par ordre décroissant...", GetSelectedPage, true, ViewModelPage.ResearchBook);
                 }
             }
             catch (Exception ex)
@@ -528,7 +588,7 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         return;
                     }
-                    this.SortItemsBy(BookGroupVM.SortBy.Name, $"Organisation en cours des livres par nom...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                    this.SortItemsBy(BookGroupVM.SortBy.Name, $"Organisation en cours des livres par nom...", GetSelectedPage, true, ViewModelPage.ResearchBook);
                 }
             }
             catch (Exception ex)
@@ -554,7 +614,7 @@ namespace LibraryProjectUWP.Views.Book
                         return;
                     }
 
-                    this.SortItemsBy(BookGroupVM.SortBy.DateCreation, $"Organisation en cours des livres par date de création...", true, GetSelectedPage, true, ViewModelPage.ResearchBook);
+                    this.SortItemsBy(BookGroupVM.SortBy.DateCreation, $"Organisation en cours des livres par date de création...", GetSelectedPage, true, ViewModelPage.ResearchBook);
                 }
                 //await this.RefreshItemsGrouping(false);
             }
@@ -1611,7 +1671,7 @@ namespace LibraryProjectUWP.Views.Book
                                 busyLoader.TbcTitle.Text = "Actualisation du catalogue des livres en cours...";
                             }
 
-                            await this.RefreshItemsGrouping(true, 1, true, ViewModelPage.ResearchBook);
+                            await this.RefreshItemsGrouping(1, true, ViewModelPage.ResearchBook);
 
                             DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                             {
@@ -1892,7 +1952,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 dispatcherTimer.Tick += async (t, f) =>
                 {
-                    await this.RefreshItemsGrouping(true, 1, true, ViewModelPage.ResearchBook);
+                    await this.RefreshItemsGrouping(1, true, ViewModelPage.ResearchBook);
 
                     DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                     {
@@ -1994,7 +2054,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 dispatcherTimer.Tick += async (t, f) =>
                 {
-                    await this.RefreshItemsGrouping(true, 1, true, sender.ViewModelPage.ViewModel);
+                    await this.RefreshItemsGrouping(1, true, sender.ViewModelPage.ViewModel);
 
                     DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                     {
@@ -2780,10 +2840,18 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is Slider slider)
                 {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
+                    var libraryCollectionSpage = this.LibraryCollectionSubPage;
+                    if (libraryCollectionSpage != null)
                     {
-                        await bookCollectionSpage.RefreshItemsGrouping();
+                        await libraryCollectionSpage.CommonView.RefreshItemsGrouping();
+                    }
+                    else
+                    {
+                        var bookCollectionSpage = this.BookCollectionSubPage;
+                        if (bookCollectionSpage != null)
+                        {
+                            await bookCollectionSpage.CommonView.RefreshItemsGrouping();
+                        }
                     }
                 }
             }
@@ -2795,5 +2863,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        
     }
 }

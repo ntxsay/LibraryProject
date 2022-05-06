@@ -281,37 +281,53 @@ namespace LibraryProjectUWP.Code.Services.UI
             {
                 int countItems = 0;
                 IEnumerable<T> itemsPage = null;
-                var searchedBooks = await DbServices.Library.SearchAsync<T>(searchParams);
-                if (searchedBooks == null || !searchedBooks.Any())
-                {
-                    ParentPage.ViewModelPage.NbElementDisplayed = 0;
-                    return null;
-                }
 
                 byte orderedBy = 0;
                 byte sortedBy = 0;
 
-                if (typeof(T).IsAssignableFrom(typeof(Tlibrary)) && LibraryCollectionSubView != null)
+                if ((typeof(T).IsAssignableFrom(typeof(Tlibrary)) || typeof(T).IsAssignableFrom(typeof(BibliothequeVM))) && LibraryCollectionSubView != null)
                 {
+                    var searchedItems = await DbServices.Library.SearchAsync<Tlibrary>(searchParams);
+                    if (searchedItems == null || !searchedItems.Any())
+                    {
+                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        return null;
+                    }
+
                     orderedBy = (byte)LibraryCollectionSubView.ViewModelPage.OrderedBy;
                     sortedBy = (byte)LibraryCollectionSubView.ViewModelPage.SortedBy;
+
+                    IEnumerable<Tlibrary> orderModelList = DbServices.Library.OrderLibraries(searchedItems, orderedBy, sortedBy);
+                    if (orderModelList == null || !orderModelList.Any())
+                    {
+                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        return null;
+                    }
+
+                    countItems = orderModelList.Count();
+                    itemsPage = DbServices.Library.GetPaginatedItemsVm(orderModelList, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage).Select(s => (T)(object)s);
+                    orderModelList = Enumerable.Empty<Tlibrary>();
                 }
-                else if (typeof(T).IsAssignableFrom(typeof(Tbook)) && BookCollectionSubView != null)
+                else if ((typeof(T).IsAssignableFrom(typeof(Tbook)) || typeof(T).IsAssignableFrom(typeof(LivreVM))) && BookCollectionSubView != null)
                 {
+                    var searchedItems = await DbServices.Library.SearchAsync<Tbook>(searchParams);
+                    if (searchedItems == null || !searchedItems.Any())
+                    {
+                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        return null;
+                    }
+
                     orderedBy = (byte)BookCollectionSubView.ViewModelPage.OrderedBy;
                     sortedBy = (byte)BookCollectionSubView.ViewModelPage.SortedBy;
-                }
 
-                var orderModelList = DbServices.Library.OrderLibraries(searchedBooks, orderedBy, sortedBy);
-                if (orderModelList == null || !orderModelList.Any())
-                {
-                    ParentPage.ViewModelPage.NbElementDisplayed = 0;
-                    return null;
-                }
+                    IEnumerable<Tbook> orderModelList = DbServices.Library.OrderLibraries(searchedItems, orderedBy, sortedBy);
+                    if (orderModelList == null || !orderModelList.Any())
+                    {
+                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        return null;
+                    }
 
-                if (typeof(T).IsAssignableFrom(typeof(Tbook)))
-                {
-                    var filterViewModelList = await DbServices.Book.FilterBooksAsync(orderModelList.Select(s => (Tbook)(object)s), ParentPage.ViewModelPage.SelectedCollections?.Select(s => s.Id),
+                    var filterViewModelList = await DbServices.Book.FilterBooksAsync(orderModelList, ParentPage.ViewModelPage.SelectedCollections?.Select(s => s.Id),
                                                 ParentPage.ViewModelPage.DisplayUnCategorizedBooks, ParentPage.ViewModelPage.SelectedSCategories);
                     if (filterViewModelList == null || !filterViewModelList.Any())
                     {
@@ -324,16 +340,10 @@ namespace LibraryProjectUWP.Code.Services.UI
                     results = await this.CompleteBooksInfoAsync(results);
                     itemsPage = results.Select(s => (T)(object)s);
                     filterViewModelList = Enumerable.Empty<Tbook>();
-
-                }
-                else if (typeof(T).IsAssignableFrom(typeof(Tlibrary)))
-                {
-                    countItems = orderModelList.Count();
-                    itemsPage = DbServices.Library.GetPaginatedItemsVm(orderModelList.Select(s => (Tlibrary)(object)s), ParentPage.ViewModelPage.MaxItemsPerPage, goToPage).Select(s => (T)(object)s);
-                    orderModelList = Enumerable.Empty<T>();
+                    orderModelList = Enumerable.Empty<Tbook>();
                 }
 
-                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage.Count();
+                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage?.Count() ?? 0;
 
                 return new CommonGroupItemVM<T>()
                 {
@@ -356,32 +366,22 @@ namespace LibraryProjectUWP.Code.Services.UI
                 int countItems = 0;
                 IEnumerable<T> itemsPage = null;
 
-                long? idLibrary = null;
                 byte orderedBy = 0;
                 byte sortedBy = 0;
 
-                if (typeof(T).IsAssignableFrom(typeof(Tbook)) || typeof(T).IsAssignableFrom(typeof(LivreVM)) && BookCollectionSubView != null)
+                if ((typeof(T).IsAssignableFrom(typeof(Tbook)) || typeof(T).IsAssignableFrom(typeof(LivreVM))) && BookCollectionSubView != null)
                 {
-                    idLibrary = BookCollectionSubView.IdLibrary;
                     orderedBy = (byte)BookCollectionSubView.ViewModelPage.OrderedBy;
                     sortedBy = (byte)BookCollectionSubView.ViewModelPage.SortedBy;
-                }
-                else if (typeof(T).IsAssignableFrom(typeof(Tlibrary)) || typeof(T).IsAssignableFrom(typeof(BibliothequeVM)) && LibraryCollectionSubView != null)
-                {
-                    orderedBy = (byte)LibraryCollectionSubView.ViewModelPage.OrderedBy;
-                    sortedBy = (byte)LibraryCollectionSubView.ViewModelPage.SortedBy;
-                }
 
-                var orderModelList = await DbServices.Library.OrderLibrariesAsync<T>(orderedBy, sortedBy);
-                if (orderModelList == null || !orderModelList.Any())
-                {
-                    ParentPage.ViewModelPage.NbElementDisplayed = 0;
-                    return null;
-                }
+                    IEnumerable<Tbook> orderModelList = await DbServices.Library.OrderLibrariesAsync<Tbook>(orderedBy, sortedBy, ParentPage.Parameters.ParentLibrary?.Id);
+                    if (orderModelList == null || !orderModelList.Any())
+                    {
+                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        return null;
+                    }
 
-                if (typeof(T).IsAssignableFrom(typeof(Tbook)))
-                {
-                    var filterViewModelList = await DbServices.Book.FilterBooksAsync(orderModelList.Select(s => (Tbook)(object)s), ParentPage.ViewModelPage.SelectedCollections?.Select(s => s.Id),
+                    var filterViewModelList = await DbServices.Book.FilterBooksAsync(orderModelList, ParentPage.ViewModelPage.SelectedCollections?.Select(s => s.Id),
                                                 ParentPage.ViewModelPage.DisplayUnCategorizedBooks, ParentPage.ViewModelPage.SelectedSCategories);
                     if (filterViewModelList == null || !filterViewModelList.Any())
                     {
@@ -394,13 +394,22 @@ namespace LibraryProjectUWP.Code.Services.UI
                     results = await this.CompleteBooksInfoAsync(results);
                     itemsPage = results.Select(s => (T)(object)s);
                     filterViewModelList = Enumerable.Empty<Tbook>();
-
+                    orderModelList = Enumerable.Empty<Tbook>();
                 }
-                else if (typeof(T).IsAssignableFrom(typeof(Tlibrary)))
+                else if ((typeof(T).IsAssignableFrom(typeof(Tlibrary)) || typeof(T).IsAssignableFrom(typeof(BibliothequeVM))) && LibraryCollectionSubView != null)
                 {
+                    orderedBy = (byte)LibraryCollectionSubView.ViewModelPage.OrderedBy;
+                    sortedBy = (byte)LibraryCollectionSubView.ViewModelPage.SortedBy;
+                    IEnumerable<Tlibrary> orderModelList = await DbServices.Library.OrderLibrariesAsync<Tlibrary>(orderedBy, sortedBy);
+                    if (orderModelList == null || !orderModelList.Any())
+                    {
+                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        return null;
+                    }
+
                     countItems = orderModelList.Count();
-                    itemsPage = DbServices.Library.GetPaginatedItemsVm(orderModelList.Select(s => (Tlibrary)(object)s), ParentPage.ViewModelPage.MaxItemsPerPage, goToPage).Select(s => (T)(object)s);
-                    orderModelList = Enumerable.Empty<T>();
+                    itemsPage = DbServices.Library.GetPaginatedItemsVm(orderModelList, ParentPage.ViewModelPage.MaxItemsPerPage, goToPage).Select(s => (T)(object)s).ToList();
+                    orderModelList = Enumerable.Empty<Tlibrary>();
                 }
 
                 ParentPage.ViewModelPage.NbElementDisplayed = itemsPage?.Count() ?? 0;
@@ -462,16 +471,16 @@ namespace LibraryProjectUWP.Code.Services.UI
                     switch (LibraryCollectionSubView.ViewModelPage.GroupedBy)
                     {
                         case LibraryGroupVM.GroupBy.None:
-                            await this.GroupItemsByNone<Tlibrary>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByNone<BibliothequeVM>(goToPage, resetPage, searchParams);
                             break;
                         case LibraryGroupVM.GroupBy.Letter:
-                            await this.GroupItemsByAlphabeticAsync<Tlibrary>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByAlphabeticAsync<BibliothequeVM>(goToPage, resetPage, searchParams);
                             break;
                         case LibraryGroupVM.GroupBy.CreationYear:
-                            await this.GroupByCreationYear<Tlibrary>(goToPage, resetPage, searchParams);
+                            await this.GroupByCreationYear<BibliothequeVM>(goToPage, resetPage, searchParams);
                             break;
                         default:
-                            await this.GroupItemsByNone<Tlibrary>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByNone<BibliothequeVM>(goToPage, resetPage, searchParams);
                             break;
                     }
 
@@ -482,19 +491,19 @@ namespace LibraryProjectUWP.Code.Services.UI
                     switch (BookCollectionSubView.ViewModelPage.GroupedBy)
                     {
                         case BookGroupVM.GroupBy.None:
-                            await this.GroupItemsByNone<Tbook>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByNone<LivreVM>(goToPage, resetPage, searchParams);
                             break;
                         case BookGroupVM.GroupBy.Letter:
-                            await this.GroupItemsByAlphabeticAsync<Tbook>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByAlphabeticAsync<LivreVM>(goToPage, resetPage, searchParams);
                             break;
                         case BookGroupVM.GroupBy.CreationYear:
-                            await this.GroupByCreationYear<Tbook>(goToPage, resetPage, searchParams);
+                            await this.GroupByCreationYear<LivreVM>(goToPage, resetPage, searchParams);
                             break;
                         case BookGroupVM.GroupBy.ParutionYear:
-                            await this.GroupByParutionYear<Tbook>(goToPage, resetPage, searchParams);
+                            await this.GroupByParutionYear<LivreVM>(goToPage, resetPage, searchParams);
                             break;
                         default:
-                            await this.GroupItemsByNone<Tbook>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByNone<LivreVM>(goToPage, resetPage, searchParams);
                             break;
                     }
 

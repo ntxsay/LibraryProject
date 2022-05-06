@@ -376,6 +376,7 @@ namespace LibraryProjectUWP.Views.Book
             }
 
             private BibliothequeVM _ParentLibrary;
+            [Obsolete]
             public BibliothequeVM ParentLibrary
             {
                 get => this._ParentLibrary;
