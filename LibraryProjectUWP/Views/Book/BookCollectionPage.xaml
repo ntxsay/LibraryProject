@@ -334,7 +334,7 @@
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter un élément">
                 <AppBarButton.Flyout>
-                    <MenuFlyout>
+                    <MenuFlyout Placement="Bottom" x:Name="MenuFlyoutCommandAdds">
                         <MenuFlyoutSubItem Text="Ajouter un livre" MTUUi:FrameworkElementExtensions.Cursor="Hand">
                             <MenuFlyoutSubItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>

@@ -756,7 +756,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 ToggleMenuFlyoutItem TMFISortByName = new ToggleMenuFlyoutItem()
                 {
-                    Text = "Nom",
+                    Text = "Titre",
                     Tag = "name",
                 };
 
@@ -795,7 +795,7 @@ namespace LibraryProjectUWP.Views.Book
                         if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "croissant") is ToggleMenuFlyoutItem currentItem)
                         {
                             currentItem.IsChecked = true;
-                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag && item.Tag.ToString() != "name" && item.Tag.ToString() != "dateCreation").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
                     else if (libraryCollectionSubPage.ViewModelPage.OrderedBy == LibraryGroupVM.OrderBy.DCroissant)
@@ -803,7 +803,7 @@ namespace LibraryProjectUWP.Views.Book
                         if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "dcroissant") is ToggleMenuFlyoutItem currentItem)
                         {
                             currentItem.IsChecked = true;
-                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag && item.Tag.ToString() != "name" && item.Tag.ToString() != "dateCreation").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
 
@@ -812,7 +812,7 @@ namespace LibraryProjectUWP.Views.Book
                         if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "name") is ToggleMenuFlyoutItem currentItem)
                         {
                             currentItem.IsChecked = true;
-                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag && item.Tag.ToString() != "croissant" && item.Tag.ToString() != "dcroissant").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
                     else if (libraryCollectionSubPage.ViewModelPage.SortedBy == LibraryGroupVM.SortBy.DateCreation)
@@ -820,7 +820,7 @@ namespace LibraryProjectUWP.Views.Book
                         if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "dateCreation") is ToggleMenuFlyoutItem currentItem)
                         {
                             currentItem.IsChecked = true;
-                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag && item.Tag.ToString() != "croissant" && item.Tag.ToString() != "dcroissant").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
                 }
@@ -831,15 +831,15 @@ namespace LibraryProjectUWP.Views.Book
                         if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "croissant") is ToggleMenuFlyoutItem currentItem)
                         {
                             currentItem.IsChecked = true;
-                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "croissant").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag && item.Tag.ToString() != "name" && item.Tag.ToString() != "dateCreation").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
-                    else if (bookCollectionSubPage.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.Croissant)
+                    else if (bookCollectionSubPage.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
                     {
                         if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "dcroissant") is ToggleMenuFlyoutItem currentItem)
                         {
                             currentItem.IsChecked = true;
-                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "dcroissant").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag && item.Tag.ToString() != "name" && item.Tag.ToString() != "dateCreation").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
 
@@ -848,7 +848,7 @@ namespace LibraryProjectUWP.Views.Book
                         if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "name") is ToggleMenuFlyoutItem currentItem)
                         {
                             currentItem.IsChecked = true;
-                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "name").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag && item.Tag.ToString() != "croissant" && item.Tag.ToString() != "dcroissant").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
                     else if (bookCollectionSubPage.ViewModelPage.SortedBy == BookGroupVM.SortBy.DateCreation)
@@ -856,7 +856,7 @@ namespace LibraryProjectUWP.Views.Book
                         if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "dateCreation") is ToggleMenuFlyoutItem currentItem)
                         {
                             currentItem.IsChecked = true;
-                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "dateCreation").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag && item.Tag.ToString() != "croissant" && item.Tag.ToString() != "dcroissant").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
                 }
@@ -956,6 +956,57 @@ namespace LibraryProjectUWP.Views.Book
                 this.SortItemsBy($"Organisation en cours des livres par date de création...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }            
         }
+
+        public void InitializeAddsCmdBarItemsForBookCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                MenuFlyoutCommandAdds.Items.Clear();
+
+                MenuFlyoutSubItem MFIOrderByCroissant = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Croissant",
+                    Tag = "croissant",
+                };
+                TMFIOrderByCroissant.Click += TMFI_OrderByCroissant_Click;
+
+                ToggleMenuFlyoutItem TMFIOrderByDCroissant = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Décroissant",
+                    Tag = "dcroissant",
+                };
+                TMFIOrderByDCroissant.Click += TMFI_OrderByDCroissant_Click;
+
+                ToggleMenuFlyoutItem TMFISortByName = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Titre",
+                    Tag = "name",
+                };
+
+                TMFISortByName.Click += TMFI_SortByName_Click;
+
+                ToggleMenuFlyoutItem TMFISortByDateCreation = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Date de création",
+                    Tag = "dateCreation",
+                };
+
+                TMFISortByDateCreation.Click += TMFI_SortByDateCreation_Click;
+
+                MenuFlyoutCommandSorts.Items.Add(TMFIOrderByCroissant);
+                MenuFlyoutCommandSorts.Items.Add(TMFIOrderByDCroissant);
+                MenuFlyoutCommandSorts.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandSorts.Items.Add(TMFISortByName);
+                MenuFlyoutCommandSorts.Items.Add(TMFISortByDateCreation);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #endregion
 
         #region SideBar
