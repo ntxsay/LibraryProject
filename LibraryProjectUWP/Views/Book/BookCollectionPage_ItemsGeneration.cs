@@ -42,11 +42,10 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void OrderItemsBy(BookGroupVM.OrderBy orderBy, string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void OrderItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
-                this.ViewModelPage.OrderedBy = orderBy;
                 this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage, searchParams);
             }
             catch (Exception ex)
@@ -57,11 +56,10 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void SortItemsBy(BookGroupVM.SortBy sortBy, string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void SortItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
         {
             try
             {
-                this.ViewModelPage.SortedBy = sortBy;
                 this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage, searchParams);
             }
             catch (Exception ex)

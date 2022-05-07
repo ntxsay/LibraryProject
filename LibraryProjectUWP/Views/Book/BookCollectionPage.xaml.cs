@@ -153,6 +153,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 this.NavigateToView(typeof(BookCollectionSubPage), this);
                 InitializeGroupsCmdBarItemsForBookCollection();
+                InitializeSortsCmdBarItemsForBookCollection();
             }
             catch (Exception ex)
             {
@@ -169,6 +170,7 @@ namespace LibraryProjectUWP.Views.Book
                 Parameters.MainPage.ChangeAppTitle(Parameters.MainPage.ViewModelPage.MainTitleBar);
                 this.NavigateToView(typeof(LibraryCollectionSubPage), this);
                 InitializeGroupsCmdBarItemsForLibraryCollection();
+                InitializeSortsCmdBarItemsForLibraryCollection();
             }
             catch (Exception ex)
             {
@@ -416,6 +418,7 @@ namespace LibraryProjectUWP.Views.Book
         #region Sort - Group - Order
         private void MenuFlyoutCommandGroups_Opened(object sender, object e)
         {
+            MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 var libraryCollectionSpage = this.LibraryCollectionSubPage;
@@ -494,10 +497,10 @@ namespace LibraryProjectUWP.Views.Book
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                Logs.Log(ex, m);
+                return;
             }
         }
 
@@ -605,11 +608,19 @@ namespace LibraryProjectUWP.Views.Book
         {
             if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
             {
+                if (libraryCollectionSubPage.ViewModelPage.GroupedBy == LibraryGroupVM.GroupBy.Letter)
+                {
+                    return;
+                }
                 libraryCollectionSubPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.Letter;
                 this.GroupItemsBy($"Groupement des bibliothèques en cours par lettre...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
             else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
             {
+                if (bookCollectionSubPage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.Letter)
+                {
+                    return;
+                }
                 bookCollectionSubPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
                 this.GroupItemsBy($"Groupement des livres en cours par lettre...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
@@ -619,11 +630,20 @@ namespace LibraryProjectUWP.Views.Book
         {
             if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
             {
+                if (libraryCollectionSubPage.ViewModelPage.GroupedBy == LibraryGroupVM.GroupBy.CreationYear)
+                {
+                    return;
+                }
+
                 libraryCollectionSubPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
                 this.GroupItemsBy($"Groupement des bibliothèques en cours par année de création...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
             else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
             {
+                if (bookCollectionSubPage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.CreationYear)
+                {
+                    return;
+                }
                 bookCollectionSubPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
                 this.GroupItemsBy($"Groupement des livres en cours par année de création...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
@@ -633,6 +653,10 @@ namespace LibraryProjectUWP.Views.Book
         {
             if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
             {
+                if (bookCollectionSubPage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.CreationYear)
+                {
+                    return;
+                }
                 bookCollectionSubPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
                 this.GroupItemsBy($"Groupement des livres en cours par année de parution...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
@@ -642,119 +666,296 @@ namespace LibraryProjectUWP.Views.Book
         {
             if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
             {
+                if (libraryCollectionSubPage.ViewModelPage.GroupedBy == LibraryGroupVM.GroupBy.CreationYear)
+                {
+                    return;
+                }
                 libraryCollectionSubPage.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
                 this.GroupItemsBy($"Dégroupement des bibliothèques en cours...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
             else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
             {
+                if (bookCollectionSubPage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.CreationYear)
+                {
+                    return;
+                }
                 bookCollectionSubPage.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
                 this.GroupItemsBy($"Dégroupement des livres en cours...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
-        private void TMFI_OrderByCroissant_Click(object sender, RoutedEventArgs e)
+        public void InitializeSortsCmdBarItemsForLibraryCollection()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (sender is ToggleMenuFlyoutItem item)
+                MenuFlyoutCommandSorts.Items.Clear();
+
+                ToggleMenuFlyoutItem TMFIOrderByCroissant = new ToggleMenuFlyoutItem()
                 {
-                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.Croissant)
+                    Text = "Croissant",
+                    Tag = "croissant",
+                };
+                TMFIOrderByCroissant.Click += TMFI_OrderByCroissant_Click;
+
+                ToggleMenuFlyoutItem TMFIOrderByDCroissant = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Décroissant",
+                    Tag = "dcroissant",
+                };
+                TMFIOrderByDCroissant.Click += TMFI_OrderByDCroissant_Click;
+
+                ToggleMenuFlyoutItem TMFISortByName = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Nom",
+                    Tag = "name",
+                };
+
+                TMFISortByName.Click += TMFI_SortByName_Click;
+
+                ToggleMenuFlyoutItem TMFISortByDateCreation = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Date de création",
+                    Tag = "dateCreation",
+                };
+                TMFISortByDateCreation.Click += TMFI_SortByDateCreation_Click;
+
+                MenuFlyoutCommandSorts.Items.Add(TMFIOrderByCroissant);
+                MenuFlyoutCommandSorts.Items.Add(TMFIOrderByDCroissant);
+                MenuFlyoutCommandSorts.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandSorts.Items.Add(TMFISortByName);
+                MenuFlyoutCommandSorts.Items.Add(TMFISortByDateCreation);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void InitializeSortsCmdBarItemsForBookCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                MenuFlyoutCommandSorts.Items.Clear();
+
+                ToggleMenuFlyoutItem TMFIOrderByCroissant = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Croissant",
+                    Tag = "croissant",
+                };
+                TMFIOrderByCroissant.Click += TMFI_OrderByCroissant_Click;
+
+                ToggleMenuFlyoutItem TMFIOrderByDCroissant = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Décroissant",
+                    Tag = "dcroissant",
+                };
+                TMFIOrderByDCroissant.Click += TMFI_OrderByDCroissant_Click;
+
+                ToggleMenuFlyoutItem TMFISortByName = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Nom",
+                    Tag = "name",
+                };
+
+                TMFISortByName.Click += TMFI_SortByName_Click;
+
+                ToggleMenuFlyoutItem TMFISortByDateCreation = new ToggleMenuFlyoutItem()
+                {
+                    Text = "Date de création",
+                    Tag = "dateCreation",
+                };
+
+                TMFISortByDateCreation.Click += TMFI_SortByDateCreation_Click;
+
+                MenuFlyoutCommandSorts.Items.Add(TMFIOrderByCroissant);
+                MenuFlyoutCommandSorts.Items.Add(TMFIOrderByDCroissant);
+                MenuFlyoutCommandSorts.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandSorts.Items.Add(TMFISortByName);
+                MenuFlyoutCommandSorts.Items.Add(TMFISortByDateCreation);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void MenuFlyoutCommandSorts_Opened(object sender, object e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
+                {
+                    if (libraryCollectionSubPage.ViewModelPage.OrderedBy == LibraryGroupVM.OrderBy.Croissant)
                     {
-                        if (!item.IsChecked)
+                        if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "croissant") is ToggleMenuFlyoutItem currentItem)
                         {
-                            item.IsChecked = true;
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
-                        return;
                     }
-                    this.OrderItemsBy(BookGroupVM.OrderBy.Croissant, $"Organisation en cours des livres par ordre croissant...", GetSelectedPage, true, ViewModelPage.ResearchBook);
+                    else if (libraryCollectionSubPage.ViewModelPage.OrderedBy == LibraryGroupVM.OrderBy.DCroissant)
+                    {
+                        if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "dcroissant") is ToggleMenuFlyoutItem currentItem)
+                        {
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                        }
+                    }
+
+                    if (libraryCollectionSubPage.ViewModelPage.SortedBy == LibraryGroupVM.SortBy.Name)
+                    {
+                        if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "name") is ToggleMenuFlyoutItem currentItem)
+                        {
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                        }
+                    }
+                    else if (libraryCollectionSubPage.ViewModelPage.SortedBy == LibraryGroupVM.SortBy.DateCreation)
+                    {
+                        if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "dateCreation") is ToggleMenuFlyoutItem currentItem)
+                        {
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag != currentItem.Tag).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                        }
+                    }
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+                {
+                    if (bookCollectionSubPage.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.Croissant)
+                    {
+                        if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "croissant") is ToggleMenuFlyoutItem currentItem)
+                        {
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "croissant").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                        }
+                    }
+                    else if (bookCollectionSubPage.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.Croissant)
+                    {
+                        if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "dcroissant") is ToggleMenuFlyoutItem currentItem)
+                        {
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "dcroissant").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                        }
+                    }
+
+                    if (bookCollectionSubPage.ViewModelPage.SortedBy == BookGroupVM.SortBy.Name)
+                    {
+                        if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "name") is ToggleMenuFlyoutItem currentItem)
+                        {
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "name").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                        }
+                    }
+                    else if (bookCollectionSubPage.ViewModelPage.SortedBy == BookGroupVM.SortBy.DateCreation)
+                    {
+                        if (MenuFlyoutCommandSorts.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "dateCreation") is ToggleMenuFlyoutItem currentItem)
+                        {
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandSorts.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "dateCreation").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        private void TMFI_OrderByCroissant_Click(object sender, RoutedEventArgs e)
+        {
+            if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
+            {
+                if (libraryCollectionSubPage.ViewModelPage.OrderedBy == LibraryGroupVM.OrderBy.Croissant)
+                {
+                    return;
+                }
+                libraryCollectionSubPage.ViewModelPage.OrderedBy = LibraryGroupVM.OrderBy.Croissant;
+                this.OrderItemsBy($"Organisation en cours des bibliothèques par ordre croissant...", GetSelectedPage, true, ViewModelPage.ResearchBook);
+            }
+            else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+            {
+                if (bookCollectionSubPage.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.Croissant)
+                {
+                    return;
+                }
+                bookCollectionSubPage.ViewModelPage.OrderedBy = BookGroupVM.OrderBy.Croissant;
+                this.OrderItemsBy($"Organisation en cours des livres par ordre croissant...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
         private void TMFI_OrderByDCroissant_Click(object sender, RoutedEventArgs e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
+            if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
             {
-                if (sender is ToggleMenuFlyoutItem item)
+                if (libraryCollectionSubPage.ViewModelPage.OrderedBy == LibraryGroupVM.OrderBy.DCroissant)
                 {
-                    if (this.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
-                    {
-                        if (!item.IsChecked)
-                        {
-                            item.IsChecked = true;
-                        }
-                        return;
-                    }
-
-                    this.OrderItemsBy(BookGroupVM.OrderBy.DCroissant, $"Organisation en cours des livres par ordre décroissant...", GetSelectedPage, true, ViewModelPage.ResearchBook);
+                    return;
                 }
+                libraryCollectionSubPage.ViewModelPage.OrderedBy = LibraryGroupVM.OrderBy.DCroissant;
+                this.OrderItemsBy($"Organisation en cours des bibliothèques par ordre décroissant...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
-            catch (Exception ex)
+            else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
             {
-                Logs.Log(ex, m);
-                return;
+                if (bookCollectionSubPage.ViewModelPage.OrderedBy == BookGroupVM.OrderBy.DCroissant)
+                {
+                    return;
+                }
+                bookCollectionSubPage.ViewModelPage.OrderedBy = BookGroupVM.OrderBy.DCroissant;
+                this.OrderItemsBy($"Organisation en cours des livres par ordre décroissant...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
         private void TMFI_SortByName_Click(object sender, RoutedEventArgs e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
+            if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
             {
-                if (sender is ToggleMenuFlyoutItem item)
+                if (libraryCollectionSubPage.ViewModelPage.SortedBy == LibraryGroupVM.SortBy.Name)
                 {
-                    if (this.ViewModelPage.SortedBy == BookGroupVM.SortBy.Name)
-                    {
-                        if (!item.IsChecked)
-                        {
-                            item.IsChecked = true;
-                        }
-                        return;
-                    }
-                    this.SortItemsBy(BookGroupVM.SortBy.Name, $"Organisation en cours des livres par nom...", GetSelectedPage, true, ViewModelPage.ResearchBook);
+                    return;
                 }
+                libraryCollectionSubPage.ViewModelPage.SortedBy = LibraryGroupVM.SortBy.Name;
+                this.SortItemsBy($"Organisation en cours des bibliothèques par nom ...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
-            catch (Exception ex)
+            else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
             {
-                Logs.Log(ex, m);
-                return;
+                if (bookCollectionSubPage.ViewModelPage.SortedBy == BookGroupVM.SortBy.Name)
+                {
+                    return;
+                }
+                bookCollectionSubPage.ViewModelPage.SortedBy = BookGroupVM.SortBy.Name;
+                this.SortItemsBy($"Organisation en cours des livres par nom ...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
 
         private void TMFI_SortByDateCreation_Click(object sender, RoutedEventArgs e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
+            if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
             {
-                if (sender is ToggleMenuFlyoutItem item)
+                if (libraryCollectionSubPage.ViewModelPage.SortedBy == LibraryGroupVM.SortBy.DateCreation)
                 {
-                    if (this.ViewModelPage.SortedBy == BookGroupVM.SortBy.DateCreation)
-                    {
-                        if (!item.IsChecked)
-                        {
-                            item.IsChecked = true;
-                        }
-                        return;
-                    }
-
-                    this.SortItemsBy(BookGroupVM.SortBy.DateCreation, $"Organisation en cours des livres par date de création...", GetSelectedPage, true, ViewModelPage.ResearchBook);
+                    return;
                 }
-                //await this.RefreshItemsGrouping(false);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
 
+                libraryCollectionSubPage.ViewModelPage.SortedBy = LibraryGroupVM.SortBy.DateCreation;
+                this.SortItemsBy($"Organisation en cours des bibliothèques par date de création...", GetSelectedPage, true, ViewModelPage.ResearchBook);
+            }
+            else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+            {
+                if (bookCollectionSubPage.ViewModelPage.SortedBy == BookGroupVM.SortBy.DateCreation)
+                {
+                    return;
+                }
+                bookCollectionSubPage.ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
+                this.SortItemsBy($"Organisation en cours des livres par date de création...", GetSelectedPage, true, ViewModelPage.ResearchBook);
+            }            
+        }
         #endregion
 
         #region SideBar
@@ -2263,7 +2464,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-
         private void SplitBtnSearch_Click(Microsoft.UI.Xaml.Controls.SplitButton sender, Microsoft.UI.Xaml.Controls.SplitButtonClickEventArgs args)
         {
             try
@@ -2992,7 +3192,5 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-
     }
 }

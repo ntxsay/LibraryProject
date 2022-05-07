@@ -248,22 +248,12 @@
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <MenuFlyout Placement="Bottom" x:Name="MenuFlyoutCommandGroups" Opened="MenuFlyoutCommandGroups_Opened">
-                        <!--<ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='parution-year', Mode=OneWay}" Text="Année de parution" Click="TMFI_GroupByParutionYear_Click"/>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='creation-year', Mode=OneWay}" Text="Année de création" Click="TMFI_GroupByCreationYear_Click"/>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='letter', Mode=OneWay}" Text="Lettre" Click="TMFI_GroupByLetter_Click"/>
-                        <MenuFlyoutSeparator/>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.GroupedBy, Converter={StaticResource groupbyToBooleanConverter}, ConverterParameter='none', Mode=OneWay}" Text="Aucun" Click="TMFI_GroupByNone_Click"/>-->
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarButton Icon="Filter" ToolTipService.ToolTip="Trier par">
                 <AppBarButton.Flyout>
-                    <MenuFlyout>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource orderbyToBooleanConverter}, ConverterParameter='croissant', Mode=OneWay}" Text="Croissant" Click="TMFI_OrderByCroissant_Click"/>
-                        <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModelPage.OrderedBy, Converter={StaticResource orderbyToBooleanConverter}, ConverterParameter='dCroissant', Mode=OneWay}" Text="Décroissant" Click="TMFI_OrderByDCroissant_Click"/>
-                        <MenuFlyoutSeparator/>
-                        <ToggleMenuFlyoutItem Text="Nom" IsChecked="{x:Bind ViewModelPage.SortedBy, Converter={StaticResource sortbyToBooleanConverter}, ConverterParameter='name', Mode=OneWay}" Click="TMFI_SortByName_Click"/>
-                        <ToggleMenuFlyoutItem Text="Date de création" IsChecked="{x:Bind ViewModelPage.SortedBy, Converter={StaticResource sortbyToBooleanConverter}, ConverterParameter='dateCreation', Mode=OneWay}" Click="TMFI_SortByDateCreation_Click"/>
+                    <MenuFlyout Placement="Bottom" x:Name="MenuFlyoutCommandSorts" Opened="MenuFlyoutCommandSorts_Opened">
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
