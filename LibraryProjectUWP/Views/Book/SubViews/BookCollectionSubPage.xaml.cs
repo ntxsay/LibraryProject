@@ -60,8 +60,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            EsLibrary esLibrary = new EsLibrary();
+            ParentPage.ViewModelPage.BackgroundImagePath = await esLibrary.GetBookCollectionBackgroundImagePathAsync(ParentPage.Parameters.ParentLibrary.Guid);
+            await ParentPage.InitializeBackgroundImagesync();
             InitializeData(true);
         }
 
@@ -333,13 +336,13 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private void DataGridItems_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        private async void DataGridItems_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             try
             {
                 if (sender is DataGrid dataGrid && dataGrid.SelectedItem is LivreVM viewModel)
                 {
-                    ParentPage.NewEditBook(viewModel, EditMode.Edit);
+                    await ParentPage.NewEditBookAsync(viewModel, EditMode.Edit);
                 }
             }
             catch (Exception ex)
@@ -562,20 +565,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private void EditBookInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void EditBookInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            try
+            if (args.Parameter is LivreVM viewModel)
             {
-                if (args.Parameter is LivreVM viewModel)
-                {
-                    ParentPage.NewEditBook(viewModel, EditMode.Edit);
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
+                await ParentPage.NewEditBookAsync(viewModel, EditMode.Edit);
             }
         }
 

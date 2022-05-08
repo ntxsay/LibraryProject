@@ -169,6 +169,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
             public static async Task<OperationStateVM> CreateAsync(BibliothequeVM viewModel)
             {
+                MethodBase m = MethodBase.GetCurrentMethod();
                 try
                 {
                     if (viewModel == null)
@@ -189,18 +190,19 @@ namespace LibraryProjectUWP.Code.Services.Db
                         };
                     }
 
+                    var isExist = await IsExistAsync(viewModel);
+                    if (isExist)
+                    {
+                        Logs.Log(m, $"La bibliothèque \"{viewModel.Name}\" existe déjà.");
+                        return new OperationStateVM()
+                        {
+                            IsSuccess = true,
+                            Message = DbServices.RecordAlreadyExistMessage
+                        };
+                    }
+
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var isExist = await context.Tlibrary.AnyAsync(c => c.Name.ToLower() == viewModel.Name.Trim().ToLower());
-                        if (isExist)
-                        {
-                            return new OperationStateVM()
-                            {
-                                IsSuccess = true,
-                                Message = DbServices.RecordAlreadyExistMessage
-                            };
-                        }
-
                         var record = new Tlibrary()
                         {
                             Guid = viewModel.Guid.ToString(),
@@ -224,7 +226,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
                 catch (Exception ex)
                 {
-                    MethodBase m = MethodBase.GetCurrentMethod();
                     Logs.Log(ex, m);
                     return new OperationStateVM()
                     {
@@ -301,7 +302,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             };
                         }
 
-                        var isExist = await context.Tlibrary.AnyAsync(c => c.Id != record.Id && c.Name.ToLower() == viewModel.Name.Trim().ToLower());
+                        var isExist = await IsExistAsync(viewModel, true, record.Id);
                         if (isExist)
                         {
                             return new OperationStateVM()
@@ -382,6 +383,33 @@ namespace LibraryProjectUWP.Code.Services.Db
                     };
                 }
             }
+
+            private static async Task<bool> IsExistAsync(BibliothequeVM viewModel, bool isEdit = false, long? modelId = null)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        string name = viewModel.Name?.Trim()?.ToLower();
+
+                        if (!isEdit)
+                        {
+                            return await context.Tlibrary.AnyAsync(c => c.Name.ToLower() == name);
+                        }
+                        else
+                        {
+                            return await context.Tlibrary.AnyAsync(c => c.Id != (long)modelId && c.Name.ToLower() == name);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return true;
+                }
+            }
+
 
             #region Helpers
 

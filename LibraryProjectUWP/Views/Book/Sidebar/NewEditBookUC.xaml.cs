@@ -77,7 +77,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
 
                 ParentPage = bookCollectionPage;
-                this.OriginalViewModel = livreVM;
+                this.OriginalViewModel = livreVM; //Attention de ne pas casser lien
 
                 ViewModelPage = new NewEditBookUCVM()
                 {
@@ -89,7 +89,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (ViewModelPage.EditMode == EditMode.Create)
                 {
-                    ViewModelPage.ViewModel = livreVM ?? new LivreVM()
+                    ViewModelPage.ViewModel = livreVM?.DeepCopy() ?? new LivreVM()
                     {
                         IdLibrary = idLibrary,
                     };
@@ -501,21 +501,6 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Collection
-        private async Task UpdateCollectionListAsync()
-        {
-            try
-            {
-                var itemList = await DbServices.Collection.AllVMAsync();
-                ViewModelPage.CollectionViewModelList = itemList?.ToList();
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         private void UpdateCollectionToBookXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             //await UpdateCollectionListAsync();
@@ -883,35 +868,11 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var viewModelsEqual = BookHelpers.GetPropertiesChanged(OriginalViewModel, ViewModelPage.ViewModel);
-                if (viewModelsEqual.Any())
+                var isModificationStateChecked = await this.CheckModificationsStateAsync();
+                if (isModificationStateChecked)
                 {
-                    var dialog = new BookEditedCD(OriginalViewModel, viewModelsEqual)
-                    {
-                        Title = "Enregistrer vos modifications"
-                    };
-
-                    var result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.Primary)
-                    {
-                        OperationStateVM operationResult = null;
-                        if (ViewModelPage.EditMode == EditMode.Create)
-                        {
-                            operationResult = await CreateAsync();
-                        }
-                        else if (ViewModelPage.EditMode == EditMode.Edit)
-                        {
-                            operationResult = await UpdateAsync();
-                        }
-
-                        return;
-                    }
-                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                    {
-                        return;
-                    }
+                    CancelModificationRequested?.Invoke(this, args);
                 }
-                CancelModificationRequested?.Invoke(this, args);
             }
             catch (Exception ex)
             {
@@ -948,6 +909,49 @@ namespace LibraryProjectUWP.Views.Book
                 MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        public async Task<bool> CheckModificationsStateAsync()
+        {
+            try
+            {
+                var viewModelsEqual = BookHelpers.GetPropertiesChanged(OriginalViewModel, ViewModelPage.ViewModel);
+                if (viewModelsEqual.Any())
+                {
+                    var dialog = new CheckModificationsStateCD(OriginalViewModel, viewModelsEqual)
+                    {
+                        Title = "Enregistrer vos modifications"
+                    };
+
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        OperationStateVM operationResult = null;
+                        if (ViewModelPage.EditMode == EditMode.Create)
+                        {
+                            operationResult = await CreateAsync();
+                        }
+                        else if (ViewModelPage.EditMode == EditMode.Edit)
+                        {
+                            operationResult = await UpdateAsync();
+                        }
+
+                        return operationResult.IsSuccess;
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return true;
             }
         }
 
@@ -1084,10 +1088,12 @@ namespace LibraryProjectUWP.Views.Book
                 OperationStateVM result = await DbServices.Book.CreateAsync(viewModel, ViewModelPage.IdLibrary);
                 if (result.IsSuccess)
                 {
+                    viewModel.Id = result.Id;
                     this.ViewModelPage.ResultMessageTitle = "Succès";
                     this.ViewModelPage.ResultMessage = result.Message;
                     this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
                     this.ViewModelPage.IsResultMessageOpen = true;
+                    await esBook.SaveBookViewModelAsync(OriginalViewModel);
                 }
                 else
                 {
@@ -1112,12 +1118,13 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var viewModel = this.ViewModelPage.ViewModel;
+                LivreVM viewModel = this.ViewModelPage.ViewModel;
 
                 OperationStateVM result = await DbServices.Book.UpdateAsync(viewModel);
                 if (result.IsSuccess)
                 {
-                    OriginalViewModel.Copy(this.ViewModelPage.ViewModel);
+                    //OriginalViewModel.Copy(this.ViewModelPage.ViewModel);
+                    OriginalViewModel.DeepCopy(viewModel);
                     ParentPage.CompleteBookInfos(OriginalViewModel);
                     await esBook.SaveBookViewModelAsync(OriginalViewModel);
 
@@ -1172,13 +1179,7 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
-
-        private void MenuFlyout_Opened(object sender, object e)
-        {
-
-        }
-
-        
+   
     }
 
     public class NewEditBookUCVM : INotifyPropertyChanged
@@ -1241,7 +1242,6 @@ namespace LibraryProjectUWP.Views.Book
         }
 
         public readonly IEnumerable<string> languagesList = CountryHelpers.LanguagesList();
-        //public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
 
         private LivreVM _ViewModel = new LivreVM();
         public LivreVM ViewModel

@@ -1,7 +1,12 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -11,6 +16,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Text;
@@ -29,36 +35,64 @@ namespace LibraryProjectUWP.Views.Library.Manage
 {
     public sealed partial class NewEditLibraryUC : PivotItem
     {
-        public readonly ManageLibraryDialogParametersVM _parameters;
-
+        public BookCollectionPage ParentPage { get; private set; }
+        public BibliothequeVM OriginalViewModel { get; private set; }
+        readonly EsLibrary eslibrary = new EsLibrary();
         public NewEditLibraryUCVM ViewModelPage { get; set; } = new NewEditLibraryUCVM();
 
         public delegate void CancelModificationEventHandler(NewEditLibraryUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
 
-        public delegate void UpdateItemEventHandler(NewEditLibraryUC sender, ExecuteRequestedEventArgs e);
-        public event UpdateItemEventHandler UpdateItemRequested;
-
-        public delegate void CreateItemEventHandler(NewEditLibraryUC sender, ExecuteRequestedEventArgs e);
-        public event CreateItemEventHandler CreateItemRequested;
+        public delegate void ExecuteTaskEventHandler(NewEditLibraryUC sender, BibliothequeVM originalViewModel, OperationStateVM e);
+        public event ExecuteTaskEventHandler ExecuteTaskRequested;
 
         public NewEditLibraryUC()
         {
             this.InitializeComponent();
         }
 
-        public NewEditLibraryUC(ManageLibraryDialogParametersVM parameters)
+        public void InitializeSideBar(BookCollectionPage bookCollectionPage, BibliothequeVM bibliothequeVM, EditMode editMode)
         {
-            this.InitializeComponent();
-            _parameters = parameters;
-            ViewModelPage.EditMode = parameters.EditMode;
-            ViewModelPage.Header = $"{(parameters.EditMode == Code.EditMode.Create ? "Ajouter" : "Editer")} une bibliothèque";
-            ViewModelPage.NamePlaceHolderText = "Nom de la bibliothèque";
-            ViewModelPage.DescriptionPlaceHolderText = "Description facultative de la bibliothèque";
-            ViewModelPage.Value = parameters?.CurrentLibrary?.Name;
-            ViewModelPage.Description = parameters?.CurrentLibrary?.Description;
-            InitializeActionInfos();
+            try
+            {
+                if (bibliothequeVM == null && editMode != EditMode.Create)
+                {
+                    return;
+                }
+
+                ParentPage = bookCollectionPage;
+                this.OriginalViewModel = bibliothequeVM; //Attention de ne pas casser lien
+
+                ViewModelPage = new NewEditLibraryUCVM()
+                {
+                    EditMode = editMode,
+                };
+
+                ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une bibliothèque";
+
+                if (ViewModelPage.EditMode == EditMode.Create)
+                {
+                    ViewModelPage.ViewModel = bibliothequeVM?.DeepCopy() ?? new BibliothequeVM();
+                }
+                else if (ViewModelPage.EditMode == EditMode.Edit)
+                {
+                    ViewModelPage.ViewModel = bibliothequeVM.DeepCopy();
+                }
+                InitializeActionInfos();
+
+                if (ViewModelPage.EditMode == EditMode.Edit)
+                {
+                    this.Bindings.Update();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
+
 
         private void InitializeActionInfos()
         {
@@ -70,20 +104,16 @@ namespace LibraryProjectUWP.Views.Library.Manage
                     //FontWeight = FontWeights.Medium,
                 };
                 TbcInfos.Inlines.Add(runTitle);
-                
-                if (_parameters != null)
+
+                if (ViewModelPage.EditMode == EditMode.Edit)
                 {
-                    if (ViewModelPage.EditMode == EditMode.Edit)
+                    Run runCategorie = new Run()
                     {
-                        Run runCategorie = new Run()
-                        {
-                            Text = " " + _parameters?.CurrentLibrary?.Name,
-                            FontWeight = FontWeights.Medium,
-                        };
-                        TbcInfos.Inlines.Add(runCategorie);
-                    }
+                        Text = " " + OriginalViewModel.Name,
+                        FontWeight = FontWeights.Medium,
+                    };
+                    TbcInfos.Inlines.Add(runCategorie);
                 }
-                
             }
             catch (Exception)
             {
@@ -92,24 +122,14 @@ namespace LibraryProjectUWP.Views.Library.Manage
             }
         }
 
-        private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            CancelModificationRequested?.Invoke(this, args);
-        }
-
-        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
-                bool isValided = IsModelValided();
-                if (!isValided)
+                var isModificationStateChecked = await this.CheckModificationsStateAsync();
+                if (isModificationStateChecked)
                 {
-                    return;
-                }
-
-                if (CreateItemRequested != null)
-                {
-                    CreateItemRequested(this, args);
+                    CancelModificationRequested?.Invoke(this, args);
                 }
             }
             catch (Exception ex)
@@ -120,7 +140,7 @@ namespace LibraryProjectUWP.Views.Library.Manage
             }
         }
 
-        private void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void BtnExecuteAction_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -130,7 +150,17 @@ namespace LibraryProjectUWP.Views.Library.Manage
                     return;
                 }
 
-                UpdateItemRequested?.Invoke(this, args);
+                OperationStateVM result = null;
+                if (ViewModelPage.EditMode == EditMode.Create)
+                {
+                    result = await CreateAsync();
+                }
+                else if (ViewModelPage.EditMode == EditMode.Edit)
+                {
+                    result = await UpdateAsync();
+                }
+
+                ExecuteTaskRequested?.Invoke(this, OriginalViewModel, result);
             }
             catch (Exception ex)
             {
@@ -140,31 +170,60 @@ namespace LibraryProjectUWP.Views.Library.Manage
             }
         }
 
+        public async Task<bool> CheckModificationsStateAsync()
+        {
+            try
+            {
+                var viewModelsEqual = BookHelpers.GetPropertiesChanged(OriginalViewModel, ViewModelPage.ViewModel);
+                if (viewModelsEqual.Any())
+                {
+                    var dialog = new CheckModificationsStateCD(OriginalViewModel, viewModelsEqual)
+                    {
+                        Title = "Enregistrer vos modifications"
+                    };
+
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        OperationStateVM operationResult = null;
+                        if (ViewModelPage.EditMode == EditMode.Create)
+                        {
+                            operationResult = await CreateAsync();
+                        }
+                        else if (ViewModelPage.EditMode == EditMode.Edit)
+                        {
+                            operationResult = await UpdateAsync();
+                        }
+
+                        return operationResult.IsSuccess;
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return true;
+            }
+        }
 
         private bool IsModelValided()
         {
             try
             {
-                if (ViewModelPage.Value.IsStringNullOrEmptyOrWhiteSpace())
+                if (ViewModelPage.ViewModel.Name.IsStringNullOrEmptyOrWhiteSpace())
                 {
                     ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
                     ViewModelPage.ResultMessage = $"Le nom de la bibliothèque ne peut pas être vide\nou ne contenir que des espaces blancs.";
                     ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
                     ViewModelPage.IsResultMessageOpen = true;
                     return false;
-                }
-
-                if (_parameters.ViewModelList != null && _parameters.ViewModelList.Any(a => a.Name.ToLower() == ViewModelPage.Value.Trim().ToLower()))
-                {
-                    var isError = !(_parameters.EditMode == Code.EditMode.Edit && _parameters.CurrentLibrary?.Name?.Trim().ToLower() == ViewModelPage.Value?.Trim().ToLower());
-                    if (isError)
-                    {
-                        ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                        ViewModelPage.ResultMessage = $"Cette bibliothèque existe déjà.";
-                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                        ViewModelPage.IsResultMessageOpen = true;
-                        return false;
-                    }
                 }
 
                 ViewModelPage.IsResultMessageOpen = false;
@@ -178,11 +237,77 @@ namespace LibraryProjectUWP.Views.Library.Manage
             }
         }
 
-
-        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async Task<OperationStateVM> CreateAsync()
         {
+            try
+            {
+                BibliothequeVM viewModel = this.ViewModelPage.ViewModel;
 
+                OperationStateVM result = await DbServices.Library.CreateAsync(viewModel);
+                if (result.IsSuccess)
+                {
+                    viewModel.Id = result.Id;
+                    this.ViewModelPage.ResultMessageTitle = "Succès";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+                    await eslibrary.SaveLibraryViewModelAsync(OriginalViewModel);
+                }
+                else
+                {
+                    //Erreur
+                    this.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
         }
+
+        private async Task<OperationStateVM> UpdateAsync()
+        {
+            try
+            {
+                BibliothequeVM viewModel = this.ViewModelPage.ViewModel;
+
+                OperationStateVM result = await DbServices.Library.UpdateAsync(viewModel);
+                if (result.IsSuccess)
+                {
+                    OriginalViewModel.DeepCopy(viewModel);
+                    await eslibrary.SaveLibraryViewModelAsync(OriginalViewModel);
+
+                    this.ViewModelPage.ResultMessageTitle = "Succès";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+                }
+                else
+                {
+                    //Erreur
+                    this.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -193,14 +318,9 @@ namespace LibraryProjectUWP.Views.Library.Manage
                     CancelModificationRequested = null;
                 }
 
-                if (CreateItemRequested != null)
+                if (ExecuteTaskRequested != null)
                 {
-                    CreateItemRequested = null;
-                }
-
-                if (UpdateItemRequested != null)
-                {
-                    UpdateItemRequested = null;
+                    ExecuteTaskRequested = null;
                 }
             }
             catch (Exception)
@@ -301,71 +421,15 @@ namespace LibraryProjectUWP.Views.Library.Manage
             }
         }
 
-        private string _ArgName;
-        public string ArgName
+        private BibliothequeVM _ViewModel;
+        public BibliothequeVM ViewModel
         {
-            get => this._ArgName;
+            get => this._ViewModel;
             set
             {
-                if (this._ArgName != value)
+                if (this._ViewModel != value)
                 {
-                    this._ArgName = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _Value;
-        public string Value
-        {
-            get => this._Value;
-            set
-            {
-                if (this._Value != value)
-                {
-                    this._Value = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _Description;
-        public string Description
-        {
-            get => this._Description;
-            set
-            {
-                if (this._Description != value)
-                {
-                    this._Description = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _NamePlaceHolderText;
-        public string NamePlaceHolderText
-        {
-            get => this._NamePlaceHolderText;
-            set
-            {
-                if (this._NamePlaceHolderText != value)
-                {
-                    this._NamePlaceHolderText = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _DescriptionPlaceHolderText;
-        public string DescriptionPlaceHolderText
-        {
-            get => this._DescriptionPlaceHolderText;
-            set
-            {
-                if (this._DescriptionPlaceHolderText != value)
-                {
-                    this._DescriptionPlaceHolderText = value;
+                    this._ViewModel = value;
                     this.OnPropertyChanged();
                 }
             }

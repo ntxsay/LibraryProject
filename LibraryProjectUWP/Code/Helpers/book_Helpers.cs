@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
 using System;
@@ -13,6 +14,42 @@ namespace LibraryProjectUWP.Code.Helpers
 {
     public class BookHelpers
     {
+        public static List<PropertiesChangedVM> GetPropertiesChanged(BibliothequeVM viewModelA, BibliothequeVM viewModelB)
+        {
+            try
+            {
+                if (viewModelA == null) return null;
+                if (viewModelB == null) return null;
+                List<PropertiesChangedVM> list = new List<PropertiesChangedVM>();
+
+                if (viewModelA.Name != viewModelB.Name)
+                {
+                    list.Add(new PropertiesChangedVM()
+                    {
+                        PropertyName = "Nom de la bibliothèque",
+                        Message = "Le nom de la bibliothèque a été changé"
+                    });
+                }
+
+                if (viewModelA.Description != viewModelB.Description)
+                {
+                    list.Add(new PropertiesChangedVM()
+                    {
+                        PropertyName = "Description de la bibliothèque",
+                        Message = "La description de la bibliothèque a été changé"
+                    });
+                }
+
+                return list;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
         public static List<PropertiesChangedVM> GetPropertiesChanged(LivreVM viewModelA, LivreVM viewModelB)
         {
             try
@@ -510,6 +547,7 @@ namespace LibraryProjectUWP.Code.Helpers
                 return null;
             }
         }
+
 
     }
 }

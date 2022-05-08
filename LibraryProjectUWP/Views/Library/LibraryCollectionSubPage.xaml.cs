@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.Code.Helpers;
+﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
@@ -279,17 +280,11 @@ namespace LibraryProjectUWP.Views.Library
         #endregion
 
         #region ContextMenu
-        private void EditLibraryInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void EditLibraryInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
+            if (args.Parameter is BibliothequeVM viewModel)
             {
-                
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
+                await ParentPage.NewEditLibraryAsync(viewModel, EditMode.Edit);
             }
         }
 

@@ -21,6 +21,7 @@ namespace LibraryProjectUWP.ViewModels.Book
 
         public long Id { get; set; }
         public long? IdLibrary { get; set; }
+        public Guid RefGuid { get; private set; } = Guid.NewGuid();
         public Guid Guid { get; set; } = Guid.NewGuid();
         public long CountOpening { get; set; }
 
@@ -207,6 +208,12 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreIdentificationVM Identification { get; set; } = new LivreIdentificationVM();
         public LivreFormatVM Format { get; set; } = new LivreFormatVM();
         public LivrePublicationVM Publication { get; set; } = new LivrePublicationVM();
+
+        public LivreVM ChangeRefGuid()
+        {
+            RefGuid = Guid.NewGuid();
+            return this;
+        }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

@@ -283,8 +283,8 @@
     <Compile Include="Views\Book\BookCollectionPage_Search.cs" />
     <Compile Include="Views\Book\BookCollectionPage_ViewModelPage.cs" />
     <Compile Include="Views\Book\BookCollectionPage_Tasks.cs" />
-    <Compile Include="Views\Book\Dialog\BookEditedCD.xaml.cs">
-      <DependentUpon>BookEditedCD.xaml</DependentUpon>
+    <Compile Include="Views\CheckModificationsStateCD.xaml.cs">
+      <DependentUpon>CheckModificationsStateCD.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\Dialog\ReturnBookExemplaryCD.xaml.cs">
       <DependentUpon>ReturnBookExemplaryCD.xaml</DependentUpon>
@@ -489,7 +489,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Book\Dialog\BookEditedCD.xaml">
+    <Page Include="Views\CheckModificationsStateCD.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -681,7 +681,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\UI\" />
-    <Folder Include="Views\Library\NewFolder1\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

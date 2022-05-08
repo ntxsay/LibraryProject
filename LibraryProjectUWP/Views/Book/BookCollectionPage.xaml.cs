@@ -37,6 +37,7 @@ using Microsoft.Toolkit.Uwp.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 using Windows.UI;
+using LibraryProjectUWP.Views.Library.Manage;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -86,11 +87,6 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     OpenBookCollection(null);
                 }
-#warning A supprimer
-                //EsLibrary esLibrary = new EsLibrary();
-                //ViewModelPage.BackgroundImagePath = await esLibrary.GetBookCollectionBackgroundImagePathAsync(Parameters.ParentLibrary.Guid);
-                //await InitializeBackgroundImagesync();
-                //
             }
             catch (Exception ex)
             {
@@ -171,6 +167,7 @@ namespace LibraryProjectUWP.Views.Book
                 this.NavigateToView(typeof(LibraryCollectionSubPage), this);
                 InitializeGroupsCmdBarItemsForLibraryCollection();
                 InitializeSortsCmdBarItemsForLibraryCollection();
+                InitializeAddsCmdBarItemsForLibraryCollection();
             }
             catch (Exception ex)
             {
@@ -210,44 +207,6 @@ namespace LibraryProjectUWP.Views.Book
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async Task LoadDataAsync(bool firstLoad)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                //var bookList = await DbServices.Book.MultipleVmWithIdLibraryAsync(_parameters.ParentLibrary.Id);
-                //_parameters.ParentLibrary.Books = bookList?.ToList() ?? new List<LivreVM>(); ;
-                await InitializeDataAsync(firstLoad);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async Task InitializeDataAsync(bool firstLoad)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                ViewModelPage.SearchingLibraryVisibility = Visibility.Collapsed;
-                if (ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
-                {
-                    await this.GridViewMode(firstLoad);
-                }
-                else if (ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
-                {
-                    await this.DataGridViewMode(firstLoad);
-                }
-            }
-            catch (Exception ex)
-            {
                 Logs.Log(ex, m);
                 return;
             }
@@ -957,6 +916,48 @@ namespace LibraryProjectUWP.Views.Book
             }            
         }
 
+        public void InitializeAddsCmdBarItemsForLibraryCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                MenuFlyoutCommandAdds.Items.Clear();
+
+                MenuFlyoutItem TMFIAddNewItem = new MenuFlyoutItem()
+                {
+                    Text = "Nouvelle bibliothèque",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE710",
+                    }
+                };
+                TMFIAddNewItem.Click += TMFIAddNewItem_Click;
+
+                MenuFlyoutItem TMFIAddFromFile = new MenuFlyoutItem()
+                {
+                    Text = "Ouvrir un fichier",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE8B5",
+                    }
+                };
+                TMFIAddFromFile.Click += TMFIAddFromFile_Click;
+
+                
+
+                MenuFlyoutCommandAdds.Items.Add(TMFIAddNewItem);
+                MenuFlyoutCommandAdds.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandAdds.Items.Add(TMFIAddFromFile);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         public void InitializeAddsCmdBarItemsForBookCollection()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -973,14 +974,14 @@ namespace LibraryProjectUWP.Views.Book
                         Glyph = "\uE736",
                     }
                 };
-                MFSIAddNew.PointerEntered += (o, e) =>
-                {
-                    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 1);
-                };
-                MFSIAddNew.PointerExited += (o, e) =>
-                {
-                    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 1);
-                };
+                //MFSIAddNew.PointerEntered += (o, e) =>
+                //{
+                //    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 1);
+                //};
+                //MFSIAddNew.PointerExited += (o, e) =>
+                //{
+                //    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 1);
+                //};
 
                 MenuFlyoutItem TMFIAddNewItem = new MenuFlyoutItem()
                 {
@@ -1080,6 +1081,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+
         private void TMFIAddNewCollection_Click(object sender, RoutedEventArgs e)
         {
             NewEditCollection(null, EditMode.Create);
@@ -1095,14 +1097,15 @@ namespace LibraryProjectUWP.Views.Book
 
         }
 
-        private void TMFIAddNewItem_Click(object sender, RoutedEventArgs e)
+        private async void TMFIAddNewItem_Click(object sender, RoutedEventArgs e)
         {
             if (FrameContainer.Content is LibraryCollectionSubPage)
             {
+                await NewEditLibraryAsync(new BibliothequeVM(), EditMode.Create);
             }
             else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
             {
-                NewEditBook(new LivreVM()
+                await NewEditBookAsync(new LivreVM()
                 {
                     IdLibrary = Parameters.ParentLibrary.Id,
                 }, EditMode.Create);
@@ -1138,7 +1141,7 @@ namespace LibraryProjectUWP.Views.Book
                         {
                             htmlServices htmlservices = new htmlServices();
                             var viewModel = await htmlservices.GetBookFromAmazonAsync(new Uri(url), new LivreVM());
-                            NewEditBook(viewModel, EditMode.Create);
+                            await NewEditBookAsync(viewModel, EditMode.Create);
                         }
                         else
                         {
@@ -1183,7 +1186,7 @@ namespace LibraryProjectUWP.Views.Book
 
                         if (viewModels.Count() == 1)
                         {
-                            NewEditBook(viewModels.First(), EditMode.Create);
+                            await NewEditBookAsync(viewModels.First(), EditMode.Create);
                         }
                         else
                         {
@@ -1280,7 +1283,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async Task InitializeBackgroundImagesync()
+        public async Task InitializeBackgroundImagesync()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1312,8 +1315,8 @@ namespace LibraryProjectUWP.Views.Book
 
         #endregion
 
-        #region Edit Book
-        public async void NewEditBook(LivreVM viewModel, EditMode editMode = EditMode.Create)
+        #region New-Edit Book
+        public async Task NewEditBookAsync(LivreVM viewModel, EditMode editMode = EditMode.Create)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -1330,40 +1333,17 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC item && item.ViewModelPage.EditMode == editMode) is NewEditBookUC checkedItem)
                 {
-                    var viewModelsEqual = BookHelpers.GetPropertiesChanged(checkedItem.OriginalViewModel, checkedItem.ViewModelPage.ViewModel);
-                    if (viewModelsEqual.Any())
+                    var isModificationStateChecked = await checkedItem.CheckModificationsStateAsync();
+                    if (isModificationStateChecked)
                     {
-                        var dialog = new BookEditedCD(checkedItem.OriginalViewModel, viewModelsEqual)
-                        {
-                            Title = "Enregistrer vos modifications"
-                        };
-
-                        var result = await dialog.ShowAsync();
-                        if (result == ContentDialogResult.Primary)
-                        {
-                            //if (checkedItem.ViewModelPage.EditMode == EditMode.Create)
-                            //{
-                            //    checkedItem.CreateItemXUiCommand_ExecuteRequested(null, null);
-                            //}
-                            //else if (checkedItem.ViewModelPage.EditMode == EditMode.Edit)
-                            //{
-                            //    checkedItem.UpdateItemXUiCommand_ExecuteRequested(null, null);
-                            //}
-                            return;
-                        }
-                        else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                        {
-                            return;
-                        }
+                        checkedItem.InitializeSideBar(Parameters.ParentLibrary.Id, this, viewModel, editMode);
+                        this.SelectItemSideBar(checkedItem);
                     }
-                    checkedItem.InitializeSideBar(Parameters.ParentLibrary.Id, this, viewModel, editMode);
-                    this.SelectItemSideBar(checkedItem);
                 }
                 else
                 {
                     NewEditBookUC userControl = new NewEditBookUC();
                     userControl.InitializeSideBar(Parameters.ParentLibrary.Id, this, viewModel, editMode);
-
 
                     userControl.CancelModificationRequested += NewEditBookUC_CancelModificationRequested;
                     userControl.ExecuteTaskRequested += NewEditBookUC_ExecuteTaskRequested;
@@ -1386,61 +1366,45 @@ namespace LibraryProjectUWP.Views.Book
 
         private void NewEditBookUC_ExecuteTaskRequested(NewEditBookUC sender, LivreVM originalViewModel, OperationStateVM e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (e.IsSuccess)
-                {
-                    if (sender.ViewModelPage.EditMode == EditMode.Edit)
-                    {
-                    }
-                    
-                    this.RemoveItemToSideBar(sender);
-                }
-                else
-                {
-
-                }
-
-                this.RemoveItemToSideBar(sender);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            this.RemoveItemToSideBar(sender);
         }
 
         private void NewEditBookUC_CancelModificationRequested(NewEditBookUC sender, ExecuteRequestedEventArgs e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-
-                this.RemoveItemToSideBar(sender);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            this.RemoveItemToSideBar(sender);
         }
 
-
-        #endregion
-
-        #region Import Book
-        private async void ImportBookFromWebSiteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            
-        }
-
-        private async void ImportBookFromExcelFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        public async Task NewEditLibraryAsync(BibliothequeVM viewModel, EditMode editMode = EditMode.Create)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditLibraryUC item && item.ViewModelPage.EditMode == editMode) is NewEditLibraryUC checkedItem)
+                {
+                    var isModificationStateChecked = await checkedItem.CheckModificationsStateAsync();
+                    if (isModificationStateChecked)
+                    {
+                        checkedItem.InitializeSideBar(this, viewModel, editMode);
+                        this.SelectItemSideBar(checkedItem);
+                    }
+                }
+                else
+                {
+                    NewEditLibraryUC userControl = new NewEditLibraryUC();
+                    userControl.InitializeSideBar(this, viewModel, editMode);
+
+                    userControl.CancelModificationRequested += NewEditLibraryUC_CancelModificationRequested;
+                    userControl.ExecuteTaskRequested += NewEditLibraryUC_ExecuteTaskRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.ViewModelPage.ItemGuid,
+                    });
+                }
+                this.ViewModelPage.IsSplitViewOpen = true;
             }
             catch (Exception ex)
             {
@@ -1449,6 +1413,18 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void NewEditLibraryUC_ExecuteTaskRequested(NewEditLibraryUC sender, BibliothequeVM originalViewModel, OperationStateVM e)
+        {
+            this.RemoveItemToSideBar(sender);
+        }
+
+        private void NewEditLibraryUC_CancelModificationRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
+        {
+            this.RemoveItemToSideBar(sender);
+        }
+        #endregion
+
+        #region Import Book
         private async void ImportBookFromJsonFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1468,7 +1444,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     if (viewModels.Count() == 1)
                     {
-                        NewEditBook(viewModels.First(), EditMode.Create);
+                        await NewEditBookAsync(viewModels.First(), EditMode.Create);
                     }
                     else
                     {
