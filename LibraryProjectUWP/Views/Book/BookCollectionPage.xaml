@@ -334,8 +334,8 @@
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter un élément">
                 <AppBarButton.Flyout>
-                    <MenuFlyout Placement="Bottom" x:Name="MenuFlyoutCommandAdds">
-                        <MenuFlyoutSubItem Text="Ajouter un livre" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                    <MenuFlyout Placement="Bottom" x:Name="MenuFlyoutCommandAdds" Opened="MenuFlyoutCommandAdds_Opened">
+                        <!--<MenuFlyoutSubItem Text="Ajouter un livre" MTUUi:FrameworkElementExtensions.Cursor="Hand">
                             <MenuFlyoutSubItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
                             </MenuFlyoutSubItem.Icon>
@@ -376,7 +376,7 @@
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;"/>
                             </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
+                        </MenuFlyoutItem>-->
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

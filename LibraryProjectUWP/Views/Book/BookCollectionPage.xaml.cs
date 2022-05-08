@@ -33,6 +33,10 @@ using LibraryProjectUWP.Views.Library;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.Views.UserControls.TitleBar;
 using LibraryProjectUWP.ViewModels.Library;
+using Microsoft.Toolkit.Uwp.UI;
+using Windows.UI.Core;
+using Windows.UI.Xaml.Media;
+using Windows.UI;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -114,6 +118,25 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        public async void OpenBookCollection(long idLibrary)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                BibliothequeVM viewModel = await DbServices.Library.SingleVMAsync(idLibrary);
+                Parameters.ParentLibrary = viewModel;
+                if (viewModel != null)
+                {
+                    OpenBookCollection(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         public void OpenBookCollection(BibliothequeVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -126,34 +149,11 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Margin = new Thickness(0, 14, 0, 0),
                     });
+                    this.NavigateToView(typeof(BookCollectionSubPage), this);
+                    InitializeGroupsCmdBarItemsForBookCollection();
+                    InitializeSortsCmdBarItemsForBookCollection();
+                    InitializeAddsCmdBarItemsForBookCollection();
                 }
-                this.NavigateToView(typeof(BookCollectionSubPage), this);
-                InitializeGroupsCmdBarItemsForBookCollection();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public async void OpenBookCollection(long idLibrary)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                BibliothequeVM viewModel = await DbServices.Library.SingleVMAsync(idLibrary);
-                Parameters.ParentLibrary = viewModel;
-                if (viewModel != null)
-                {
-                    Parameters.MainPage.ChangeAppTitle(new TitleBarLibraryName(viewModel)
-                    {
-                        Margin = new Thickness(0, 14, 0, 0),
-                    });
-                }
-                this.NavigateToView(typeof(BookCollectionSubPage), this);
-                InitializeGroupsCmdBarItemsForBookCollection();
-                InitializeSortsCmdBarItemsForBookCollection();
             }
             catch (Exception ex)
             {
@@ -964,41 +964,114 @@ namespace LibraryProjectUWP.Views.Book
             {
                 MenuFlyoutCommandAdds.Items.Clear();
 
-                MenuFlyoutSubItem MFIOrderByCroissant = new ToggleMenuFlyoutItem()
+                MenuFlyoutSubItem MFSIAddNew = new MenuFlyoutSubItem()
                 {
-                    Text = "Croissant",
-                    Tag = "croissant",
+                    Text = "Ajouter un livre",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE736",
+                    }
                 };
-                TMFIOrderByCroissant.Click += TMFI_OrderByCroissant_Click;
-
-                ToggleMenuFlyoutItem TMFIOrderByDCroissant = new ToggleMenuFlyoutItem()
+                MFSIAddNew.PointerEntered += (o, e) =>
                 {
-                    Text = "Décroissant",
-                    Tag = "dcroissant",
+                    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 1);
                 };
-                TMFIOrderByDCroissant.Click += TMFI_OrderByDCroissant_Click;
-
-                ToggleMenuFlyoutItem TMFISortByName = new ToggleMenuFlyoutItem()
+                MFSIAddNew.PointerExited += (o, e) =>
                 {
-                    Text = "Titre",
-                    Tag = "name",
+                    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 1);
                 };
 
-                TMFISortByName.Click += TMFI_SortByName_Click;
-
-                ToggleMenuFlyoutItem TMFISortByDateCreation = new ToggleMenuFlyoutItem()
+                MenuFlyoutItem TMFIAddNewItem = new MenuFlyoutItem()
                 {
-                    Text = "Date de création",
-                    Tag = "dateCreation",
+                    Text = "Nouveau livre",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE710",
+                    }
                 };
+                TMFIAddNewItem.Click += TMFIAddNewItem_Click;
+                MFSIAddNew.Items.Add(TMFIAddNewItem);
+                MFSIAddNew.Items.Add(new MenuFlyoutSeparator());
 
-                TMFISortByDateCreation.Click += TMFI_SortByDateCreation_Click;
+                MenuFlyoutItem TMFIAddFromWebsite = new MenuFlyoutItem()
+                {
+                    Text = "Lien Amazon (Expérimental)",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uF6FA",
+                    }
+                };
+                TMFIAddFromWebsite.Click += TMFIAddFromWebsite_Click;
+                MFSIAddNew.Items.Add(TMFIAddFromWebsite);
+                MFSIAddNew.Items.Add(new MenuFlyoutSeparator());
 
-                MenuFlyoutCommandSorts.Items.Add(TMFIOrderByCroissant);
-                MenuFlyoutCommandSorts.Items.Add(TMFIOrderByDCroissant);
-                MenuFlyoutCommandSorts.Items.Add(new MenuFlyoutSeparator());
-                MenuFlyoutCommandSorts.Items.Add(TMFISortByName);
-                MenuFlyoutCommandSorts.Items.Add(TMFISortByDateCreation);
+                MenuFlyoutItem TMFIAddFromFile = new MenuFlyoutItem()
+                {
+                    Text = "Ouvrir un fichier",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE8B5",
+                    }
+                };
+                TMFIAddFromFile.Click += TMFIAddFromFile_Click;
+                MFSIAddNew.Items.Add(TMFIAddFromFile);
+
+                MenuFlyoutItem TMFIAddFromExcelFile = new MenuFlyoutItem()
+                {
+                    Text = "Ouvrir un classeur Excel",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE8B5",
+                    }
+                };
+                TMFIAddFromExcelFile.Click += TMFIAddFromExcelFile_Click;
+                MFSIAddNew.Items.Add(TMFIAddFromExcelFile);
+
+                MenuFlyoutItem TMFIAddNewHuman = new MenuFlyoutItem()
+                {
+                    Text = "Ajouter une personne",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE77b",
+                    }
+                };
+                TMFIAddNewHuman.Click += TMFIAddNewHuman_Click;
+
+                MenuFlyoutItem TMFIAddNewSociety = new MenuFlyoutItem()
+                {
+                    Text = "Ajouter une société",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE731",
+                    }
+                };
+                TMFIAddNewSociety.Click += MFI_NewSociety_Click;
+
+                MenuFlyoutItem TMFIAddNewCollection = new MenuFlyoutItem()
+                {
+                    Text = "Ajouter une collection",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE81E",
+                    }
+                };
+                TMFIAddNewCollection.Click += TMFIAddNewCollection_Click;
+
+                MenuFlyoutCommandAdds.Items.Add(MFSIAddNew);
+                MenuFlyoutCommandAdds.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandAdds.Items.Add(TMFIAddNewHuman);
+                MenuFlyoutCommandAdds.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandAdds.Items.Add(TMFIAddNewSociety);
+                MenuFlyoutCommandAdds.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandAdds.Items.Add(TMFIAddNewCollection);
             }
             catch (Exception ex)
             {
@@ -1007,6 +1080,152 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void TMFIAddNewCollection_Click(object sender, RoutedEventArgs e)
+        {
+            NewEditCollection(null, EditMode.Create);
+        }
+
+        private void TMFIAddNewHuman_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void MenuFlyoutCommandAdds_Opened(object sender, object e)
+        {
+
+        }
+
+        private void TMFIAddNewItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (FrameContainer.Content is LibraryCollectionSubPage)
+            {
+            }
+            else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
+            {
+                NewEditBook(new LivreVM()
+                {
+                    IdLibrary = Parameters.ParentLibrary.Id,
+                }, EditMode.Create);
+            }
+        }
+
+        private async void TMFIAddFromWebsite_Click(object sender, RoutedEventArgs e)
+        {
+            if (FrameContainer.Content is LibraryCollectionSubPage)
+            {
+            }
+            else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                try
+                {
+                    var dialog = new ImportBookFromUrlCD()
+                    {
+                        Title = "Importer un livre depuis Amazon"
+                    };
+
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        string url = dialog.Tbx_Url.Text?.Trim();
+                        if (url == null || url.IsStringNullOrEmptyOrWhiteSpace())
+                        {
+                            Logs.Log(m, $"Une url valide doit être renseignée.");
+                            return;
+                        }
+
+                        if (url.Contains("amazon"))
+                        {
+                            htmlServices htmlservices = new htmlServices();
+                            var viewModel = await htmlservices.GetBookFromAmazonAsync(new Uri(url), new LivreVM());
+                            NewEditBook(viewModel, EditMode.Create);
+                        }
+                        else
+                        {
+                            Logs.Log(m, $"L'url doit provenir d'Amazon.");
+                            return;
+                        }
+                    }
+                    else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
+                    {
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logs.Log(ex, m);
+                    return;
+                }
+            }
+        }
+
+        private async void TMFIAddFromFile_Click(object sender, RoutedEventArgs e)
+        {
+            if (FrameContainer.Content is LibraryCollectionSubPage)
+            {
+            }
+            else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                try
+                {
+                    var storageFile = await Files.OpenStorageFileAsync(Files.BookExtensions);
+                    if (storageFile == null)
+                    {
+                        Logs.Log(m, $"Vous devez sélectionner un type de fichier valide.");
+                        return;
+                    }
+
+                    var viewModels = (await esBook.OpenBooksFromFileAsync(storageFile))?.ToList();
+                    if (viewModels != null && viewModels.Any())
+                    {
+                        viewModels.ForEach((book) => this.CompleteBookInfos(book));
+
+                        if (viewModels.Count() == 1)
+                        {
+                            NewEditBook(viewModels.First(), EditMode.Create);
+                        }
+                        else
+                        {
+                            ImportBookFromFile(viewModels, storageFile);
+                            OpenImportBookFromFile(viewModels);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logs.Log(ex, m);
+                    return;
+                }
+            }
+        }
+
+        private async void TMFIAddFromExcelFile_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (FrameContainer.Content is LibraryCollectionSubPage)
+                {
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
+                {
+                    var storageFile = await Files.OpenStorageFileAsync(Files.ExcelExtensions);
+                    if (storageFile == null)
+                    {
+                        Logs.Log(m, $"Vous devez sélectionner un fichier de type Microsoft Excel.");
+                        return;
+                    }
+
+                    this.ImportBookFromExcelFile(storageFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         #endregion
 
         #region SideBar
@@ -1088,10 +1307,7 @@ namespace LibraryProjectUWP.Views.Book
         #region New Book
         private void NewBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            NewEditBook(new LivreVM()
-            {
-                IdLibrary = Parameters.ParentLibrary.Id,
-            }, EditMode.Create);
+            
         }
 
         #endregion
@@ -1216,46 +1432,7 @@ namespace LibraryProjectUWP.Views.Book
         #region Import Book
         private async void ImportBookFromWebSiteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var dialog = new ImportBookFromUrlCD()
-                {
-                    Title = "Importer un livre depuis Amazon"
-                };
-
-                var result = await dialog.ShowAsync();
-                if (result == ContentDialogResult.Primary)
-                {
-                    string url = dialog.Tbx_Url.Text?.Trim();
-                    if (url == null || url.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        Logs.Log(m, $"Une url valide doit être renseignée.");
-                        return;
-                    }
-
-                    if (url.Contains("amazon"))
-                    {
-                        htmlServices htmlservices = new htmlServices();
-                        var viewModel = await htmlservices.GetBookFromAmazonAsync(new Uri(url), new LivreVM());
-                        NewEditBook(viewModel, EditMode.Create);
-                    }
-                    else
-                    {
-                        Logs.Log(m, $"L'url doit provenir d'Amazon.");
-                        return;
-                    }
-                }
-                else if (result == ContentDialogResult.None)//Si l'utilisateur a appuyé sur le bouton annuler
-                {
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            
         }
 
         private async void ImportBookFromExcelFileXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -1263,14 +1440,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var storageFile = await Files.OpenStorageFileAsync(Files.ExcelExtensions);
-                if (storageFile == null)
-                {
-                    Logs.Log(m, $"Vous devez sélectionner un fichier de type Microsoft Excel.");
-                    return;
-                }
-
-                this.ImportBookFromExcelFile(storageFile);
+                
             }
             catch (Exception ex)
             {
@@ -3243,5 +3413,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
     }
 }
