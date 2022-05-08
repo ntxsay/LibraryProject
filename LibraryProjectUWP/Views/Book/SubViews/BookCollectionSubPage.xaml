@@ -16,7 +16,7 @@
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
     xmlns:brushes="using:Microsoft.Toolkit.Uwp.UI.Media"
-    Loaded="Page_Loaded" Unloaded="Page_Unloaded">
+    Loaded="Page_Loaded" Unloaded="Page_Unloaded" NavigationCacheMode="Enabled">
     <Page.Resources>
         <customConverters:ClassificationAgeToStringConverter x:Key="classificationAgeToStringConverter" />
         <customConverters:IntToBooleanConverter x:Key="intToBooleanConverter" />

@@ -1179,7 +1179,6 @@ namespace LibraryProjectUWP.Views.Book
         {
 
         }
-   
     }
 
     public class NewEditBookUCVM : INotifyPropertyChanged

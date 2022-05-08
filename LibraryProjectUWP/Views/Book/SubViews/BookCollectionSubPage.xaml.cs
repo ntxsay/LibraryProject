@@ -65,12 +65,20 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             EsLibrary esLibrary = new EsLibrary();
             ParentPage.ViewModelPage.BackgroundImagePath = await esLibrary.GetBookCollectionBackgroundImagePathAsync(ParentPage.Parameters.ParentLibrary.Guid);
             await ParentPage.InitializeBackgroundImagesync();
-            InitializeData(true);
+            if (ParentPage.Parameters.ParentLibrary.Id != IdLibrary)
+            {
+                IdLibrary = ParentPage.Parameters.ParentLibrary.Id;
+                InitializeData(true);
+            }
+            else if (ViewModelPage.GroupedRelatedViewModel == null || ViewModelPage.GroupedRelatedViewModel.Collection == null || !ViewModelPage.GroupedRelatedViewModel.Collection.Any())
+            {
+                InitializeData(true);
+            }
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-
+            //GC.Collect();
         }
 
         private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)

@@ -176,7 +176,7 @@
             </StackPanel>
         </Grid>
         <!--CommandBar-->
-        <CommandBar x:Name="MyCommand" VerticalAlignment="Top" IsSticky="True" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" DefaultLabelPosition="Right">
+        <CommandBar x:Name="MyCommand" x:FieldModifier="public" VerticalAlignment="Top" IsSticky="True" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" DefaultLabelPosition="Right">
             <AppBarButton x:Name="ABBtn_SelectedItems" ToolTipService.ToolTip="Livre(s) sélectionné(s)" Label="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToStringPhraseConverter}, ConverterParameter='counter livre(s) sélectionné(s)', Mode=OneWay}"
                           IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToEnablingConverter}, Mode=OneWay}">
                 <AppBarButton.Icon>
@@ -361,27 +361,6 @@
             <AppBarSeparator/>
             <AppBarButton Icon="RepeatAll" LabelPosition="Collapsed" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ReloadDataXamlUICommand}"/>
             <AppBarSeparator/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Modifier l'image d'arrière-plan" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ChangeBackgroundImageXUiCmd}">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xEB9F;"/>
-                    </AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarSeparator/>
-                <AppBarButton x:Name="ABBOpenContentFolder" Label="Ouvrir le dossier contenant" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="ABBOpenContentFolder_Click">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xE838;"/>
-                    </AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarSeparator/>
-                <AppBarButton Label="Exporter tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource ExportAllBookXamlUICommand}">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xEDE1;"/>
-                    </AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarSeparator/>
-                <AppBarButton Icon="Help" Label="Aide" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
-            </CommandBar.SecondaryCommands>
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <AutoSuggestBox x:Name="ASB_SearchItem" Width="310" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,8,0,4" 

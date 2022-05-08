@@ -17,7 +17,7 @@ using Windows.UI.Xaml.Input;
 
 namespace LibraryProjectUWP.Code.Services.Tasks
 {
-    public class ExportAllBooksTask
+    public class ExportAllLibrariesTask
     {
         public MainPage MainPage { get; private set; }
         private BackgroundWorker WorkerBackground;
@@ -30,10 +30,10 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         public bool IsWorkerRunning => WorkerBackground != null && WorkerBackground.IsBusy;
         public bool IsWorkerCancelResquested => WorkerBackground != null && WorkerBackground.CancellationPending;
 
-        public delegate void AfterTaskCompletedEventHandler(ExportAllBooksTask sender, object e);
+        public delegate void AfterTaskCompletedEventHandler(ExportAllLibrariesTask sender, object e);
         public event AfterTaskCompletedEventHandler AfterTaskCompletedRequested;
 
-        public ExportAllBooksTask(MainPage mainPage)
+        public ExportAllLibrariesTask(MainPage mainPage)
         {
             MainPage = mainPage;
         }
@@ -76,7 +76,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         }
 
         #region
-        public void InitializeWorker(BibliothequeVM viewModel)
+        public void InitializeWorker()
         {
             try
             {
@@ -102,7 +102,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                         {
                             MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                             {
-                                ProgessText = $"Export en cours de l'ensemble des livres de la bibliothèque « {viewModel.Name} ».",
+                                ProgessText = $"Export en cours de l'ensemble des bibliothèques.",
                                 CancelButtonText = "Annuler l'export",
                                 CancelButtonVisibility = Visibility.Visible,
                                 CancelButtonCallback = () =>
@@ -113,12 +113,12 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                                         WorkerBackground.CancelAsync();
                                     }
                                 },
-                                OpenedLoaderCallback = () => WorkerBackground.RunWorkerAsync(viewModel),
+                                OpenedLoaderCallback = () => WorkerBackground.RunWorkerAsync(),
                             });
                         }
                         else
                         {
-                            WorkerBackground.RunWorkerAsync(viewModel);
+                            WorkerBackground.RunWorkerAsync();
                         }
                     }
                 }
@@ -135,9 +135,9 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         {
             try
             {
-                if (sender is BackgroundWorker worker && e.Argument is BibliothequeVM viewModel)
+                if (sender is BackgroundWorker worker)
                 {
-                    using (Task<IList<LivreVM>> task = DbServices.Book.GetListOfBooksVmInLibraryAsync(viewModel.Id, cancellationTokenSource.Token))
+                    using (Task<IList<BibliothequeVM>> task = DbServices.Library.AllVMAsync())
                     {
                         task.Wait();
 
@@ -199,7 +199,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 // Si erreur
                 if (e.Error != null)
                 {
-                    message = $"Une erreur s'est produite lors de l'export des bibliothèques.";
+                    message = $"Une erreur s'est produite lors de l'export des livres.";
                 }
                 else if (e.Cancelled)
                 {
@@ -207,8 +207,8 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 }
                 else
                 {
-                    var viewModelList = e.Result as LivreVM[];
-                    message = $"{viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "bibliothèques ont été exportés" : "bibliothèque a été exporté")}.";
+                    var viewModelList = e.Result as BibliothequeVM[];
+                    message = $"{viewModelList?.Count() ?? 0} {((viewModelList?.Count() ?? 0) > 1 ? "livres ont été exportés" : "livre a été exporté")}.";
                     
                     if (viewModelList != null && viewModelList.Any())
                     {

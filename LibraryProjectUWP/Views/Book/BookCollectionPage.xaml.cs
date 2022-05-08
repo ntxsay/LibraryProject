@@ -85,7 +85,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    OpenBookCollection(null);
+                    OpenBookCollection(Parameters.ParentLibrary);
                 }
             }
             catch (Exception ex)
@@ -100,11 +100,9 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                 //_parameters.ParentLibrary.Books.Clear();
                 //_parameters.ParentLibrary.Books.Clear();
-                Parameters.ParentLibrary.CountBooks = 0;
-                ViewModelPage = null;
+                //ViewModelPage = null;
                 //_parameters = null;
             }
             catch (Exception ex)
@@ -149,6 +147,7 @@ namespace LibraryProjectUWP.Views.Book
                     InitializeGroupsCmdBarItemsForBookCollection();
                     InitializeSortsCmdBarItemsForBookCollection();
                     InitializeAddsCmdBarItemsForBookCollection();
+                    InitializeSecondaryCmdBarItemsForBookCollection();
                 }
             }
             catch (Exception ex)
@@ -168,6 +167,7 @@ namespace LibraryProjectUWP.Views.Book
                 InitializeGroupsCmdBarItemsForLibraryCollection();
                 InitializeSortsCmdBarItemsForLibraryCollection();
                 InitializeAddsCmdBarItemsForLibraryCollection();
+                InitializeSecondaryCmdBarItemsForLibraryCollection();
             }
             catch (Exception ex)
             {
@@ -1229,6 +1229,218 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        public void InitializeSecondaryCmdBarItemsForLibraryCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                MyCommand.SecondaryCommands.Clear();
+
+                AppBarButton AppBarBtnChangeBackground = new AppBarButton()
+                {
+                    Label = "Modifier l'image d'arrière-plan",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uEB9F",
+                    }
+                };
+                AppBarBtnChangeBackground.Click += AppBarBtnChangeBackground_Click;
+
+                AppBarButton AppBarBtnOpenContentFolder = new AppBarButton()
+                {
+                    Label = "Ouvrir le dossier contenant",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE838",
+                    }
+                };
+                AppBarBtnOpenContentFolder.Click += AppBarBtnOpenContentFolder_Click;
+
+                AppBarButton AppBarBtnExportAllItems = new AppBarButton()
+                {
+                    Label = "Exporter toutes les bibliothèques",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uEDE1",
+                    }
+                };
+                AppBarBtnExportAllItems.Click += AppBarBtnExportAllItems_Click;
+
+                //AppBarButton AppBarBtnHelp = new AppBarButton()
+                //{
+                //    Label = "Aide",
+                //    Icon = new FontIcon
+                //    {
+                //        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                //        Glyph = "\uE897",
+                //    }
+                //};
+                //AppBarBtnHelp.Click += AppBarBtnHelp_Click;
+
+                MyCommand.SecondaryCommands.Add(AppBarBtnChangeBackground);
+                MyCommand.SecondaryCommands.Add(new AppBarSeparator());
+                MyCommand.SecondaryCommands.Add(AppBarBtnOpenContentFolder);
+                MyCommand.SecondaryCommands.Add(new AppBarSeparator());
+                MyCommand.SecondaryCommands.Add(AppBarBtnExportAllItems);
+                //MyCommand.SecondaryCommands.Add(new AppBarSeparator());
+                //MyCommand.SecondaryCommands.Add(AppBarBtnHelp);
+
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void InitializeSecondaryCmdBarItemsForBookCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                MyCommand.SecondaryCommands.Clear();
+
+                AppBarButton AppBarBtnChangeBackground = new AppBarButton()
+                {
+                    Label = "Modifier l'image d'arrière-plan",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uEB9F",
+                    }
+                };
+                AppBarBtnChangeBackground.Click += AppBarBtnChangeBackground_Click;
+
+                AppBarButton AppBarBtnOpenContentFolder = new AppBarButton()
+                {
+                    Label = "Ouvrir le dossier contenant",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE838",
+                    }
+                };
+                AppBarBtnOpenContentFolder.Click += AppBarBtnOpenContentFolder_Click;
+
+                AppBarButton AppBarBtnExportAllItems = new AppBarButton()
+                {
+                    Label = "Exporter toutes les bibliothèques",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uEDE1",
+                    }
+                };
+                AppBarBtnExportAllItems.Click += AppBarBtnExportAllItems_Click;
+
+                AppBarButton AppBarBtnCloseLibrary = new AppBarButton()
+                {
+                    Label = "Quitter la bibliothèque",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE8BB",
+                    }
+                };
+                AppBarBtnCloseLibrary.Click += AppBarBtnCloseLibrary_Click;
+
+                //AppBarButton AppBarBtnHelp = new AppBarButton()
+                //{
+                //    Label = "Aide",
+                //    Icon = new FontIcon
+                //    {
+                //        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                //        Glyph = "\uE897",
+                //    }
+                //};
+                //AppBarBtnHelp.Click += AppBarBtnHelp_Click;
+
+                MyCommand.SecondaryCommands.Add(AppBarBtnChangeBackground);
+                MyCommand.SecondaryCommands.Add(new AppBarSeparator());
+                MyCommand.SecondaryCommands.Add(AppBarBtnOpenContentFolder);
+                MyCommand.SecondaryCommands.Add(new AppBarSeparator());
+                MyCommand.SecondaryCommands.Add(AppBarBtnExportAllItems);
+                MyCommand.SecondaryCommands.Add(new AppBarSeparator());
+                //MyCommand.SecondaryCommands.Add(AppBarBtnHelp);
+                MyCommand.SecondaryCommands.Add(AppBarBtnCloseLibrary);
+
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void AppBarBtnCloseLibrary_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                bool isClosable = await CloseLibraryAsync();
+                if (isClosable)
+                {
+                    this.RemoveAllItemToSideBar();
+                    this.OpenLibraryCollection(); 
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void AppBarBtnHelp_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void AppBarBtnExportAllItems_Click(object sender, RoutedEventArgs e)
+        {
+            ExportAllItems();
+        }
+
+        private async void AppBarBtnOpenContentFolder_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                _ = await Folders.OpenApplicationLocalFolderAsync();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void AppBarBtnChangeBackground_Click(object sender, RoutedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                EsLibrary esLibrary = new EsLibrary();
+                var result = await esLibrary.ChangeBookCollectionBackgroundImageAsync(Parameters.ParentLibrary.Guid);
+                if (!result.IsSuccess)
+                {
+                    return;
+                }
+
+                ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.BookCollectionDefaultBackgroundImage;
+                await InitializeBackgroundImagesync();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         #endregion
 
         #region SideBar
@@ -2057,6 +2269,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        #region Export items
         public async Task ExportThisBookAsync(LivreVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -2129,12 +2342,27 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void ABBOpenContentFolder_Click(object sender, RoutedEventArgs e)
+        public void ExportAllItems()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                _ = await Folders.OpenApplicationLocalFolderAsync();
+                if (FrameContainer.Content is LibraryCollectionSubPage)
+                {
+                    ExportAllLibrariesTask exportAllLibrariesTask = new ExportAllLibrariesTask(Parameters.MainPage)
+                    {
+                        UseIntervalAfterFinish = false
+                    };
+                    exportAllLibrariesTask.InitializeWorker();
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
+                {
+                    ExportAllBooksTask exportAllBooksTask = new ExportAllBooksTask(Parameters.MainPage)
+                    {
+                        UseIntervalAfterFinish = false
+                    };
+                    exportAllBooksTask.InitializeWorker(Parameters.ParentLibrary);
+                }
             }
             catch (Exception ex)
             {
@@ -2142,6 +2370,8 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
+        #endregion
 
         #region Delete Book
 
@@ -2885,6 +3115,44 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void RemoveAllItemToSideBar()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.CmbxSideBarItemTitle.Items.Count > 0)
+                {
+                    for (int i = 0; i < this.CmbxSideBarItemTitle.Items.Count; i++)
+                    {
+                        if (this.CmbxSideBarItemTitle.Items[i] is SideBarItemHeaderVM headerVM)
+                        {
+                            ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
+                            i = 0;
+                            continue;
+                        }
+                    }
+                }
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    for (int i = 0; i < this.PivotRightSideBar.Items.Count; i++)
+                    {
+                        this.PivotRightSideBar.Items.RemoveAt(i);
+                        i = 0;
+                        continue;
+                    }
+                }
+
+                this.ViewModelPage.IsSplitViewOpen = false;
+                this.CmbxSideBarItemTitle.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         private void RemoveItemToSideBar(PivotItem item)
         {
@@ -3387,6 +3655,30 @@ namespace LibraryProjectUWP.Views.Book
                 MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
+            }
+        }
+
+        public async Task<bool> CloseLibraryAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditBookUC) is NewEditBookUC bookeditor)
+                {
+                    //bookeditor.Focus(FocusState.Programmatic);
+                    var isModificationStateChecked = await bookeditor.CheckModificationsStateAsync();
+                    if (!isModificationStateChecked)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return true;
             }
         }
 

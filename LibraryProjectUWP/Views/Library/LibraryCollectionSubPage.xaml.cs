@@ -63,7 +63,10 @@ namespace LibraryProjectUWP.Views.Library
         #region Loading
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadDataAsync(true);
+            if (ViewModelPage.GroupedRelatedViewModel == null || ViewModelPage.GroupedRelatedViewModel.Collection == null || !ViewModelPage.GroupedRelatedViewModel.Collection.Any())
+            {
+                InitializeData(true);
+            }
         }
 
         private void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -813,5 +816,9 @@ namespace LibraryProjectUWP.Views.Library
 
         #endregion
 
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

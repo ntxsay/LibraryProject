@@ -223,7 +223,7 @@
                 <TextBlock Grid.Row="0" Text="Général" FontSize="17" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="SemiBold" Margin="0 0 0 8" Visibility="Collapsed"/>
                 <ScrollViewer Grid.Row="1">
                     <StackPanel Style="{StaticResource StackGroupItemStyle}">
-                        <TextBox Text="{x:Bind ViewModelPage.ViewModel.MainTitle, Mode=TwoWay}" PlaceholderText="Titre principal du livre">
+                        <TextBox Text="{x:Bind ViewModelPage.ViewModel.MainTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Titre principal du livre">
                             <TextBox.Header>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <TextBlock Text="Titre du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
@@ -374,13 +374,13 @@
                 <TextBlock Grid.Row="0" Text="Publication" FontSize="17" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="SemiBold" Margin="0 0 0 8" Visibility="Collapsed"/>
                 <ScrollViewer Grid.Row="1">
                     <StackPanel Orientation="Vertical" Spacing="18" VerticalAlignment="Top">
-                        <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.Cotation, Mode=TwoWay}" PlaceholderText="Cotation du livre">
+                        <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.Cotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Cotation du livre">
                             <TextBox.Header>
                                 <TextBlock Text="Cotation du livre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </TextBox.Header>
                         </TextBox>
                         <StackPanel Orientation="Vertical">
-                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN, Mode=TwoWay}" PlaceholderText="ISBN du livre">
+                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="ISBN du livre">
                                 <TextBox.Header>
                                     <TextBlock Text="ISBN" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </TextBox.Header>
@@ -390,27 +390,27 @@
                             </HyperlinkButton>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Spacing="18" Visibility="{x:Bind ViewModelPage.DisplayOthersIdentificationVisibility, Mode=OneWay}">
-                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN10, Mode=TwoWay}" PlaceholderText="ISBN-10 du livre">
+                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="ISBN-10 du livre">
                                 <TextBox.Header>
                                     <TextBlock Text="ISBN-10" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </TextBox.Header>
                             </TextBox>
-                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN13, Mode=TwoWay}" PlaceholderText="ISBN-13 du livre">
+                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ISBN13, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="ISBN-13 du livre">
                                 <TextBox.Header>
                                     <TextBlock Text="ISBN-13" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </TextBox.Header>
                             </TextBox>
-                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ISSN, Mode=TwoWay}" PlaceholderText="ISSN du livre">
+                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ISSN, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="ISSN du livre">
                                 <TextBox.Header>
                                     <TextBlock Text="ISSN" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </TextBox.Header>
                             </TextBox>
-                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ASIN, Mode=TwoWay}" PlaceholderText="ASIN du livre">
+                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.ASIN, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="ASIN du livre">
                                 <TextBox.Header>
                                     <TextBlock Text="ASIN (Amazon)" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </TextBox.Header>
                             </TextBox>
-                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.CodeBarre, Mode=TwoWay}" PlaceholderText="Code barre du livre">
+                            <TextBox Text="{x:Bind ViewModelPage.ViewModel.Identification.CodeBarre, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Code barre du livre">
                                 <TextBox.Header>
                                     <TextBlock Text="Code barre" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                                 </TextBox.Header>
@@ -494,12 +494,12 @@
                 <TextBlock Grid.Row="0" Text="Description" FontSize="17" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontWeight="SemiBold" Margin="0 0 0 8" Visibility="Collapsed"/>
                 <ScrollViewer Grid.Row="1">
                     <StackPanel Style="{StaticResource StackGroupItemStyle}">
-                        <TextBox Text="{x:Bind ViewModelPage.ViewModel.Description.Resume, Mode=TwoWay}" MinHeight="100" PlaceholderText="Résumé du livre" TextWrapping="Wrap" AcceptsReturn="True">
+                        <TextBox Text="{x:Bind ViewModelPage.ViewModel.Description.Resume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinHeight="100" PlaceholderText="Résumé du livre" TextWrapping="Wrap" AcceptsReturn="True">
                             <TextBox.Header>
                                 <TextBlock Text="Résumé" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </TextBox.Header>
                         </TextBox>
-                        <TextBox Text="{x:Bind ViewModelPage.ViewModel.Description.Notes, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes personnelles concernant le livre" TextWrapping="Wrap" AcceptsReturn="True">
+                        <TextBox Text="{x:Bind ViewModelPage.ViewModel.Description.Notes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinHeight="100" PlaceholderText="Notes personnelles concernant le livre" TextWrapping="Wrap" AcceptsReturn="True">
                             <TextBox.Header>
                                 <TextBlock Text="Notes" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                             </TextBox.Header>

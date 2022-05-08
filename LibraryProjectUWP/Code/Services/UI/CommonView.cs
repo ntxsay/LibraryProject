@@ -507,7 +507,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                             break;
                     }
 
-                    BookCollectionSubView.ViewModelPage.NbItems = (int)await DbServices.Book.CountBooksInLibraryAsync(BookCollectionSubView.IdLibrary);
+                    BookCollectionSubView.ViewModelPage.NbItems = (int)await DbServices.Book.CountBooksInLibraryAsync(ParentPage.Parameters.ParentLibrary.Id);
                 }
             }
             catch (Exception ex)
