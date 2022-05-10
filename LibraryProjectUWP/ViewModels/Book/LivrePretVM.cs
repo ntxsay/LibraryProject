@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Windows.UI.Xaml.Media;
 
 namespace LibraryProjectUWP.ViewModels.Book
 {
@@ -232,6 +233,48 @@ namespace LibraryProjectUWP.ViewModels.Book
                 return "Status inconnu";
             }
         }
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class LivrePretDayCellVM : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public int IdDay { get; set; }
+        
+        private int _Day;
+        public int Day
+        {
+            get => _Day;
+            set
+            {
+                if (_Day != value)
+                {
+                    _Day = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private SolidColorBrush _DayColor;
+        public SolidColorBrush DayColor
+        {
+            get => _DayColor;
+            set
+            {
+                if (_DayColor != value)
+                {
+                    _DayColor = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public DateTime Date { get; set; }
+        public IList<DateTime?> Dates { get; set; } = new List<DateTime?>();
+
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             // Raise the PropertyChanged event, passing the name of the property whose value has changed.

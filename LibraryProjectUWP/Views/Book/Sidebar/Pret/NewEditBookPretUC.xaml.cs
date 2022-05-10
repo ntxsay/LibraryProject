@@ -39,6 +39,7 @@ namespace LibraryProjectUWP.Views.Book
         public delegate void CreateItemEventHandler(NewEditBookPretUC sender, ExecuteRequestedEventArgs e);
         public event CreateItemEventHandler CreateItemRequested;
 
+        public BookCollectionPage ParentPage { get; private set; }
         readonly GetAvailableBookExemplariesForPretTask getAvailableBookExemplariesForPretTask = new GetAvailableBookExemplariesForPretTask();
 
         public NewEditBookPretUC()
@@ -77,9 +78,9 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
+                ParentPage = bookCollectionPage;
                 ViewModelPage = new NewEditBookPretUCVM()
                 {
-                    ParentPage = bookCollectionPage,
                     EditMode = editMode,
                     ParentBook = livreVM,
                     ViewModel = livrePretVm ?? new LivrePretVM()
@@ -137,7 +138,7 @@ namespace LibraryProjectUWP.Views.Book
 
         private void HyperlinkBtn_AddNew_Exemplary_Click(object sender, RoutedEventArgs e)
         {
-            ViewModelPage.ParentPage.NewBookExemplary(ViewModelPage.ParentBook, new SideBarInterLinkVM()
+            this.ParentPage.NewBookExemplary(ViewModelPage.ParentBook, new SideBarInterLinkVM()
             {
                 ParentGuid = ViewModelPage.ItemGuid,
                 ParentType = typeof(NewEditBookPretUC)
@@ -175,6 +176,7 @@ namespace LibraryProjectUWP.Views.Book
 
                     ViewModelPage.WorkerTextVisibility = Visibility.Collapsed;
                     ViewModelPage.AddExemplaryBtnVisibility = Visibility.Visible;
+                    ParentPage.OpenBookPretSchedule();
                 };
             }
             catch (Exception ex)
@@ -323,23 +325,23 @@ namespace LibraryProjectUWP.Views.Book
                     else
                     {
                         //Ajoute un nouvel auteur
-                        if (ViewModelPage.ParentPage != null)
+                        if (this.ParentPage != null)
                         {
                             if (!sender.Text.IsStringNullOrEmptyOrWhiteSpace())
                             {
                                 var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                 if (split.Length == 1)
                                 {
-                                    ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                    this.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
                                 }
                                 else if (split.Length >= 2)
                                 {
-                                    ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
+                                    this.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
                                 }
                             }
                             else
                             {
-                                ViewModelPage.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                this.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
                             }
                             sender.Text = String.Empty;
                         }
@@ -732,20 +734,6 @@ namespace LibraryProjectUWP.Views.Book
                 if (this._EditMode != value)
                 {
                     this._EditMode = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        private BookCollectionPage _ParentPage;
-        public BookCollectionPage ParentPage
-        {
-            get => this._ParentPage;
-            set
-            {
-                if (this._ParentPage != value)
-                {
-                    this._ParentPage = value;
                     this.OnPropertyChanged();
                 }
             }

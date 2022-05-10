@@ -1,0 +1,34 @@
+﻿<UserControl
+    x:Class="LibraryProjectUWP.Views.Book.SubViews.BookPretScheduleUC"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views.Book.SubViews"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" 
+    d:DesignHeight="300"
+    d:DesignWidth="300" Margin="1" Tapped="UserControl_Tapped" DoubleTapped="UserControl_DoubleTapped" IsDoubleTapEnabled="True">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="SystemControlRevealFocusVisualBrush" Color="#FF0078D4" />
+        <SolidColorBrush x:Key="SystemControlFocusVisualSecondaryBrush" Color="#B3FFFFFF" />
+    </UserControl.Resources>
+
+    <Grid Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid HorizontalAlignment="Right" Margin="0 2 2 0">
+                <Ellipse Fill="{x:Bind ViewModel.DayColor, Mode=OneWay}" Height="28" Width="28" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBlock Text="{x:Bind ViewModel.Day,  Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0 -2 0 0"/>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
+            <ScrollViewer>
+                <Button Padding="1 1" Background="DeepSkyBlue">Pret du kkkd</Button>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+
+</UserControl>

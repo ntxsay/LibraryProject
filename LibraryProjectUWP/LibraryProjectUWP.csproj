@@ -283,7 +283,12 @@
     <Compile Include="Views\Book\BookCollectionPage_ItemsGeneration.cs" />
     <Compile Include="Views\Book\BookCollectionPage_Search.cs" />
     <Compile Include="Views\Book\BookCollectionPage_ViewModelPage.cs" />
-    <Compile Include="Views\Book\BookCollectionPage_Tasks.cs" />
+    <Compile Include="Views\Book\SubViews\BookPretScheduleSubPage.xaml.cs">
+      <DependentUpon>BookPretScheduleSubPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Book\SubViews\BookPretScheduleUC.xaml.cs">
+      <DependentUpon>BookPretScheduleUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CheckModificationsStateCD.xaml.cs">
       <DependentUpon>CheckModificationsStateCD.xaml</DependentUpon>
     </Compile>
@@ -490,6 +495,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Book\SubViews\BookPretScheduleSubPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Book\SubViews\BookPretScheduleUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CheckModificationsStateCD.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -670,8 +683,11 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
     </PackageReference>
+    <PackageReference Include="Syncfusion.SfSchedule.UWP">
+      <Version>20.1.0.52</Version>
+    </PackageReference>
     <PackageReference Include="Syncfusion.XlsIO.UWP">
-      <Version>20.1.0.48</Version>
+      <Version>20.1.0.52</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

@@ -176,6 +176,52 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        public void OpenImportBookFromExcel()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.NavigateToView(typeof(ImportBookExcelSubPage), this);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void OpenImportBookFromFile(IEnumerable<LivreVM> viewModelList)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.NavigateToView(typeof(ImportBookFileSubPage), new BookSubPageParametersDriverVM()
+                {
+                    ParentPage = this,
+                    ViewModelList = new ObservableCollection<LivreVM>(viewModelList),
+                });
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void OpenBookPretSchedule()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.NavigateToView(typeof(BookPretScheduleSubPage), this);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void ReloadDataXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
