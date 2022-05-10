@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.Code.Services.Logging;
+﻿using LibraryProjectUWP.Code.Services.Db;
+using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
@@ -55,7 +56,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             try
             {
                 var now = DateTime.Now;
-                CurrentMonth = new DateTime(now.Year, now.Month, 1);
+                CurrentMonth = new DateTime(now.Year, now.Month, 1, 23, 59, 59);
                 DisplayDays();
             }
             catch (Exception)
@@ -89,15 +90,51 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     VSWGridDays.Children.Add(border);
                 }
 
+                var prets = DbServices.Book.AllPretsVMAsync().GetAwaiter().GetResult();
+
                 var now = DateTime.Now;
                 for (int i = 1; i <= daysInMonth; i++)
                 {
-                    BookPretScheduleUC dayUC = new BookPretScheduleUC(new LivrePretDayCellVM()
+                    var date = new DateTime(CurrentMonth.Year, CurrentMonth.Month, i);
+                    var viewModel = new LivrePretDayCellVM()
                     {
                         Day = i,
-                        Date = new DateTime(CurrentMonth.Year, CurrentMonth.Month, i),
-                        DayColor = CurrentMonth.Year == now.Year && CurrentMonth.Month == now.Month &&  i == now.Day ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.Transparent),
-                    }, this)
+                        Date = date,
+                        DayColor = CurrentMonth.Year == now.Year && CurrentMonth.Month == now.Month && i == now.Day ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.Transparent),
+                    };
+
+                    if (prets != null && prets.Count > 0)
+                    {
+                        List<LivrePretVM> nPrets = new List<LivrePretVM>();
+                        foreach(var item in prets)
+                        {
+                            var itemDayDateStart = new DateTime(item.DatePret.Year, item.DatePret.Month, item.DatePret.Day);
+                            var itemDayDateStartComparaison = DateTime.Compare(date, itemDayDateStart);
+                            if (item.DateRemise.HasValue)
+                            {
+                                var itemDayDateEnd = new DateTime(item.DateRemise.Value.Year, item.DateRemise.Value.Month, item.DateRemise.Value.Day);
+                                var itemDayDateEndComparaison = DateTime.Compare(date, itemDayDateEnd);
+                                if (itemDayDateStartComparaison >= 0 && itemDayDateEndComparaison <= 0)
+                                {
+                                    nPrets.Add(item);
+                                }
+                            }
+                            else
+                            {
+                                if (itemDayDateStartComparaison == 0)
+                                {
+                                    nPrets.Add(item);
+                                }
+                            }
+                        }
+
+                        if (nPrets != null && nPrets.Count > 0)
+                        {
+                            viewModel.Prets = new ObservableCollection<LivrePretVM>(nPrets);
+                        }
+                    }
+
+                    BookPretScheduleUC dayUC = new BookPretScheduleUC(viewModel, this)
                     {
                         Width = GridDayNames.ColumnDefinitions[0].ActualWidth - 2,
                         Height = GridDayNames.ColumnDefinitions[0].ActualWidth - 2,

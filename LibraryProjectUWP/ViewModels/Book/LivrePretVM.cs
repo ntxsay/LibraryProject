@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Windows.UI.Xaml.Media;
+using System.Collections.ObjectModel;
 
 namespace LibraryProjectUWP.ViewModels.Book
 {
@@ -243,7 +244,6 @@ namespace LibraryProjectUWP.ViewModels.Book
     public class LivrePretDayCellVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public int IdDay { get; set; }
         
         private int _Day;
         public int Day
@@ -272,8 +272,33 @@ namespace LibraryProjectUWP.ViewModels.Book
                 }
             }
         }
-        public DateTime Date { get; set; }
-        public IList<DateTime?> Dates { get; set; } = new List<DateTime?>();
+
+        private DateTime _Date;
+        public DateTime Date
+        {
+            get => _Date;
+            set
+            {
+                if (_Date != value)
+                {
+                    _Date = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private ObservableCollection<LivrePretVM> _Prets = new ObservableCollection<LivrePretVM>();
+        public ObservableCollection<LivrePretVM> Prets
+        {
+            get => _Prets;
+            set
+            {
+                if (_Prets != value)
+                {
+                    _Prets = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

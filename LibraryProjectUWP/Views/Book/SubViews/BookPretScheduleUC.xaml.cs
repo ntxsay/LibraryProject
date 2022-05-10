@@ -23,6 +23,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
     public sealed partial class BookPretScheduleUC : UserControl
     {
         public LivrePretDayCellVM ViewModel { get; private set; }
+        public HorizontalAlignment ButtonHorizontalAlignment { get; private set; }
         public BookPretScheduleSubPage ParentPage { get; private set; }
 
         public BookPretScheduleUC()

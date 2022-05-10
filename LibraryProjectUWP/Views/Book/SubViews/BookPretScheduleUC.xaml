@@ -5,6 +5,7 @@
     xmlns:local="using:LibraryProjectUWP.Views.Book.SubViews"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300" Margin="1" Tapped="UserControl_Tapped" DoubleTapped="UserControl_DoubleTapped" IsDoubleTapEnabled="True">
@@ -25,8 +26,24 @@
             </Grid>
         </Grid>
         <Grid Grid.Row="1">
-            <ScrollViewer>
-                <Button Padding="1 1" Background="DeepSkyBlue">Pret du kkkd</Button>
+            <ScrollViewer  HorizontalAlignment="Stretch">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Prets, Mode=OneWay}" HorizontalAlignment="Stretch">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" Spacing="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="booktVm:LivrePretVM">
+                            <Button Padding="1 1" Background="DeepSkyBlue"  HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+                                <TextBlock Text="{x:Bind Emprunteur.DisplayName3}" TextAlignment="Left">
+                                    <Run Text="{x:Bind DatePret}"/>
+                                    <Run Text="{x:Bind DateRemise}"/>
+                                </TextBlock>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
         </Grid>
     </Grid>
