@@ -1,6 +1,9 @@
-﻿using LibraryProjectUWP.Code.Helpers;
+﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,6 +31,18 @@ namespace LibraryProjectUWP.Views.Contact
     {
         readonly ContactListParametersDriverVM _parameters;
         public ContactListUCVM ViewModelPage { get; set; } = new ContactListUCVM();
+
+        public delegate void CancelModificationEventHandler(ContactListUC sender, ExecuteRequestedEventArgs e);
+        public event CancelModificationEventHandler CancelModificationRequested;
+
+        private CollectionViewSource CollectionViewSource { get; set; } = new CollectionViewSource()
+        {
+            IsSourceGrouped = true,
+            ItemsPath = new PropertyPath("Items")
+        };
+
+        readonly GetContactsListTask getContactsListTask = new GetContactsListTask();
+
         public ContactListUC()
         {
             this.InitializeComponent();
@@ -39,8 +54,59 @@ namespace LibraryProjectUWP.Views.Contact
             _parameters = parameters;
             ViewModelPage.Header = $"Les adhérants";
             ViewModelPage.ViewModelList = parameters?.ViewModelList;
-            GroupItemsByLetterNomNaissance();
+            InitializeData(ContactType.Human);
         }
+
+        public void InitializeData(ContactType contactType)
+        {
+            try
+            {
+                ViewModelPage.WorkerTextVisibility = Visibility.Visible;
+                ViewModelPage.DataListVisibility = Visibility.Collapsed;
+                if (getContactsListTask.IsWorkerRunning)
+                {
+                    return;
+                }
+
+                getContactsListTask.InitializeWorker(contactType);
+                getContactsListTask.AfterTaskCompletedRequested += (j, e) =>
+                {
+                    if (e.Result is WorkerState<ContactVM, ContactVM> result && result.ResultList != null && result.ResultList.Any())
+                    {
+                        var GroupingItems = this.OrderItems(result.ResultList)?.Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NomNaissance.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                        if (GroupingItems != null && GroupingItems.Count() > 0)
+                        {
+                            if (this.CollectionViewSource.View == null)
+                            {
+                                this.CollectionViewSource.Source = ViewModelPage.ViewModelListGroup;
+                            }
+
+                            List<ContactGroupCastVM> contactGroupCastVMs = (GroupingItems.Select(groupingItem => new ContactGroupCastVM()
+                            {
+                                GroupName = groupingItem.Key,
+                                Items = new ObservableCollection<ContactVM>(groupingItem),
+                            })).ToList();
+
+                            ViewModelPage.ViewModelListGroup.Clear();
+                            foreach (var item in contactGroupCastVMs)
+                            {
+                                ViewModelPage.ViewModelListGroup.Add(item);
+                            }
+                        }
+
+                    }
+                    ViewModelPage.WorkerTextVisibility = Visibility.Collapsed;
+                    ViewModelPage.DataListVisibility = Visibility.Visible;
+                };
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -49,7 +115,18 @@ namespace LibraryProjectUWP.Views.Contact
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                if (CancelModificationRequested != null)
+                {
+                    CancelModificationRequested = null;
+                }
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
         }
 
         private void InitializeDataGroup()
@@ -67,36 +144,36 @@ namespace LibraryProjectUWP.Views.Contact
 
         #region Groups
        
-        public void GroupItemsByLetterNomNaissance()
-        {
-            try
-            {
-                if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-                {
-                    return;
-                }
+        //public void GroupItemsByLetterNomNaissance()
+        //{
+        //    try
+        //    {
+        //        if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
+        //        {
+        //            return;
+        //        }
 
-                var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NomNaissance.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
-                if (GroupingItems != null && GroupingItems.Count() > 0)
-                {
-                    List<ContactGroupCastVM> contactGroupCastVMs = (GroupingItems.Select(groupingItem => new ContactGroupCastVM()
-                    {
-                        GroupName = groupingItem.Key,
-                        Items = new ObservableCollection<ContactVM>(groupingItem),
-                    })).ToList();
+        //        var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NomNaissance.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+        //        if (GroupingItems != null && GroupingItems.Count() > 0)
+        //        {
+        //            List<ContactGroupCastVM> contactGroupCastVMs = (GroupingItems.Select(groupingItem => new ContactGroupCastVM()
+        //            {
+        //                GroupName = groupingItem.Key,
+        //                Items = new ObservableCollection<ContactVM>(groupingItem),
+        //            })).ToList();
 
-                    ViewModelPage.ViewModelListGroup = contactGroupCastVMs;
+        //            ViewModelPage.ViewModelListGroup = contactGroupCastVMs;
                     
-                    //_contactParameters.ParentPage.ViewModelPage.GroupedBy = ContactGroupVM.GroupBy.LetterNomNaissance;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        //            //_contactParameters.ParentPage.ViewModelPage.GroupedBy = ContactGroupVM.GroupBy.LetterNomNaissance;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MethodBase m = MethodBase.GetCurrentMethod();
+        //        Logs.Log(ex, m);
+        //        return;
+        //    }
+        //}
 
         //public void GroupItemsByLetterPrenom()
         //{
@@ -214,6 +291,11 @@ namespace LibraryProjectUWP.Views.Contact
 
         }
 
+        private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            CancelModificationRequested?.Invoke(this, args);
+        }
+
         private void ASB_SearchItem_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
 
@@ -313,6 +395,34 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
+        private Visibility _DataListVisibility;
+        public Visibility DataListVisibility
+        {
+            get => this._DataListVisibility;
+            set
+            {
+                if (this._DataListVisibility != value)
+                {
+                    this._DataListVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _WorkerTextVisibility;
+        public Visibility WorkerTextVisibility
+        {
+            get => this._WorkerTextVisibility;
+            set
+            {
+                if (this._WorkerTextVisibility != value)
+                {
+                    this._WorkerTextVisibility = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         private IEnumerable<ContactVM> _ViewModelList;
         public IEnumerable<ContactVM> ViewModelList
         {
@@ -327,8 +437,8 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private IEnumerable<ContactGroupCastVM> _ViewModelListGroup;
-        public IEnumerable<ContactGroupCastVM> ViewModelListGroup
+        private ObservableCollection<ContactGroupCastVM> _ViewModelListGroup = new ObservableCollection<ContactGroupCastVM>();
+        public ObservableCollection<ContactGroupCastVM> ViewModelListGroup
         {
             get => this._ViewModelListGroup;
             set

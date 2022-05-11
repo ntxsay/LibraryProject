@@ -50,16 +50,6 @@
                        Description="Actualise les données depuis la base de données" 
                        Label="Actualiser les données">
         </XamlUICommand>
-        <XamlUICommand x:Name="DisplayContactListXamlUICommand" 
-                       ExecuteRequested="DisplayContactListXamlUICommand_ExecuteRequested"
-                       Description="Affiche la liste des adhérants" 
-                       Label="Afficher les adhérants">
-        </XamlUICommand>
-        <XamlUICommand x:Name="DisplayAuthorListXamlUICommand" 
-                       ExecuteRequested="DisplayAuthorListXamlUICommand_ExecuteRequested"
-                       Description="Affiche la liste des auteurs existants" 
-                       Label="Afficher les auteurs">
-        </XamlUICommand>
         <XamlUICommand x:Name="ExportAllBookXamlUICommand" 
                        ExecuteRequested="ExportAllBookXamlUICommand_ExecuteRequested"
                        Description="Exporte tous les livres existants">
@@ -68,14 +58,6 @@
                        ExecuteRequested="DisplayEditorListXUiCmd_ExecuteRequested"
                        Description="Afficher la liste des éditeurs" 
                        Label="Afficher les éditeurs">
-        </XamlUICommand>
-        <XamlUICommand x:Name="DisplayCategorieListXUiCmd" 
-                       ExecuteRequested="DisplayCategorieListXUiCmd_ExecuteRequested"
-                       Description="Affiche les catégories">
-        </XamlUICommand>
-        <XamlUICommand x:Name="DisplayCollectionListXUiCmd" 
-                       ExecuteRequested="DisplayCollectionListXUiCmd_ExecuteRequested"
-                       Description="Affiche les collections">
         </XamlUICommand>
         <ThemeShadow x:Name="BackgroundGridShadow"/>
 
@@ -279,33 +261,12 @@
                 </AppBarToggleButton.Icon>
             </AppBarToggleButton>
             <AppBarSeparator/>
-            <AppBarButton Icon="View" ToolTipService.ToolTip="Affiche les auteurs ou les contacts emprunteurs">
+            <AppBarButton Icon="View">
                 <!--<AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7BC;" FontSize="18"/>
                 </AppBarButton.Icon>-->
                 <AppBarButton.Flyout>
-                    <MenuFlyout>
-                        <MenuFlyoutItem Text="Afficher les catégories" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayCategorieListXUiCmd}">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Afficher les collections" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayCollectionListXUiCmd}">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81E;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Afficher les auteurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayAuthorListXamlUICommand}">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Afficher les adhérants" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource DisplayContactListXamlUICommand}">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe77b;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
+                    <MenuFlyout x:Name="MenuFlyoutCommandView" Opened="MenuFlyoutCommandView_Opened">
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

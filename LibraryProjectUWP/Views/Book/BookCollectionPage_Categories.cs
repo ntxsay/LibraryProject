@@ -20,7 +20,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
         #region Events Categorie
-        private void DisplayCategorieListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void DisplayCategoriesList()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try

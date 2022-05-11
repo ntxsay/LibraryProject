@@ -72,14 +72,9 @@ namespace LibraryProjectUWP.Views.Categories
             _parameters = parameters;
             ViewModelPage.Header = $"Catégories";
             ViewModelPage.ParentLibrary = parameters?.ParentLibrary;
-            ViewModelPage.ParentLibrary.Categories.CollectionChanged += Categories_CollectionChanged;
             InitializeActionInfos();
         }
 
-        private void Categories_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            
-        }
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {

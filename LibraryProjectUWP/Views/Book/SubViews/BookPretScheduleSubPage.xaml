@@ -20,7 +20,19 @@
 
     <Grid>
         <Pivot>
-            <PivotItem Header="Agenda des emprunts">
+            <PivotItem>
+                <PivotItem.Header>
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <userControls:SideBarItemHeader x:Name="header" Grid.Column="0" Title="Agenda des emprunts" Glyph="&#xE748;" />
+                        <Button Grid.Column="1" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fermer cet onglet" Click="BtnClose_Click">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="16"/>
+                        </Button>
+                    </Grid>
+                </PivotItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>

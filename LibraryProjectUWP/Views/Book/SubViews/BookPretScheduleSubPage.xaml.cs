@@ -249,5 +249,10 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 throw;
             }
         }
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            ParentPage.OpenBookCollection(ParentPage.Parameters.ParentLibrary);
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace LibraryProjectUWP.Views.Book
             NewEditCollection(null, EditMode.Create);
         }
 
-        private void DisplayCollectionListXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void DisplayCollectionsList()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try

@@ -147,6 +147,7 @@ namespace LibraryProjectUWP.Views.Book
                     InitializeGroupsCmdBarItemsForBookCollection();
                     InitializeSortsCmdBarItemsForBookCollection();
                     InitializeAddsCmdBarItemsForBookCollection();
+                    InitializeViewCmdBarItemsForBookCollection();
                     InitializeSecondaryCmdBarItemsForBookCollection();
                 }
             }
@@ -167,6 +168,7 @@ namespace LibraryProjectUWP.Views.Book
                 InitializeGroupsCmdBarItemsForLibraryCollection();
                 InitializeSortsCmdBarItemsForLibraryCollection();
                 InitializeAddsCmdBarItemsForLibraryCollection();
+                InitializeViewCmdBarItemsForLibraryCollection();
                 InitializeSecondaryCmdBarItemsForLibraryCollection();
             }
             catch (Exception ex)
@@ -421,6 +423,8 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Sort - Group - Order
+
+        #region Groups
         private void MenuFlyoutCommandGroups_Opened(object sender, object e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -688,7 +692,9 @@ namespace LibraryProjectUWP.Views.Book
                 this.GroupItemsBy($"Dégroupement des livres en cours...", GetSelectedPage, true, ViewModelPage.ResearchBook);
             }
         }
+        #endregion
 
+        #region Sort & Order
         public void InitializeSortsCmdBarItemsForLibraryCollection()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -959,7 +965,193 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 bookCollectionSubPage.ViewModelPage.SortedBy = BookGroupVM.SortBy.DateCreation;
                 this.SortItemsBy($"Organisation en cours des livres par date de création...", GetSelectedPage, true, ViewModelPage.ResearchBook);
-            }            
+            }
+        }
+        #endregion
+
+        public void InitializeViewCmdBarItemsForLibraryCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                MenuFlyoutCommandView.Items.Clear();
+
+                //MenuFlyoutItem MFIDisplayCategories = new MenuFlyoutItem()
+                //{
+                //    Text = "Afficher les catégories",
+                //    Icon = new FontIcon
+                //    {
+                //        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                //        Glyph = "\uE81E",
+                //    }
+                //};
+                //MFIDisplayCategories.Click += MFIDisplayCategories_Click;
+
+                //MenuFlyoutItem MFIDisplayCollections = new MenuFlyoutItem()
+                //{
+                //    Text = "Afficher les collections",
+                //    Icon = new FontIcon
+                //    {
+                //        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                //        Glyph = "\uE81E",
+                //    }
+                //};
+                //MFIDisplayCollections.Click += MFIDisplayCollections_Click;
+
+                MenuFlyoutItem MFIDisplayHumans = new MenuFlyoutItem()
+                {
+                    Text = "Afficher les contacts",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE77b",
+                    }
+                };
+                MFIDisplayHumans.Click += MFIDisplayHumans_Click;
+
+                MenuFlyoutItem MFIDisplaySociety = new MenuFlyoutItem()
+                {
+                    Text = "Afficher les sociétés",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE731",
+                    }
+                };
+                MFIDisplaySociety.Click += MFIDisplaySociety_Click;
+
+                //MenuFlyoutItem MFIDisplayBookPretScheduler = new MenuFlyoutItem()
+                //{
+                //    Text = "Afficher l'agenda des prêts",
+                //    Icon = new FontIcon
+                //    {
+                //        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                //        Glyph = "\uE748",
+                //    }
+                //};
+                //MFIDisplayBookPretScheduler.Click += MFIDisplayBookPretScheduler_Click;
+
+                //MenuFlyoutCommandView.Items.Add(MFIDisplayCategories);
+                //MenuFlyoutCommandView.Items.Add(MFIDisplayCollections);
+                //MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandView.Items.Add(MFIDisplayHumans);
+                MenuFlyoutCommandView.Items.Add(MFIDisplaySociety);
+                //MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
+                //MenuFlyoutCommandView.Items.Add(MFIDisplayBookPretScheduler);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
+        public void InitializeViewCmdBarItemsForBookCollection()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                MenuFlyoutCommandView.Items.Clear();
+
+                MenuFlyoutItem MFIDisplayCategories = new MenuFlyoutItem()
+                {
+                    Text = "Afficher les catégories",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE81E",
+                    }
+                };
+                MFIDisplayCategories.Click += MFIDisplayCategories_Click;
+
+                MenuFlyoutItem MFIDisplayCollections = new MenuFlyoutItem()
+                {
+                    Text = "Afficher les collections",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE81E",
+                    }
+                };
+                MFIDisplayCollections.Click += MFIDisplayCollections_Click;
+
+                MenuFlyoutItem MFIDisplayHumans = new MenuFlyoutItem()
+                {
+                    Text = "Afficher les contacts",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE77b",
+                    }
+                };
+                MFIDisplayHumans.Click += MFIDisplayHumans_Click;
+
+                MenuFlyoutItem MFIDisplaySociety = new MenuFlyoutItem()
+                {
+                    Text = "Afficher les sociétés",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE731",
+                    }
+                };
+                MFIDisplaySociety.Click += MFIDisplaySociety_Click;
+
+                MenuFlyoutItem MFIDisplayBookPretScheduler = new MenuFlyoutItem()
+                {
+                    Text = "Afficher l'agenda des prêts",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE748",
+                    }
+                };
+                MFIDisplayBookPretScheduler.Click += MFIDisplayBookPretScheduler_Click;
+
+                MenuFlyoutCommandView.Items.Add(MFIDisplayCategories);
+                MenuFlyoutCommandView.Items.Add(MFIDisplayCollections);
+                MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandView.Items.Add(MFIDisplayHumans);
+                MenuFlyoutCommandView.Items.Add(MFIDisplaySociety);
+                MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandView.Items.Add(MFIDisplayBookPretScheduler);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void MFIDisplayBookPretScheduler_Click(object sender, RoutedEventArgs e)
+        {
+            OpenBookPretSchedule();
+        }
+
+        private void MFIDisplaySociety_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayContactsList();
+        }
+
+        private void MFIDisplayHumans_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayContactsList();
+        }
+
+        private void MFIDisplayCollections_Click(object sender, RoutedEventArgs e)
+        {
+            this.DisplayCollectionsList();
+        }
+
+        private void MFIDisplayCategories_Click(object sender, RoutedEventArgs e)
+        {
+            this.DisplayCategoriesList();
+        }
+
+        private void MenuFlyoutCommandView_Opened(object sender, object e)
+        {
+
         }
 
         public void InitializeAddsCmdBarItemsForLibraryCollection()
@@ -2647,7 +2839,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void DisplayContactListXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void DisplayContactsList()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -2674,6 +2866,8 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     });
 
+                    userControl.CancelModificationRequested += ContactListUC_CancelModificationRequested;
+
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
@@ -2683,6 +2877,20 @@ namespace LibraryProjectUWP.Views.Book
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ContactListUC_CancelModificationRequested(ContactListUC sender, ExecuteRequestedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.RemoveItemToSideBar(sender);
             }
             catch (Exception ex)
             {
@@ -3727,6 +3935,5 @@ namespace LibraryProjectUWP.Views.Book
                 return true;
             }
         }
-
     }
 }

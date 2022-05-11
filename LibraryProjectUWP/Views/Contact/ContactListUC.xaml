@@ -21,15 +21,14 @@
     <PivotItem.Resources>
         <customConverters:NameToColorConverter x:Key="NameToColorConverter"/>
         <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModelPage.ViewModelListGroup}" IsSourceGrouped="True" ItemsPath="Items"/>
-        
+        <XamlUICommand x:Name="CancelModificationXUiCommand" 
+                       ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
+                       Description="Annule toutes les modifications apportées à l'item">
+        </XamlUICommand>
         <DataTemplate x:Key="ZoomedInTemplate" x:DataType="contactVm:ContactVM">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <PersonPicture DisplayName="{x:Bind DisplayName}" Width="32" Height="32" BorderBrush="Transparent" BorderThickness="0" Background="{x:Bind DisplayName, Converter={StaticResource NameToColorConverter}}"/>
-                <TextBlock TextWrapping="NoWrap" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center">
-                        <Run Text="{x:Bind NomNaissance, Mode=OneWay}"/>
-                        <Run Text="{x:Bind Prenom, Mode=OneWay}"/>
-                        <Run Text="{x:Bind AutresPrenoms, Mode=OneWay}"/>
-                </TextBlock>
+                <TextBlock TextWrapping="NoWrap" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Text="{x:Bind DisplayName3, Mode=OneWay}"/>
             </StackPanel>
         </DataTemplate>
 
@@ -70,17 +69,37 @@
                 <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
             </AutoSuggestBox.QueryIcon>
         </AutoSuggestBox>
-        <SemanticZoom Grid.Row="1">
-            <SemanticZoom.ZoomedInView>
-                <ListView ItemsSource="{x:Bind cvsGroups.View}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
-                    <ListView.GroupStyle>
-                        <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
-                    </ListView.GroupStyle>
-                </ListView>
-            </SemanticZoom.ZoomedInView>
-            <SemanticZoom.ZoomedOutView>
-                <GridView ItemsSource="{x:Bind cvsGroups.View.CollectionGroups}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
-            </SemanticZoom.ZoomedOutView>
-        </SemanticZoom>
+        <Grid Grid.Row="1" RowSpacing="2">
+            <StackPanel Orientation="Vertical" Spacing="4" Visibility="{x:Bind ViewModelPage.WorkerTextVisibility, Mode=OneWay}">
+                <ProgressRing IsActive="True" Height="40" Width="40"/>
+                <TextBlock x:Name="tbcStatus" Grid.Row="1" TextAlignment="Center" Text="Récupération en cours des contacts, veuillez patienter quelques instants." Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <SemanticZoom Visibility="{x:Bind ViewModelPage.DataListVisibility, Mode=OneWay}">
+                <SemanticZoom.ZoomedInView>
+                    <ListView ItemsSource="{x:Bind cvsGroups.View}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
+                        <ListView.GroupStyle>
+                            <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
+                        </ListView.GroupStyle>
+                    </ListView>
+                </SemanticZoom.ZoomedInView>
+                <SemanticZoom.ZoomedOutView>
+                    <GridView ItemsSource="{x:Bind cvsGroups.View.CollectionGroups}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
+                </SemanticZoom.ZoomedOutView>
+            </SemanticZoom>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
+                <Button Command="{StaticResource CancelModificationXUiCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;"/>
+                        <TextBlock Text="Fermer" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
     </Grid>
 </PivotItem>

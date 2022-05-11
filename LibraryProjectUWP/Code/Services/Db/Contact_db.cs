@@ -15,6 +15,7 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
 using Windows.Storage;
 using LibraryProjectUWP.ViewModels.Contact;
+using System.Threading;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
@@ -115,13 +116,13 @@ namespace LibraryProjectUWP.Code.Services.Db
             #endregion
 
             #region Multiple
-            public static async Task<IList<Tcontact>> MultipleAsync(ContactRole contactRole)
+            public static async Task<IList<Tcontact>> MultipleAsync(ContactRole contactRole, CancellationToken cancellationToken = default)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var collection = await context.Tcontact.Where(w => w.Role == (byte)contactRole).ToListAsync();
+                        var collection = await context.Tcontact.Where(w => w.Role == (byte)contactRole).ToListAsync(cancellationToken);
                         if (collection == null || !collection.Any()) return Enumerable.Empty<Tcontact>().ToList();
 
                         return collection;
@@ -135,11 +136,49 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<ContactVM>> MultipleVMAsync(ContactRole contactRole)
+            public static async Task<IList<ContactVM>> MultipleVMAsync(ContactRole contactRole, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    var collection = await MultipleAsync(contactRole);
+                    var collection = await MultipleAsync(contactRole, cancellationToken);
+                    if (!collection.Any()) return Enumerable.Empty<ContactVM>().ToList();
+
+                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<ContactVM>().ToList();
+                }
+            }
+
+            public static async Task<IList<Tcontact>> MultipleAsync(ContactType contactType, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var collection = await context.Tcontact.Where(w => w.Type == (byte)contactType).ToListAsync(cancellationToken);
+                        if (collection == null || !collection.Any()) return Enumerable.Empty<Tcontact>().ToList();
+
+                        return collection;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return Enumerable.Empty<Tcontact>().ToList();
+                }
+            }
+
+            public static async Task<IList<ContactVM>> MultipleVMAsync(ContactType contactType, CancellationToken cancellationToken = default)
+            {
+                try
+                {
+                    var collection = await MultipleAsync(contactType, cancellationToken);
                     if (!collection.Any()) return Enumerable.Empty<ContactVM>().ToList();
 
                     var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
