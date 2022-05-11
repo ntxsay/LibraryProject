@@ -18,13 +18,28 @@ namespace LibraryProjectUWP.ViewModels.Book
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public long Id { get; set; }
         public long IdBook { get; set; } = -1;
+        public string BookTitle { get; set; }
         public long IdBookExemplary { get; set; }
         public long NoExemplary { get; set; }
         public LivreVM Livre { get; set; }
 
         [JsonIgnore]
         public readonly IEnumerable<string> EtatList = LibraryHelpers.Book.EtatModelList;
-        
+
+        private SolidColorBrush _EventColor;
+        public SolidColorBrush EventColor
+        {
+            get => _EventColor;
+            set
+            {
+                if (_EventColor != value)
+                {
+                    _EventColor = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private LivreExemplaryVM _Exemplary;
         public LivreExemplaryVM Exemplary
         {

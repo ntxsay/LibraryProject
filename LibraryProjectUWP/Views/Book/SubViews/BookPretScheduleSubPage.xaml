@@ -20,7 +20,7 @@
 
     <Grid>
         <Pivot>
-            <PivotItem Header="Importer des livres depuis un classeur Excel">
+            <PivotItem Header="Agenda des emprunts">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -42,6 +42,9 @@
                                     <FontIcon Glyph="&#xE76B;"/>
                                 </Button>
                                 <Button Content="Aujourd'hui" Click="BtnToday_Click"/>
+                                <Button Click="BtnNextMonth_Click">
+                                    <FontIcon Glyph="&#xE76C;"/>
+                                </Button>
                                 <Button Click="BtnNextMonth_Click">
                                     <FontIcon Glyph="&#xE76C;"/>
                                 </Button>
@@ -70,9 +73,25 @@
                     </Grid>
                     <Grid Grid.Row="1">
                         <ScrollViewer>
-                            <VariableSizedWrapGrid x:Name="VSWGridDays" Orientation="Horizontal" MaximumRowsOrColumns="7">
-
-                            </VariableSizedWrapGrid>
+                            <Grid x:Name="GridDayCells" MinHeight="1000">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                            </Grid>
+                            
                         </ScrollViewer>
                     </Grid>
                 </Grid>

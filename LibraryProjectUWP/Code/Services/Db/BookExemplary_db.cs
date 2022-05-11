@@ -21,6 +21,40 @@ namespace LibraryProjectUWP.Code.Services.Db
     {
         public partial struct Book
         {
+            /// <summary>
+            /// Retourne un élément de la base de données avec un identifiant unique
+            /// </summary>
+            /// <typeparam name="T">Type d'entrée et de sortie (Modèle)</typeparam>
+            /// <param name="id">Identifiant unique</param>
+            /// <returns></returns>
+            public static async Task<Tbook> GetBookFromIdExemplaryAsync(long idExemplary)
+            {
+                try
+                {
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var item = await context.TbookExemplary.SingleOrDefaultAsync(d => d.Id == idExemplary);
+                        if (item != null)
+                        {
+                            return await SingleAsync(item.IdBook);
+                        }
+
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
+            public static async Task<LivreVM> GetBookVMFromIdExemplaryAsync(long idExemplary, long? idLibrary = null)
+            {
+                return await ViewModelConverterAsync(await GetBookFromIdExemplaryAsync(idExemplary));
+            }
+
             public static async Task<long> CountExemplaryInBookAsync(long idBook, CancellationToken cancellationToken = default)
             {
                 try

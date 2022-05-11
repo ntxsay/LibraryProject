@@ -6,12 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
+    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300" Margin="1" Tapped="UserControl_Tapped" DoubleTapped="UserControl_DoubleTapped" IsDoubleTapEnabled="True">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="SystemControlRevealFocusVisualBrush" Color="#FF0078D4" />
-        <SolidColorBrush x:Key="SystemControlFocusVisualSecondaryBrush" Color="#B3FFFFFF" />
+        <converters:StringFormatConverter x:Key="StringFormatConverter"/>
+        <customConverters:DateTimeToStringDisplay x:Key="dateTimeToStringDisplay"/>
     </UserControl.Resources>
 
     <Grid Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}">
@@ -35,11 +37,48 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="booktVm:LivrePretVM">
-                            <Button Padding="1 1" Background="DeepSkyBlue"  HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
-                                <TextBlock Text="{x:Bind Emprunteur.DisplayName3}" TextAlignment="Left">
-                                    <Run Text="{x:Bind DatePret}"/>
-                                    <Run Text="{x:Bind DateRemise}"/>
-                                </TextBlock>
+                            <Button Padding="1 1" Background="{x:Bind EventColor, Mode=OneWay}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{x:Bind BookTitle}" TextAlignment="Left"></TextBlock>
+                                </Grid>
+                                <Button.Flyout>
+                                    <Flyout>
+                                        <Grid RowSpacing="14" MaxWidth="300">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="*"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0" ColumnSpacing="8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid Grid.Column="0" VerticalAlignment="Center">
+                                                    <Ellipse Height="40" Width="40" Fill="{ThemeResource SystemControlChromeLowAcrylicElementBrush}"/>
+                                                    <TextBlock Text="{x:Bind Exemplary.NoExemplaire, Mode=OneWay}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center"/>
+                                                </Grid>
+                                                <TextBlock Grid.Column="1" Text="{x:Bind BookTitle}" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="18" TextWrapping="Wrap"/>
+                                            </Grid>
+                                            <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" TextAlignment="Justify" TextWrapping="Wrap">
+                                                    <Run Text="Un prêt a été accordé à "/><Run Text="{x:Bind Emprunteur.DisplayName3}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                                    <Run Text="le "/><Run Text="{x:Bind DatePret, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='ddd dd MMM yyyy'}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                                    <Run Text="à "/><Run Text="{x:Bind TimePret, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='dd/MM/yyyy'}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/><Run Text="." />
+                                                    <Run Text="Le retour est prévu le "/><Run Text="{x:Bind DateRemise, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='ddd dd MMM yyyy'}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                                    <Run Text="à "/><Run Text="{x:Bind TimeRemise, Converter={StaticResource dateTimeToStringDisplay}, ConverterParameter='dd/MM/yyyy'}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                                    <LineBreak /><LineBreak /><Run Text="Etat du livre avant prêt "/><Run Text="{x:Bind EtatAvantPret.Etat}" Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"/>
+                                            </TextBlock>
+                                            <StackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+                                                <Button HorizontalAlignment="Right">Editer</Button>
+                                                <Button HorizontalAlignment="Right">Remettre</Button>
+                                            </StackPanel>
+                                        </Grid>
+
+                                    </Flyout>
+                                </Button.Flyout>
                             </Button>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -47,5 +86,13 @@
             </ScrollViewer>
         </Grid>
     </Grid>
-
+    <FlyoutBase.AttachedFlyout>
+        <MenuFlyout Opened="MenuFlyout_Opened">
+            <MenuFlyoutItem Text="Nouveau prêt">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE748;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+    </FlyoutBase.AttachedFlyout>
 </UserControl>

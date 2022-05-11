@@ -1,4 +1,5 @@
-﻿using LibraryProjectUWP.Code.Services.Db;
+﻿using LibraryProjectUWP.Code.Services;
+using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
 using Microsoft.Toolkit.Uwp.UI.Controls;
@@ -70,9 +71,10 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         {
             try
             {
-                if (VSWGridDays.Children.Any())
+                int rowIndex = 0, columnIndex = 0;
+                if (GridDayCells.Children.Any())
                 {
-                    VSWGridDays.Children.Clear();
+                    GridDayCells.Children.Clear();
                 }
 
                 int daysInMonth = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
@@ -82,15 +84,25 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 {
                     Border border = new Border()
                     {
-                        Width = GridDayNames.ColumnDefinitions[0].ActualWidth,
-                        Height = GridDayNames.ColumnDefinitions[0].ActualWidth,
                         Background = new SolidColorBrush(Colors.Transparent),
                     };
 
-                    VSWGridDays.Children.Add(border);
+                    GridDayCells.Children.Add(border);
+                    border.SetValue(Grid.RowProperty, rowIndex);
+                    border.SetValue(Grid.ColumnProperty, columnIndex);
+
+                    if (columnIndex == 6)
+                    {
+                        columnIndex = 0;
+                        rowIndex++;
+                    }
+                    else
+                    {
+                        columnIndex++;
+                    }
                 }
 
-                var prets = DbServices.Book.AllPretsVMAsync().GetAwaiter().GetResult();
+                var prets = DbServices.Book.AllPretsVMAsync().GetAwaiter().GetResult()?.ToList();
 
                 var now = DateTime.Now;
                 for (int i = 1; i <= daysInMonth; i++)
@@ -105,9 +117,17 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
                     if (prets != null && prets.Count > 0)
                     {
+                        NameToColorService nameToColorService = new NameToColorService();
+                        prets.ForEach(p => p.EventColor = nameToColorService.GetColor(p));
+
+
                         List<LivrePretVM> nPrets = new List<LivrePretVM>();
                         foreach(var item in prets)
                         {
+                            var book = DbServices.Book.SingleAsync(item.Exemplary.IdBook, null).GetAwaiter().GetResult();
+                            item.IdBook = book.Id;
+                            item.BookTitle = book.MainTitle;
+
                             var itemDayDateStart = new DateTime(item.DatePret.Year, item.DatePret.Month, item.DatePret.Day);
                             var itemDayDateStartComparaison = DateTime.Compare(date, itemDayDateStart);
                             if (item.DateRemise.HasValue)
@@ -134,13 +154,21 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         }
                     }
 
-                    BookPretScheduleUC dayUC = new BookPretScheduleUC(viewModel, this)
-                    {
-                        Width = GridDayNames.ColumnDefinitions[0].ActualWidth - 2,
-                        Height = GridDayNames.ColumnDefinitions[0].ActualWidth - 2,
-                    };
+                    BookPretScheduleUC dayUC = new BookPretScheduleUC(viewModel, this);
 
-                    VSWGridDays.Children.Add(dayUC);
+                    GridDayCells.Children.Add(dayUC);
+                    dayUC.SetValue(Grid.RowProperty, rowIndex);
+                    dayUC.SetValue(Grid.ColumnProperty, columnIndex);
+
+                    if (columnIndex == 6)
+                    {
+                        columnIndex = 0;
+                        rowIndex++;
+                    }
+                    else
+                    {
+                        columnIndex++;
+                    }
                 }
 
                 TbkMonthName.Text = $"{DateTimeFormatInfo.CurrentInfo.GetMonthName(CurrentMonth.Month)} {CurrentMonth.Year}";
@@ -154,28 +182,28 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            try
-            {
-                foreach (var item in VSWGridDays.Children)
-                {
-                    if (item is Border border)
-                    {
-                        border.Width = GridDayNames.ColumnDefinitions[0].ActualWidth;
-                        border.Height = GridDayNames.ColumnDefinitions[0].ActualWidth;
-                        border.Background = new SolidColorBrush(Colors.Transparent);
-                    }
-                    else if (item is BookPretScheduleUC dayUC)
-                    {
-                        dayUC.Width = GridDayNames.ColumnDefinitions[0].ActualWidth - 2;
-                        dayUC.Height = GridDayNames.ColumnDefinitions[0].ActualWidth - 2;
-                    }
-                }
-            }
-            catch (Exception)
-            {
+            //try
+            //{
+            //    foreach (var item in GridDayCells.Children)
+            //    {
+            //        if (item is Border border)
+            //        {
+            //            border.Width = GridDayNames.ColumnDefinitions[0].ActualWidth;
+            //            border.Height = GridDayNames.ColumnDefinitions[0].ActualWidth;
+            //            border.Background = new SolidColorBrush(Colors.Transparent);
+            //        }
+            //        else if (item is BookPretScheduleUC dayUC)
+            //        {
+            //            dayUC.Width = GridDayNames.ColumnDefinitions[0].ActualWidth - 2;
+            //            dayUC.Height = GridDayNames.ColumnDefinitions[0].ActualWidth - 2;
+            //        }
+            //    }
+            //}
+            //catch (Exception)
+            //{
 
-                throw;
-            }
+            //    throw;
+            //}
         }
 
         private void BtnPreviousMonth_Click(object sender, RoutedEventArgs e)
@@ -209,7 +237,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         {
             try
             {
-                var selectedDays = VSWGridDays.Children.Where(s => s is BookPretScheduleUC scheduleUC && DateTime.Compare(scheduleUC.ViewModel.Date, BookPretScheduleUCDateStart.ViewModel.Date) >= 0 && DateTime.Compare(scheduleUC.ViewModel.Date, BookPretScheduleUCDateEnd.ViewModel.Date) <= 0).Select(q => (BookPretScheduleUC)q).ToList();
+                var selectedDays = GridDayCells.Children.Where(s => s is BookPretScheduleUC scheduleUC && DateTime.Compare(scheduleUC.ViewModel.Date, BookPretScheduleUCDateStart.ViewModel.Date) >= 0 && DateTime.Compare(scheduleUC.ViewModel.Date, BookPretScheduleUCDateEnd.ViewModel.Date) <= 0).Select(q => (BookPretScheduleUC)q).ToList();
                 if (selectedDays != null && selectedDays.Count > 0)
                 {
 

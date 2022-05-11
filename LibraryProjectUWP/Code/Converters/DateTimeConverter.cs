@@ -23,14 +23,18 @@ namespace LibraryProjectUWP.Code.Converters
                     {
                         return dateTime.ToString(dateStringFormat);
                     }
+                    else if (value is TimeSpan timeSpan)
+                    {
+                        return timeSpan.ToString(@"hh\:mm");
+                    }
                 }
                 
 
-                return "date inconnue";
+                return "N.C";
             }
             catch (Exception)
             {
-                return "date inconnue";
+                return string.Empty;
             }
         }
 

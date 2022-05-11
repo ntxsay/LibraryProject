@@ -45,6 +45,9 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 ParentPage.BookPretScheduleUCDateEnd = this;
                 ParentPage.SelectCellsDay();
+                FrameworkElement senderElement = sender as FrameworkElement;
+                FlyoutBase flyoutBase = FlyoutBase.GetAttachedFlyout(senderElement);
+                flyoutBase.ShowAt(senderElement);
             }
             else
             {
@@ -55,6 +58,25 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         private void UserControl_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
 
+        }
+
+        private void MenuFlyout_Opened(object sender, object e)
+        {
+            try
+            {
+                if (sender is MenuFlyout menuFlyout)
+                {
+                    if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
+                    {
+                        flyoutItem.Text = $"Nouveau prêt du « {ParentPage.BookPretScheduleUCDateStart.ViewModel.Date:d} au {ParentPage.BookPretScheduleUCDateEnd.ViewModel.Date:d} »";
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }
