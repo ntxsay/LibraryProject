@@ -332,16 +332,28 @@ namespace LibraryProjectUWP.Views.Book
                                 var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                 if (split.Length == 1)
                                 {
-                                    this.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                    this.ParentPage.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                                    {
+                                        ParentGuid = ViewModelPage.ItemGuid,
+                                        ParentType = typeof(NewEditBookPretUC),
+                                    }, split[0], string.Empty, string.Empty);
                                 }
                                 else if (split.Length >= 2)
                                 {
-                                    this.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
+                                    this.ParentPage.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                                    {
+                                        ParentGuid = ViewModelPage.ItemGuid,
+                                        ParentType = typeof(NewEditBookPretUC),
+                                    }, split[0], split[1], string.Empty);
                                 }
                             }
                             else
                             {
-                                this.ParentPage.NewContact(ContactType.Human, ContactRole.Adherant, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                this.ParentPage.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                                {
+                                    ParentGuid = ViewModelPage.ItemGuid,
+                                    ParentType = typeof(NewEditBookPretUC),
+                                }, string.Empty, string.Empty, string.Empty);
                             }
                             sender.Text = String.Empty;
                         }

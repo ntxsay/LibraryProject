@@ -432,17 +432,29 @@ namespace LibraryProjectUWP.Views.Book
                                     var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                     if (split.Length == 1)
                                     {
-                                        ParentPage.NewContact(ContactType.Human, ContactRole.Author, split[0], string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                        ParentPage.NewEditContact(ContactType.Human, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                        {
+                                            ParentGuid = ViewModelPage.ItemGuid,
+                                            ParentType = typeof(NewEditBookUC),
+                                        }, split[0], string.Empty, string.Empty);
                                     }
                                     else if (split.Length >= 2)
                                     {
-                                        ParentPage.NewContact(ContactType.Human, ContactRole.Author, split[0], split[1], string.Empty, ViewModelPage.ItemGuid);
+                                        ParentPage.NewEditContact(ContactType.Human, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                        {
+                                            ParentGuid = ViewModelPage.ItemGuid,
+                                            ParentType = typeof(NewEditBookUC),
+                                        }, split[0], split[1], string.Empty);
                                     }
                                 }
                                 //Société
                                 else if (viewModel.Id == -2)
                                 {
-                                    ParentPage.NewContact(ContactType.Society, ContactRole.Author, string.Empty, string.Empty, sender.Text.Trim(), ViewModelPage.ItemGuid);
+                                    ParentPage.NewEditContact(ContactType.Society, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                    {
+                                        ParentGuid = ViewModelPage.ItemGuid,
+                                        ParentType = typeof(NewEditBookUC),
+                                    }, string.Empty, string.Empty, sender.Text.Trim());
                                 }
                             }
                             else
@@ -450,12 +462,20 @@ namespace LibraryProjectUWP.Views.Book
                                 //Personne
                                 if (viewModel.Id == -1)
                                 {
-                                    ParentPage.NewContact(ContactType.Human, ContactRole.Author, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                    ParentPage.NewEditContact(ContactType.Human, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                    {
+                                        ParentGuid = ViewModelPage.ItemGuid,
+                                        ParentType = typeof(NewEditBookUC),
+                                    }, string.Empty, string.Empty, string.Empty);
                                 }
                                 //Société
                                 else if (viewModel.Id == -2)
                                 {
-                                    ParentPage.NewContact(ContactType.Society, ContactRole.Author, string.Empty, string.Empty, string.Empty, ViewModelPage.ItemGuid);
+                                    ParentPage.NewEditContact(ContactType.Society, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                    {
+                                        ParentGuid = ViewModelPage.ItemGuid,
+                                        ParentType = typeof(NewEditBookUC),
+                                    }, string.Empty, string.Empty, string.Empty);
                                 }
                             }
                             sender.Text = String.Empty;
@@ -780,7 +800,11 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (ParentPage != null)
                         {
-                            ParentPage.NewContact(ContactType.Society, ContactRole.EditorHouse, string.Empty, string.Empty, sender.Text, ViewModelPage.ItemGuid);
+                            ParentPage.NewEditContact(ContactType.Society, ContactRole.EditorHouse, EditMode.Create, new SideBarInterLinkVM()
+                            {
+                                ParentGuid = ViewModelPage.ItemGuid,
+                                ParentType = typeof(NewEditBookUC),
+                            }, string.Empty, string.Empty, sender.Text);
                             sender.Text = String.Empty;
                         }
                     }

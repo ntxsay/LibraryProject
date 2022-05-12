@@ -4,6 +4,7 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Collection;
+using LibraryProjectUWP.Views.Contact;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
@@ -102,6 +103,33 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
+        public ContactListUC GetContactListUCSideBarByGuid(Pivot pivot, Guid guid)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (pivot == null)
+                {
+                    return null;
+                }
+
+                if (pivot.Items.Count > 0)
+                {
+                    object itemPivot = pivot.Items.FirstOrDefault(f => f is ContactListUC item && item.ViewModelPage.ItemGuid == guid);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as ContactListUC;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
 
         public BookPretListUC GetBookPretListUCSideBarByGuid(Pivot pivot, Guid guid)
         {

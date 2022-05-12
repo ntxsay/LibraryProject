@@ -4,6 +4,7 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,12 +30,19 @@ namespace LibraryProjectUWP.Views.Contact
 {
     public sealed partial class ContactListUC : PivotItem
     {
-        readonly ContactListParametersDriverVM _parameters;
+        public BookCollectionPage ParentPage { get; private set; }
         public ContactListUCVM ViewModelPage { get; set; } = new ContactListUCVM();
 
         public delegate void CancelModificationEventHandler(ContactListUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
 
+        public delegate void UpdateItemEventHandler(ContactListUC sender, ExecuteRequestedEventArgs e);
+        public event UpdateItemEventHandler UpdateItemRequested;
+
+        public delegate void CreateItemEventHandler(ContactListUC sender, ExecuteRequestedEventArgs e);
+        public event CreateItemEventHandler CreateItemRequested;
+
+        public ObservableCollection<ContactGroupCastVM> ViewModelListGroup { get; set; } = new ObservableCollection<ContactGroupCastVM>();
         private CollectionViewSource CollectionViewSource { get; set; } = new CollectionViewSource()
         {
             IsSourceGrouped = true,
@@ -45,22 +53,39 @@ namespace LibraryProjectUWP.Views.Contact
 
         public ContactListUC()
         {
+            if (this.CollectionViewSource.View == null)
+            {
+                this.CollectionViewSource.Source = ViewModelListGroup;
+            }
+
             this.InitializeComponent();
         }
 
-        public ContactListUC(ContactListParametersDriverVM parameters)
-        {
-            this.InitializeComponent();
-            _parameters = parameters;
-            ViewModelPage.Header = $"Les adhérants";
-            ViewModelPage.ViewModelList = parameters?.ViewModelList;
-            InitializeData(ContactType.Human);
-        }
-
-        public void InitializeData(ContactType contactType)
+        public void InitializeSideBar(BookCollectionPage bookCollectionPage, ContactType contactType)
         {
             try
             {
+                ParentPage = bookCollectionPage;
+
+                ViewModelPage = new ContactListUCVM()
+                {
+                    ContactType = contactType,
+                };
+
+                switch (contactType)
+                {
+                    case ContactType.Human:
+                        ViewModelPage.Header = $"Les contacts";
+                        TbcInfos.Text = "Vous naviguez parmis tous les contacts";
+                        break;
+                    case ContactType.Society:
+                        ViewModelPage.Header = $"Les sociétés";
+                        TbcInfos.Text = "Vous naviguez parmis toutes les sociétés";
+                        break;
+                    default:
+                        break;
+                }
+
                 ViewModelPage.WorkerTextVisibility = Visibility.Visible;
                 ViewModelPage.DataListVisibility = Visibility.Collapsed;
                 if (getContactsListTask.IsWorkerRunning)
@@ -78,20 +103,22 @@ namespace LibraryProjectUWP.Views.Contact
                         {
                             if (this.CollectionViewSource.View == null)
                             {
-                                this.CollectionViewSource.Source = ViewModelPage.ViewModelListGroup;
+                                this.CollectionViewSource.Source = ViewModelListGroup;
                             }
 
-                            List<ContactGroupCastVM> contactGroupCastVMs = (GroupingItems.Select(groupingItem => new ContactGroupCastVM()
+                            List<ContactGroupCastVM> contactGroupCastVMs = GroupingItems.Select(groupingItem => new ContactGroupCastVM()
                             {
                                 GroupName = groupingItem.Key,
                                 Items = new ObservableCollection<ContactVM>(groupingItem),
-                            })).ToList();
+                            }).ToList();
 
-                            ViewModelPage.ViewModelListGroup.Clear();
+                            ViewModelListGroup.Clear();
                             foreach (var item in contactGroupCastVMs)
                             {
-                                ViewModelPage.ViewModelListGroup.Add(item);
+                                ViewModelListGroup.Add(item);
                             }
+
+                            
                         }
 
                     }
@@ -113,6 +140,11 @@ namespace LibraryProjectUWP.Views.Contact
             
         }
 
+        private void ABBtn_Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeSideBar(ParentPage, ViewModelPage.ContactType);
+        }
+
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             try
@@ -121,6 +153,19 @@ namespace LibraryProjectUWP.Views.Contact
                 {
                     CancelModificationRequested = null;
                 }
+
+                if (CreateItemRequested != null)
+                {
+                    CreateItemRequested = null;
+                }
+
+                if (UpdateItemRequested != null)
+                {
+                    UpdateItemRequested = null;
+                }
+
+                getContactsListTask?.DisposeWorker();
+                ViewModelPage = null;
             }
             catch (Exception)
             {
@@ -283,12 +328,90 @@ namespace LibraryProjectUWP.Views.Contact
 
         private void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
+            try
+            {
+                //if (ViewModelPage.SearchedViewModel != null)
+                //{
+                //    ViewModelPage.SearchedViewModel = null;
+                //}
+
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || !ViewModelListGroup.Any())
+                {
+                    return;
+                }
+
+                var FilteredItems = new List<ContactVM>();
+                var splitSearchTerm = sender.Text.ToLower().Split(" ");
+
+                foreach (var value in ViewModelListGroup.Select(s => s.Items).SelectMany(a => a.ToList()).Select(q => q).ToList())
+                {
+                    if (value.DisplayName3.IsStringNullOrEmptyOrWhiteSpace()) continue;
+
+                    var found = splitSearchTerm.All((key) =>
+                    {
+                        return value.DisplayName3.ToLower().Contains(key.ToLower());
+                    });
+
+                    if (found)
+                    {
+                        FilteredItems.Add(value);
+                    }
+                }
+                sender.ItemsSource = FilteredItems;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
 
         }
 
         private void ASB_SearchItem_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
+            try
+            {
+                if (args.SelectedItem != null && args.SelectedItem is ContactVM value)
+                {
+                    sender.Text = value.DisplayName3;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
 
+        private void ASB_SearchItem_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            try
+            {
+                if (args.ChosenSuggestion != null && args.ChosenSuggestion is ContactVM viewModel)
+                {
+                    foreach (var item in ListViewZoomInView.Items)
+                    {
+                        if (item is ContactVM itemViewModel && itemViewModel.Id == viewModel.Id)
+                        {
+                            if (ListViewZoomInView.SelectedItem != item)
+                            {
+                                ListViewZoomInView.SelectedItem = item;
+                            }
+
+                            ListViewZoomInView.ScrollIntoView(ListViewZoomInView.SelectedItem);
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -296,7 +419,210 @@ namespace LibraryProjectUWP.Views.Contact
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private void ASB_SearchItem_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                ParentPage.NewEditContact(ViewModelPage.ContactType, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                {
+                    ParentGuid = ViewModelPage.ItemGuid,
+                    ParentType = typeof(ContactListUC)
+                });
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                //bool isValided = IsModelValided();
+                //if (!isValided)
+                //{
+                //    return;
+                //}
+
+                UpdateItemRequested?.Invoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+
+        }
+
+        private void MenuFlyout_Opened(object sender, object e)
+        {
+            try
+            {
+                if (sender is MenuFlyout menuFlyout)
+                {
+                    if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItemOpenSelectedBooks)
+                    {
+                        if (ViewModelPage.SelectedViewModels != null && ViewModelPage.SelectedViewModels.Count > 0)
+                        {
+                            flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
+                            flyoutItemOpenSelectedBooks.IsEnabled = true;
+                        }
+                        else
+                        {
+                            flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
+                            flyoutItemOpenSelectedBooks.IsEnabled = false;
+                        }
+                    }
+
+
+                    if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
+                    {
+                        if (menuFlyout.Items[2] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Ajouter {ParentPage.ViewModelPage.SelectedItems.Count} livre(s) à « {flyoutItem.Tag} »";
+                            flyoutItem.IsEnabled = true;
+                        }
+                    }
+                    else
+                    {
+                        if (menuFlyout.Items[2] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Aucun livre à ajouter à « {flyoutItem.Tag} »";
+                            flyoutItem.IsEnabled = false;
+                        }
+                    }
+
+                    if (menuFlyout.Items[3] is MenuFlyoutItem flyoutItemDecategorize)
+                    {
+                        if (flyoutItemDecategorize.Tag is CollectionVM collectionVM)
+                        {
+                            if (collectionVM.BooksId != null && collectionVM.BooksId.Any())
+                            {
+                                flyoutItemDecategorize.Text = $"Retirer {collectionVM.BooksId.Count} livre(s) de « {collectionVM.Name} »";
+                                flyoutItemDecategorize.IsEnabled = true;
+                            }
+                            else
+                            {
+                                flyoutItemDecategorize.Text = $"Aucun livre à retirer de « {collectionVM.Name} »";
+                                flyoutItemDecategorize.IsEnabled = false;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void MenuFlyout_DeleteCmB_Opened(object sender, object e)
+        {
+            try
+            {
+                if (sender is MenuFlyout menuFlyout)
+                {
+                    if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItemDelete)
+                    {
+                        if (ViewModelPage.SelectedViewModels.Count > 1)
+                        {
+                            flyoutItemDelete.Text = $"Supprimer « {ViewModelPage.SelectedViewModels.Count} collections »";
+                        }
+                        else if (ViewModelPage.SelectedViewModels.Count == 1)
+                        {
+                            flyoutItemDelete.Text = $"Supprimer « {ViewModelPage.SelectedViewModels[0].Name} »";
+                        }
+                        else
+                        {
+                            flyoutItemDelete.Text = $"Aucune collection n'est à supprimer";
+                        }
+                    }
+
+                    if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
+                    {
+                        if (menuFlyout.Items[1] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Décatégoriser {ParentPage.ViewModelPage.SelectedItems.Count} livre(s)";
+                            flyoutItem.IsEnabled = true;
+                        }
+                    }
+                    else
+                    {
+                        if (menuFlyout.Items[1] is MenuFlyoutItem flyoutItem)
+                        {
+                            flyoutItem.Text = $"Aucun livre à retirer d'une collection";
+                            flyoutItem.IsEnabled = false;
+                        }
+                    }
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void MenuFlyoutItem_DecategorizeBooksFromCollection_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
+                {
+                    OperationStateVM result = await DbServices.Collection.DecategorizeBooksAsync(ParentPage.ViewModelPage.SelectedItems.Select(s => s.Id));
+                    if (result.IsSuccess)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Succès";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                        ViewModelPage.IsResultMessageOpen = true;
+
+                        await ParentPage.UpdateLibraryCollectionAsync();
+                    }
+                    else
+                    {
+                        //Erreur
+                        ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
+        private void ABBtnExport_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ABBtnEdit_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ABBtnCreate_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -307,7 +633,7 @@ namespace LibraryProjectUWP.Views.Contact
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         public Guid ItemGuid { get; private set; } = Guid.NewGuid();
-        //public Guid? ParentGuid { get; set; }
+        //public SideBarInterLinkVM ParentReferences { get; set; }
 
         private string _Header;
         public string Header
@@ -351,15 +677,15 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private string _ArgName;
-        public string ArgName
+        private ContactType _ContactType;
+        public ContactType ContactType
         {
-            get => this._ArgName;
+            get => this._ContactType;
             set
             {
-                if (this._ArgName != value)
+                if (this._ContactType != value)
                 {
-                    this._ArgName = value;
+                    this._ContactType = value;
                     this.OnPropertyChanged();
                 }
             }
@@ -423,29 +749,29 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private IEnumerable<ContactVM> _ViewModelList;
-        public IEnumerable<ContactVM> ViewModelList
+        private string _SelectedViewModelMessage;
+        public string SelectedViewModelMessage
         {
-            get => this._ViewModelList;
+            get => this._SelectedViewModelMessage;
             set
             {
-                if (this._ViewModelList != value)
+                if (this._SelectedViewModelMessage != value)
                 {
-                    this._ViewModelList = value;
+                    this._SelectedViewModelMessage = value;
                     this.OnPropertyChanged();
                 }
             }
         }
 
-        private ObservableCollection<ContactGroupCastVM> _ViewModelListGroup = new ObservableCollection<ContactGroupCastVM>();
-        public ObservableCollection<ContactGroupCastVM> ViewModelListGroup
+        private ObservableCollection<ContactVM> _SelectedViewModels = new ObservableCollection<ContactVM>();
+        public ObservableCollection<ContactVM> SelectedViewModels
         {
-            get => this._ViewModelListGroup;
+            get => this._SelectedViewModels;
             set
             {
-                if (this._ViewModelListGroup != value)
+                if (_SelectedViewModels != value)
                 {
-                    this._ViewModelListGroup = value;
+                    this._SelectedViewModels = value;
                     this.OnPropertyChanged();
                 }
             }

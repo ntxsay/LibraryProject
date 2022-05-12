@@ -3,6 +3,8 @@ using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -33,6 +35,7 @@ namespace LibraryProjectUWP.Views.Contact
     public sealed partial class NewEditContactUC : PivotItem
     {
         public NewEditContactUCVM ViewModelPage { get; set; } = new NewEditContactUCVM();
+        public BookCollectionPage ParentPage { get; private set; }
 
         public delegate void CancelModificationEventHandler(NewEditContactUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
@@ -54,10 +57,35 @@ namespace LibraryProjectUWP.Views.Contact
             //InitializeFieldVisibility();
         }
 
-        public void LoadControl()
+        public void InitializeSideBar(BookCollectionPage bookCollectionPage, EditMode editMode, ContactType contactType, ContactRole contactRole, string prenom = null, string nomNaissance = null, string societyName = null)
         {
-            InitializeActionInfos();
-            InitializeFieldVisibility();
+            try
+            {
+                ParentPage = bookCollectionPage;
+                ViewModelPage = new NewEditContactUCVM()
+                {
+                    EditMode = editMode,
+                    ViewModel = new ContactVM()
+                    {
+                        ContactRole = contactRole,
+                        ContactType = contactType,
+                        NomNaissance = nomNaissance,
+                        Prenom = prenom,
+                        SocietyName = societyName,
+                    },
+                };
+
+                ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Prêter un livre" : "Editer un livre")}";
+
+                InitializeActionInfos();
+                InitializeFieldVisibility();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void InitializeActionInfos()
@@ -345,7 +373,7 @@ namespace LibraryProjectUWP.Views.Contact
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         public Guid ItemGuid { get; private set; } = Guid.NewGuid();
-        public Guid? ParentGuid { get; set; }
+        public SideBarInterLinkVM ParentReferences { get; set; }
 
         public readonly IEnumerable<string> contactRole = LibraryHelpers.Contact.ContactRoleList;
         public readonly IEnumerable<string> nationalityList = CountryHelpers.NationalitiesList();

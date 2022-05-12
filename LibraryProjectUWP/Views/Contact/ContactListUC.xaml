@@ -20,16 +20,46 @@
     Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
     <PivotItem.Resources>
         <customConverters:NameToColorConverter x:Key="NameToColorConverter"/>
-        <CollectionViewSource x:Name="cvsGroups" Source="{x:Bind ViewModelPage.ViewModelListGroup}" IsSourceGrouped="True" ItemsPath="Items"/>
+        <customConverters:CreateWordsConverter x:Key="createWordsConverter" />
+        <customConverters:IntGreaterThanToBooleanConverter x:Key="intGreaterThanToBooleanConverter" />
+        <customConverters:IntEqualToBooleanConverter x:Key="intEqualToBooleanConverter" />
         <XamlUICommand x:Name="CancelModificationXUiCommand" 
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
         </XamlUICommand>
+        <XamlUICommand x:Name="CreateItemXUiCommand" 
+                       ExecuteRequested="CreateItemXUiCommand_ExecuteRequested"
+                       Description="Crée un nouvel item">
+        </XamlUICommand>
+        <XamlUICommand x:Name="UpdateItemXUiCommand" 
+                       ExecuteRequested="UpdateItemXUiCommand_ExecuteRequested"
+                       Description="Met à jour l'item">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DeleteItemXUiCommand" 
+                       ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
+                       Description="Supprime l'item">
+        </XamlUICommand>
         <DataTemplate x:Key="ZoomedInTemplate" x:DataType="contactVm:ContactVM">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <PersonPicture DisplayName="{x:Bind DisplayName}" Width="32" Height="32" BorderBrush="Transparent" BorderThickness="0" Background="{x:Bind DisplayName, Converter={StaticResource NameToColorConverter}}"/>
-                <TextBlock TextWrapping="NoWrap" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Text="{x:Bind DisplayName3, Mode=OneWay}"/>
-            </StackPanel>
+            <ListViewItem>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <PersonPicture DisplayName="{x:Bind DisplayName}" Width="32" Height="32" BorderBrush="Transparent" BorderThickness="0" Background="{x:Bind DisplayName, Converter={StaticResource NameToColorConverter}}"/>
+                    <TextBlock TextWrapping="NoWrap" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Text="{x:Bind DisplayName3, Mode=OneWay}"/>
+                </StackPanel>
+                <ListViewItem.ContextFlyout>
+                    <MenuFlyout Opened="MenuFlyout_Opened">
+                        <MenuFlyoutItem Tag="{x:Bind DisplayName3, Mode=OneWay}" Icon="View" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Tag="{x:Bind DisplayName3, Mode=OneWay}" Icon="Add" Command="{StaticResource AddBooksToCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
+                        <MenuFlyoutItem Tag="{x:Bind Mode=OneWay}" Icon="Remove" Command="{StaticResource DecategorizeBooksFromCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="{x:Bind DisplayName3, Converter={StaticResource createWordsConverter}, ConverterParameter='Editer « {x} »', Mode=OneWay}" Icon="Edit"
+                                             Command="{StaticResource UpdateItemXUiCommand}" CommandParameter="{x:Bind Mode=OneWay}"/>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="{x:Bind DisplayName3, Converter={StaticResource createWordsConverter}, ConverterParameter='Supprimer « {x} »', Mode=OneWay}" Icon="Delete" 
+                                            Command="{StaticResource DeleteItemXUiCommand}" CommandParameter="{x:Bind }"/>
+                    </MenuFlyout>
+                </ListViewItem.ContextFlyout>
+            </ListViewItem>
         </DataTemplate>
 
         <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="contactVm:ContactGroupCastVM">
@@ -59,35 +89,81 @@
     <Grid RowSpacing="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <AutoSuggestBox x:Name="ASB_SearchItem" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,8,0,4" 
+        <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 10" TextWrapping="Wrap"/>
+        <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Collapsed" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" HorizontalContentAlignment="Left">
+            <AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="View">
+                <!--<AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
+                </AppBarButton.Icon>-->
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Icon="View" Text="Afficher tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInAllItemXUiCmd}">
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Icon="View" Text="{x:Bind ViewModelPage.SelectedViewModelMessage, Mode=OneWay}" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInThisItemXUiCmd}"
+                                        IsEnabled="{x:Bind ViewModelPage.SelectedViewModels.Count, Converter={StaticResource intGreaterThanToBooleanConverter}, ConverterParameter='0', Mode=OneWay}">
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarSeparator/>
+            <AppBarButton x:Name="ABBtnCreate" Label="Ajouter" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="ABBtnCreat_Click" />
+            <AppBarSeparator/>
+            <AppBarButton x:Name="ABBtnEdit" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" 
+                          Click="ABBtnEdit_Click" IsEnabled="{x:Bind ViewModelPage.SelectedViewModels.Count, Converter={StaticResource intEqualToBooleanConverter}, ConverterParameter='1', Mode=OneWay}"/>
+            <AppBarButton x:Name="ABBDelete" Icon="Delete" Label="Supprimer" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                <AppBarButton.Flyout>
+                    <MenuFlyout Opened="MenuFlyout_DeleteCmB_Opened">
+                        <MenuFlyoutItem Text="hhshs" IsEnabled="{x:Bind ViewModelPage.SelectedViewModels.Count, Converter={StaticResource intGreaterThanToBooleanConverter}, ConverterParameter='0', Mode=OneWay}"
+                                        Command="{StaticResource DeleteItemXUiCommand}" Icon="Delete"/>
+                        <MenuFlyoutItem Icon="Remove" Click="MenuFlyoutItem_DecategorizeBooksFromCollection_Click"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Name="ABBtnExport" Label="Exporter au format JSON" ToolTipService.ToolTip="Le chemin d'accès est défini comme ressource internet" MTUUi:FrameworkElementExtensions.Cursor="Hand" 
+                              Click="ABBtnExport_Click">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE74E;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+        <AutoSuggestBox x:Name="ASB_SearchItem" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,8,0,4" 
                     PlaceholderText="Rechercher un contact" IsSuggestionListOpen="False"
                                     TextChanged="ASB_SearchItem_TextChanged" SuggestionChosen="ASB_SearchItem_SuggestionChosen"  QuerySubmitted="ASB_SearchItem_QuerySubmitted">
             <AutoSuggestBox.QueryIcon>
                 <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
             </AutoSuggestBox.QueryIcon>
+            <AutoSuggestBox.ItemTemplate>
+                <DataTemplate x:DataType="contactVm:ContactVM">
+                    <TextBlock Text="{x:Bind DisplayName3}" />
+                </DataTemplate>
+            </AutoSuggestBox.ItemTemplate>
         </AutoSuggestBox>
-        <Grid Grid.Row="1" RowSpacing="2">
+        <Grid Grid.Row="3" RowSpacing="2">
             <StackPanel Orientation="Vertical" Spacing="4" Visibility="{x:Bind ViewModelPage.WorkerTextVisibility, Mode=OneWay}">
                 <ProgressRing IsActive="True" Height="40" Width="40"/>
                 <TextBlock x:Name="tbcStatus" Grid.Row="1" TextAlignment="Center" Text="Récupération en cours des contacts, veuillez patienter quelques instants." Foreground="{ThemeResource SystemControlBackgroundAccentBrush}" TextWrapping="Wrap"/>
             </StackPanel>
             <SemanticZoom Visibility="{x:Bind ViewModelPage.DataListVisibility, Mode=OneWay}">
                 <SemanticZoom.ZoomedInView>
-                    <ListView ItemsSource="{x:Bind cvsGroups.View}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
+                    <ListView x:Name="ListViewZoomInView" ItemsSource="{x:Bind CollectionViewSource.View, Mode=OneWay}" HorizontalAlignment="Stretch" SelectionMode="Extended" ItemTemplate="{StaticResource ZoomedInTemplate}" Background="Transparent">
                         <ListView.GroupStyle>
                             <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
                         </ListView.GroupStyle>
                     </ListView>
                 </SemanticZoom.ZoomedInView>
                 <SemanticZoom.ZoomedOutView>
-                    <GridView ItemsSource="{x:Bind cvsGroups.View.CollectionGroups}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
+                    <GridView ItemsSource="{x:Bind CollectionViewSource.View.CollectionGroups, Mode=OneWay}" SelectionMode="None" ItemTemplate="{StaticResource ZoomedOutTemplate}"/>
                 </SemanticZoom.ZoomedOutView>
             </SemanticZoom>
         </Grid>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />

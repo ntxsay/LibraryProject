@@ -1131,12 +1131,12 @@ namespace LibraryProjectUWP.Views.Book
 
         private void MFIDisplaySociety_Click(object sender, RoutedEventArgs e)
         {
-            DisplayContactsList();
+            DisplayContactsList(ContactType.Society);
         }
 
         private void MFIDisplayHumans_Click(object sender, RoutedEventArgs e)
         {
-            DisplayContactsList();
+            DisplayContactsList(ContactType.Human);
         }
 
         private void MFIDisplayCollections_Click(object sender, RoutedEventArgs e)
@@ -1327,7 +1327,7 @@ namespace LibraryProjectUWP.Views.Book
 
         private void TMFIAddNewHuman_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            this.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, null);
         }
 
         private void MenuFlyoutCommandAdds_Opened(object sender, object e)
@@ -2717,47 +2717,32 @@ namespace LibraryProjectUWP.Views.Book
         #region Contact
         private void MFI_NewPersonne_Click(object sender, RoutedEventArgs e)
         {
-            this.NewContact(ContactType.Human, ContactRole.Adherant, string.Empty, string.Empty);
+            this.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, null);
         }
 
         private void MFI_NewSociety_Click(object sender, RoutedEventArgs e)
         {
-            this.NewContact(ContactType.Society, ContactRole.EditorHouse, string.Empty, string.Empty);
+            this.NewEditContact(ContactType.Society, ContactRole.EditorHouse, EditMode.Create, null);
         }
 
-        internal void NewContact(ContactType contactType, ContactRole contactRole, string prenom = null, string nomNaissance = null, string societyName = null, Guid? guid = null)
+        internal void NewEditContact(ContactType contactType, ContactRole contactRole, EditMode editMode = EditMode.Create, SideBarInterLinkVM parentReferences = null, string prenom = null, string nomNaissance = null, string societyName = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == EditMode.Create && item.ViewModelPage.ViewModel.ContactType == contactType);
-                if (checkedItem != null)
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == editMode && item.ViewModelPage.ViewModel.ContactType == contactType) is NewEditContactUC checkedItem)
                 {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                    checkedItem.InitializeSideBar(this, editMode, contactType, contactRole, prenom, nomNaissance, societyName);
+                    this.SelectItemSideBar(checkedItem);
                 }
                 else
                 {
-                    NewEditContactUC userControl = new NewEditContactUC()
-                    {
-                        ViewModelPage = new NewEditContactUCVM()
-                        {
-                            EditMode = EditMode.Create,
-                            ViewModel = new ContactVM()
-                            {
-                                ContactRole = contactRole,
-                                ContactType = contactType,
-                                NomNaissance = nomNaissance,
-                                Prenom = prenom,
-                                SocietyName = societyName,
-                            },
-                        }
-                    };
+                    NewEditContactUC userControl = new NewEditContactUC();
+                    userControl.InitializeSideBar(this, editMode, contactType, contactRole, prenom, nomNaissance, societyName);
 
-                    userControl.LoadControl();
-
-                    if (guid != null)
+                    if (parentReferences != null)
                     {
-                        userControl.ViewModelPage.ParentGuid = guid;
+                        userControl.ViewModelPage.ParentReferences = parentReferences;
                     }
 
                     userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
@@ -2795,13 +2780,16 @@ namespace LibraryProjectUWP.Views.Book
                     sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
                     sender.ViewModelPage.IsResultMessageOpen = true;
 
-                    if (sender.ViewModelPage.ParentGuid != null)
+                    if (sender.ViewModelPage.ParentReferences != null)
                     {
-                        var bookManager = GetBookSideBarByGuid((Guid)sender.ViewModelPage.ParentGuid);
-                        if (bookManager != null)
+                        if (sender.ViewModelPage.ParentReferences.ParentType == typeof(ContactListUC))
                         {
-                            bookManager.ViewModelPage.ViewModel.Auteurs.Add(newViewModel);
-                            NewEditContactUC_CancelModificationRequested(sender, e);
+                            var item = uiServices.GetContactListUCSideBarByGuid(PivotRightSideBar, sender.ViewModelPage.ParentReferences.ParentGuid);
+                            if (item != null)
+                            {
+                                item.InitializeSideBar(this, item.ViewModelPage.ContactType);
+                                SelectItemSideBar(item);
+                            }
                         }
                     }
                 }
@@ -2839,7 +2827,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void DisplayContactsList()
+        private async void DisplayContactsList(ContactType contactType)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -2851,23 +2839,9 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    IList<ContactVM> contactsList = await DbServices.Contact.AllVMAsync();
-                    //if (ViewModelPage.ContactViewModelList == null || !ViewModelPage.ContactViewModelList.Any())
-                    //{
-                    //    ViewModelPage.ContactViewModelList = contactsList?.ToList();
-                    //}
-
-                    ContactListUC userControl = new ContactListUC(new ContactListParametersDriverVM()
-                    {
-                        ViewModelList = contactsList?.ToList(), //ViewModelPage.ContactViewModelList,
-                        CurrentViewModel = new ContactVM()
-                        {
-                            TitreCivilite = CivilityHelpers.MPoint,
-                        }
-                    });
-
+                    ContactListUC userControl = new ContactListUC();
+                    userControl.InitializeSideBar(this, contactType);
                     userControl.CancelModificationRequested += ContactListUC_CancelModificationRequested;
-
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
