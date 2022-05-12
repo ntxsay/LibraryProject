@@ -896,20 +896,6 @@ namespace LibraryProjectUWP.Views.Collection
         }
 
 
-        private BibliothequeVM _ParentLibrary;
-        public BibliothequeVM ParentLibrary
-        {
-            get => this._ParentLibrary;
-            set
-            {
-                if (this._ParentLibrary != value)
-                {
-                    this._ParentLibrary = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
         private string _SelectedViewModelMessage;
         public string SelectedViewModelMessage
         {

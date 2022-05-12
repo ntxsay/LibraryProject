@@ -998,46 +998,31 @@ namespace LibraryProjectUWP.Views.Book
                 //};
                 //MFIDisplayCollections.Click += MFIDisplayCollections_Click;
 
-                MenuFlyoutItem MFIDisplayHumans = new MenuFlyoutItem()
+                MenuFlyoutItem MFIDisplayAuthors = new MenuFlyoutItem()
                 {
-                    Text = "Afficher les contacts",
+                    Text = "Afficher les auteurs",
                     Icon = new FontIcon
                     {
                         FontFamily = new FontFamily("Segoe MDL2 Assets"),
                         Glyph = "\uE77b",
                     }
                 };
-                MFIDisplayHumans.Click += MFIDisplayHumans_Click;
+                MFIDisplayAuthors.Click += MFIDisplayAuthors_Click;
 
-                MenuFlyoutItem MFIDisplaySociety = new MenuFlyoutItem()
+                MenuFlyoutItem MFIDisplayEditors = new MenuFlyoutItem()
                 {
-                    Text = "Afficher les sociétés",
+                    Text = "Afficher les éditeurs",
                     Icon = new FontIcon
                     {
                         FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                        Glyph = "\uE731",
+                        Glyph = "\uE77b",
                     }
                 };
-                MFIDisplaySociety.Click += MFIDisplaySociety_Click;
+                MFIDisplayEditors.Click += MFIDisplayEditors_Click;
 
-                //MenuFlyoutItem MFIDisplayBookPretScheduler = new MenuFlyoutItem()
-                //{
-                //    Text = "Afficher l'agenda des prêts",
-                //    Icon = new FontIcon
-                //    {
-                //        FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                //        Glyph = "\uE748",
-                //    }
-                //};
-                //MFIDisplayBookPretScheduler.Click += MFIDisplayBookPretScheduler_Click;
 
-                //MenuFlyoutCommandView.Items.Add(MFIDisplayCategories);
-                //MenuFlyoutCommandView.Items.Add(MFIDisplayCollections);
-                //MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
-                MenuFlyoutCommandView.Items.Add(MFIDisplayHumans);
-                MenuFlyoutCommandView.Items.Add(MFIDisplaySociety);
-                //MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
-                //MenuFlyoutCommandView.Items.Add(MFIDisplayBookPretScheduler);
+                MenuFlyoutCommandView.Items.Add(MFIDisplayAuthors);
+                MenuFlyoutCommandView.Items.Add(MFIDisplayEditors);
             }
             catch (Exception ex)
             {
@@ -1076,27 +1061,27 @@ namespace LibraryProjectUWP.Views.Book
                 };
                 MFIDisplayCollections.Click += MFIDisplayCollections_Click;
 
-                MenuFlyoutItem MFIDisplayHumans = new MenuFlyoutItem()
+                MenuFlyoutItem MFIDisplayAuthors = new MenuFlyoutItem()
                 {
-                    Text = "Afficher les contacts",
+                    Text = "Afficher les auteurs",
                     Icon = new FontIcon
                     {
                         FontFamily = new FontFamily("Segoe MDL2 Assets"),
                         Glyph = "\uE77b",
                     }
                 };
-                MFIDisplayHumans.Click += MFIDisplayHumans_Click;
+                MFIDisplayAuthors.Click += MFIDisplayAuthors_Click;
 
-                MenuFlyoutItem MFIDisplaySociety = new MenuFlyoutItem()
+                MenuFlyoutItem MFIDisplayEditors = new MenuFlyoutItem()
                 {
-                    Text = "Afficher les sociétés",
+                    Text = "Afficher les éditeurs",
                     Icon = new FontIcon
                     {
                         FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                        Glyph = "\uE731",
+                        Glyph = "\uE77b",
                     }
                 };
-                MFIDisplaySociety.Click += MFIDisplaySociety_Click;
+                MFIDisplayEditors.Click += MFIDisplayEditors_Click;
 
                 MenuFlyoutItem MFIDisplayBookPretScheduler = new MenuFlyoutItem()
                 {
@@ -1112,8 +1097,8 @@ namespace LibraryProjectUWP.Views.Book
                 MenuFlyoutCommandView.Items.Add(MFIDisplayCategories);
                 MenuFlyoutCommandView.Items.Add(MFIDisplayCollections);
                 MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
-                MenuFlyoutCommandView.Items.Add(MFIDisplayHumans);
-                MenuFlyoutCommandView.Items.Add(MFIDisplaySociety);
+                MenuFlyoutCommandView.Items.Add(MFIDisplayAuthors);
+                MenuFlyoutCommandView.Items.Add(MFIDisplayEditors);
                 MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
                 MenuFlyoutCommandView.Items.Add(MFIDisplayBookPretScheduler);
             }
@@ -1124,11 +1109,22 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        
+
         private void MFIDisplayBookPretScheduler_Click(object sender, RoutedEventArgs e)
         {
             OpenBookPretSchedule();
         }
 
+        private void MFIDisplayEditors_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayContactsList(ContactType.Society);
+        }
+
+        private void MFIDisplayAuthors_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
         private void MFIDisplaySociety_Click(object sender, RoutedEventArgs e)
         {
             DisplayContactsList(ContactType.Society);
@@ -2827,7 +2823,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void DisplayContactsList(ContactType contactType)
+        private async void DisplayContactsList(ContactType? contactType, ContactRole contactRole)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try

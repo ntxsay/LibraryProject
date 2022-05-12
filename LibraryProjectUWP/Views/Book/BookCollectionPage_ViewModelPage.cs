@@ -88,6 +88,20 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
+            private IEnumerable<ContactVM> _SelectedContacts = null;
+            public IEnumerable<ContactVM> SelectedContacts
+            {
+                get => this._SelectedContacts;
+                set
+                {
+                    if (_SelectedContacts != value)
+                    {
+                        this._SelectedContacts = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
             private bool _DisplayUnCategorizedBooks = false;
             public bool DisplayUnCategorizedBooks
             {

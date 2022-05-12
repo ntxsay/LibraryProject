@@ -89,7 +89,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         }
 
         #region
-        public void InitializeWorker(ContactType contactType)
+        public void InitializeWorker(ContactType? contactType, ContactRole? contactRole)
         {
             try
             {
@@ -125,12 +125,12 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                                         WorkerBackground.CancelAsync();
                                     }
                                 },
-                                OpenedLoaderCallback = () => WorkerBackground.RunWorkerAsync(contactType),
+                                OpenedLoaderCallback = () => WorkerBackground.RunWorkerAsync(new Tuple<ContactType?, ContactRole?>(contactType, contactRole)),
                             });
                         }
                         else
                         {
-                            WorkerBackground.RunWorkerAsync(contactType);
+                            WorkerBackground.RunWorkerAsync(new Tuple<ContactType?, ContactRole?>(contactType, contactRole));
                         }
                     }
                 }
@@ -147,9 +147,9 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         {
             try
             {
-                if (sender is BackgroundWorker worker && e.Argument is ContactType contactType)
+                if (sender is BackgroundWorker worker && e.Argument is Tuple<ContactType?, ContactRole?> contactType)
                 {
-                    using (Task<IList<ContactVM>> task = DbServices.Contact.MultipleVMAsync(contactType))
+                    using (Task<IList<ContactVM>> task = DbServices.Contact.MultipleVMAsync(contactType.Item1, contactType.Item2, cancellationTokenSource.Token))
                     {
                         task.Wait();
 

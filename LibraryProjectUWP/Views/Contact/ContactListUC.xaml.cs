@@ -1,10 +1,12 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Book;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -61,7 +63,7 @@ namespace LibraryProjectUWP.Views.Contact
             this.InitializeComponent();
         }
 
-        public void InitializeSideBar(BookCollectionPage bookCollectionPage, ContactType contactType)
+        public void InitializeSideBar(BookCollectionPage bookCollectionPage, ContactType? contactType, ContactRole? contactRole)
         {
             try
             {
@@ -133,7 +135,6 @@ namespace LibraryProjectUWP.Views.Contact
                 return;
             }
         }
-
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -462,7 +463,55 @@ namespace LibraryProjectUWP.Views.Contact
 
         }
 
-        private void MenuFlyout_Opened(object sender, object e)
+        private void ListViewZoomInView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (sender is ListView listView)
+                {
+                    var cast = listView.SelectedItems?.Select(s => (ContactVM)s);
+                    this.ViewModelPage.SelectedViewModels = new ObservableCollection<ContactVM>(cast);
+                    if (listView.SelectedItems.Count > 1)
+                    {
+                        ViewModelPage.SelectedViewModelMessage = $"Afficher « {listView.SelectedItems.Count} contacts »";
+                        //if (TtipDeleteCollection.IsOpen)
+                        //{
+                        //    TtipDeleteCollection.IsOpen = false;
+                        //}
+                    }
+                    else if (listView.SelectedItems.Count == 1)
+                    {
+                        ViewModelPage.SelectedViewModelMessage = $"Afficher « {ViewModelPage.SelectedViewModel?.DisplayName3} »";
+                    }
+                    else
+                    {
+                        ViewModelPage.SelectedViewModelMessage = $"Aucun contact n'est à afficher";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SelectedViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void MenuFlyout_ListViewItemContext_Opened(object sender, object e)
         {
             try
             {
@@ -472,6 +521,12 @@ namespace LibraryProjectUWP.Views.Contact
                     {
                         if (ViewModelPage.SelectedViewModels != null && ViewModelPage.SelectedViewModels.Count > 0)
                         {
+                            flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
+                            flyoutItemOpenSelectedBooks.IsEnabled = true;
+                        }
+                        else if (flyoutItemOpenSelectedBooks.Tag is string value)
+                        {
+                            ViewModelPage.SelectedViewModelMessage = $"Afficher « {value} »";
                             flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
                             flyoutItemOpenSelectedBooks.IsEnabled = true;
                         }
@@ -502,18 +557,18 @@ namespace LibraryProjectUWP.Views.Contact
 
                     if (menuFlyout.Items[3] is MenuFlyoutItem flyoutItemDecategorize)
                     {
-                        if (flyoutItemDecategorize.Tag is CollectionVM collectionVM)
+                        if (flyoutItemDecategorize.Tag is ContactVM collectionVM)
                         {
-                            if (collectionVM.BooksId != null && collectionVM.BooksId.Any())
-                            {
-                                flyoutItemDecategorize.Text = $"Retirer {collectionVM.BooksId.Count} livre(s) de « {collectionVM.Name} »";
-                                flyoutItemDecategorize.IsEnabled = true;
-                            }
-                            else
-                            {
-                                flyoutItemDecategorize.Text = $"Aucun livre à retirer de « {collectionVM.Name} »";
-                                flyoutItemDecategorize.IsEnabled = false;
-                            }
+                            //if (collectionVM.BooksId != null && collectionVM.BooksId.Any())
+                            //{
+                            //    flyoutItemDecategorize.Text = $"Retirer {collectionVM.BooksId.Count} livre(s) de « {collectionVM.Name} »";
+                            //    flyoutItemDecategorize.IsEnabled = true;
+                            //}
+                            //else
+                            //{
+                            //    flyoutItemDecategorize.Text = $"Aucun livre à retirer de « {collectionVM.Name} »";
+                            //    flyoutItemDecategorize.IsEnabled = false;
+                            //}
                         }
                     }
                 }
@@ -536,15 +591,15 @@ namespace LibraryProjectUWP.Views.Contact
                     {
                         if (ViewModelPage.SelectedViewModels.Count > 1)
                         {
-                            flyoutItemDelete.Text = $"Supprimer « {ViewModelPage.SelectedViewModels.Count} collections »";
+                            flyoutItemDelete.Text = $"Supprimer « {ViewModelPage.SelectedViewModels.Count} contacts »";
                         }
                         else if (ViewModelPage.SelectedViewModels.Count == 1)
                         {
-                            flyoutItemDelete.Text = $"Supprimer « {ViewModelPage.SelectedViewModels[0].Name} »";
+                            flyoutItemDelete.Text = $"Supprimer « {ViewModelPage.SelectedViewModels[0].DisplayName3} »";
                         }
                         else
                         {
-                            flyoutItemDelete.Text = $"Aucune collection n'est à supprimer";
+                            flyoutItemDelete.Text = $"Aucun contact n'est à supprimer";
                         }
                     }
 
@@ -575,6 +630,85 @@ namespace LibraryProjectUWP.Views.Contact
                 return;
             }
         }
+
+        private async void AddBooksToCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
+                {
+                    if (args.Parameter is ContactVM viewModel)
+                    {
+                        //var creationResult = await DbServices.Collection.CreateCollectionConnectorAsync(ParentPage.ViewModelPage.SelectedItems.Select(s => s.Id), viewModel);
+                        //if (creationResult.IsSuccess)
+                        //{
+                        //    ViewModelPage.ResultMessageTitle = "Succès";
+                        //    ViewModelPage.ResultMessage = creationResult.Message;
+                        //    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                        //    ViewModelPage.IsResultMessageOpen = true;
+
+                        //    await ParentPage.UpdateLibraryCollectionAsync();
+                        //}
+                        //else
+                        //{
+                        //    //Erreur
+                        //    ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        //    ViewModelPage.ResultMessage = creationResult.Message;
+                        //    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                        //    ViewModelPage.IsResultMessageOpen = true;
+                        //    return;
+                        //}
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void DecategorizeBooksFromCollectionXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                OperationStateVM result = null;
+                if (args.Parameter is ContactVM viewModel)
+                {
+                    //result = await DbServices.Collection.DecategorizeBooksAsync(viewModel.BooksId);
+                }
+
+                if (result != null)
+                {
+                    if (result.IsSuccess)
+                    {
+                        ViewModelPage.ResultMessageTitle = "Succès";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                        ViewModelPage.IsResultMessageOpen = true;
+
+                        await ParentPage.UpdateLibraryCollectionAsync();
+                    }
+                    else
+                    {
+                        //Erreur
+                        ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                        ViewModelPage.ResultMessage = result.Message;
+                        ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                        ViewModelPage.IsResultMessageOpen = true;
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         private async void MenuFlyoutItem_DecategorizeBooksFromCollection_Click(object sender, RoutedEventArgs e)
         {
@@ -611,6 +745,39 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
+        private async void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.SelectedViewModels != null)
+                {
+                    ParentPage.ViewModelPage.SelectedContacts = ViewModelPage.SelectedViewModels;
+                    await ParentPage.RefreshItemsGrouping();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void NavigateInAllItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                ParentPage.ViewModelPage.SelectedContacts = null;
+                await ParentPage.RefreshItemsGrouping();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         private void ABBtnExport_Click(object sender, RoutedEventArgs e)
         {
@@ -626,6 +793,8 @@ namespace LibraryProjectUWP.Views.Contact
         {
 
         }
+
+        
     }
 
     public class ContactListUCVM : INotifyPropertyChanged
@@ -677,8 +846,64 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private ContactType _ContactType;
-        public ContactType ContactType
+        private Brush _ResultMessageForeGround;
+        public Brush ResultMessageForeGround
+        {
+            get => this._ResultMessageForeGround;
+            set
+            {
+                if (this._ResultMessageForeGround != value)
+                {
+                    this._ResultMessageForeGround = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private InfoBarSeverity _ResultMessageSeverity = InfoBarSeverity.Informational;
+        public InfoBarSeverity ResultMessageSeverity
+        {
+            get => this._ResultMessageSeverity;
+            set
+            {
+                if (this._ResultMessageSeverity != value)
+                {
+                    this._ResultMessageSeverity = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsResultMessageOpen;
+        public bool IsResultMessageOpen
+        {
+            get => this._IsResultMessageOpen;
+            set
+            {
+                if (this._IsResultMessageOpen != value)
+                {
+                    this._IsResultMessageOpen = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _ResultMessageTitle;
+        public string ResultMessageTitle
+        {
+            get => this._ResultMessageTitle;
+            set
+            {
+                if (this._ResultMessageTitle != value)
+                {
+                    this._ResultMessageTitle = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ContactType? _ContactType;
+        public ContactType? ContactType
         {
             get => this._ContactType;
             set
@@ -691,32 +916,32 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
-
-        private ContactVM _ViewModel;
-        public ContactVM ViewModel
+        private ContactRole? _ContactRole;
+        public ContactRole? ContactRole
         {
-            get => this._ViewModel;
+            get => this._ContactRole;
             set
             {
-                if (this._ViewModel != value)
+                if (this._ContactRole != value)
                 {
-                    this._ViewModel = value;
+                    this._ContactRole = value;
                     this.OnPropertyChanged();
                 }
             }
         }
 
-        private Brush _ResultMessageForeGround;
-        public Brush ResultMessageForeGround
+        public readonly IEnumerable<string> civilityList = CivilityHelpers.CiviliteListShorted();
+
+        private ContactVM _SelectedViewModel;
+        public ContactVM SelectedViewModel
         {
-            get => this._ResultMessageForeGround;
+            get => _SelectedViewModel;
             set
             {
-                if (this._ResultMessageForeGround != value)
+                if (_SelectedViewModel != value)
                 {
-                    this._ResultMessageForeGround = value;
-                    this.OnPropertyChanged();
+                    _SelectedViewModel = value;
+                    OnPropertyChanged();
                 }
             }
         }
