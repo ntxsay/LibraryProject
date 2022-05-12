@@ -123,6 +123,37 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
+            <AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                <AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
+                </AppBarButton.Icon>
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Afficher les adhérants" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayAdherant_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Afficher les auteurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayAuthors_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Afficher les éditeurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayEditors_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Afficher tous les contacts" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayAllContacts_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarSeparator/>
             <AppBarButton x:Name="ABBtnCreate" Label="Ajouter" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="ABBtnCreate_Click" />
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBtnEdit" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" 

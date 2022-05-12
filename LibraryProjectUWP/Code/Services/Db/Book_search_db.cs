@@ -577,7 +577,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         var termToLower = parameters.Term.ToLower();
                         TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
 
-                        List<Tcontact> existingItemList = (await Contact.MultipleAsync(contactRole))?.ToList();
+                        List<Tcontact> existingItemList = (await Contact.MultipleAsync(null, contactRole))?.ToList();
                         List<Tcontact> tcontacts = new List<Tcontact>();
 
                         if (existingItemList != null && existingItemList.Any())

@@ -175,13 +175,13 @@ namespace LibraryProjectUWP.Views.Book
                         IEnumerable<ContactVM> authorsVMs = Enumerable.Empty<ContactVM>();
                         IEnumerable<ContactVM> editorsVMs = Enumerable.Empty<ContactVM>();
                         IEnumerable<CollectionVM> collectionsVMs = Enumerable.Empty<CollectionVM>();
-                        using (Task<IList<ContactVM>> taskAuthors = DbServices.Contact.MultipleVMAsync(ContactRole.Author))
+                        using (Task<IList<ContactVM>> taskAuthors = DbServices.Contact.MultipleVMAsync(null, ContactRole.Author))
                         {
                             taskAuthors.Wait();
                             authorsVMs = taskAuthors.Result;
                         }
 
-                        using (Task<IList<ContactVM>> taskEditors = DbServices.Contact.MultipleVMAsync(ContactRole.EditorHouse))
+                        using (Task<IList<ContactVM>> taskEditors = DbServices.Contact.MultipleVMAsync(null, ContactRole.EditorHouse))
                         {
                             taskEditors.Wait();
                             editorsVMs = taskEditors.Result;
@@ -273,7 +273,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var authorsList = await DbServices.Contact.MultipleVMAsync(ContactRole.Author);
+                var authorsList = await DbServices.Contact.MultipleVMAsync(null, ContactRole.Author);
                 ViewModelPage.AuthorViewModelList = authorsList?.ToList();
             }
             catch (Exception ex)
@@ -671,7 +671,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var itemList = await DbServices.Contact.MultipleVMAsync(ContactRole.EditorHouse);
+                var itemList = await DbServices.Contact.MultipleVMAsync(null, ContactRole.EditorHouse);
                 ViewModelPage.EditorsViewModelList = itemList?.ToList();
             }
             catch (Exception ex)

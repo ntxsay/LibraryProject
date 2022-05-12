@@ -57,16 +57,6 @@ namespace LibraryProjectUWP.Code
 
     public enum ContactType : byte
     {
-        [Obsolete]
-        Adherant,
-        [Obsolete]
-        Author,
-        [Obsolete]
-        Translator,
-        [Obsolete]
-        EditorHouse,
-        [Obsolete]
-        Enterprise,
         Human,
         Society
     }

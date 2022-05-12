@@ -63,7 +63,7 @@ namespace LibraryProjectUWP.Views.Contact
             this.InitializeComponent();
         }
 
-        public void InitializeSideBar(BookCollectionPage bookCollectionPage, ContactType? contactType, ContactRole? contactRole)
+        public void InitializeSideBar(BookCollectionPage bookCollectionPage, ContactType? contactType = null, ContactRole? contactRole = null)
         {
             try
             {
@@ -72,21 +72,53 @@ namespace LibraryProjectUWP.Views.Contact
                 ViewModelPage = new ContactListUCVM()
                 {
                     ContactType = contactType,
+                    ContactRole = contactRole
                 };
 
-                switch (contactType)
+                if (contactType != null && contactRole == null)
                 {
-                    case ContactType.Human:
-                        ViewModelPage.Header = $"Les contacts";
-                        TbcInfos.Text = "Vous naviguez parmis tous les contacts";
-                        break;
-                    case ContactType.Society:
-                        ViewModelPage.Header = $"Les sociétés";
-                        TbcInfos.Text = "Vous naviguez parmis toutes les sociétés";
-                        break;
-                    default:
-                        break;
+                    switch (contactType)
+                    {
+                        case ContactType.Human:
+                            ViewModelPage.Header = $"Les contacts";
+                            TbcInfos.Text = "Vous naviguez parmis tous les contacts";
+                            break;
+                        case ContactType.Society:
+                            ViewModelPage.Header = $"Les sociétés";
+                            TbcInfos.Text = "Vous naviguez parmis toutes les sociétés";
+                            break;
+                        default:
+                            break;
+                    }
                 }
+                else if (contactType == null && contactRole != null)
+                {
+                    switch (contactRole)
+                    {
+                        case ContactRole.Adherant:
+                            ViewModelPage.Header = $"Afficher les adhérants";
+                            TbcInfos.Text = "Vous naviguez parmis tous les adhérants";
+                            break;
+                        case ContactRole.Author:
+                            ViewModelPage.Header = $"Afficher les auteurs";
+                            TbcInfos.Text = "Vous naviguez parmis les auteurs";
+                            break;
+                        case ContactRole.Translator:
+                            break;
+                        case ContactRole.EditorHouse:
+                            ViewModelPage.Header = $"Afficher les éditeurs";
+                            TbcInfos.Text = "Vous naviguez parmis les éditeurs et maisons d'édition";
+                            break;
+                        case ContactRole.Illustrator:
+                            break;
+                    }
+                }
+                else
+                {
+                    ViewModelPage.Header = $"Afficher les contacts";
+                    TbcInfos.Text = "Vous naviguez parmis tous les contacts";
+                }
+
 
                 ViewModelPage.WorkerTextVisibility = Visibility.Visible;
                 ViewModelPage.DataListVisibility = Visibility.Collapsed;
@@ -95,7 +127,7 @@ namespace LibraryProjectUWP.Views.Contact
                     return;
                 }
 
-                getContactsListTask.InitializeWorker(contactType);
+                getContactsListTask.InitializeWorker(contactType, contactRole);
                 getContactsListTask.AfterTaskCompletedRequested += (j, e) =>
                 {
                     if (e.Result is WorkerState<ContactVM, ContactVM> result && result.ResultList != null && result.ResultList.Any())
@@ -167,19 +199,6 @@ namespace LibraryProjectUWP.Views.Contact
 
                 getContactsListTask?.DisposeWorker();
                 ViewModelPage = null;
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        private void InitializeDataGroup()
-        {
-            try
-            {
-
             }
             catch (Exception)
             {
@@ -419,25 +438,6 @@ namespace LibraryProjectUWP.Views.Contact
         {
             CancelModificationRequested?.Invoke(this, args);
         }
-
-        private void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                ParentPage.NewEditContact(ViewModelPage.ContactType, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
-                {
-                    ParentGuid = ViewModelPage.ItemGuid,
-                    ParentType = typeof(ContactListUC)
-                });
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         private void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
@@ -791,10 +791,41 @@ namespace LibraryProjectUWP.Views.Contact
 
         private void ABBtnCreate_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                ParentPage.NewEditContact(ViewModelPage.ContactType ?? ContactType.Human, ViewModelPage.ContactRole ?? ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                {
+                    ParentGuid = ViewModelPage.ItemGuid,
+                    ParentType = typeof(ContactListUC)
+                });
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void MFI_DisplayAdherant_Click(object sender, RoutedEventArgs e)
+        {
 
         }
 
-        
+        private void MFI_DisplayAuthors_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MFI_DisplayEditors_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MFI_DisplayAllContacts_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
     public class ContactListUCVM : INotifyPropertyChanged

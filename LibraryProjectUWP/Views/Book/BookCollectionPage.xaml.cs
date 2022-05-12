@@ -1118,21 +1118,12 @@ namespace LibraryProjectUWP.Views.Book
 
         private void MFIDisplayEditors_Click(object sender, RoutedEventArgs e)
         {
-            DisplayContactsList(ContactType.Society);
+            DisplayContactsList(null, ContactRole.EditorHouse);
         }
 
         private void MFIDisplayAuthors_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
-        }
-        private void MFIDisplaySociety_Click(object sender, RoutedEventArgs e)
-        {
-            DisplayContactsList(ContactType.Society);
-        }
-
-        private void MFIDisplayHumans_Click(object sender, RoutedEventArgs e)
-        {
-            DisplayContactsList(ContactType.Human);
+            DisplayContactsList(null, ContactRole.Author);
         }
 
         private void MFIDisplayCollections_Click(object sender, RoutedEventArgs e)
