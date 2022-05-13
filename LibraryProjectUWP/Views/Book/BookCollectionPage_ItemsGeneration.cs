@@ -7,6 +7,8 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book.SubViews;
+using LibraryProjectUWP.Views.Library;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
@@ -28,7 +30,7 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
-        public void GroupItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void GroupItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
         {
             try
             {
@@ -42,7 +44,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void OrderItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void OrderItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
         {
             try
             {
@@ -56,7 +58,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void SortItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void SortItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
         {
             try
             {
@@ -70,7 +72,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void GenerateItemsWithBusyLoader(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public void GenerateItemsWithBusyLoader(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
         {
             try
             {
@@ -113,23 +115,18 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var libraryCollectionSpage = this.LibraryCollectionSubPage;
-                if (libraryCollectionSpage != null)
+                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    await libraryCollectionSpage.CommonView.RefreshItemsGrouping(goToPage, resetPage, searchParams);
+                    await libraryCollectionSubPage.CommonView.RefreshItemsGrouping(goToPage, resetPage, searchParams);
                 }
-                else
+                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
                 {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
-                    {
-                        await bookCollectionSpage.CommonView.RefreshItemsGrouping(goToPage, resetPage, searchParams);
-                    }
+                    await bookCollectionSubPage.CommonView.RefreshItemsGrouping(goToPage, resetPage, searchParams);
                 }
             }
             catch (Exception ex)

@@ -269,7 +269,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Pivot x:Name="PivotItems" x:FieldModifier="Public" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ViewModelPage.GroupedRelatedViewModel.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        <Pivot x:Name="PivotItems" x:FieldModifier="Public" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ParentPage.ViewModelPage.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}" SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}">
             <Pivot.OpacityTransition>
                 <ScalarTransition />

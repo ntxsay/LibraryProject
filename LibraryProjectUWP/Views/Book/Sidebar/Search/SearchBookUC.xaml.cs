@@ -3,6 +3,7 @@ using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Code.Services.Tasks;
+using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
@@ -29,6 +30,11 @@ namespace LibraryProjectUWP.Views.Book
     {
 
         public SearchBookUCVM ViewModelPage { get; set; } = new SearchBookUCVM();
+        public BookCollectionPage ParentPage { get; private set; }
+
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        public SideBarInterLinkVM ParentReferences { get; set; }
+
 
         public delegate void CancelModificationEventHandler(SearchBookUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
@@ -58,33 +64,40 @@ namespace LibraryProjectUWP.Views.Book
         }
 
 
-        public void InitializeSideBar(ResearchBookVM viewModel, long idLibrary)
+        public void InitializeSideBar(BookCollectionPage parentPage, ResearchItemVM viewModel, long? idLibrary = null)
         {
             try
             {
+                ParentPage = parentPage;
                 ViewModelPage = new SearchBookUCVM()
                 {
                     IdLibrary = idLibrary,
-                    ViewModel = viewModel ?? new ResearchBookVM()
-                    {
-                        IdLibrary = idLibrary,
-                        Term = "",
-                        TermParameter = LibraryHelpers.Book.Search.Terms.Contains,
-                        SearchInAuthors = true,
-                        SearchInMainTitle = true,
-                        SearchInEditors = true,
-                        SearchInOtherTitles = true,
-                        SearchInCollections = false,
-                    },
+                    ViewModel = viewModel,
                 };
 
-                var keyPair = LibraryHelpers.Book.Search.SearchOnListDictionary.SingleOrDefault(s => s.Key == (byte)ViewModelPage.ViewModel.TermParameter);
+                if (ViewModelPage.ViewModel.TypeObject == typeof(BibliothequeVM))
+                {
+                    ViewModelPage.SearchInMainTitleVisibility = Visibility.Visible;
+                    ViewModelPage.SearchInOtherTitlesVisibility = Visibility.Collapsed;
+                    ViewModelPage.SearchInAuthorsVisibility = Visibility.Collapsed;
+                    ViewModelPage.SearchInEditorsVisibility = Visibility.Collapsed;
+                    ViewModelPage.SearchInCollectionsVisibility = Visibility.Collapsed;
+                }
+                else if (ViewModelPage.ViewModel.TypeObject == typeof(LivreVM))
+                {
+                    ViewModelPage.SearchInMainTitleVisibility = Visibility.Visible;
+                    ViewModelPage.SearchInOtherTitlesVisibility = Visibility.Visible;
+                    ViewModelPage.SearchInAuthorsVisibility = Visibility.Visible;
+                    ViewModelPage.SearchInEditorsVisibility = Visibility.Visible;
+                    ViewModelPage.SearchInCollectionsVisibility = Visibility.Visible;
+                }
+
+                var keyPair = Search.SearchOnListDictionary.SingleOrDefault(s => s.Key == (byte)ViewModelPage.ViewModel.TermParameter);
                 if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
                 {
                     CmbxTermsParams.SelectedItem = keyPair.Value;
                 }
 
-                ViewModelPage.Header = $"Rechercher des livres";
 
                 InitializeActionInfos();
                 this.Bindings.Update();
@@ -102,12 +115,26 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 TbcInfos.Inlines.Clear();
-                Run runTitle = new Run()
+                if (ViewModelPage.ViewModel.TypeObject == typeof(BibliothequeVM))
                 {
-                    Text = $"Vous êtes en train de rechercher des livres.",
-                    //FontWeight = FontWeights.Medium,
-                };
-                TbcInfos.Inlines.Add(runTitle);
+                    ViewModelPage.Header = $"Rechercher des bibliothèques";
+                    Run runTitle = new Run()
+                    {
+                        Text = $"Vous êtes en train de rechercher des bibliothèques.",
+                        //FontWeight = FontWeights.Medium,
+                    };
+                    TbcInfos.Inlines.Add(runTitle);
+                }
+                else if (ViewModelPage.ViewModel.TypeObject == typeof(LivreVM))
+                {
+                    ViewModelPage.Header = $"Rechercher des livres";
+                    Run runTitle = new Run()
+                    {
+                        Text = $"Vous êtes en train de rechercher des livres.",
+                        //FontWeight = FontWeights.Medium,
+                    };
+                    TbcInfos.Inlines.Add(runTitle);
+                }
             }
             catch (Exception ex)
             {
@@ -227,7 +254,7 @@ namespace LibraryProjectUWP.Views.Book
                     var keyPair = LibraryHelpers.Book.Search.SearchOnListDictionary.SingleOrDefault(s => s.Value == value);
                     if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
                     {
-                        ViewModelPage.ViewModel.TermParameter = (LibraryHelpers.Book.Search.Terms)keyPair.Key;
+                        ViewModelPage.ViewModel.TermParameter = (Code.Search.Terms)keyPair.Key;
                     }
                 }
             }
@@ -244,9 +271,7 @@ namespace LibraryProjectUWP.Views.Book
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public readonly IEnumerable<string> searchOnList = LibraryHelpers.Book.Search.SearchOnList;
 
-        public long IdLibrary { get; set; }
-        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
-        public SideBarInterLinkVM ParentReferences { get; set; }
+        public long? IdLibrary { get; set; }
 
         private string _Header;
         public string Header
@@ -333,8 +358,8 @@ namespace LibraryProjectUWP.Views.Book
         }
 
 
-        private ResearchBookVM _ViewModel;
-        public ResearchBookVM ViewModel
+        private ResearchItemVM _ViewModel;
+        public ResearchItemVM ViewModel
         {
             get => this._ViewModel;
             set
@@ -343,6 +368,76 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     this._ViewModel = value;
                     this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _SearchInMainTitleVisibility;
+        public Visibility SearchInMainTitleVisibility
+        {
+            get => _SearchInMainTitleVisibility;
+            set
+            {
+                if (_SearchInMainTitleVisibility != value)
+                {
+                    _SearchInMainTitleVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _SearchInOtherTitlesVisibility;
+        public Visibility SearchInOtherTitlesVisibility
+        {
+            get => _SearchInOtherTitlesVisibility;
+            set
+            {
+                if (_SearchInOtherTitlesVisibility != value)
+                {
+                    _SearchInOtherTitlesVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _SearchInAuthorsVisibility;
+        public Visibility SearchInAuthorsVisibility
+        {
+            get => _SearchInAuthorsVisibility;
+            set
+            {
+                if (_SearchInAuthorsVisibility != value)
+                {
+                    _SearchInAuthorsVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _SearchInCollectionsVisibility;
+        public Visibility SearchInCollectionsVisibility
+        {
+            get => _SearchInCollectionsVisibility;
+            set
+            {
+                if (_SearchInCollectionsVisibility != value)
+                {
+                    _SearchInCollectionsVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Visibility _SearchInEditorsVisibility;
+        public Visibility SearchInEditorsVisibility
+        {
+            get => _SearchInEditorsVisibility;
+            set
+            {
+                if (_SearchInEditorsVisibility != value)
+                {
+                    _SearchInEditorsVisibility = value;
+                    OnPropertyChanged();
                 }
             }
         }

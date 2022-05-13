@@ -26,7 +26,7 @@ namespace LibraryProjectUWP.Code.Services.Db
     {
         public partial struct Library
         {
-            public static async Task<IList<Tlibrary>> SearchLibrariesInName(ResearchBookVM parameters, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tlibrary>> SearchLibrariesInName(ResearchItemVM parameters, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -46,17 +46,17 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         switch (parameters.TermParameter)
                         {
-                            case LibraryHelpers.Book.Search.Terms.Equals:
-                                tlibraries = await context.Tlibrary.Where(w => w.Name == parameters.Term).ToListAsync(cancellationToken);
+                            case Code.Search.Terms.Equals:
+                                tlibraries = await context.Tlibrary.Where(w => w.Name.ToLower() == parameters.Term).ToListAsync(cancellationToken);
                                 break;
-                            case LibraryHelpers.Book.Search.Terms.Contains:
-                                tlibraries = await context.Tlibrary.Where(w => w.Name.Contains(parameters.Term)).ToListAsync(cancellationToken);
+                            case Code.Search.Terms.Contains:
+                                tlibraries = await context.Tlibrary.Where(w => w.Name.ToLower().Contains(parameters.Term)).ToListAsync(cancellationToken);
                                 break;
-                            case LibraryHelpers.Book.Search.Terms.StartWith:
-                                tlibraries = await context.Tlibrary.Where(w => w.Name.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
+                            case Code.Search.Terms.StartWith:
+                                tlibraries = await context.Tlibrary.Where(w => w.Name.ToLower().StartsWith(parameters.Term)).ToListAsync(cancellationToken);
                                 break;
-                            case LibraryHelpers.Book.Search.Terms.EndWith:
-                                tlibraries = await context.Tlibrary.Where(w => w.Name.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
+                            case Code.Search.Terms.EndWith:
+                                tlibraries = await context.Tlibrary.Where(w => w.Name.ToLower().EndsWith(parameters.Term)).ToListAsync(cancellationToken);
                                 break;
                             default:
                                 break;
@@ -74,7 +74,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
 
-            public static async Task<IList<T>> SearchAsync<T>(ResearchBookVM parameters, CancellationToken cancellationToken = default) where T : class
+            public static async Task<IList<T>> SearchAsync<T>(ResearchItemVM parameters, CancellationToken cancellationToken = default) where T : class
             {
                 try
                 {

@@ -125,6 +125,7 @@ namespace LibraryProjectUWP.Code.Helpers
                     TermEndWith,
                 };
 
+                [Obsolete]
                 public static Dictionary<byte, string> SearchOnListDictionary => new Dictionary<byte, string>()
                 {
                     {(byte)Terms.Contains, TermContains },

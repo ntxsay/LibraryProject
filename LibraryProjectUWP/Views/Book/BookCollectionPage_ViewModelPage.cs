@@ -32,15 +32,15 @@ namespace LibraryProjectUWP.Views.Book
         {
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-            private ResearchBookVM _ResearchBook = null;
-            public ResearchBookVM ResearchBook
+            private ResearchItemVM _ResearchItem = null;
+            public ResearchItemVM ResearchItem
             {
-                get => this._ResearchBook;
+                get => this._ResearchItem;
                 set
                 {
-                    if (this._ResearchBook != value)
+                    if (this._ResearchItem != value)
                     {
-                        this._ResearchBook = value;
+                        this._ResearchItem = value;
                         this.OnPropertyChanged();
                     }
                 }

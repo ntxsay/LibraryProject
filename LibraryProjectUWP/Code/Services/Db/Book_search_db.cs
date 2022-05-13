@@ -453,7 +453,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Search
-            public static async Task<IList<Tbook>> SearchBooksInMainTitle(ResearchBookVM parameters, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInMainTitle(ResearchItemVM parameters, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -473,16 +473,16 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         switch (parameters.TermParameter)
                         {
-                            case LibraryHelpers.Book.Search.Terms.Equals:
+                            case Code.Search.Terms.Equals:
                                 tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle == parameters.Term).ToListAsync(cancellationToken);
                                 break;
-                            case LibraryHelpers.Book.Search.Terms.Contains:
+                            case Code.Search.Terms.Contains:
                                 tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.Contains(parameters.Term)).ToListAsync(cancellationToken);
                                 break;
-                            case LibraryHelpers.Book.Search.Terms.StartWith:
+                            case Code.Search.Terms.StartWith:
                                 tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
                                 break;
-                            case LibraryHelpers.Book.Search.Terms.EndWith:
+                            case Code.Search.Terms.EndWith:
                                 tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
                                 break;
                             default:
@@ -500,7 +500,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tbook>> SearchBooksInOtherTitles(ResearchBookVM parameters, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInOtherTitles(ResearchItemVM parameters, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -522,16 +522,16 @@ namespace LibraryProjectUWP.Code.Services.Db
                         List<TbookOtherTitle> booksTitles = null;
                         switch (parameters.TermParameter)
                         {
-                            case LibraryHelpers.Book.Search.Terms.Equals:
+                            case Code.Search.Terms.Equals:
                                 booksTitles = await context.TbookOtherTitle.Where(w => w.Title == parameters.Term).ToListAsync(cancellationToken);
                                 break;
-                            case LibraryHelpers.Book.Search.Terms.Contains:
+                            case Code.Search.Terms.Contains:
                                 booksTitles = await context.TbookOtherTitle.Where(w => w.Title.Contains(parameters.Term)).ToListAsync(cancellationToken);
                                 break;
-                            case LibraryHelpers.Book.Search.Terms.StartWith:
+                            case Code.Search.Terms.StartWith:
                                 booksTitles = await context.TbookOtherTitle.Where(w => w.Title.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
                                 break;
-                            case LibraryHelpers.Book.Search.Terms.EndWith:
+                            case Code.Search.Terms.EndWith:
                                 booksTitles = await context.TbookOtherTitle.Where(w => w.Title.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
                                 break;
                             default:
@@ -558,7 +558,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tbook>> SearchBooksInContacts(ResearchBookVM parameters, IEnumerable<ContactRole> contactRoleList, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInContacts(ResearchItemVM parameters, IEnumerable<ContactRole> contactRoleList, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -586,7 +586,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             {
                                 switch (parameters.TermParameter)
                                 {
-                                    case LibraryHelpers.Book.Search.Terms.Equals:
+                                    case Code.Search.Terms.Equals:
                                         if (item.TitreCivilite?.ToLower() == termToLower || item.NomNaissance?.ToLower() == termToLower ||
                                             item.Prenom?.ToLower() == termToLower || item.AutresPrenoms?.ToLower() == termToLower ||
                                             item.NomUsage?.ToLower() == termToLower || item.SocietyName?.ToLower() == termToLower)
@@ -594,7 +594,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                             tcontacts.Add(item);
                                         }
                                         break;
-                                    case LibraryHelpers.Book.Search.Terms.Contains:
+                                    case Code.Search.Terms.Contains:
                                         if (item.TitreCivilite?.ToLower().Contains(termToLower) == true || item.NomNaissance?.ToLower().Contains(termToLower) == true ||
                                             item.Prenom?.ToLower().Contains(termToLower) == true || item.AutresPrenoms?.ToLower().Contains(termToLower) == true ||
                                             item.NomUsage?.ToLower().Contains(termToLower) == true || item.SocietyName?.ToLower().Contains(termToLower) == true)
@@ -603,7 +603,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                         }
 
                                         break;
-                                    case LibraryHelpers.Book.Search.Terms.StartWith:
+                                    case Code.Search.Terms.StartWith:
                                         if (item.TitreCivilite?.ToLower().StartsWith(termToLower) == true || item.NomNaissance?.ToLower().StartsWith(termToLower) == true ||
                                             item.Prenom?.ToLower().StartsWith(termToLower) == true || item.AutresPrenoms?.ToLower().StartsWith(termToLower) == true ||
                                             item.NomUsage?.ToLower().StartsWith(termToLower) == true || item.SocietyName?.ToLower().StartsWith(termToLower) == true)
@@ -611,7 +611,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                             tcontacts.Add(item);
                                         }
                                         break;
-                                    case LibraryHelpers.Book.Search.Terms.EndWith:
+                                    case Code.Search.Terms.EndWith:
                                         if (item.TitreCivilite?.ToLower().EndsWith(termToLower) == true || item.NomNaissance?.ToLower().EndsWith(termToLower) == true ||
                                             item.Prenom?.ToLower().EndsWith(termToLower) == true || item.AutresPrenoms?.ToLower().EndsWith(termToLower) == true ||
                                             item.NomUsage?.ToLower().EndsWith(termToLower) == true || item.SocietyName?.ToLower().EndsWith(termToLower) == true)
@@ -647,7 +647,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
 
-            public static async Task<IList<Tbook>> SearchBooksAsync(ResearchBookVM parameters, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksAsync(ResearchItemVM parameters, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -730,7 +730,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<LivreVM>> SearchBooksVMAsync(ResearchBookVM parameters, CancellationToken cancellationToken = default)
+            public static async Task<IList<LivreVM>> SearchBooksVMAsync(ResearchItemVM parameters, CancellationToken cancellationToken = default)
             {
                 try
                 {

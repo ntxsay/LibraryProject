@@ -261,6 +261,7 @@
     <Compile Include="ViewModels\General\PageSystemVM.cs" />
     <Compile Include="ViewModels\General\PriceVM.cs" />
     <Compile Include="ViewModels\General\PropertiesChangedVM.cs" />
+    <Compile Include="ViewModels\General\ResearchItemVM.cs" />
     <Compile Include="ViewModels\General\SideBarInterLinkVM.cs" />
     <Compile Include="ViewModels\General\SideBarItemHeaderVM.cs" />
     <Compile Include="ViewModels\General\TaskVM.cs" />

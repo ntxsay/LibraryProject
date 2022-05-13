@@ -1,21 +1,21 @@
 ﻿using LibraryProjectUWP.Code;
-using Newtonsoft.Json;
+using LibraryProjectUWP.ViewModels.Book;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryProjectUWP.ViewModels.Book
+namespace LibraryProjectUWP.ViewModels.General
 {
-    public class ResearchBookVM : INotifyPropertyChanged
+    public class ResearchItemVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public long IdLibrary { get; set; }
+        public Type TypeObject { get; set; } = typeof(LivreVM);
+        public long? IdLibrary { get; set; }
 
         private string _Term;
         public string Term
@@ -101,8 +101,8 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        private Code.Search.Terms _TermParameter = Code.Search.Terms.Contains;
-        public Code.Search.Terms TermParameter
+        private Search.Terms _TermParameter = Search.Terms.Contains;
+        public Search.Terms TermParameter
         {
             get => _TermParameter;
             set
@@ -122,5 +122,4 @@ namespace LibraryProjectUWP.ViewModels.Book
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
 }

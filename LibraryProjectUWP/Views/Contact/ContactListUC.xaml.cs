@@ -448,6 +448,7 @@ namespace LibraryProjectUWP.Views.Contact
         {
             CancelModificationRequested?.Invoke(this, args);
         }
+
         private void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
@@ -499,20 +500,6 @@ namespace LibraryProjectUWP.Views.Contact
                         ViewModelPage.SelectedViewModelMessage = $"Aucun contact n'est à afficher";
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void SelectedViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                
             }
             catch (Exception ex)
             {
@@ -796,7 +783,22 @@ namespace LibraryProjectUWP.Views.Contact
 
         private void ABBtnEdit_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                if (ViewModelPage.SelectedViewModel != null && ViewModelPage.SelectedViewModel is ContactVM viewModel)
+                {
+                    ParentPage.NewEditContact(EditMode.Edit, null, null, new SideBarInterLinkVM()
+                    {
+                        ParentGuid = this.ItemGuid,
+                        ParentType = typeof(ContactListUC)
+                    }, viewModel);
+                }
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
         }
 
         private void MFI_CreatePerson_Click(object sender, RoutedEventArgs e)

@@ -59,11 +59,11 @@ namespace LibraryProjectUWP.Views.Contact
         {
         }
 
-        public void InitializeSideBar(BookCollectionPage bookCollectionPage, EditMode editMode, ContactType contactType, IEnumerable<ContactRole> contactRoles = null, ContactVM contactVM = null)
+        public void InitializeSideBar(BookCollectionPage bookCollectionPage, EditMode editMode, ContactType? contactType = null, IEnumerable<ContactRole> contactRoles = null, ContactVM contactVM = null)
         {
             try
             {
-                if (contactVM == null && editMode != EditMode.Create)
+                if (contactVM == null && editMode != EditMode.Create && contactType == null)
                 {
                     return;
                 }
@@ -80,7 +80,7 @@ namespace LibraryProjectUWP.Views.Contact
                 {
                     ViewModelPage.ViewModel = contactVM?.DeepCopy() ?? new ContactVM();
                     ViewModelPage.ViewModel.ContactRoles = contactRoles != null && contactRoles.Any() ?  new ObservableCollection<ContactRole>(contactRoles) : new ObservableCollection<ContactRole>() { ContactRole.Adherant };
-                    ViewModelPage.ViewModel.ContactType = contactType;
+                    ViewModelPage.ViewModel.ContactType = (ContactType)contactType;
                 }
                 else if (ViewModelPage.EditMode == EditMode.Edit)
                 {
@@ -115,15 +115,15 @@ namespace LibraryProjectUWP.Views.Contact
                 string name = string.Empty;
                 if (ViewModelPage.ViewModel.ContactType == ContactType.Human)
                 {
-                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une personne" : "d'éditer")}";
-                    name = $"{ViewModelPage?.ViewModel?.TitreCivilite} {ViewModelPage?.ViewModel?.NomNaissance} {ViewModelPage?.ViewModel?.Prenom}";
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une personne" : "d'éditer")} ";
+                    name = $"{ViewModelPage?.ViewModel?.DisplayName3}";
                     ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une personne";
                     ViewModelPage.Glyph = "\ue77b";
                 }
                 else if (ViewModelPage.ViewModel.ContactType == ContactType.Society)
                 {
-                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une société" : "d'éditer une société")}";
-                    name = $"{ViewModelPage?.ViewModel?.SocietyName}";
+                    title = $"Vous êtes en train {(ViewModelPage.EditMode == EditMode.Create ? "d'ajouter une société" : "d'éditer une société")} ";
+                    name = $"{ViewModelPage?.ViewModel?.DisplayName3}";
                     ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} une société";
                     ViewModelPage.Glyph = "\uE731";
                 }

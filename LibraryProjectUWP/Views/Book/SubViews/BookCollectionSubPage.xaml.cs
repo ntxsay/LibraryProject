@@ -192,7 +192,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
                         }
 
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchItem);
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });
@@ -219,7 +219,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
                         }
 
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchItem);
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });
@@ -806,7 +806,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 await this.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal,
                    async () =>
                     {
-                        await CommonView.RefreshItemsGrouping(page, true, ParentPage.ViewModelPage.ResearchBook);
+                        await CommonView.RefreshItemsGrouping(page, true, ParentPage.ViewModelPage.ResearchItem);
                         var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
                         if (buttonsPage != null && buttonsPage.Any())
                         {

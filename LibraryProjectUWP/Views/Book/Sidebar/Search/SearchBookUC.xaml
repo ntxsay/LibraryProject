@@ -40,7 +40,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <userControls:SideBarItemHeader x:Name="header" Grid.Column="0" Title="{x:Bind ViewModelPage.Header, Mode=OneWay}" Glyph="{x:Bind ViewModelPage.Glyph, Mode=OneWay}" HeaderGuid="{x:Bind ViewModelPage.ItemGuid, Mode=OneWay}" />
+            <userControls:SideBarItemHeader x:Name="header" Grid.Column="0" Title="{x:Bind ViewModelPage.Header, Mode=OneWay}" Glyph="{x:Bind ViewModelPage.Glyph, Mode=OneWay}" HeaderGuid="{x:Bind ItemGuid, Mode=OneWay}" />
             <Button Grid.Column="1" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fermer cet onglet"
                     Click="BtnHidePanel_Click">
                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;" FontSize="16"/>
@@ -75,19 +75,19 @@
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="Rechercher dans" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     <StackPanel Grid.Row="1" Spacing="4" Orientation="Vertical" Padding="0 0 0 0">
-                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInMainTitle, Mode=TwoWay}">
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInMainTitle, Mode=TwoWay}" Visibility="{x:Bind ViewModelPage.SearchInMainTitleVisibility, Mode=OneWay}">
                             <TextBlock Text="Titre"/>
                         </CheckBox>
-                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInOtherTitles, Mode=TwoWay}">
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInOtherTitles, Mode=TwoWay}" Visibility="{x:Bind ViewModelPage.SearchInOtherTitlesVisibility, Mode=OneWay}">
                             <TextBlock Text="Autre(s) titre(s)"/>
                         </CheckBox>
-                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInAuthors, Mode=TwoWay}">
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInAuthors, Mode=TwoWay}" Visibility="{x:Bind ViewModelPage.SearchInAuthorsVisibility, Mode=OneWay}">
                             <TextBlock Text="Auteurs"/>
                         </CheckBox>
-                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInEditors, Mode=TwoWay}">
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInEditors, Mode=TwoWay}" Visibility="{x:Bind ViewModelPage.SearchInEditorsVisibility, Mode=OneWay}">
                             <TextBlock Text="Maisons d'édition"/>
                         </CheckBox>
-                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInCollections, Mode=TwoWay}">
+                        <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInCollections, Mode=TwoWay}" Visibility="{x:Bind ViewModelPage.SearchInCollectionsVisibility, Mode=OneWay}">
                             <TextBlock Text="Collections"/>
                         </CheckBox>
                     </StackPanel>

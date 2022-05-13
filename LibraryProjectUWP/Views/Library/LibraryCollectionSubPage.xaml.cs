@@ -775,7 +775,7 @@ namespace LibraryProjectUWP.Views.Library
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
                         }
 
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchItem);
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });
@@ -802,7 +802,7 @@ namespace LibraryProjectUWP.Views.Library
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
                         }
 
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchBook);
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchItem);
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });

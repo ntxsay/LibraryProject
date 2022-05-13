@@ -39,7 +39,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             LibraryCollectionSubView = libraryCollectionSubView;
         }
 
-        public async Task GroupItemsByNone<T>(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null) where T : class
+        public async Task GroupItemsByNone<T>(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null) where T : class
         {
             try
             {
@@ -97,7 +97,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task GroupItemsByAlphabeticAsync<T>(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null) where T : class
+        public async Task GroupItemsByAlphabeticAsync<T>(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null) where T : class
         {
             try
             {
@@ -155,7 +155,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task GroupByCreationYear<T>(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null) where T : class
+        public async Task GroupByCreationYear<T>(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null) where T : class
         {
             try
             {
@@ -213,7 +213,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task GroupByParutionYear<T>(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null) where T : class
+        public async Task GroupByParutionYear<T>(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null) where T : class
         {
             try
             {
@@ -253,7 +253,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task<CommonGroupItemVM<T>> GenerateBookGroupItemAsync<T>(int goToPage = 1, ResearchBookVM searchParams = null) where T : class
+        public async Task<CommonGroupItemVM<T>> GenerateBookGroupItemAsync<T>(int goToPage = 1, ResearchItemVM searchParams = null) where T : class
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -274,7 +274,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        private async Task<CommonGroupItemVM<T>> GenerateResearchBookGroupItemAsync<T>(ResearchBookVM searchParams, int goToPage = 1) where T : class
+        private async Task<CommonGroupItemVM<T>> GenerateResearchBookGroupItemAsync<T>(ResearchItemVM searchParams, int goToPage = 1) where T : class
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -461,7 +461,7 @@ namespace LibraryProjectUWP.Code.Services.UI
         }
 
 
-        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true, ResearchBookVM searchParams = null)
+        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
