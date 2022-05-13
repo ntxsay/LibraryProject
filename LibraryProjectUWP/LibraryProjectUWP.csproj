@@ -225,6 +225,7 @@
     <Compile Include="Models\Local\TbookTranslatorConnector.cs" />
     <Compile Include="Models\Local\Tcollection.cs" />
     <Compile Include="Models\Local\Tcontact.cs" />
+    <Compile Include="Models\Local\TcontactRole.cs" />
     <Compile Include="Models\Local\Tlibrary.cs" />
     <Compile Include="Models\Local\TlibraryCategorie.cs" />
     <Compile Include="Models\Local\TlibrarySubCategorie.cs" />

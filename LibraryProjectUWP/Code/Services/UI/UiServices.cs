@@ -115,7 +115,7 @@ namespace LibraryProjectUWP.Code.Services.UI
 
                 if (pivot.Items.Count > 0)
                 {
-                    object itemPivot = pivot.Items.FirstOrDefault(f => f is ContactListUC item && item.ViewModelPage.ItemGuid == guid);
+                    object itemPivot = pivot.Items.FirstOrDefault(f => f is ContactListUC item && item.ItemGuid == guid);
                     if (itemPivot != null)
                     {
                         return itemPivot as ContactListUC;

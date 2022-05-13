@@ -133,36 +133,53 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<long>> GetListOfIdBooksFromContactListAsync(IEnumerable<long> idContactList, ContactRole contactRole)
+            public static async Task<IList<long>> GetListOfIdBooksFromContactListAsync(IEnumerable<long> idContactList, IEnumerable<ContactRole> contactRoleList)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        List<long> Ncollection = new List<long>();
-                        if (contactRole == ContactRole.Author)
+                        if (contactRoleList != null && contactRoleList.Any())
                         {
-                            foreach (var idContact in idContactList)
+                            List<long> Ncollection = new List<long>();
+                            foreach (ContactRole contactRole in contactRoleList)
                             {
-                                long? idBook = (await context.TbookAuthorConnector.SingleOrDefaultAsync(w => w.Id == idContact))?.IdBook;
-                                if (idBook != null)
+                                switch (contactRole)
                                 {
-                                    Ncollection.Add((long)idBook);
+                                    case ContactRole.Adherant:
+                                        break;
+                                    case ContactRole.Author:
+                                        foreach (var idContact in idContactList)
+                                        {
+                                            long? idBook = (await context.TbookAuthorConnector.SingleOrDefaultAsync(w => w.Id == idContact))?.IdBook;
+                                            if (idBook != null)
+                                            {
+                                                Ncollection.Add((long)idBook);
+                                            }
+                                        }
+                                        break;
+                                    case ContactRole.EditorHouse:
+                                        foreach (var idContact in idContactList)
+                                        {
+                                            long? idBook = (await context.TbookEditeurConnector.SingleOrDefaultAsync(w => w.Id == idContact))?.IdBook;
+                                            if (idBook != null)
+                                            {
+                                                Ncollection.Add((long)idBook);
+                                            }
+                                        }
+                                        break;
+                                    case ContactRole.Translator:
+                                        break;
+                                    case ContactRole.Illustrator:
+                                        break;
+                                    default:
+                                        break;
                                 }
                             }
+                            return Ncollection.Distinct().ToList();
                         }
-                        else if (contactRole == ContactRole.EditorHouse)
-                        {
-                            foreach (var idContact in idContactList)
-                            {
-                                long? idBook = (await context.TbookEditeurConnector.SingleOrDefaultAsync(w => w.Id == idContact))?.IdBook;
-                                if (idBook != null)
-                                {
-                                    Ncollection.Add((long)idBook);
-                                }
-                            }
-                        }
-                        return Ncollection.Distinct().ToList() ;
+
+                        return Enumerable.Empty<long>().ToList();
                     }
                 }
                 catch (Exception ex)

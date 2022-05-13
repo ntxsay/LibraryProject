@@ -22,18 +22,6 @@
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
         </XamlUICommand>
-        <XamlUICommand x:Name="CreateItemXUiCommand" 
-                       ExecuteRequested="CreateItemXUiCommand_ExecuteRequested"
-                       Description="Crée un nouvel item">
-        </XamlUICommand>
-        <XamlUICommand x:Name="UpdateItemXUiCommand" 
-                       ExecuteRequested="UpdateItemXUiCommand_ExecuteRequested"
-                       Description="Met à jour l'item">
-        </XamlUICommand>
-        <XamlUICommand x:Name="DeleteItemXUiCommand" 
-                       ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
-                       Description="Supprime l'item">
-        </XamlUICommand>
     </PivotItem.Resources>
     <PivotItem.Header>
         <Grid ColumnSpacing="8">
@@ -79,12 +67,26 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ComboBox x:Name="cmbxContactRole" Grid.Row="0" ItemsSource="{x:Bind ViewModelPage.contactRole}" PlaceholderText="Role de contact" SelectionChanged="CmbxContactRole_SelectionChanged"
-                              HorizontalAlignment="Stretch">
-                    <ComboBox.Header>
-                        <TextBlock Text="Role de contact" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    </ComboBox.Header>
-                </ComboBox>
+                <Grid Grid.Row="0" RowSpacing="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Role du contact" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    <MUIXC:DropDownButton Grid.Row="1" HorizontalContentAlignment="Left" HorizontalAlignment="Stretch">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8FD;"/>
+                            <TextBlock Grid.Column="1" x:Name="TbkRolesNames" FontWeight="Medium" TextWrapping="Wrap"/>
+                        </Grid>
+                        <MUIXC:DropDownButton.Flyout>
+                            <MenuFlyout x:Name="MenuFlyoutRoles" Placement="BottomEdgeAlignedLeft" Opened="MenuFlyoutRoles_Opened"></MenuFlyout>
+                        </MUIXC:DropDownButton.Flyout>
+                    </MUIXC:DropDownButton>
+                </Grid>
                 <TextBox Grid.Row="1" Text="{x:Bind ViewModelPage.ViewModel.SocietyName, Mode=TwoWay}" PlaceholderText="Nom de la société" TextWrapping="Wrap" AcceptsReturn="True"
                          Visibility="{x:Bind ViewModelPage.SocietyNameVisibility, Mode=OneWay}">
                     <TextBox.Header>
@@ -198,11 +200,11 @@
                             <TextBlock Text="Lieu de décès" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
                     </TextBox>
-                    <TextBox Text="{x:Bind ViewModelPage.ViewModel.Biographie, Mode=TwoWay}" MinHeight="100" PlaceholderText="Biographie courte de l'auteur" TextWrapping="Wrap" AcceptsReturn="True">
+                    <!--<TextBox Text="{x:Bind ViewModelPage.ViewModel.Biographie, Mode=TwoWay}" MinHeight="100" PlaceholderText="Biographie courte de l'auteur" TextWrapping="Wrap" AcceptsReturn="True">
                         <TextBox.Header>
                             <TextBlock Text="Biographie" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                         </TextBox.Header>
-                    </TextBox>
+                    </TextBox>-->
                 </StackPanel>
                 <StackPanel Grid.Row="4" Orientation="Vertical" Spacing="8" Visibility="{x:Bind ViewModelPage.AdressVisibility, Mode=OneWay}">
                     <TextBox Text="{x:Bind ViewModelPage.ViewModel.AdressePostal, Mode=TwoWay}" MinHeight="100" PlaceholderText="Adresse postale" TextWrapping="Wrap" AcceptsReturn="True">
@@ -236,9 +238,9 @@
                         </TextBox.Header>
                     </TextBox>
                 </StackPanel>
-                <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Observation, Mode=TwoWay}" MinHeight="100" PlaceholderText="Notes ou observations" TextWrapping="Wrap" AcceptsReturn="True">
+                <TextBox Grid.Row="5" Text="{x:Bind ViewModelPage.ViewModel.Observation, Mode=TwoWay}" MinHeight="150" PlaceholderText="Notes, obervations ou biographie" TextWrapping="Wrap" AcceptsReturn="True">
                     <TextBox.Header>
-                        <TextBlock Text="Observations" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                        <TextBlock Text="Notes / Biographie" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
                     </TextBox.Header>
                 </TextBox>
             </Grid>
@@ -254,13 +256,13 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="4" Margin="0 0 0 8">
-                <Button Command="{StaticResource CreateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
+                <Button Click="BtnExecuteAction_Click" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
                         <TextBlock Text="Créer" />
                     </StackPanel>
                 </Button>
-                <Button Command="{StaticResource UpdateItemXUiCommand}" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">
+                <Button Click="BtnExecuteAction_Click" Visibility="{x:Bind ViewModelPage.EditMode, Converter={StaticResource editModeToVisibilityConverter}, ConverterParameter='reverse', Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEB7E;"/>
                         <TextBlock Text="Mettre à jour" />

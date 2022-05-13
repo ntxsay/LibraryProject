@@ -33,6 +33,7 @@ namespace LibraryProjectUWP.Views.Contact
     public sealed partial class ContactListUC : PivotItem
     {
         public BookCollectionPage ParentPage { get; private set; }
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
         public ContactListUCVM ViewModelPage { get; set; } = new ContactListUCVM();
 
         public delegate void CancelModificationEventHandler(ContactListUC sender, ExecuteRequestedEventArgs e);
@@ -63,7 +64,7 @@ namespace LibraryProjectUWP.Views.Contact
             this.InitializeComponent();
         }
 
-        public void InitializeSideBar(BookCollectionPage bookCollectionPage, ContactType? contactType = null, ContactRole? contactRole = null)
+        public void InitializeSideBar(BookCollectionPage bookCollectionPage, ContactType? contactType = null, IEnumerable<ContactRole> contactRoleList = null)
         {
             try
             {
@@ -72,10 +73,10 @@ namespace LibraryProjectUWP.Views.Contact
                 ViewModelPage = new ContactListUCVM()
                 {
                     ContactType = contactType,
-                    ContactRole = contactRole
+                    ContactRoles = contactRoleList != null && contactRoleList.Any() ? new ObservableCollection<ContactRole>(contactRoleList) : new ObservableCollection<ContactRole>(),
                 };
 
-                if (contactType != null && contactRole == null)
+                if (contactType != null && (contactRoleList == null || contactRoleList != null && !contactRoleList.Any()))
                 {
                     switch (contactType)
                     {
@@ -91,27 +92,36 @@ namespace LibraryProjectUWP.Views.Contact
                             break;
                     }
                 }
-                else if (contactType == null && contactRole != null)
+                else if (contactType == null && contactRoleList != null && contactRoleList.Any())
                 {
-                    switch (contactRole)
+                    if (contactRoleList.Count() == 1)
                     {
-                        case ContactRole.Adherant:
-                            ViewModelPage.Header = $"Afficher les adhérants";
-                            TbcInfos.Text = "Vous naviguez parmis tous les adhérants";
-                            break;
-                        case ContactRole.Author:
-                            ViewModelPage.Header = $"Afficher les auteurs";
-                            TbcInfos.Text = "Vous naviguez parmis les auteurs";
-                            break;
-                        case ContactRole.Translator:
-                            break;
-                        case ContactRole.EditorHouse:
-                            ViewModelPage.Header = $"Afficher les éditeurs";
-                            TbcInfos.Text = "Vous naviguez parmis les éditeurs et maisons d'édition";
-                            break;
-                        case ContactRole.Illustrator:
-                            break;
+                        switch (contactRoleList.FirstOrDefault())
+                        {
+                            case ContactRole.Adherant:
+                                ViewModelPage.Header = $"Afficher les adhérants";
+                                TbcInfos.Text = "Vous naviguez parmis tous les adhérants";
+                                break;
+                            case ContactRole.Author:
+                                ViewModelPage.Header = $"Afficher les auteurs";
+                                TbcInfos.Text = "Vous naviguez parmis les auteurs";
+                                break;
+                            case ContactRole.Translator:
+                                break;
+                            case ContactRole.EditorHouse:
+                                ViewModelPage.Header = $"Afficher les éditeurs";
+                                TbcInfos.Text = "Vous naviguez parmis les éditeurs et maisons d'édition";
+                                break;
+                            case ContactRole.Illustrator:
+                                break;
+                        }
                     }
+                    else
+                    {
+                        ViewModelPage.Header = $"Afficher les contacts";
+                        TbcInfos.Text = "Vous naviguez parmis des contacts ayant divers rôles";
+                    }
+                    
                 }
                 else
                 {
@@ -127,7 +137,7 @@ namespace LibraryProjectUWP.Views.Contact
                     return;
                 }
 
-                getContactsListTask.InitializeWorker(contactType, contactRole);
+                getContactsListTask.InitializeWorker(contactType, contactRoleList);
                 getContactsListTask.AfterTaskCompletedRequested += (j, e) =>
                 {
                     if (e.Result is WorkerState<ContactVM, ContactVM> result && result.ResultList != null && result.ResultList.Any())
@@ -175,7 +185,7 @@ namespace LibraryProjectUWP.Views.Contact
 
         private void ABBtn_Refresh_Click(object sender, RoutedEventArgs e)
         {
-            InitializeSideBar(ParentPage, ViewModelPage.ContactType);
+            InitializeSideBar(ParentPage, ViewModelPage.ContactType, ViewModelPage.ContactRoles);
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -789,15 +799,33 @@ namespace LibraryProjectUWP.Views.Contact
 
         }
 
-        private void ABBtnCreate_Click(object sender, RoutedEventArgs e)
+        private void MFI_CreatePerson_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ParentPage.NewEditContact(ViewModelPage.ContactType ?? ContactType.Human, ViewModelPage.ContactRole ?? ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                ParentPage.NewEditContact(EditMode.Create, ContactType.Human, null, new SideBarInterLinkVM()
                 {
-                    ParentGuid = ViewModelPage.ItemGuid,
+                    ParentGuid = this.ItemGuid,
                     ParentType = typeof(ContactListUC)
-                });
+                }, null);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void MFI_CreateSociety_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ParentPage.NewEditContact(EditMode.Create, ContactType.Society, null, new SideBarInterLinkVM()
+                {
+                    ParentGuid = this.ItemGuid,
+                    ParentType = typeof(ContactListUC)
+                }, null);
             }
             catch (Exception ex)
             {
@@ -809,30 +837,32 @@ namespace LibraryProjectUWP.Views.Contact
 
         private void MFI_DisplayAdherant_Click(object sender, RoutedEventArgs e)
         {
-
+            InitializeSideBar(ParentPage, null, new ContactRole[] { ContactRole.Adherant });
         }
 
         private void MFI_DisplayAuthors_Click(object sender, RoutedEventArgs e)
         {
+            InitializeSideBar(ParentPage, null, new ContactRole[] { ContactRole.Author });
 
         }
 
         private void MFI_DisplayEditors_Click(object sender, RoutedEventArgs e)
         {
-
+            InitializeSideBar(ParentPage, null, new ContactRole[] { ContactRole.EditorHouse });
         }
 
         private void MFI_DisplayAllContacts_Click(object sender, RoutedEventArgs e)
         {
-
+            InitializeSideBar(ParentPage, null, null);
         }
+
+        
     }
 
     public class ContactListUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
         //public SideBarInterLinkVM ParentReferences { get; set; }
 
         private string _Header;
@@ -947,16 +977,16 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private ContactRole? _ContactRole;
-        public ContactRole? ContactRole
+        private ObservableCollection<ContactRole> _ContactRoles = new ObservableCollection<ContactRole>();
+        public ObservableCollection<ContactRole> ContactRoles
         {
-            get => this._ContactRole;
+            get => _ContactRoles;
             set
             {
-                if (this._ContactRole != value)
+                if (_ContactRoles != value)
                 {
-                    this._ContactRole = value;
-                    this.OnPropertyChanged();
+                    _ContactRoles = value;
+                    OnPropertyChanged();
                 }
             }
         }

@@ -976,53 +976,19 @@ namespace LibraryProjectUWP.Views.Book
             {
                 MenuFlyoutCommandView.Items.Clear();
 
-                //MenuFlyoutItem MFIDisplayCategories = new MenuFlyoutItem()
-                //{
-                //    Text = "Afficher les catégories",
-                //    Icon = new FontIcon
-                //    {
-                //        FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                //        Glyph = "\uE81E",
-                //    }
-                //};
-                //MFIDisplayCategories.Click += MFIDisplayCategories_Click;
-
-                //MenuFlyoutItem MFIDisplayCollections = new MenuFlyoutItem()
-                //{
-                //    Text = "Afficher les collections",
-                //    Icon = new FontIcon
-                //    {
-                //        FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                //        Glyph = "\uE81E",
-                //    }
-                //};
-                //MFIDisplayCollections.Click += MFIDisplayCollections_Click;
-
-                MenuFlyoutItem MFIDisplayAuthors = new MenuFlyoutItem()
+                MenuFlyoutItem MFIDisplayContacts = new MenuFlyoutItem()
                 {
-                    Text = "Afficher les auteurs",
+                    Text = "Afficher les contacts",
                     Icon = new FontIcon
                     {
                         FontFamily = new FontFamily("Segoe MDL2 Assets"),
                         Glyph = "\uE77b",
                     }
                 };
-                MFIDisplayAuthors.Click += MFIDisplayAuthors_Click;
-
-                MenuFlyoutItem MFIDisplayEditors = new MenuFlyoutItem()
-                {
-                    Text = "Afficher les éditeurs",
-                    Icon = new FontIcon
-                    {
-                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                        Glyph = "\uE77b",
-                    }
-                };
-                MFIDisplayEditors.Click += MFIDisplayEditors_Click;
+                MFIDisplayContacts.Click += MFIDisplayContacts_Click;
 
 
-                MenuFlyoutCommandView.Items.Add(MFIDisplayAuthors);
-                MenuFlyoutCommandView.Items.Add(MFIDisplayEditors);
+                MenuFlyoutCommandView.Items.Add(MFIDisplayContacts);
             }
             catch (Exception ex)
             {
@@ -1061,27 +1027,16 @@ namespace LibraryProjectUWP.Views.Book
                 };
                 MFIDisplayCollections.Click += MFIDisplayCollections_Click;
 
-                MenuFlyoutItem MFIDisplayAuthors = new MenuFlyoutItem()
+                MenuFlyoutItem MFIDisplayContacts = new MenuFlyoutItem()
                 {
-                    Text = "Afficher les auteurs",
+                    Text = "Afficher les contacts",
                     Icon = new FontIcon
                     {
                         FontFamily = new FontFamily("Segoe MDL2 Assets"),
                         Glyph = "\uE77b",
                     }
                 };
-                MFIDisplayAuthors.Click += MFIDisplayAuthors_Click;
-
-                MenuFlyoutItem MFIDisplayEditors = new MenuFlyoutItem()
-                {
-                    Text = "Afficher les éditeurs",
-                    Icon = new FontIcon
-                    {
-                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                        Glyph = "\uE77b",
-                    }
-                };
-                MFIDisplayEditors.Click += MFIDisplayEditors_Click;
+                MFIDisplayContacts.Click += MFIDisplayContacts_Click;
 
                 MenuFlyoutItem MFIDisplayBookPretScheduler = new MenuFlyoutItem()
                 {
@@ -1097,8 +1052,7 @@ namespace LibraryProjectUWP.Views.Book
                 MenuFlyoutCommandView.Items.Add(MFIDisplayCategories);
                 MenuFlyoutCommandView.Items.Add(MFIDisplayCollections);
                 MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
-                MenuFlyoutCommandView.Items.Add(MFIDisplayAuthors);
-                MenuFlyoutCommandView.Items.Add(MFIDisplayEditors);
+                MenuFlyoutCommandView.Items.Add(MFIDisplayContacts);
                 MenuFlyoutCommandView.Items.Add(new MenuFlyoutSeparator());
                 MenuFlyoutCommandView.Items.Add(MFIDisplayBookPretScheduler);
             }
@@ -1109,21 +1063,14 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        
+        private void MFIDisplayContacts_Click(object sender, RoutedEventArgs e)
+        {
+            DisplayContactsList(null, null);
+        }
 
         private void MFIDisplayBookPretScheduler_Click(object sender, RoutedEventArgs e)
         {
             OpenBookPretSchedule();
-        }
-
-        private void MFIDisplayEditors_Click(object sender, RoutedEventArgs e)
-        {
-            DisplayContactsList(null, ContactRole.EditorHouse);
-        }
-
-        private void MFIDisplayAuthors_Click(object sender, RoutedEventArgs e)
-        {
-            DisplayContactsList(null, ContactRole.Author);
         }
 
         private void MFIDisplayCollections_Click(object sender, RoutedEventArgs e)
@@ -1170,11 +1117,34 @@ namespace LibraryProjectUWP.Views.Book
                 };
                 TMFIAddFromFile.Click += TMFIAddFromFile_Click;
 
-                
+                MenuFlyoutItem TMFIAddNewHuman = new MenuFlyoutItem()
+                {
+                    Text = "Ajouter une personne",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE77b",
+                    }
+                };
+                TMFIAddNewHuman.Click += TMFIAddNewHuman_Click;
+
+                MenuFlyoutItem TMFIAddNewSociety = new MenuFlyoutItem()
+                {
+                    Text = "Ajouter une société",
+                    Icon = new FontIcon
+                    {
+                        FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                        Glyph = "\uE731",
+                    }
+                };
+                TMFIAddNewSociety.Click += MFI_NewSociety_Click;
 
                 MenuFlyoutCommandAdds.Items.Add(TMFIAddNewItem);
-                MenuFlyoutCommandAdds.Items.Add(new MenuFlyoutSeparator());
                 MenuFlyoutCommandAdds.Items.Add(TMFIAddFromFile);
+                MenuFlyoutCommandAdds.Items.Add(new MenuFlyoutSeparator());
+                MenuFlyoutCommandAdds.Items.Add(TMFIAddNewHuman);
+                MenuFlyoutCommandAdds.Items.Add(TMFIAddNewSociety);
+
             }
             catch (Exception ex)
             {
@@ -1199,14 +1169,6 @@ namespace LibraryProjectUWP.Views.Book
                         Glyph = "\uE736",
                     }
                 };
-                //MFSIAddNew.PointerEntered += (o, e) =>
-                //{
-                //    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 1);
-                //};
-                //MFSIAddNew.PointerExited += (o, e) =>
-                //{
-                //    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 1);
-                //};
 
                 MenuFlyoutItem TMFIAddNewItem = new MenuFlyoutItem()
                 {
@@ -1314,7 +1276,12 @@ namespace LibraryProjectUWP.Views.Book
 
         private void TMFIAddNewHuman_Click(object sender, RoutedEventArgs e)
         {
-            this.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, null);
+            this.NewEditContact(EditMode.Create, ContactType.Human, null, null);
+        }
+
+        private void MFI_NewSociety_Click(object sender, RoutedEventArgs e)
+        {
+            this.NewEditContact(EditMode.Create, ContactType.Society, null, null);
         }
 
         private void MenuFlyoutCommandAdds_Opened(object sender, object e)
@@ -1850,9 +1817,13 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void NewEditLibraryUC_ExecuteTaskRequested(NewEditLibraryUC sender, BibliothequeVM originalViewModel, OperationStateVM e)
+        private async void NewEditLibraryUC_ExecuteTaskRequested(NewEditLibraryUC sender, BibliothequeVM originalViewModel, OperationStateVM e)
         {
-            this.RemoveItemToSideBar(sender);
+            if (e.IsSuccess)
+            {
+                await this.RefreshItemsGrouping(this.GetSelectedPage, true, this.ViewModelPage.ResearchBook);
+                this.RemoveItemToSideBar(sender);
+            }
         }
 
         private void NewEditLibraryUC_CancelModificationRequested(NewEditLibraryUC sender, ExecuteRequestedEventArgs e)
@@ -2702,44 +2673,35 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Contact
-        private void MFI_NewPersonne_Click(object sender, RoutedEventArgs e)
-        {
-            this.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, null);
-        }
-
-        private void MFI_NewSociety_Click(object sender, RoutedEventArgs e)
-        {
-            this.NewEditContact(ContactType.Society, ContactRole.EditorHouse, EditMode.Create, null);
-        }
-
-        internal void NewEditContact(ContactType contactType, ContactRole contactRole, EditMode editMode = EditMode.Create, SideBarInterLinkVM parentReferences = null, string prenom = null, string nomNaissance = null, string societyName = null)
+        
+        internal void NewEditContact(EditMode editMode = EditMode.Create, ContactType contactType = ContactType.Human, IEnumerable<ContactRole> contactRoles = null, SideBarInterLinkVM parentReferences = null, ContactVM viewModel = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is NewEditContactUC item && item.ViewModelPage.EditMode == editMode && item.ViewModelPage.ViewModel.ContactType == contactType) is NewEditContactUC checkedItem)
                 {
-                    checkedItem.InitializeSideBar(this, editMode, contactType, contactRole, prenom, nomNaissance, societyName);
+                    checkedItem.InitializeSideBar(this, editMode, contactType, contactRoles, viewModel);
                     this.SelectItemSideBar(checkedItem);
                 }
                 else
                 {
                     NewEditContactUC userControl = new NewEditContactUC();
-                    userControl.InitializeSideBar(this, editMode, contactType, contactRole, prenom, nomNaissance, societyName);
+                    userControl.InitializeSideBar(this, editMode, contactType, contactRoles, viewModel);
 
                     if (parentReferences != null)
                     {
-                        userControl.ViewModelPage.ParentReferences = parentReferences;
+                        userControl.ParentReferences = parentReferences;
                     }
 
                     userControl.CancelModificationRequested += NewEditContactUC_CancelModificationRequested;
-                    userControl.CreateItemRequested += NewEditContactUC_CreateItemRequested;
+                    userControl.ExecuteTaskRequested += NewEditContactUC_ExecuteTaskRequested;
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
+                        IdItem = userControl.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -2751,27 +2713,18 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void NewEditContactUC_CreateItemRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
+        private void NewEditContactUC_ExecuteTaskRequested(NewEditContactUC sender, ContactVM originalViewModel, OperationStateVM e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ContactVM newViewModel = sender.ViewModelPage.ViewModel;
-
-                var creationResult = await DbServices.Contact.CreateAsync(newViewModel);
-                if (creationResult.IsSuccess)
+                if (e.IsSuccess)
                 {
-                    newViewModel.Id = creationResult.Id;
-                    sender.ViewModelPage.ResultMessageTitle = "Succès";
-                    sender.ViewModelPage.ResultMessage = creationResult.Message;
-                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-                    sender.ViewModelPage.IsResultMessageOpen = true;
-
-                    if (sender.ViewModelPage.ParentReferences != null)
+                    if (sender.ParentReferences != null)
                     {
-                        if (sender.ViewModelPage.ParentReferences.ParentType == typeof(ContactListUC))
+                        if (sender.ParentReferences.ParentType == typeof(ContactListUC))
                         {
-                            var item = uiServices.GetContactListUCSideBarByGuid(PivotRightSideBar, sender.ViewModelPage.ParentReferences.ParentGuid);
+                            var item = uiServices.GetContactListUCSideBarByGuid(PivotRightSideBar, sender.ParentReferences.ParentGuid);
                             if (item != null)
                             {
                                 item.InitializeSideBar(this, item.ViewModelPage.ContactType);
@@ -2779,15 +2732,7 @@ namespace LibraryProjectUWP.Views.Book
                             }
                         }
                     }
-                }
-                else
-                {
-                    //Erreur
-                    sender.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
-                    sender.ViewModelPage.ResultMessage = creationResult.Message;
-                    sender.ViewModelPage.ResultMessageSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-                    sender.ViewModelPage.IsResultMessageOpen = true;
-                    return;
+                    this.RemoveItemToSideBar(sender);
                 }
             }
             catch (Exception ex)
@@ -2796,45 +2741,34 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
 
         private void NewEditContactUC_CancelModificationRequested(NewEditContactUC sender, ExecuteRequestedEventArgs e)
         {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                sender.CancelModificationRequested -= NewEditContactUC_CancelModificationRequested;
-                sender.CreateItemRequested -= NewEditContactUC_CreateItemRequested;
-
-                this.RemoveItemToSideBar(sender);
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
+            this.RemoveItemToSideBar(sender);
         }
 
-        private async void DisplayContactsList(ContactType? contactType, ContactRole contactRole)
+        private void DisplayContactsList(ContactType? contactType, IEnumerable<ContactRole> contactRoles = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var checkedItem = this.PivotRightSideBar.Items.FirstOrDefault(f => f.GetType() == typeof(ContactListUC));
-                if (checkedItem != null)
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is ContactListUC) is ContactListUC checkedItem)
                 {
-                    this.PivotRightSideBar.SelectedItem = checkedItem;
+                    this.SelectItemSideBar(checkedItem);
+                    checkedItem.InitializeSideBar(this, contactType, contactRoles);
                 }
                 else
                 {
                     ContactListUC userControl = new ContactListUC();
-                    userControl.InitializeSideBar(this, contactType);
+                    userControl.InitializeSideBar(this, contactType, contactRoles);
                     userControl.CancelModificationRequested += ContactListUC_CancelModificationRequested;
 
                     this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
+                        IdItem = userControl.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;

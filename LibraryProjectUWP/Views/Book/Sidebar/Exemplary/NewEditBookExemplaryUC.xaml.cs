@@ -291,29 +291,39 @@ namespace LibraryProjectUWP.Views.Book
                                     var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                     if (split.Length == 1)
                                     {
-                                        _parameters.ParentPage.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                                        _parameters.ParentPage.NewEditContact(EditMode.Create, ContactType.Human, new ContactRole[] { ContactRole.Adherant }, new SideBarInterLinkVM()
                                         {
                                             ParentGuid = ViewModelPage.ItemGuid,
                                             ParentType = typeof(NewEditBookExemplaryUC),
-                                        }, split[0], string.Empty, string.Empty);
+                                        }, new ContactVM()
+                                        {
+                                            NomNaissance = split[0],
+                                        });
                                     }
                                     else if (split.Length >= 2)
                                     {
-                                        _parameters.ParentPage.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                                        _parameters.ParentPage.NewEditContact(EditMode.Create, ContactType.Human, new ContactRole[] { ContactRole.Adherant }, new SideBarInterLinkVM()
                                         {
                                             ParentGuid = ViewModelPage.ItemGuid,
                                             ParentType = typeof(NewEditBookExemplaryUC),
-                                        }, split[0], split[1], string.Empty);
+                                        }, new ContactVM()
+                                        {
+                                            NomNaissance = split[0],
+                                            Prenom = split[1],
+                                        });
                                     }
                                 }
                                 //Société
                                 else if (viewModel.Id == -2)
                                 {
-                                    _parameters.ParentPage.NewEditContact(ContactType.Society, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                                    _parameters.ParentPage.NewEditContact(EditMode.Create, ContactType.Society, new ContactRole[] { ContactRole.Adherant }, new SideBarInterLinkVM()
                                     {
                                         ParentGuid = ViewModelPage.ItemGuid,
                                         ParentType = typeof(NewEditBookExemplaryUC),
-                                    }, string.Empty, string.Empty, sender.Text.Trim());
+                                    }, new ContactVM()
+                                    {
+                                        SocietyName = sender.Text.Trim(),
+                                    });
                                 }
                             }
                             else
@@ -321,20 +331,20 @@ namespace LibraryProjectUWP.Views.Book
                                 //Personne
                                 if (viewModel.Id == -1)
                                 {
-                                    _parameters.ParentPage.NewEditContact(ContactType.Human, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                                    _parameters.ParentPage.NewEditContact(EditMode.Create, ContactType.Human, new ContactRole[] { ContactRole.Adherant }, new SideBarInterLinkVM()
                                     {
                                         ParentGuid = ViewModelPage.ItemGuid,
                                         ParentType = typeof(NewEditBookExemplaryUC),
-                                    }, string.Empty, string.Empty, string.Empty);
+                                    }, null);
                                 }
                                 //Société
                                 else if (viewModel.Id == -2)
                                 {
-                                    _parameters.ParentPage.NewEditContact(ContactType.Society, ContactRole.Adherant, EditMode.Create, new SideBarInterLinkVM()
+                                    _parameters.ParentPage.NewEditContact(EditMode.Create, ContactType.Society, new ContactRole[] { ContactRole.Adherant }, new SideBarInterLinkVM()
                                     {
                                         ParentGuid = ViewModelPage.ItemGuid,
                                         ParentType = typeof(NewEditBookExemplaryUC),
-                                    }, string.Empty, string.Empty, string.Empty);
+                                    }, null);
                                 }
                             }
                             sender.Text = String.Empty;

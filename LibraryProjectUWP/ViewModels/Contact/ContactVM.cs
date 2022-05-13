@@ -3,6 +3,7 @@ using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.ES;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -31,15 +32,15 @@ namespace LibraryProjectUWP.ViewModels.Contact
             }
         }
 
-        private ContactRole _ContactRole;
-        public ContactRole ContactRole
+        private ObservableCollection<ContactRole> _ContactRoles = new ObservableCollection<ContactRole>();
+        public ObservableCollection<ContactRole> ContactRoles
         {
-            get => _ContactRole;
+            get => _ContactRoles;
             set
             {
-                if (_ContactRole != value)
+                if (_ContactRoles != value)
                 {
-                    _ContactRole = value;
+                    _ContactRoles = value;
                     OnPropertyChanged();
                 }
             }

@@ -154,7 +154,22 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarButton x:Name="ABBtnCreate" Label="Ajouter" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="ABBtnCreate_Click" />
+            <AppBarButton x:Name="ABBtnCreate" Label="Ajouter" Icon="Add" MTUUi:FrameworkElementExtensions.Cursor="Hand">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Ajouter une personne" Click="MFI_CreatePerson_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE77b;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Ajouter une société" Click="MFI_CreateSociety_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE731;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
             <AppBarSeparator/>
             <AppBarButton x:Name="ABBtnEdit" Icon="Edit" Label="Editer" MTUUi:FrameworkElementExtensions.Cursor="Hand" 
                           Click="ABBtnEdit_Click" IsEnabled="{x:Bind ViewModelPage.SelectedViewModels.Count, Converter={StaticResource intEqualToBooleanConverter}, ConverterParameter='1', Mode=OneWay}"/>

@@ -17,11 +17,11 @@ namespace LibraryProjectUWP.Models.Local
             TbookIllustratorConnector = new HashSet<TbookIllustratorConnector>();
             TbookPret = new HashSet<TbookPret>();
             TbookTranslatorConnector = new HashSet<TbookTranslatorConnector>();
+            TcontactRole = new HashSet<TcontactRole>();
         }
 
         public long Id { get; set; }
         public long Type { get; set; }
-        public long Role { get; set; }
         public string Guid { get; set; }
         public string DateAjout { get; set; }
         public string DateEdition { get; set; }
@@ -51,5 +51,6 @@ namespace LibraryProjectUWP.Models.Local
         public virtual ICollection<TbookIllustratorConnector> TbookIllustratorConnector { get; set; }
         public virtual ICollection<TbookPret> TbookPret { get; set; }
         public virtual ICollection<TbookTranslatorConnector> TbookTranslatorConnector { get; set; }
+        public virtual ICollection<TcontactRole> TcontactRole { get; set; }
     }
 }

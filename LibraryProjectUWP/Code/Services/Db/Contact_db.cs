@@ -39,6 +39,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         var collection = await context.Tcontact.ToListAsync();
                         if (collection == null || !collection.Any()) return Enumerable.Empty<Tcontact>().ToList();
+                        collection.Select(async f => f.TcontactRole = await context.TcontactRole.Where(s => s.IdContact == f.Id).ToListAsync());
 
                         return collection;
                     }
@@ -90,6 +91,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         var s = await context.Tcontact.SingleOrDefaultAsync(d => d.Id == id);
                         if (s == null) return null;
+                        s.TcontactRole = await context.TcontactRole.Where(f => f.IdContact == f.Id).ToListAsync();
+
 
                         return s;
                     }
@@ -116,29 +119,87 @@ namespace LibraryProjectUWP.Code.Services.Db
             #endregion
 
             #region Multiple
-            public static async Task<IList<Tcontact>> MultipleAsync(ContactType? contactType = null, ContactRole? contactRole = null, CancellationToken cancellationToken = default)
+            public static async Task<List<Tcontact>> MultipleAsync(ContactType? contactType = null, IEnumerable<ContactRole> contactRoleList = null, CancellationToken cancellationToken = default)
             {
                 try
                 {
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
                         List<Tcontact> collection = new List<Tcontact>();
-                        if (contactType == null && contactRole == null)
+                        if (contactType == null && contactRoleList == null || !contactRoleList.Any())
                         {
-                            collection = await context.Tcontact.ToListAsync(cancellationToken);
+                            var result = await context.Tcontact.ToListAsync(cancellationToken);
+                            if (result != null && result.Any())
+                            {
+                                collection.AddRange(result);
+                            }
                         }
-                        else if (contactType != null && contactRole == null)
+                        else if (contactType != null && contactRoleList == null || !contactRoleList.Any())
                         {
-                            collection = await context.Tcontact.Where(w => w.Type == (byte)contactType).ToListAsync(cancellationToken);
+                            var result = await context.Tcontact.Where(w => w.Type == (byte)contactType).ToListAsync(cancellationToken);
+                            if (result != null && result.Any())
+                            {
+                                collection.AddRange(result);
+                            }
                         }
-                        else if (contactType == null && contactRole != null)
+                        else if (contactType == null && contactRoleList != null && contactRoleList.Any())
                         {
-                            collection = await context.Tcontact.Where(w => w.Role == (byte)contactRole).ToListAsync(cancellationToken);
+                            List<TcontactRole> tRoleList = new List<TcontactRole>();
+                            foreach (var role in contactRoleList)
+                            {
+                                var result = await context.TcontactRole.Where(w => w.Role == (byte)role).ToListAsync(cancellationToken);
+                                if (result != null && result.Any())
+                                {
+                                    tRoleList.AddRange(result);
+                                }
+                            }
+
+                            if (tRoleList != null && tRoleList.Any())
+                            {
+                                foreach (var role in tRoleList)
+                                {
+                                    var result = await context.Tcontact.Where(w => w.Id == role.IdContact).ToListAsync(cancellationToken);
+                                    if (result != null && result.Any())
+                                    {
+                                        collection.AddRange(result);
+                                    }
+                                }
+                            }
+                        }
+                        else if (contactType != null && contactRoleList != null && contactRoleList.Any())
+                        {
+                            List<TcontactRole> tRoleList = new List<TcontactRole>();
+                            foreach (var role in contactRoleList)
+                            {
+                                var result = await context.TcontactRole.Where(w => w.Role == (byte)role).ToListAsync(cancellationToken);
+                                if (result != null && result.Any())
+                                {
+                                    tRoleList.AddRange(result);
+                                }
+                            }
+
+                            if (tRoleList != null && tRoleList.Any())
+                            {
+                                foreach (var role in tRoleList)
+                                {
+                                    var result = await context.Tcontact.Where(w => w.Id == role.IdContact && w.Type == (byte)contactType).ToListAsync(cancellationToken);
+                                    if (result != null && result.Any())
+                                    {
+                                        collection.AddRange(result);
+                                    }
+                                }
+                            }
                         }
 
-                        if (collection == null || !collection.Any()) return Enumerable.Empty<Tcontact>().ToList();
-
-                        return collection;
+                        if (collection != null && collection.Any())
+                        {
+                            collection.Select(async f => f.TcontactRole = await context.TcontactRole.Where(s => s.IdContact == f.Id).ToListAsync());
+                            return collection.Distinct().ToList();
+                        }
+                        else
+                        {
+                            return Enumerable.Empty<Tcontact>().ToList();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -149,11 +210,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<ContactVM>> MultipleVMAsync(ContactType? contactType = null, ContactRole? contactRole = null, CancellationToken cancellationToken = default)
+            public static async Task<List<ContactVM>> MultipleVMAsync(ContactType? contactType = null, IEnumerable<ContactRole> contactRoleList = null, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    var collection = await MultipleAsync(contactType, contactRole, cancellationToken);
+                    var collection = await MultipleAsync(contactType, contactRoleList, cancellationToken);
                     if (!collection.Any()) return Enumerable.Empty<ContactVM>().ToList();
 
                     var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(t => t.Result).ToList();
@@ -301,7 +362,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 ContactVM authorVm = new ContactVM()
                                 {
                                     ContactType = contactType,
-                                    ContactRole = contactRole,
+                                    ContactRoles = new ObservableCollection<ContactRole>() { contactRole },
                                     TitreCivilite = CivilityHelpers.NonSpecifie,
                                 };
 
@@ -444,7 +505,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         var record = new Tcontact()
                         {
-                            Guid = viewModel.Guid.ToString(),
+                            Guid = Guid.NewGuid().ToString(),
                             DateAjout = viewModel.DateAjout.ToString(),
                             DateEdition = null,
                             Observation = viewModel.Observation,
@@ -467,11 +528,31 @@ namespace LibraryProjectUWP.Code.Services.Db
                             Nationality = viewModel.Nationality,
                             SocietyName = viewModel.SocietyName,
                             Type = (long)viewModel.ContactType,
-                            Role = (long)viewModel.ContactRole,
                         };
 
                         _ = await context.Tcontact.AddAsync(record);
                         await context.SaveChangesAsync();
+
+                        if (viewModel.ContactRoles != null && viewModel.ContactRoles.Any())
+                        {
+                            List<TcontactRole> tRoles = new List<TcontactRole>();
+                            foreach (var role in viewModel.ContactRoles)
+                            {
+                                TcontactRole tcontactRole = new TcontactRole()
+                                {
+                                    IdContact = record.Id,
+                                    Role = (long)role,
+                                };
+
+                                tRoles.Add(tcontactRole);
+                            }
+
+                            if (tRoles != null && tRoles.Any())
+                            {
+                                await context.TcontactRole.AddRangeAsync(tRoles);
+                                await context.SaveChangesAsync();
+                            }
+                        }
 
                         await CreateFolderAsync(viewModel.Guid);
 
@@ -631,9 +712,34 @@ namespace LibraryProjectUWP.Code.Services.Db
                         record.DateNaissance = viewModel.DateNaissance?.ToString();
                         record.LieuNaissance = viewModel.LieuNaissance;
                         record.Type = (long)viewModel.ContactType;
-                        record.Role = (long)viewModel.ContactRole;
                         record.Nationality = viewModel.Nationality;
                         record.SocietyName = viewModel.SocietyName;
+
+                        var recordRoles = await context.TcontactRole.Where(a => a.IdContact == record.Id).ToListAsync();
+                        if (recordRoles.Any())
+                        {
+                            context.TcontactRole.RemoveRange(recordRoles);
+                        }
+
+                        if (viewModel.ContactRoles != null && viewModel.ContactRoles.Any())
+                        {
+                            List<TcontactRole> tcontactRoles = new List<TcontactRole>();
+                            foreach (var role in viewModel.ContactRoles)
+                            {
+                                var tcontactRole = new TcontactRole()
+                                {
+                                    IdContact = record.Id,
+                                    Role = (long)role,
+                                };
+
+                                tcontactRoles.Add(tcontactRole);
+                            }
+
+                            if (tcontactRoles != null && tcontactRoles.Any())
+                            {
+                                await context.TcontactRole.AddRangeAsync(tcontactRoles);
+                            }
+                        }
 
                         context.Tcontact.Update(record);
                         await context.SaveChangesAsync();
@@ -703,6 +809,25 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
+            public static async Task CompleteModelInfos(LibraryDbContext context, Tcontact model)
+            {
+                try
+                {
+                    if (context == null || model == null)
+                    {
+                        return;
+                    }
+
+                    model.TcontactRole = await context.TcontactRole.Where(s => s.IdContact == model.Id).ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return;
+                }
+            }
+
             public static async Task<Tuple<bool, long>> IsContactExistAsync(ContactVM viewModel, bool isEdit = false, long? modelId = null)
             {
                 try
@@ -785,7 +910,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Id = model.Id,
                         Guid = isGuidCorrect ? guid : Guid.Empty,
                         ContactType = (ContactType)model.Type,
-                        ContactRole = (ContactRole)model.Role,
                         DateAjout = DatesHelpers.Converter.GetDateFromString(model.DateAjout),
                         DateEdition = DatesHelpers.Converter.GetNullableDateFromString(model.DateEdition),
                         Observation = model.Observation,
@@ -808,6 +932,12 @@ namespace LibraryProjectUWP.Code.Services.Db
                         SocietyName = model.SocietyName,
                         Nationality = model.Nationality,
                     };
+
+                    if (model.TcontactRole != null && model.TcontactRole.Count > 0)
+                    {
+                        viewModel.ContactRoles = new ObservableCollection<ContactRole>(model.TcontactRole.Select(s => (ContactRole)s.Role));
+                    }
+
                     return viewModel;
                 }
                 catch (Exception ex)

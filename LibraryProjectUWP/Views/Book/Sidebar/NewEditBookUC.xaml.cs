@@ -175,13 +175,13 @@ namespace LibraryProjectUWP.Views.Book
                         IEnumerable<ContactVM> authorsVMs = Enumerable.Empty<ContactVM>();
                         IEnumerable<ContactVM> editorsVMs = Enumerable.Empty<ContactVM>();
                         IEnumerable<CollectionVM> collectionsVMs = Enumerable.Empty<CollectionVM>();
-                        using (Task<IList<ContactVM>> taskAuthors = DbServices.Contact.MultipleVMAsync(null, ContactRole.Author))
+                        using (Task<List<ContactVM>> taskAuthors = DbServices.Contact.MultipleVMAsync(null, new ContactRole[] { ContactRole.Author }))
                         {
                             taskAuthors.Wait();
                             authorsVMs = taskAuthors.Result;
                         }
 
-                        using (Task<IList<ContactVM>> taskEditors = DbServices.Contact.MultipleVMAsync(null, ContactRole.EditorHouse))
+                        using (Task<List<ContactVM>> taskEditors = DbServices.Contact.MultipleVMAsync(null, new ContactRole[] { ContactRole.EditorHouse }))
                         {
                             taskEditors.Wait();
                             editorsVMs = taskEditors.Result;
@@ -273,7 +273,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var authorsList = await DbServices.Contact.MultipleVMAsync(null, ContactRole.Author);
+                var authorsList = await DbServices.Contact.MultipleVMAsync(null, new ContactRole[] { ContactRole.Author });
                 ViewModelPage.AuthorViewModelList = authorsList?.ToList();
             }
             catch (Exception ex)
@@ -432,29 +432,39 @@ namespace LibraryProjectUWP.Views.Book
                                     var split = StringHelpers.SplitWord(sender.Text, new string[] { " " });
                                     if (split.Length == 1)
                                     {
-                                        ParentPage.NewEditContact(ContactType.Human, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                        ParentPage.NewEditContact(EditMode.Create, ContactType.Human, new ContactRole[] { ContactRole.Author }, new SideBarInterLinkVM()
                                         {
                                             ParentGuid = ViewModelPage.ItemGuid,
                                             ParentType = typeof(NewEditBookUC),
-                                        }, split[0], string.Empty, string.Empty);
+                                        }, new ContactVM()
+                                        {
+                                            NomNaissance = split[0],
+                                        });
                                     }
                                     else if (split.Length >= 2)
                                     {
-                                        ParentPage.NewEditContact(ContactType.Human, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                        ParentPage.NewEditContact(EditMode.Create, ContactType.Human, new ContactRole[] { ContactRole.Author }, new SideBarInterLinkVM()
                                         {
                                             ParentGuid = ViewModelPage.ItemGuid,
                                             ParentType = typeof(NewEditBookUC),
-                                        }, split[0], split[1], string.Empty);
+                                        }, new ContactVM()
+                                        {
+                                            NomNaissance = split[0],
+                                            Prenom = split[1],
+                                        });
                                     }
                                 }
                                 //Société
                                 else if (viewModel.Id == -2)
                                 {
-                                    ParentPage.NewEditContact(ContactType.Society, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                    ParentPage.NewEditContact(EditMode.Create, ContactType.Society, new ContactRole[] { ContactRole.Author }, new SideBarInterLinkVM()
                                     {
                                         ParentGuid = ViewModelPage.ItemGuid,
                                         ParentType = typeof(NewEditBookUC),
-                                    }, string.Empty, string.Empty, sender.Text.Trim());
+                                    }, new ContactVM()
+                                    {
+                                        SocietyName = sender.Text.Trim(),
+                                    });
                                 }
                             }
                             else
@@ -462,20 +472,20 @@ namespace LibraryProjectUWP.Views.Book
                                 //Personne
                                 if (viewModel.Id == -1)
                                 {
-                                    ParentPage.NewEditContact(ContactType.Human, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                    ParentPage.NewEditContact(EditMode.Create, ContactType.Human, new ContactRole[] { ContactRole.Author },  new SideBarInterLinkVM()
                                     {
                                         ParentGuid = ViewModelPage.ItemGuid,
                                         ParentType = typeof(NewEditBookUC),
-                                    }, string.Empty, string.Empty, string.Empty);
+                                    }, null);
                                 }
                                 //Société
                                 else if (viewModel.Id == -2)
                                 {
-                                    ParentPage.NewEditContact(ContactType.Society, ContactRole.Author, EditMode.Create, new SideBarInterLinkVM()
+                                    ParentPage.NewEditContact(EditMode.Create, ContactType.Society, new ContactRole[] { ContactRole.Author }, new SideBarInterLinkVM()
                                     {
                                         ParentGuid = ViewModelPage.ItemGuid,
                                         ParentType = typeof(NewEditBookUC),
-                                    }, string.Empty, string.Empty, string.Empty);
+                                    }, null);
                                 }
                             }
                             sender.Text = String.Empty;
@@ -671,7 +681,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var itemList = await DbServices.Contact.MultipleVMAsync(null, ContactRole.EditorHouse);
+                var itemList = await DbServices.Contact.MultipleVMAsync(null, new ContactRole[] { ContactRole.EditorHouse });
                 ViewModelPage.EditorsViewModelList = itemList?.ToList();
             }
             catch (Exception ex)
@@ -800,11 +810,14 @@ namespace LibraryProjectUWP.Views.Book
                         //Ajoute un nouvel auteur
                         if (ParentPage != null)
                         {
-                            ParentPage.NewEditContact(ContactType.Society, ContactRole.EditorHouse, EditMode.Create, new SideBarInterLinkVM()
+                            ParentPage.NewEditContact(EditMode.Create, ContactType.Society, new ContactRole[] { ContactRole.EditorHouse }, new SideBarInterLinkVM()
                             {
                                 ParentGuid = ViewModelPage.ItemGuid,
                                 ParentType = typeof(NewEditBookUC),
-                            }, string.Empty, string.Empty, sender.Text);
+                            }, new ContactVM()
+                            {
+                                SocietyName = sender.Text.Trim(),
+                            });
                             sender.Text = String.Empty;
                         }
                     }

@@ -57,17 +57,17 @@ namespace LibraryProjectUWP.Code
 
     public enum ContactType : byte
     {
-        Human,
-        Society
+        Human = 0,
+        Society = 1,
     }
 
     public enum ContactRole : byte
     {
-        Adherant,
-        Author,
-        Translator,
-        EditorHouse,
-        Illustrator
+        Adherant = 0,
+        Author = 1,
+        EditorHouse = 2,
+        Translator = 3,
+        Illustrator = 4
     }
 
     public enum BookTypeVerification : byte

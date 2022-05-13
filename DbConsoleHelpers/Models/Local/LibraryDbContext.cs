@@ -35,6 +35,7 @@ namespace DbConsoleHelpers.Models.Local
         public virtual DbSet<TbookTranslatorConnector> TbookTranslatorConnector { get; set; }
         public virtual DbSet<Tcollection> Tcollection { get; set; }
         public virtual DbSet<Tcontact> Tcontact { get; set; }
+        public virtual DbSet<TcontactRole> TcontactRole { get; set; }
         public virtual DbSet<Tlibrary> Tlibrary { get; set; }
         public virtual DbSet<TlibraryCategorie> TlibraryCategorie { get; set; }
         public virtual DbSet<TlibrarySubCategorie> TlibrarySubCategorie { get; set; }
@@ -366,6 +367,20 @@ namespace DbConsoleHelpers.Models.Local
                 entity.Property(e => e.DateAjout).IsRequired();
 
                 entity.Property(e => e.Guid).IsRequired();
+            });
+
+            modelBuilder.Entity<TcontactRole>(entity =>
+            {
+                entity.ToTable("TContactRole");
+
+                entity.HasIndex(e => e.Id)
+                    .IsUnique();
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.IdContactNavigation)
+                    .WithMany(p => p.TcontactRole)
+                    .HasForeignKey(d => d.IdContact);
             });
 
             modelBuilder.Entity<Tlibrary>(entity =>

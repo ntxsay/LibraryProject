@@ -135,7 +135,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                             if (parameters.SearchInAuthors == true)
                             {
-                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameters, ContactRole.Author, cancellationToken);
+                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.Author }, cancellationToken);
                                 if (_tbooks != null && _tbooks.Any())
                                 {
                                     tbooks.AddRange(_tbooks);
@@ -144,7 +144,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                             if (parameters.SearchInEditors == true)
                             {
-                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameters, ContactRole.EditorHouse, cancellationToken);
+                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.EditorHouse }, cancellationToken);
                                 if (_tbooks != null && _tbooks.Any())
                                 {
                                     tbooks.AddRange(_tbooks);

@@ -262,11 +262,8 @@
             </AppBarToggleButton>
             <AppBarSeparator/>
             <AppBarButton Icon="View">
-                <!--<AppBarButton.Icon>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7BC;" FontSize="18"/>
-                </AppBarButton.Icon>-->
                 <AppBarButton.Flyout>
-                    <MenuFlyout x:Name="MenuFlyoutCommandView" Opened="MenuFlyoutCommandView_Opened">
+                    <MenuFlyout x:Name="MenuFlyoutCommandView" Placement="BottomEdgeAlignedRight" Opened="MenuFlyoutCommandView_Opened">
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

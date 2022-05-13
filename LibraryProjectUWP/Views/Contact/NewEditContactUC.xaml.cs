@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
@@ -8,6 +9,7 @@ using LibraryProjectUWP.Views.Book;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -35,16 +37,18 @@ namespace LibraryProjectUWP.Views.Contact
     public sealed partial class NewEditContactUC : PivotItem
     {
         public NewEditContactUCVM ViewModelPage { get; set; } = new NewEditContactUCVM();
+        public ContactVM OriginalViewModel { get; private set; }
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+        public SideBarInterLinkVM ParentReferences { get; set; }
+
         public BookCollectionPage ParentPage { get; private set; }
 
         public delegate void CancelModificationEventHandler(NewEditContactUC sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
 
-        public delegate void UpdateItemEventHandler(NewEditContactUC sender, ExecuteRequestedEventArgs e);
-        public event UpdateItemEventHandler UpdateItemRequested;
+        public delegate void ExecuteTaskEventHandler(NewEditContactUC sender, ContactVM originalViewModel, OperationStateVM e);
+        public event ExecuteTaskEventHandler ExecuteTaskRequested;
 
-        public delegate void CreateItemEventHandler(NewEditContactUC sender, ExecuteRequestedEventArgs e);
-        public event CreateItemEventHandler CreateItemRequested;
 
         public NewEditContactUC()
         {
@@ -53,32 +57,45 @@ namespace LibraryProjectUWP.Views.Contact
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
-            //InitializeActionInfos();
-            //InitializeFieldVisibility();
         }
 
-        public void InitializeSideBar(BookCollectionPage bookCollectionPage, EditMode editMode, ContactType contactType, ContactRole contactRole, string prenom = null, string nomNaissance = null, string societyName = null)
+        public void InitializeSideBar(BookCollectionPage bookCollectionPage, EditMode editMode, ContactType contactType, IEnumerable<ContactRole> contactRoles = null, ContactVM contactVM = null)
         {
             try
             {
+                if (contactVM == null && editMode != EditMode.Create)
+                {
+                    return;
+                }
+
                 ParentPage = bookCollectionPage;
+                this.OriginalViewModel = contactVM; //Attention de ne pas casser lien
+
                 ViewModelPage = new NewEditContactUCVM()
                 {
                     EditMode = editMode,
-                    ViewModel = new ContactVM()
-                    {
-                        ContactRole = contactRole,
-                        ContactType = contactType,
-                        NomNaissance = nomNaissance,
-                        Prenom = prenom,
-                        SocietyName = societyName,
-                    },
                 };
 
-                ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Prêter un livre" : "Editer un livre")}";
+                if (ViewModelPage.EditMode == EditMode.Create)
+                {
+                    ViewModelPage.ViewModel = contactVM?.DeepCopy() ?? new ContactVM();
+                    ViewModelPage.ViewModel.ContactRoles = contactRoles != null && contactRoles.Any() ?  new ObservableCollection<ContactRole>(contactRoles) : new ObservableCollection<ContactRole>() { ContactRole.Adherant };
+                    ViewModelPage.ViewModel.ContactType = contactType;
+                }
+                else if (ViewModelPage.EditMode == EditMode.Edit)
+                {
+                    ViewModelPage.ViewModel = contactVM.DeepCopy();
+                }
 
                 InitializeActionInfos();
                 InitializeFieldVisibility();
+                InitializeRoleText();
+                InitializeMenuFlyout();
+
+                if (ViewModelPage.EditMode == EditMode.Edit)
+                {
+                    this.Bindings.Update();
+                }
             }
             catch (Exception ex)
             {
@@ -92,6 +109,8 @@ namespace LibraryProjectUWP.Views.Contact
         {
             try
             {
+                TbcInfos.Inlines.Clear();
+
                 string title = string.Empty;
                 string name = string.Empty;
                 if (ViewModelPage.ViewModel.ContactType == ContactType.Human)
@@ -152,45 +171,27 @@ namespace LibraryProjectUWP.Views.Contact
                     ViewModelPage.CivilityVisibility = Visibility.Collapsed;
                 }
 
-                if (ViewModelPage.ViewModel.ContactRole == ContactRole.Adherant)
+                if (ViewModelPage.ViewModel.ContactRoles !=null && ViewModelPage.ViewModel.ContactRoles.Any())
                 {
-                    ViewModelPage.AuthorVisibility = Visibility.Collapsed;
-                }
-                else if (ViewModelPage.ViewModel.ContactRole == ContactRole.EditorHouse)
-                {
-                   // ViewModelPage.SocietyNameVisibility = Visibility.Visible;
-                }
-                else if (ViewModelPage.ViewModel.ContactRole == ContactRole.Author)
-                {
-                    ViewModelPage.AdressVisibility = Visibility.Visible;
-                    ViewModelPage.AuthorVisibility = Visibility.Visible;
-                }
-
-                var isExist = LibraryHelpers.Contact.ContactRoleDictionary.TryGetValue((byte)ViewModelPage.ViewModel.ContactRole, out string value);
-                if (isExist && (cmbxContactRole.SelectedItem == null || cmbxContactRole.SelectedItem is string selectedVal && selectedVal != value))
-                {
-                    cmbxContactRole.SelectedItem = value;
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private void CmbxContactRole_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                if (sender is ComboBox comboBox && comboBox.SelectedItem is string type)
-                {
-                    var typeKeyPair = LibraryHelpers.Contact.ContactRoleDictionary.SingleOrDefault(s => s.Value == type);
-                    if (!typeKeyPair.Equals(default(KeyValuePair<byte, string>)))
+                    foreach (var role in ViewModelPage.ViewModel.ContactRoles)
                     {
-                        ViewModelPage.ViewModel.ContactRole = (ContactRole)typeKeyPair.Key;
-                        InitializeFieldVisibility();
+                        switch (role)
+                        {
+                            case ContactRole.Adherant:
+                                break;
+                            case ContactRole.Author:
+                                if (ViewModelPage.ViewModel.ContactType == ContactType.Human)
+                                    ViewModelPage.AuthorVisibility = Visibility.Visible;
+                                break;
+                            case ContactRole.EditorHouse:
+                                break;
+                            case ContactRole.Translator:
+                                break;
+                            case ContactRole.Illustrator:
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
@@ -201,6 +202,148 @@ namespace LibraryProjectUWP.Views.Contact
                 return;
             }
         }
+
+        private void InitializeRoleText()
+        {
+            try
+            {
+                string rolesList = string.Empty;
+
+                var rolesDictio = LibraryHelpers.Contact.ContactRoleDictionary;
+                foreach (var _role in rolesDictio)
+                {
+                    if (ViewModelPage.ViewModel.ContactRoles.Any(a => (byte)a == _role.Key))
+                    {
+                        rolesList += $"{_role.Value}, ";
+                    }
+                }
+
+                rolesList = rolesList.Trim();
+                if (rolesList.EndsWith(','))
+                {
+                    rolesList = rolesList.Remove(rolesList.Length - 1, 1);
+                }
+
+                TbkRolesNames.Text = rolesList;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void InitializeMenuFlyout()
+        {
+            try
+            {
+                MenuFlyoutRoles.Items.Clear();
+                var rolesDictio = LibraryHelpers.Contact.ContactRoleDictionary;
+                foreach (var role in rolesDictio)
+                {
+                    ToggleMenuFlyoutItem toggleMenuFlyoutItemRole = new ToggleMenuFlyoutItem()
+                    {
+                        Text = role.Value,
+                        Tag = role,
+                    };
+                    toggleMenuFlyoutItemRole.Click += ToggleMenuFlyoutItemRole_Click;
+                    MenuFlyoutRoles.Items.Add(toggleMenuFlyoutItemRole);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void MenuFlyoutRoles_Opened(object sender, object e)
+        {
+            try
+            {
+                if (sender is MenuFlyout menuFlyout)
+                {
+                    string rolesList = string.Empty;
+
+                    if (!ViewModelPage.ViewModel.ContactRoles.Any())
+                    {
+                        menuFlyout.Items.Where(w => w is ToggleMenuFlyoutItem toggleMenuFlyoutItem && toggleMenuFlyoutItem.IsChecked).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(d => d.IsChecked = false);
+                    }
+                    else
+                    {
+                        foreach (var item in menuFlyout.Items)
+                        {
+                            if (item is ToggleMenuFlyoutItem toggleMenuFlyoutItem && toggleMenuFlyoutItem.Tag is KeyValuePair<byte, string> role)
+                            {
+                                if (ViewModelPage.ViewModel.ContactRoles.Any(a => (byte)a == role.Key))
+                                {
+                                    if (!toggleMenuFlyoutItem.IsChecked)
+                                    {
+                                        toggleMenuFlyoutItem.IsChecked = true;
+                                    }
+                                    rolesList += $"{role.Value}, ";
+                                }
+                                else
+                                {
+                                    if (toggleMenuFlyoutItem.IsChecked)
+                                    {
+                                        toggleMenuFlyoutItem.IsChecked = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    rolesList = rolesList.Trim();
+                    if (rolesList.EndsWith(','))
+                    {
+                        rolesList = rolesList.Remove(rolesList.Length - 1, 1);
+                    }
+
+                    TbkRolesNames.Text = rolesList;
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ToggleMenuFlyoutItemRole_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is ToggleMenuFlyoutItem toggleMenuFlyoutItem && toggleMenuFlyoutItem.Tag is KeyValuePair<byte, string> role)
+                {
+                    if (toggleMenuFlyoutItem.IsChecked)
+                    {
+                        if (!ViewModelPage.ViewModel.ContactRoles.Any(a => (byte)a == role.Key))
+                        {
+                            ViewModelPage.ViewModel.ContactRoles.Add((ContactRole)role.Key);
+                        }
+                    }
+                    else
+                    {
+                        if (ViewModelPage.ViewModel.ContactRoles.Any(a => (byte)a == role.Key))
+                        {
+                            ViewModelPage.ViewModel.ContactRoles.Remove((ContactRole)role.Key);
+                        }
+                    }
+                }
+
+                InitializeRoleText();
+                InitializeFieldVisibility();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         private void MfiClearNaissanceDate_Click(object sender, RoutedEventArgs e)
         {
@@ -241,7 +384,7 @@ namespace LibraryProjectUWP.Views.Contact
             CancelModificationRequested?.Invoke(this, args);
         }
 
-        private async void CreateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void BtnExecuteAction_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -251,27 +394,17 @@ namespace LibraryProjectUWP.Views.Contact
                     return;
                 }
 
-                CreateItemRequested?.Invoke(this, args);
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        private async void UpdateItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                bool isValided = await IsModelValided();
-                if (!isValided)
+                OperationStateVM result = null;
+                if (ViewModelPage.EditMode == EditMode.Create)
                 {
-                    return;
+                    result = await CreateAsync();
+                }
+                else if (ViewModelPage.EditMode == EditMode.Edit)
+                {
+                    result = await UpdateAsync();
                 }
 
-                UpdateItemRequested?.Invoke(this, args);
+                ExecuteTaskRequested?.Invoke(this, OriginalViewModel, result);
             }
             catch (Exception ex)
             {
@@ -280,7 +413,6 @@ namespace LibraryProjectUWP.Views.Contact
                 return;
             }
         }
-
 
         private async Task<bool> IsModelValided()
         {
@@ -335,11 +467,77 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-
-        private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async Task<OperationStateVM> CreateAsync()
         {
+            try
+            {
+                ContactVM viewModel = this.ViewModelPage.ViewModel;
 
+                OperationStateVM result = await DbServices.Contact.CreateAsync(viewModel);
+                if (result.IsSuccess)
+                {
+                    viewModel.Id = result.Id;
+                    this.ViewModelPage.ResultMessageTitle = "Succès";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+#warning Ajouter le système afin de sauvegarder 
+                    //await esBook.SaveBookViewModelAsync(OriginalViewModel);
+                }
+                else
+                {
+                    //Erreur
+                    this.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
         }
+
+        private async Task<OperationStateVM> UpdateAsync()
+        {
+            try
+            {
+                ContactVM viewModel = this.ViewModelPage.ViewModel;
+
+                OperationStateVM result = await DbServices.Contact.UpdateAsync(viewModel);
+                if (result.IsSuccess)
+                {
+                    this.ViewModelPage.ResultMessageTitle = "Succès";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Success;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+#warning Ajouter le système afin de sauvegarder 
+                    //await esBook.SaveBookViewModelAsync(OriginalViewModel);
+                }
+                else
+                {
+                    //Erreur
+                    this.ViewModelPage.ResultMessageTitle = "Une erreur s'est produite";
+                    this.ViewModelPage.ResultMessage = result.Message;
+                    this.ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Error;
+                    this.ViewModelPage.IsResultMessageOpen = true;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -350,14 +548,9 @@ namespace LibraryProjectUWP.Views.Contact
                     CancelModificationRequested = null;
                 }
 
-                if (CreateItemRequested != null)
+                if (ExecuteTaskRequested != null)
                 {
-                    CreateItemRequested = null;
-                }
-
-                if (UpdateItemRequested != null)
-                {
-                    UpdateItemRequested = null;
+                    ExecuteTaskRequested = null;
                 }
             }
             catch (Exception)
@@ -366,14 +559,13 @@ namespace LibraryProjectUWP.Views.Contact
                 throw;
             }
         }
+
+        
     }
 
     public class NewEditContactUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
-        public SideBarInterLinkVM ParentReferences { get; set; }
 
         public readonly IEnumerable<string> contactRole = LibraryHelpers.Contact.ContactRoleList;
         public readonly IEnumerable<string> nationalityList = CountryHelpers.NationalitiesList();

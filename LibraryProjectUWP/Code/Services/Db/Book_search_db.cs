@@ -558,7 +558,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tbook>> SearchBooksInContacts(ResearchBookVM parameters, ContactRole contactRole, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInContacts(ResearchBookVM parameters, IEnumerable<ContactRole> contactRoleList, CancellationToken cancellationToken = default)
             {
                 try
                 {
@@ -577,7 +577,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         var termToLower = parameters.Term.ToLower();
                         TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
 
-                        List<Tcontact> existingItemList = (await Contact.MultipleAsync(null, contactRole))?.ToList();
+                        List<Tcontact> existingItemList = (await Contact.MultipleAsync(null, contactRoleList))?.ToList();
                         List<Tcontact> tcontacts = new List<Tcontact>();
 
                         if (existingItemList != null && existingItemList.Any())
@@ -627,7 +627,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (tcontacts != null && tcontacts.Any())
                         {
-                            var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontacts.Select(s => s.Id), contactRole);
+                            var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontacts.Select(s => s.Id), contactRoleList);
                             List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
                             if (_tbooks != null && _tbooks.Any())
                             {
@@ -686,7 +686,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (parameters.SearchInAuthors == true)
                         {
-                            IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, ContactRole.Author, cancellationToken);
+                            IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.Author }, cancellationToken);
                             if (_tbooks != null && _tbooks.Any())
                             {
                                 tbooks.AddRange(_tbooks);
@@ -695,7 +695,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (parameters.SearchInEditors == true)
                         {
-                            IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, ContactRole.EditorHouse, cancellationToken);
+                            IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.EditorHouse }, cancellationToken);
                             if (_tbooks != null && _tbooks.Any())
                             {
                                 tbooks.AddRange(_tbooks);
