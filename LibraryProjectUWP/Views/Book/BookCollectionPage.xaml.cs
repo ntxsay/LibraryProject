@@ -376,10 +376,13 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    await bookCollectionSpage.GridViewMode(firstLoad);
+                    await libraryCollectionSubPage.GridViewMode(firstLoad);
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+                {
+                    await bookCollectionSubPage.GridViewMode(firstLoad);
                 }
             }
             catch (Exception ex)
@@ -394,10 +397,13 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    await bookCollectionSpage.DataGridViewMode(firstLoad);
+                    await libraryCollectionSubPage.DataGridViewMode(firstLoad);
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+                {
+                    await bookCollectionSubPage.DataGridViewMode(firstLoad);
                 }
             }
             catch (Exception ex)
