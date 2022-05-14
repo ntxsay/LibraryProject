@@ -125,8 +125,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is Button button && button.Parent is Grid parentGrid)
                 {
-                    var comboBox = parentGrid.Children.FirstOrDefault(f => f is ComboBox) as ComboBox;
-                    if (comboBox != null)
+                    if (parentGrid.Children.FirstOrDefault(f => f is ComboBox) is ComboBox comboBox)
                     {
                         comboBox.SelectedItem = null;
                     }

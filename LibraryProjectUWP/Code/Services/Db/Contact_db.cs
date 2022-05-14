@@ -933,6 +933,11 @@ namespace LibraryProjectUWP.Code.Services.Db
                         Nationality = model.Nationality,
                     };
 
+                    if (model.TcontactRole == null || !model.TcontactRole.Any())
+                    {
+                        var roles = await context.TcontactRole.Where(f => f.IdContact == f.Id).ToListAsync();
+                    }
+
                     if (model.TcontactRole != null && model.TcontactRole.Count > 0)
                     {
                         viewModel.ContactRoles = new ObservableCollection<ContactRole>(model.TcontactRole.Select(s => (ContactRole)s.Role));

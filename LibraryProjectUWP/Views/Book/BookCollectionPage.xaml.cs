@@ -1948,8 +1948,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.ImportDataRequested -= ImportBookFromFileUC_ImportDataRequested;
 
                 this.RemoveItemToSideBar(sender);
-#warning A implémenter urgent
-                this.OpenBookCollection(1);
+                this.OpenBookCollection(Parameters.ParentLibrary);
             }
             catch (Exception ex)
             {
@@ -2031,8 +2030,7 @@ namespace LibraryProjectUWP.Views.Book
                 sender.ImportDataRequested -= ImportBookFromExcelUC_ImportDataRequested;
 
                 this.RemoveItemToSideBar(sender);
-#warning A implémenter urgent
-                this.OpenBookCollection(1);
+                this.OpenBookCollection(Parameters.ParentLibrary);
             }
             catch (Exception ex)
             {
