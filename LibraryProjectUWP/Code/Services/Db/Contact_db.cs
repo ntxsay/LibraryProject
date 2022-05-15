@@ -347,6 +347,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
             #endregion
 
+
             public static IEnumerable<ContactVM> CreateViewModel(string value, ContactType contactType, ContactRole contactRole, char separator = ',')
             {
                 try
@@ -809,16 +810,19 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
-            public static async Task CompleteModelInfos(LibraryDbContext context, Tcontact model)
+            public static async Task CompleteModelInfos(Tcontact model)
             {
                 try
                 {
-                    if (context == null || model == null)
+                    if (model == null)
                     {
                         return;
                     }
 
-                    model.TcontactRole = await context.TcontactRole.Where(s => s.IdContact == model.Id).ToListAsync();
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        model.TcontactRole = await context.TcontactRole.Where(s => s.IdContact == model.Id).ToListAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -935,7 +939,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     if (model.TcontactRole == null || !model.TcontactRole.Any())
                     {
-                        var roles = await context.TcontactRole.Where(f => f.IdContact == f.Id).ToListAsync();
+                        await CompleteModelInfos(model);
                     }
 
                     if (model.TcontactRole != null && model.TcontactRole.Count > 0)
