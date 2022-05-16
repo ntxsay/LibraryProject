@@ -923,11 +923,11 @@ namespace LibraryProjectUWP.Views.Categories
         {
             try
             {
-                if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any())
+                if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any() && _parameters.BookPage.ViewModelPage.SelectedItems is ICollection<LivreVM> collection)
                 {
                     if (args.Parameter is CategorieLivreVM categorieLivreVM)
                     {
-                        var creationResult = await DbServices.Categorie.CreateCategorieConnectorAsync(_parameters.BookPage.ViewModelPage.SelectedItems.Select(s => s.Id), categorieLivreVM, null);
+                        var creationResult = await DbServices.Categorie.CreateCategorieConnectorAsync(collection.Select(s => s.Id), categorieLivreVM, null);
                         if (creationResult.IsSuccess)
                         {
                             ViewModelPage.ResultMessageTitle = "Succès";
@@ -952,7 +952,7 @@ namespace LibraryProjectUWP.Views.Categories
                         var parentCategorie = await DbServices.Categorie.GetParentCategorieVMAsync(subCategorieLivreVM.Id);
                         if (parentCategorie != null)
                         {
-                            var creationResult = await DbServices.Categorie.CreateCategorieConnectorAsync(_parameters.BookPage.ViewModelPage.SelectedItems.Select(s => s.Id), parentCategorie, subCategorieLivreVM);
+                            var creationResult = await DbServices.Categorie.CreateCategorieConnectorAsync(collection.Select(s => s.Id), parentCategorie, subCategorieLivreVM);
                             if (creationResult.IsSuccess)
                             {
                                 ViewModelPage.ResultMessageTitle = "Succès";
@@ -990,7 +990,7 @@ namespace LibraryProjectUWP.Views.Categories
             {
                 if (sender is MenuFlyout menuFlyout)
                 {
-                    if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any())
+                    if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any() && _parameters.BookPage.ViewModelPage.SelectedItems is ICollection<LivreVM> collection)
                     {
                         if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItem)
                         {
@@ -1020,9 +1020,9 @@ namespace LibraryProjectUWP.Views.Categories
         {
             try
             {
-                if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any())
+                if (_parameters.BookPage.ViewModelPage.SelectedItems != null && _parameters.BookPage.ViewModelPage.SelectedItems.Any() && _parameters.BookPage.ViewModelPage.SelectedItems is ICollection<LivreVM> collection)
                 {
-                    var result = await DbServices.Categorie.DecategorizeBooksAsync(_parameters.BookPage.ViewModelPage.SelectedItems.Select(s => s.Id));
+                    var result = await DbServices.Categorie.DecategorizeBooksAsync(collection.Select(s => s.Id));
                     if (result.IsSuccess)
                     {
                         ViewModelPage.ResultMessageTitle = "Succès";

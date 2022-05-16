@@ -26,20 +26,6 @@ namespace LibraryProjectUWP.Views.Library
                             .AddText("Une ou plusieurs tâches d'arrière-plan sont en cours d'exécution, nous vous prions de patienter quelques instants.");
             }
 
-            private int _CountPages;
-            public int CountPages
-            {
-                get => this._CountPages;
-                set
-                {
-                    if (_CountPages != value)
-                    {
-                        this._CountPages = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
             private BibliothequeVM _SearchedViewModel = null;
             public BibliothequeVM SearchedViewModel
             {
@@ -77,48 +63,6 @@ namespace LibraryProjectUWP.Views.Library
                     if (_PagesList != value)
                     {
                         this._PagesList = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private ObservableCollection<TaskVM> _TaskList = new ObservableCollection<TaskVM>();
-            public ObservableCollection<TaskVM> TaskList
-            {
-                get => this._TaskList;
-                set
-                {
-                    if (_TaskList != value)
-                    {
-                        this._TaskList = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private ObservableCollection<SideBarItemHeaderVM> _ItemsSideBarHeader = new ObservableCollection<SideBarItemHeaderVM>();
-            public ObservableCollection<SideBarItemHeaderVM> ItemsSideBarHeader
-            {
-                get => this._ItemsSideBarHeader;
-                set
-                {
-                    if (_ItemsSideBarHeader != value)
-                    {
-                        this._ItemsSideBarHeader = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private ICollection<BibliothequeVM> _SelectedItems = new List<BibliothequeVM>();
-            public ICollection<BibliothequeVM> SelectedItems
-            {
-                get => this._SelectedItems;
-                set
-                {
-                    if (_SelectedItems != value)
-                    {
-                        this._SelectedItems = value;
                         this.OnPropertyChanged();
                     }
                 }

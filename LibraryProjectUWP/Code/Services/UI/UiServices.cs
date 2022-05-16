@@ -416,7 +416,6 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-
         public GridView GetSelectedGridViewFromPivotTemplate(Pivot pivot, string gridViewName = "GridViewItems")
         {
             try
@@ -432,24 +431,13 @@ namespace LibraryProjectUWP.Code.Services.UI
                 }
 
                 var _container = pivot.ContainerFromItem(pivot.SelectedItem);
-                var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
-                while (gridView != null && gridView.Name != gridViewName)
+                var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container, gridViewName);
+                if (gridView != null)
                 {
-                    gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
-                    if (gridView == null)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        if (gridView.Name == gridViewName)
-                        {
-                            break;
-                        }
-                    }
+                    return gridView;
                 }
 
-                return gridView;
+                return null;
             }
             catch (Exception ex)
             {

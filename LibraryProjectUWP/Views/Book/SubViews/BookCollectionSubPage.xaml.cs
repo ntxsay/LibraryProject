@@ -9,6 +9,7 @@ using LibraryProjectUWP.ViewModels.General;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -256,11 +257,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         }
                     }
 
-                    if (ParentPage.ViewModelPage.SelectedItems.Any())
+                    if (ParentPage.ViewModelPage.SelectedItems.Any() && ParentPage.ViewModelPage.SelectedItems is ICollection<LivreVM> collection)
                     {
                         foreach (var gridViewItem in gridView.Items)
                         {
-                            foreach (var item in ParentPage.ViewModelPage.SelectedItems)
+                            foreach (var item in collection)
                             {
                                 if (gridViewItem is LivreVM _viewModel && _viewModel.Id == item.Id && !gridView.SelectedItems.Contains(item))
                                 {
@@ -302,11 +303,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         }
                     }
 
-                    if (ParentPage.ViewModelPage.SelectedItems.Any())
+                    if (ParentPage.ViewModelPage.SelectedItems.Any() && ParentPage.ViewModelPage.SelectedItems is ICollection<LivreVM> collection)
                     {
                         foreach (var dataGridItem in dataGrid.ItemsSource)
                         {
-                            foreach (var item in ParentPage.ViewModelPage.SelectedItems)
+                            foreach (var item in collection)
                             {
                                 if (dataGridItem is LivreVM _viewModel && _viewModel.Id == item.Id && !dataGrid.SelectedItems.Contains(item))
                                 {
@@ -415,7 +416,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (sender is Pivot pivot)
                 {
-                    ParentPage.ViewModelPage.SelectedItems = new List<LivreVM>();
+                    ParentPage.ViewModelPage.SelectedItems = new ObservableCollection<object>();
                     this.ViewModelPage.SelectedPivotIndex = pivot.SelectedIndex;
                 }
             }
@@ -433,7 +434,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (sender is GridView gridView)
                 {
-                    ParentPage.ViewModelPage.SelectedItems = gridView.SelectedItems.Cast<LivreVM>().ToList();
+                    var items = gridView.SelectedItems.Cast<object>();
+                    ParentPage.ViewModelPage.SelectedItems = new ObservableCollection<object>(items);
                 }
             }
             catch (Exception ex)
@@ -450,7 +452,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (sender is DataGrid dataGrid)
                 {
-                    ParentPage.ViewModelPage.SelectedItems = dataGrid.SelectedItems.Cast<LivreVM>().ToList();
+                    var items = dataGrid.SelectedItems.Cast<object>();
+                    ParentPage.ViewModelPage.SelectedItems = new ObservableCollection<object>(items);
                 }
             }
             catch (Exception ex)
@@ -465,7 +468,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         {
             try
             {
-                if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
+                if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.GridView)
                 {
                     var gridViewItems = uiServices.GetSelectedGridViewFromPivotTemplate(this.PivotItems, "GridViewItems");
                     if (gridViewItems != null)
@@ -473,7 +476,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         gridViewItems.SelectAll();
                     }
                 }
-                else if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                else if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.DataGridView)
                 {
                     var dataGridItems = uiServices.GetSelectedDataGridFromPivotTemplate(this.PivotItems, "DataGridItems");
                     if (dataGridItems != null)
@@ -530,9 +533,9 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
+                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any() && ParentPage.ViewModelPage.SelectedItems is ICollection<LivreVM> collection)
                 {
-                    await ParentPage.DeleteBookAsync(ParentPage.ViewModelPage.SelectedItems);
+                    await ParentPage.DeleteBookAsync(collection);
                 }
             }
             catch (Exception ex)
@@ -1268,8 +1271,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     Viewbox viewboxThumbnailContainer = grid.Children.FirstOrDefault(f => f is Viewbox _viewboxThumbnailContainer && _viewboxThumbnailContainer.Name == "ViewboxSimpleThumnailDatatemplate") as Viewbox;
                     if (viewboxThumbnailContainer != null)
                     {
-                        Border border = viewboxThumbnailContainer.Child as Border;
-                        if (border != null)
+                        if (viewboxThumbnailContainer.Child is Border border)
                         {
                             Grid gridImageContainer = border.Child as Grid;
                             if (gridImageContainer != null)

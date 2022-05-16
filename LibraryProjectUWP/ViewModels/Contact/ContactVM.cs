@@ -341,6 +341,7 @@ namespace LibraryProjectUWP.ViewModels.Contact
         }
 
         private string _Biographie;
+        [Obsolete("Sera supprimé dans une prochaine version. Utilisez \"Observation\"")]
         public string Biographie
         {
             get => _Biographie;

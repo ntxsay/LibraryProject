@@ -3,6 +3,7 @@ using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Code.Services.Tasks;
+using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Book;
@@ -711,9 +712,9 @@ namespace LibraryProjectUWP.Views.Contact
         {
             try
             {
-                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
+                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any() && ParentPage.ViewModelPage.SelectedItems is ICollection<LivreVM> collection)
                 {
-                    OperationStateVM result = await DbServices.Collection.DecategorizeBooksAsync(ParentPage.ViewModelPage.SelectedItems.Select(s => s.Id));
+                    OperationStateVM result = await DbServices.Collection.DecategorizeBooksAsync(collection.Select(s => s.Id));
                     if (result.IsSuccess)
                     {
                         ViewModelPage.ResultMessageTitle = "Succès";

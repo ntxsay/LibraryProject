@@ -137,11 +137,29 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is GridView gridView)
                 {
-                    if (this.ViewModelPage.SelectedItems.Any())
+                    if (ViewModelPage.SearchedViewModel != null)
                     {
                         foreach (var gridViewItem in gridView.Items)
                         {
-                            foreach (var item in this.ViewModelPage.SelectedItems)
+                            if (gridViewItem is BibliothequeVM _viewModel && _viewModel.Id == ViewModelPage.SearchedViewModel.Id)
+                            {
+                                if (gridView.SelectedItem != gridViewItem)
+                                {
+                                    gridView.SelectedItem = gridViewItem;
+                                }
+
+                                var _gridViewItemContainer = gridView.ContainerFromItem(gridViewItem);
+                                //OpenFlyoutSearchedItemGridView(_gridViewItemContainer);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (ParentPage.ViewModelPage.SelectedItems.Any() && ParentPage.ViewModelPage.SelectedItems is ICollection<BibliothequeVM> collection)
+                    {
+                        foreach (var gridViewItem in gridView.Items)
+                        {
+                            foreach (var item in collection)
                             {
                                 if (gridViewItem is BibliothequeVM _viewModel && _viewModel.Id == item.Id && !gridView.SelectedItems.Contains(item))
                                 {
@@ -152,6 +170,7 @@ namespace LibraryProjectUWP.Views.Library
                         }
                     }
                     gridView.SelectionChanged += GridViewItems_SelectionChanged;
+                    gridView.Focus(FocusState.Pointer);
                 }
             }
             catch (Exception ex)
@@ -168,11 +187,11 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is DataGrid dataGrid)
                 {
-                    if (this.ViewModelPage.SelectedItems.Any())
+                    if (ParentPage.ViewModelPage.SelectedItems.Any() && ParentPage.ViewModelPage.SelectedItems is ICollection<BibliothequeVM> collection)
                     {
                         foreach (var dataGridItem in dataGrid.ItemsSource)
                         {
-                            foreach (var item in this.ViewModelPage.SelectedItems)
+                            foreach (var item in collection)
                             {
                                 if (dataGridItem is BibliothequeVM _viewModel && _viewModel.Id == item.Id && !dataGrid.SelectedItems.Contains(item))
                                 {
@@ -235,7 +254,7 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is Pivot pivot)
                 {
-                    this.ViewModelPage.SelectedItems = new List<BibliothequeVM>();
+                    ParentPage.ViewModelPage.SelectedItems = new List<BibliothequeVM>().Select(s => (object)s).ToList();
                     this.ViewModelPage.SelectedPivotIndex = pivot.SelectedIndex;
                 }
             }
@@ -253,7 +272,7 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is GridView gridView)
                 {
-                    this.ViewModelPage.SelectedItems = gridView.SelectedItems.Cast<BibliothequeVM>().ToList();
+                    ParentPage.ViewModelPage.SelectedItems = gridView.SelectedItems.Cast<object>().ToList();
                 }
             }
             catch (Exception ex)
@@ -270,7 +289,7 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is DataGrid dataGrid)
                 {
-                    this.ViewModelPage.SelectedItems = dataGrid.SelectedItems.Cast<BibliothequeVM>().ToList();
+                    ParentPage.ViewModelPage.SelectedItems = dataGrid.SelectedItems.Cast<object>().ToList();
                 }
             }
             catch (Exception ex)

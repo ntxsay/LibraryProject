@@ -55,6 +55,7 @@ namespace LibraryProjectUWP.Views.Book
 
         public BookCollectionPage()
         {
+            ViewModelPage.PropertyChanged += ViewModelPage_PropertyChanged;
             this.InitializeComponent();
         }
 
@@ -139,10 +140,16 @@ namespace LibraryProjectUWP.Views.Book
                 Parameters.ParentLibrary = viewModel;
                 if (viewModel != null)
                 {
+                    ViewModelPage.SelectedItems.Clear();
+                    ViewModelPage.SelectedItems = new ObservableCollection<object>();
+                    this.Lv_SelectedItems.ItemTemplate = (DataTemplate)this.Resources["BookSuggestDataTemplate"];
+                    this.ViewModelPage.SelectedItemsMessage = "0 livre(s) sélectionné(s)";
+
                     Parameters.MainPage.ChangeAppTitle(new TitleBarLibraryName(viewModel)
                     {
                         Margin = new Thickness(0, 14, 0, 0),
                     });
+
                     this.NavigateToView(typeof(BookCollectionSubPage), this);
                     InitializeGroupsCmdBarItemsForBookCollection();
                     InitializeSortsCmdBarItemsForBookCollection();
@@ -166,6 +173,11 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                ViewModelPage.SelectedItems.Clear();
+                ViewModelPage.SelectedItems = new ObservableCollection<object>();
+                this.Lv_SelectedItems.ItemTemplate = (DataTemplate)this.Resources["LibrarySuggestDataTemplate"];
+                this.ViewModelPage.SelectedItemsMessage = "0 bibliothèque(s) sélectionnée(s)";
+
                 Parameters.MainPage.ChangeAppTitle(Parameters.MainPage.ViewModelPage.MainTitleBar);
                 this.NavigateToView(typeof(LibraryCollectionSubPage), this);
                 InitializeGroupsCmdBarItemsForLibraryCollection();
@@ -268,6 +280,66 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
 
         #region Selection
+        private void ViewModelPage_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            try
+            {
+                if (e.PropertyName == nameof(BookCollectionPageVM.SelectedItems))
+                {
+                    UpdateCollections();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void UpdateCollections()
+        {
+            try
+            {
+                if (ViewModelPage.SelectedItems != null && ViewModelPage.SelectedItems.Any())
+                {
+                    if (ViewModelPage.SelectedItems.FirstOrDefault() is BibliothequeVM)
+                    {
+                        this.ViewModelPage.SelectedItemsMessage = $"{ViewModelPage.SelectedItems.Count} bibliothèque(s) sélectionnée(s)";
+                    }
+                    else if (ViewModelPage.SelectedItems.FirstOrDefault() is LivreVM)
+                    {
+                        this.ViewModelPage.SelectedItemsMessage = $"{ViewModelPage.SelectedItems.Count} livre(s) sélectionné(s)";
+                    }
+                    else
+                    {
+                        this.ViewModelPage.SelectedItemsMessage = string.Empty;
+                    }
+                }
+                else
+                {
+                    if (FrameContainer.Content is LibraryCollectionSubPage)
+                    {
+                        this.ViewModelPage.SelectedItemsMessage = "0 bibliothèque(s) sélectionnée(s)";
+                    }
+                    else if (FrameContainer.Content is BookCollectionSubPage)
+                    {
+                        this.ViewModelPage.SelectedItemsMessage = "0 livre(s) sélectionné(s)";
+                    }
+                    else
+                    {
+                        this.ViewModelPage.SelectedItemsMessage = string.Empty;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private async void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -293,10 +365,13 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    bookCollectionSpage.SelectAll();
+
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+                {
+                    bookCollectionSubPage.SelectAll();
                 }
             }
             catch (Exception ex)
@@ -2627,7 +2702,7 @@ namespace LibraryProjectUWP.Views.Book
                         deleteManyBooksTask.AfterTaskCompletedRequested += async (s, e) =>
                         {
                             ViewModelPage.SelectedItems.Clear();
-                            ViewModelPage.SelectedItems = new List<LivreVM>();
+                            ViewModelPage.SelectedItems = new ObservableCollection<object>();
 
                             var busyLoader = Parameters.MainPage.GetBusyLoader ;
                             if (busyLoader != null)

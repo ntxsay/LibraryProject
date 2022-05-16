@@ -375,8 +375,8 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
-            private ICollection<LivreVM> _SelectedItems = new List<LivreVM>();
-            public ICollection<LivreVM> SelectedItems
+            private ICollection<object> _SelectedItems = new List<object>();
+            public ICollection<object> SelectedItems
             {
                 get => this._SelectedItems;
                 set
@@ -384,6 +384,20 @@ namespace LibraryProjectUWP.Views.Book
                     if (_SelectedItems != value)
                     {
                         this._SelectedItems = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
+            private string _SelectedItemsMessage;
+            public string SelectedItemsMessage
+            {
+                get => this._SelectedItemsMessage;
+                set
+                {
+                    if (_SelectedItemsMessage != value)
+                    {
+                        this._SelectedItemsMessage = value;
                         this.OnPropertyChanged();
                     }
                 }
