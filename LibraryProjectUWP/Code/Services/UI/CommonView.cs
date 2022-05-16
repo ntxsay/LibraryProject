@@ -484,10 +484,6 @@ namespace LibraryProjectUWP.Code.Services.UI
                             break;
                     }
 
-                    if (LibraryCollectionSubView.PivotItems.Items.Count > 0)
-                    {
-                        LibraryCollectionSubView.PivotItems.SelectedIndex = 0;
-                    }
                     LibraryCollectionSubView.ViewModelPage.NbItems = await DbServices.Library.CountLibrariesAsync();
                 }
                 else if (BookCollectionSubView != null)
@@ -511,10 +507,6 @@ namespace LibraryProjectUWP.Code.Services.UI
                             break;
                     }
 
-                    if (BookCollectionSubView.PivotItems.Items.Count > 0)
-                    {
-                        BookCollectionSubView.PivotItems.SelectedIndex = 0;
-                    }
                     BookCollectionSubView.ViewModelPage.NbItems = (int)await DbServices.Book.CountBooksInLibraryAsync(ParentPage.Parameters.ParentLibrary.Id);
                 }
             }

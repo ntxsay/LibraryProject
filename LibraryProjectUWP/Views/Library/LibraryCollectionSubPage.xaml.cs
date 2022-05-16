@@ -299,6 +299,88 @@ namespace LibraryProjectUWP.Views.Library
                 return;
             }
         }
+
+        public void SelectAll()
+        {
+            try
+            {
+                if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.GridView)
+                {
+                    var gridViewItems = uiServices.GetSelectedGridViewFromPivotTemplate(this.PivotItems, "GridViewItems");
+                    if (gridViewItems != null)
+                    {
+                        gridViewItems.SelectAll();
+                    }
+                }
+                else if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.DataGridView)
+                {
+                    var dataGridItems = uiServices.GetSelectedDataGridFromPivotTemplate(this.PivotItems, "DataGridItems");
+                    if (dataGridItems != null)
+                    {
+                        foreach (var dataGridItem in dataGridItems.ItemsSource)
+                        {
+                            if (!dataGridItems.SelectedItems.Contains(dataGridItem))
+                            {
+                                dataGridItems.SelectedItems.Add(dataGridItem);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void DeSelectAll()
+        {
+            try
+            {
+                if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
+                {
+                    var gridViewItems = uiServices.GetSelectedGridViewFromPivotTemplate(this.PivotItems, "GridViewItems");
+                    if (gridViewItems != null)
+                    {
+                        gridViewItems.SelectedItems.Clear();
+                    }
+                }
+                else if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                {
+                    var dataGridItems = uiServices.GetSelectedDataGridFromPivotTemplate(this.PivotItems, "DataGridItems");
+                    if (dataGridItems != null)
+                    {
+                        dataGridItems.SelectedItems.Clear();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public async Task DeleteAllSelected()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any() && ParentPage.ViewModelPage.SelectedItems is ICollection<BibliothequeVM> collection)
+                {
+#warning Implémenter la methode de suppression des bibliothèques
+                    //await ParentPage.DeleteBookAsync(collection);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         #endregion
 
         #region ContextMenu

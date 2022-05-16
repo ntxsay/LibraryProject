@@ -528,7 +528,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public async void DeleteAllSelected()
+        public async Task DeleteAllSelected()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try

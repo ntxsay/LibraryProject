@@ -75,7 +75,7 @@ namespace LibraryProjectUWP.Views.Book
         
 
         #region Loading
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -141,7 +141,7 @@ namespace LibraryProjectUWP.Views.Book
                 if (viewModel != null)
                 {
                     ViewModelPage.SelectedItems.Clear();
-                    ViewModelPage.SelectedItems = new ObservableCollection<object>();
+                    ViewModelPage.SelectedItems = new List<object>();
                     this.Lv_SelectedItems.ItemTemplate = (DataTemplate)this.Resources["BookSuggestDataTemplate"];
                     this.ViewModelPage.SelectedItemsMessage = "0 livre(s) sélectionné(s)";
 
@@ -174,7 +174,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 ViewModelPage.SelectedItems.Clear();
-                ViewModelPage.SelectedItems = new ObservableCollection<object>();
+                ViewModelPage.SelectedItems = new List<object>();
                 this.Lv_SelectedItems.ItemTemplate = (DataTemplate)this.Resources["LibrarySuggestDataTemplate"];
                 this.ViewModelPage.SelectedItemsMessage = "0 bibliothèque(s) sélectionnée(s)";
 
@@ -367,7 +367,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-
+                    libraryCollectionSubPage.SelectAll();
                 }
                 else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
                 {
@@ -386,10 +386,34 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    bookCollectionSpage.DeSelectAll();
+                    libraryCollectionSubPage.DeSelectAll();
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+                {
+                    bookCollectionSubPage.DeSelectAll();
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private async void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
+                {
+                    await libraryCollectionSubPage.DeleteAllSelected();
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+                {
+                    await bookCollectionSubPage.DeleteAllSelected();
                 }
             }
             catch (Exception ex)
@@ -517,10 +541,9 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                var libraryCollectionSpage = this.LibraryCollectionSubPage;
-                if (libraryCollectionSpage != null)
+                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    if (libraryCollectionSpage.ViewModelPage.GroupedBy == LibraryGroupVM.GroupBy.None)
+                    if (libraryCollectionSubPage.ViewModelPage.GroupedBy == LibraryGroupVM.GroupBy.None)
                     {
                         if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "none") is ToggleMenuFlyoutItem currentItem)
                         {
@@ -528,7 +551,7 @@ namespace LibraryProjectUWP.Views.Book
                             MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "none").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
-                    else if (libraryCollectionSpage.ViewModelPage.GroupedBy == LibraryGroupVM.GroupBy.Letter)
+                    else if (libraryCollectionSubPage.ViewModelPage.GroupedBy == LibraryGroupVM.GroupBy.Letter)
                     {
                         if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "letter") is ToggleMenuFlyoutItem currentItem)
                         {
@@ -536,7 +559,7 @@ namespace LibraryProjectUWP.Views.Book
                             MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "letter").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
                     }
-                    else if (libraryCollectionSpage.ViewModelPage.GroupedBy == LibraryGroupVM.GroupBy.CreationYear)
+                    else if (libraryCollectionSubPage.ViewModelPage.GroupedBy == LibraryGroupVM.GroupBy.CreationYear)
                     {
                         if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "creation-year") is ToggleMenuFlyoutItem currentItem)
                         {
@@ -549,47 +572,43 @@ namespace LibraryProjectUWP.Views.Book
                         MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                     }
                 }
-                else
+                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
                 {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
+                    if (bookCollectionSubPage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.None)
                     {
-                        if (bookCollectionSpage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.None)
+                        if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "none") is ToggleMenuFlyoutItem currentItem)
                         {
-                            if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "none") is ToggleMenuFlyoutItem currentItem)
-                            {
-                                currentItem.IsChecked = true;
-                                MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "none").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
-                            }
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "none").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
-                        else if (bookCollectionSpage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.Letter)
+                    }
+                    else if (bookCollectionSubPage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.Letter)
+                    {
+                        if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "letter") is ToggleMenuFlyoutItem currentItem)
                         {
-                            if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "letter") is ToggleMenuFlyoutItem currentItem)
-                            {
-                                currentItem.IsChecked = true;
-                                MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "letter").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
-                            }
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "letter").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
-                        else if (bookCollectionSpage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.CreationYear)
+                    }
+                    else if (bookCollectionSubPage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.CreationYear)
+                    {
+                        if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "creation-year") is ToggleMenuFlyoutItem currentItem)
                         {
-                            if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "creation-year") is ToggleMenuFlyoutItem currentItem)
-                            {
-                                currentItem.IsChecked = true;
-                                MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "creation-year").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
-                            }
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "creation-year").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
-                        else if (bookCollectionSpage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.ParutionYear)
+                    }
+                    else if (bookCollectionSubPage.ViewModelPage.GroupedBy == BookGroupVM.GroupBy.ParutionYear)
+                    {
+                        if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "parution-year") is ToggleMenuFlyoutItem currentItem)
                         {
-                            if (MenuFlyoutCommandGroups.Items.SingleOrDefault(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() == "parution-year") is ToggleMenuFlyoutItem currentItem)
-                            {
-                                currentItem.IsChecked = true;
-                                MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "parution-year").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
-                            }
+                            currentItem.IsChecked = true;
+                            MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem item && item.Tag.ToString() != "parution-year").Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                         }
-                        else
-                        {
-                            MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
-                        }
+                    }
+                    else
+                    {
+                        MenuFlyoutCommandGroups.Items.Where(w => w is ToggleMenuFlyoutItem).Select(s => (ToggleMenuFlyoutItem)s).ToList().ForEach(x => x.IsChecked = false);
                     }
                 }
             }
@@ -1083,8 +1102,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-
         public void InitializeViewCmdBarItemsForBookCollection()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -1445,6 +1462,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             if (FrameContainer.Content is LibraryCollectionSubPage)
             {
+#warning Importer une bibliothèque via un fichier (json);
             }
             else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
             {
@@ -1489,6 +1507,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (FrameContainer.Content is LibraryCollectionSubPage)
                 {
+#warning Importer une bibliothèque via un fichier (excel);
                 }
                 else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
                 {
@@ -2656,23 +2675,7 @@ namespace LibraryProjectUWP.Views.Book
 
         #region Delete Book
 
-        private void Btn_DeleteAll_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
-                {
-                    bookCollectionSpage.DeleteAllSelected();
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+        
 
         public async Task DeleteBookAsync(IEnumerable<LivreVM> viewModelList)
         {

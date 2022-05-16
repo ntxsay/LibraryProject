@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.ViewModels.Book
 {
+    [Obsolete("Est remplacé par ResearchItemVM")]
     public class ResearchBookVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };

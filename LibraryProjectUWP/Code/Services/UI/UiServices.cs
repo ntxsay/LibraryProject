@@ -425,12 +425,12 @@ namespace LibraryProjectUWP.Code.Services.UI
                     return null;
                 }
 
-                if (pivot.SelectedItem == null)
+                if (pivot.Items.Count == 0 || pivot.SelectedIndex < 0)
                 {
                     return null;
                 }
 
-                var _container = pivot.ContainerFromItem(pivot.SelectedItem);
+                var _container = pivot.ContainerFromItem(pivot.Items[pivot.SelectedIndex]);
                 var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container, gridViewName);
                 if (gridView != null)
                 {
