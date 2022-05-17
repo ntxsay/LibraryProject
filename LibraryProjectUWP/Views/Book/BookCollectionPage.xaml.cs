@@ -38,6 +38,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 using Windows.UI;
 using LibraryProjectUWP.Views.Library.Manage;
+using Windows.Media.Core;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -52,7 +53,7 @@ namespace LibraryProjectUWP.Views.Book
         public LibraryBookNavigationDriverVM Parameters { get; private set; }
         readonly EsBook esBook = new EsBook();
         readonly UiServices uiServices = new UiServices();
-
+        DispatcherTimer dispatcherTimerAddNewItem;
         public BookCollectionPage()
         {
             ViewModelPage.PropertyChanged += ViewModelPage_PropertyChanged;
@@ -1372,7 +1373,53 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void ABBAddItem_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            try
+            {
+                if (this.TeachTipNewHelp.IsOpen == false && (dispatcherTimerAddNewItem == null || (dispatcherTimerAddNewItem != null && !dispatcherTimerAddNewItem.IsEnabled)))
+                {
+                    dispatcherTimerAddNewItem = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 3),
+                    };
 
+                    dispatcherTimerAddNewItem.Tick += (f, i) =>
+                    {
+                        this.TeachTipNewHelp.IsOpen = true;
+                        InitializeAddNewTeachingTip();
+                        dispatcherTimerAddNewItem?.Stop();
+                    };
+                    dispatcherTimerAddNewItem.Start();
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void ABBAddItem_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            try
+            {
+                if (this.dispatcherTimerAddNewItem != null)
+                {
+                    if (dispatcherTimerAddNewItem?.IsEnabled == true)
+                    {
+                        dispatcherTimerAddNewItem?.Stop();
+                    }
+
+                    this.dispatcherTimerAddNewItem = null;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         private void TMFIAddNewCollection_Click(object sender, RoutedEventArgs e)
         {
             NewEditCollection(null, EditMode.Create);
@@ -1722,15 +1769,22 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                EsLibrary esLibrary = new EsLibrary();
-                var result = await esLibrary.ChangeBookCollectionBackgroundImageAsync(Parameters.ParentLibrary.Guid);
-                if (!result.IsSuccess)
+                if (FrameContainer.Content is LibraryCollectionSubPage)
                 {
-                    return;
+#warning Implémenter le background pour les bibliothèques
                 }
+                else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
+                {
+                    EsLibrary esLibrary = new EsLibrary();
+                    var result = await esLibrary.ChangeBookCollectionBackgroundImageAsync(Parameters.ParentLibrary.Guid);
+                    if (!result.IsSuccess)
+                    {
+                        return;
+                    }
 
-                ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.BookCollectionDefaultBackgroundImage;
-                await InitializeBackgroundImagesync();
+                    ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.BookCollectionDefaultBackgroundImage;
+                    await InitializeBackgroundImagesync();
+                }
             }
             catch (Exception ex)
             {
@@ -1911,7 +1965,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         Glyph = userControl.ViewModelPage.Glyph,
                         Title = userControl.ViewModelPage.Header,
-                        IdItem = userControl.ViewModelPage.ItemGuid,
+                        IdItem = userControl.ItemGuid,
                     });
                 }
                 this.ViewModelPage.IsSplitViewOpen = true;
@@ -3966,6 +4020,123 @@ namespace LibraryProjectUWP.Views.Book
             {
                 Logs.Log(ex, m);
                 return true;
+            }
+        }
+
+        private void FlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is FlipView flipView)
+                {
+                    if (flipView.SelectedIndex > -1 && flipView.Items[flipView.SelectedIndex] is FlipViewItem flipViewItem)
+                    {
+                        if (flipView.SelectedIndex == 0)
+                        {
+                            TeachTipNewHelp.Title = "Nouvelle bibliothèque";
+                            TeachTipNewHelp.Subtitle = "Suivez cette courte vidéo pour apprendre à créer une nouvelle bibliothèque.";
+                            
+                            if (flipViewItem.Content == null)
+                            {
+                                var mediaPlayer = new MediaPlayerElement()
+                                {
+                                    Source = MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/VTutos/AddNewLibrary.mp4")),
+                                    AutoPlay = true,
+                                    AreTransportControlsEnabled = false,
+                                    Stretch = Stretch.UniformToFill,                                    
+                                };
+                                flipViewItem.Content = mediaPlayer;
+                                mediaPlayer.MediaPlayer.IsLoopingEnabled = true;
+                                mediaPlayer.MediaPlayer.Play();
+                            }
+                            else if (flipViewItem.Content is MediaPlayerElement playerElement)
+                            {
+                                playerElement.MediaPlayer.Play();
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void InitializeAddNewTeachingTip()
+        {
+            try
+            {
+                if (FlipViewTeachAddNew.Items.Count > 0 && FlipViewTeachAddNew.Items[0] is FlipViewItem flipViewItem)
+                {
+                    TeachTipNewHelp.Title = "Nouvelle bibliothèque";
+                    TeachTipNewHelp.Subtitle = "Suivez cette courte vidéo pour apprendre à créer une nouvelle bibliothèque.";
+                    if (flipViewItem.Content == null)
+                    {
+                        var mediaPlayer = new MediaPlayerElement()
+                        {
+                            Source = MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/VTutos/AddNewLibrary.mp4")),
+                            AutoPlay = true,
+                            AreTransportControlsEnabled = false,
+                            Stretch = Stretch.UniformToFill,
+                        };
+                        flipViewItem.Content = mediaPlayer;
+                        mediaPlayer.MediaPlayer.IsLoopingEnabled = true;
+                        mediaPlayer.MediaPlayer.Play();
+                    }
+                    else if (flipViewItem.Content is MediaPlayerElement playerElement)
+                    {
+                        playerElement.MediaPlayer.Play();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void TeachTipNewHelp_CloseButtonClick(Microsoft.UI.Xaml.Controls.TeachingTip sender, object args)
+        {
+            try
+            {
+                if (dispatcherTimerAddNewItem != null)
+                {
+                    if (dispatcherTimerAddNewItem?.IsEnabled == true)
+                    {
+                        dispatcherTimerAddNewItem?.Stop();
+                    }
+
+                    dispatcherTimerAddNewItem = null;
+                }
+                foreach (var item in FlipViewTeachAddNew.Items)
+                {
+                    if (item is FlipViewItem flipViewItem)
+                    {
+                        if (flipViewItem.Content is MediaPlayerElement mediaPlayerElement)
+                        {
+                            if (mediaPlayerElement.MediaPlayer != null)
+                            {
+                                //if (mediaPlayerElement.MediaPlayer.PlaybackSession.CanPause)
+                                //{
+                                //    mediaPlayerElement.MediaPlayer.Pause();
+                                //}
+                                //mediaPlayerElement.MediaPlayer.Dispose();
+                                mediaPlayerElement.Source = null;
+                                //mediaPlayerElement = null;
+                            }
+                            flipViewItem.Content = null;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
     }

@@ -22,7 +22,6 @@ namespace LibraryProjectUWP.Code.Services.UI
 {
     public  class CommonView
     {
-        //readonly MainPage ParentPage;
         readonly BookCollectionPage ParentPage;
         readonly BookCollectionSubPage BookCollectionSubView;
         readonly LibraryCollectionSubPage LibraryCollectionSubView;

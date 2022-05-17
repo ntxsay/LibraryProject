@@ -36,6 +36,8 @@ namespace LibraryProjectUWP.Views.Library.Manage
     public sealed partial class NewEditLibraryUC : PivotItem
     {
         public BookCollectionPage ParentPage { get; private set; }
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
+
         public BibliothequeVM OriginalViewModel { get; private set; }
         readonly EsLibrary eslibrary = new EsLibrary();
         public NewEditLibraryUCVM ViewModelPage { get; set; } = new NewEditLibraryUCVM();
@@ -334,7 +336,6 @@ namespace LibraryProjectUWP.Views.Library.Manage
     public class NewEditLibraryUCVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
         public Guid? ParentGuid { get; set; }
 
         private string _Header;

@@ -292,7 +292,7 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter un élément">
+            <AppBarButton x:Name="ABBAddItem" Icon="Add" ToolTipService.ToolTip="Ajouter un élément" PointerMoved="ABBAddItem_PointerMoved" PointerExited="ABBAddItem_PointerExited">
                 <AppBarButton.Flyout>
                     <MenuFlyout Placement="Bottom" x:Name="MenuFlyoutCommandAdds" Opened="MenuFlyoutCommandAdds_Opened">
                         <!--<MenuFlyoutSubItem Text="Ajouter un livre" MTUUi:FrameworkElementExtensions.Cursor="Hand">
@@ -368,6 +368,28 @@
                 </StackPanel>
             </CommandBar.Content>
         </CommandBar>
+
+        <MUIXC:TeachingTip x:Name="TeachTipNewHelp" Target="{x:Bind ABBAddItem}" PreferredPlacement="Bottom" Width="500" CloseButtonClick="TeachTipNewHelp_CloseButtonClick">
+            <MUIXC:TeachingTip.HeroContent>
+                <StackPanel Orientation="Vertical">
+                    <FlipView x:Name="FlipViewTeachAddNew" SelectionChanged="FlipView_SelectionChanged" Width="320" Height="200" Margin="0 0 0 0">
+                        <FlipViewItem>
+                        </FlipViewItem>
+                        <FlipViewItem>
+                        </FlipViewItem>
+                    </FlipView>
+                    <MUIXC:PipsPager x:Name="FlipViewPipsPager"
+        HorizontalAlignment="Center"
+        Margin="0, 12, 0, 0"
+        NumberOfPages="2"
+        SelectedPageIndex="{x:Bind Path=FlipViewTeachAddNew.SelectedIndex, Mode=TwoWay}" />
+
+                </StackPanel>
+            </MUIXC:TeachingTip.HeroContent>
+            <!--<MUIXC:TeachingTip.Content>
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">To change your desktop theme visit the <Hyperlink NavigateUri="ms-settings:colors">Settings app</Hyperlink>.</TextBlock>
+            </MUIXC:TeachingTip.Content>-->
+        </MUIXC:TeachingTip>
         <MUIXC:TeachingTip x:Name="MyTeachingTip" PreferredPlacement="Bottom">
         </MUIXC:TeachingTip>
     </Grid>

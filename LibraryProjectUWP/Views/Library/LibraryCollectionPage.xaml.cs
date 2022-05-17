@@ -2046,7 +2046,7 @@ namespace LibraryProjectUWP.Views.Library
                         {
                             if (item is NewEditLibraryUC bookExemplaryUC)
                             {
-                                if (bookExemplaryUC.ViewModelPage.ItemGuid == headerVM.IdItem)
+                                if (bookExemplaryUC.ItemGuid == headerVM.IdItem)
                                 {
                                     ViewModelPage.ItemsSideBarHeader.Remove(headerVM);
                                     break;
