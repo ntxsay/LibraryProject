@@ -19,6 +19,7 @@ namespace LibraryProjectUWP.Code.Services.UI
 {
     internal class UiServices
     {
+        #region SideBar
         public SearchBookUC GetSearchBookUCSideBar(Pivot pivot)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -185,7 +186,8 @@ namespace LibraryProjectUWP.Code.Services.UI
                 Logs.Log(ex, m);
                 return null;
             }
-        }
+        } 
+        #endregion
 
         public GridViewItem GetSelectedGridViewItem<T>(long id, Pivot pivot, string gridViewName = "GridViewItems", bool selectAfterFinded = false) where T : class
         {
@@ -274,6 +276,93 @@ namespace LibraryProjectUWP.Code.Services.UI
                 return null;
             }
         }
+
+        public object SelectDataGridItem<T>(long id, Pivot pivot, string dataGridName = "DataGridItems", bool selectAfterFinded = true) where T : class
+        {
+            try
+            {
+                if (pivot == null)
+                {
+                    return null;
+                }
+
+                foreach (var pivotItem in pivot.Items)
+                {
+                    if (typeof(T) == typeof(BibliothequeVM))
+                    {
+                        if (pivotItem is IGrouping<string, BibliothequeVM> group && group.Any(f => f.Id == id))
+                        {
+                            if (pivot.SelectedItem != pivotItem)
+                            {
+                                pivot.SelectedItem = pivotItem;
+                            }
+
+                            var _container = pivot.ContainerFromItem(pivotItem);
+                            DataGrid dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(_container, dataGridName);
+                            if (dataGrid != null)
+                            {
+                                foreach (var dataGridItem in dataGrid.ItemsSource)
+                                {
+                                    if (dataGridItem is BibliothequeVM _viewModel && _viewModel.Id == id)
+                                    {
+                                        if (selectAfterFinded)
+                                        {
+                                            if (dataGrid.SelectedItem != dataGridItem)
+                                            {
+                                                dataGrid.SelectedItem = dataGridItem;
+                                            }
+                                        }
+
+                                        return dataGridItem;
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                    else if (typeof(T) == typeof(LivreVM))
+                    {
+                        if (pivotItem is IGrouping<string, LivreVM> group && group.Any(f => f.Id == id))
+                        {
+                            if (pivot.SelectedItem != pivotItem)
+                            {
+                                pivot.SelectedItem = pivotItem;
+                            }
+
+                            var _container = pivot.ContainerFromItem(pivotItem);
+                            DataGrid dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(_container, dataGridName);
+                            if (dataGrid != null)
+                            {
+                                foreach (var dataGridItem in dataGrid.ItemsSource)
+                                {
+                                    if (dataGridItem is LivreVM _viewModel && _viewModel.Id == id)
+                                    {
+                                        if (selectAfterFinded)
+                                        {
+                                            if (dataGrid.SelectedItem != dataGridItem)
+                                            {
+                                                dataGrid.SelectedItem = dataGridItem;
+                                            }
+                                        }
+
+                                        return dataGridItem;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
 
         public Image GetSelectedThumbnailImage<T>(long id, Pivot pivot, string gridViewName = "GridViewItems") where T : class
         {

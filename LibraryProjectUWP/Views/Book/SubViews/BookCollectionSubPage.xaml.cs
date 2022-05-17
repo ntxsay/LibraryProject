@@ -509,7 +509,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         {
             try
             {
-                if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
+                if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.GridView)
                 {
                     var gridViewItems = uiServices.GetSelectedGridViewFromPivotTemplate(this.PivotItems, "GridViewItems");
                     if (gridViewItems != null)
@@ -517,7 +517,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         gridViewItems.SelectedItems.Clear();
                     }
                 }
-                else if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
+                else if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.DataGridView)
                 {
                     var dataGridItems = uiServices.GetSelectedDataGridFromPivotTemplate(this.PivotItems, "DataGridItems");
                     if (dataGridItems != null)
@@ -539,9 +539,9 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any() && ParentPage.ViewModelPage.SelectedItems is ICollection<LivreVM> collection)
+                if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any() && ParentPage.ViewModelPage.SelectedItems.FirstOrDefault() is LivreVM)
                 {
-                    await ParentPage.DeleteBookAsync(collection);
+                    await ParentPage.DeleteBookAsync(ParentPage.ViewModelPage.SelectedItems.Cast<LivreVM>());
                 }
             }
             catch (Exception ex)
@@ -900,128 +900,29 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         }
         #endregion
 
-
         #region Search
-        public async Task SearchViewModel(LivreVM viewModel)
+        public void SearchViewModel(LivreVM viewModel)
         {
             if (viewModel == null) return;
-            if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
+            if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.GridView)
             {
-                await SearchViewModelGridView(viewModel);
-            }
-            else if (ParentPage.ViewModelPage.DataViewMode == Code.DataViewModeEnum.DataGridView)
-            {
-                await SearchViewModelDataGridView(viewModel);
-            }
-        }
-
-        public async Task SearchViewModelGridView(LivreVM viewModel)
-        {
-            try
-            {
-                if (viewModel == null)
+                var gridViewItem = uiServices.GetSelectedGridViewItem<LivreVM>(viewModel.Id, PivotItems);
+                if (gridViewItem != null)
                 {
-                    return;
-                }
-                var isMatchInCurrent = SearchViewModelInCurrentGridView(viewModel);
-                if (!isMatchInCurrent)
-                {
-                    foreach (var pageVm in ViewModelPage.PagesList)
+                    var pivotItemContainer = PivotItems.ContainerFromIndex(PivotItems.SelectedIndex);
+                    var scrollViewer = FindVisualChild<ScrollViewer>(pivotItemContainer, "scrollItems");
+                    if (scrollViewer != null)
                     {
-                        var search = GetPaginatedItems(ParentPage.Parameters.ParentLibrary.Books, pageVm.CurrentPage);
-                        if (search != null && search.Any(f => f.Id == viewModel.Id))
-                        {
-                            ViewModelPage.SearchedViewModel = viewModel;
-                            await GotoPage(pageVm.CurrentPage);
-                            return;
-                        }
+                        _ = scrollViewer.ScrollToElement(gridViewItem, true, false);
+                        OpenFlyoutSearchedItemGridView(gridViewItem);
                     }
                 }
             }
-            catch (Exception ex)
+            else if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.DataGridView)
             {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
+                _ = uiServices.SelectDataGridItem<LivreVM>(viewModel.Id, PivotItems);
             }
         }
-
-        public bool SearchViewModelInCurrentGridView(LivreVM viewModel)
-        {
-            try
-            {
-                if (viewModel == null)
-                {
-                    return false;
-                }
-
-                foreach (var pivotItem in PivotItems.Items)
-                {
-                    if (pivotItem is IGrouping<string, LivreVM> group && group.Any(f => f.Id == viewModel.Id))
-                    {
-                        if (this.PivotItems.SelectedItem != pivotItem)
-                        {
-                            this.PivotItems.SelectedItem = pivotItem;
-                        }
-
-                        var _container = this.PivotItems.ContainerFromItem(pivotItem);
-                        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
-                        while (gridView != null && gridView.Name != "GridViewItems")
-                        {
-                            gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
-                            if (gridView == null)
-                            {
-                                return false;
-                            }
-                            else
-                            {
-                                if (gridView.Name == "GridViewItems")
-                                {
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (gridView != null)
-                        {
-                            foreach (var gridViewItem in gridView.Items)
-                            {
-                                if (gridViewItem is LivreVM _viewModel && _viewModel.Id == viewModel.Id)
-                                {
-                                    if (gridView.SelectedItem != gridViewItem)
-                                    {
-                                        gridView.SelectedItem = gridViewItem;
-                                    }
-
-                                    var _gridViewItemContainer = gridView.ContainerFromItem(gridViewItem);
-                                    var selectedGridViewitem = _gridViewItemContainer as GridViewItem;
-
-                                    var _selectedPivotItem = PivotItems.ContainerFromItem(pivotItem);
-                                    var selectedPivotItem = _selectedPivotItem as PivotItem;
-
-                                    var scrollViewer = VisualViewHelpers.FindVisualChild<ScrollViewer>(selectedPivotItem, "scrollItems");
-                                    if (scrollViewer != null)
-                                    {
-                                        var result = scrollViewer.ScrollToElement(selectedGridViewitem, true, false);
-                                        OpenFlyoutSearchedItemGridView(_gridViewItemContainer);
-                                    }
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return false;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return false;
-            }
-        }
-
 
         private void OpenFlyoutSearchedItemGridView(DependencyObject _gridViewItemContainer)
         {
@@ -1032,14 +933,12 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     return;
                 }
 
-                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
+                var grid = FindVisualChild<Grid>(_gridViewItemContainer);
                 if (grid != null)
                 {
-                    Grid gridActions = grid.Children.FirstOrDefault(f => f is Grid _gridActions && _gridActions.Name == "GridActions") as Grid;
-                    if (gridActions != null)
+                    if (grid.Children.FirstOrDefault(f => f is Grid _gridActions && _gridActions.Name == "GridActions") is Grid gridActions)
                     {
-                        Button buttonActions = gridActions.Children.FirstOrDefault(f => f is Button _buttonActions && _buttonActions.Name == "BtnActions") as Button;
-                        if (buttonActions != null)
+                        if (gridActions.Children.FirstOrDefault(f => f is Button _buttonActions && _buttonActions.Name == "BtnActions") is Button buttonActions)
                         {
                             buttonActions.Flyout.ShowAt(buttonActions, new FlyoutShowOptions()
                             {
@@ -1055,100 +954,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 MethodBase m = MethodBase.GetCurrentMethod();
                 Logs.Log(ex, m);
                 return;
-            }
-        }
-
-        private async Task SearchViewModelDataGridView(LivreVM viewModel)
-        {
-            try
-            {
-                if (viewModel == null)
-                {
-                    return;
-                }
-
-                var isMatch = SearchViewModelInCurrentDataGrid(viewModel);
-                if (!isMatch)
-                {
-                    foreach (var pageVm in ViewModelPage.PagesList)
-                    {
-                        var search = GetPaginatedItems(ParentPage.Parameters.ParentLibrary.Books, pageVm.CurrentPage);
-                        if (search != null && search.Any(f => f.Id == viewModel.Id))
-                        {
-                            ViewModelPage.SearchedViewModel = viewModel;
-                            await GotoPage(pageVm.CurrentPage);
-                            return;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public bool SearchViewModelInCurrentDataGrid(LivreVM viewModel)
-        {
-            try
-            {
-                if (viewModel == null)
-                {
-                    return false;
-                }
-
-                foreach (var pivotItem in PivotItems.Items)
-                {
-                    if (pivotItem is IGrouping<string, LivreVM> group && group.Any(f => f.Id == viewModel.Id))
-                    {
-                        if (this.PivotItems.SelectedItem != pivotItem)
-                        {
-                            this.PivotItems.SelectedItem = pivotItem;
-                        }
-
-                        var _container = this.PivotItems.ContainerFromItem(pivotItem);
-                        DataGrid dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(_container);
-                        while (dataGrid != null && dataGrid.Name != "DataGridItems")
-                        {
-                            dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(dataGrid);
-                            if (dataGrid == null)
-                            {
-                                return false;
-                            }
-                            else
-                            {
-                                if (dataGrid.Name == "DataGridItems")
-                                {
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (dataGrid != null)
-                        {
-                            foreach (var dataGridItem in dataGrid.ItemsSource)
-                            {
-                                if (dataGridItem is LivreVM _viewModel && _viewModel == viewModel)
-                                {
-                                    if (dataGrid.SelectedItem != dataGridItem)
-                                    {
-                                        dataGrid.SelectedItem = dataGridItem;
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return false;
             }
         }
         #endregion

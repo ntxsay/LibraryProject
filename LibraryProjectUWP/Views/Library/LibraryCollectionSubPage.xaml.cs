@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
@@ -40,8 +41,9 @@ namespace LibraryProjectUWP.Views.Library
         public LibraryCollectionPageVM ViewModelPage { get; set; }
         public CommonView CommonView { get; private set; }
         public BookCollectionPage ParentPage { get; private set; }
-        EsLibrary esLibrary = new EsLibrary();
-        UiServices uiServices = new UiServices();
+
+        readonly EsLibrary esLibrary = new EsLibrary();
+        readonly UiServices uiServices = new UiServices();
         public MainPage MainPage { get; private set; }
 
 
@@ -608,6 +610,66 @@ namespace LibraryProjectUWP.Views.Library
         }
 
         #endregion
+
+        #region Search
+        public void SearchViewModel(BibliothequeVM viewModel)
+        {
+            if (viewModel == null) return;
+            if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.GridView)
+            {
+                var gridViewItem = uiServices.GetSelectedGridViewItem<BibliothequeVM>(viewModel.Id, PivotItems);
+                if (gridViewItem != null)
+                {
+                    var pivotItemContainer = PivotItems.ContainerFromIndex(PivotItems.SelectedIndex);
+                    var scrollViewer = VisualViewHelpers.FindVisualChild<ScrollViewer>(pivotItemContainer, "scrollItems");
+                    if (scrollViewer != null)
+                    {
+                        _ = scrollViewer.ScrollToElement(gridViewItem, true, false);
+                        OpenFlyoutSearchedItemGridView(gridViewItem);
+                    }
+                }
+            }
+            else if (ParentPage.ViewModelPage.DataViewMode == DataViewModeEnum.DataGridView)
+            {
+                _ = uiServices.SelectDataGridItem<BibliothequeVM>(viewModel.Id, PivotItems);
+            }
+        }
+
+        private void OpenFlyoutSearchedItemGridView(DependencyObject _gridViewItemContainer)
+        {
+            try
+            {
+                if (_gridViewItemContainer == null)
+                {
+                    return;
+                }
+
+                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
+                if (grid != null)
+                {
+                    if (grid.Children.FirstOrDefault(f => f is Grid _gridActions && _gridActions.Name == "GridActions") is Grid gridActions)
+                    {
+                        if (gridActions.Children.FirstOrDefault(f => f is Button _buttonActions && _buttonActions.Name == "BtnActions") is Button buttonActions)
+                        {
+                            buttonActions.Flyout.ShowAt(buttonActions, new FlyoutShowOptions()
+                            {
+                                Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
+                                ShowMode = FlyoutShowMode.Auto
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        #endregion
+
 
         #region Loading BacKGroundWorker
         private BackgroundWorker WorkerLoadLibraries;

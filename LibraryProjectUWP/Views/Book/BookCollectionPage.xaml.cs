@@ -60,7 +60,6 @@ namespace LibraryProjectUWP.Views.Book
             this.InitializeComponent();
         }
 
-        public LibraryCollectionSubPage LibraryCollectionSubPage => FrameContainer.Content as LibraryCollectionSubPage;
         public BookCollectionSubPage BookCollectionSubPage => FrameContainer.Content as BookCollectionSubPage;
         public ImportBookExcelSubPage ImportBookExcelSubPage => FrameContainer.Content as ImportBookExcelSubPage;
         public ImportBookFileSubPage ImportBookFileSubPage => FrameContainer.Content as ImportBookFileSubPage;
@@ -291,10 +290,13 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                var bookCollectionSpage = this.BookCollectionSubPage;
-                if (bookCollectionSpage != null)
+                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    bookCollectionSpage.InitializeData(true);
+                    libraryCollectionSubPage.InitializeData(true);
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+                {
+                    bookCollectionSubPage.InitializeData(true);
                 }
             }
             catch (Exception ex)
@@ -385,16 +387,19 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async void Lv_SelectedItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Lv_SelectedItems_ItemClick(object sender, ItemClickEventArgs e)
         {
             try
             {
-                if (sender is ListView listView && listView.SelectedItem is LivreVM viewModel)
+                if (sender is ListView listView)
                 {
-                    var bookCollectionSpage = this.BookCollectionSubPage;
-                    if (bookCollectionSpage != null)
+                    if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage && e.ClickedItem is BibliothequeVM bibliothequeVM)
                     {
-                        await bookCollectionSpage.SearchViewModel(viewModel);
+                        libraryCollectionSubPage.SearchViewModel(bibliothequeVM);
+                    }
+                    else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage && e.ClickedItem is LivreVM livreVM)
+                    {
+                        bookCollectionSubPage.SearchViewModel(livreVM);
                     }
                 }
             }
@@ -4017,18 +4022,13 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is Slider slider)
                 {
-                    var libraryCollectionSpage = this.LibraryCollectionSubPage;
-                    if (libraryCollectionSpage != null)
+                    if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                     {
-                        await libraryCollectionSpage.CommonView.RefreshItemsGrouping();
+                        await libraryCollectionSubPage.CommonView.RefreshItemsGrouping();
                     }
-                    else
+                    else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
                     {
-                        var bookCollectionSpage = this.BookCollectionSubPage;
-                        if (bookCollectionSpage != null)
-                        {
-                            await bookCollectionSpage.CommonView.RefreshItemsGrouping();
-                        }
+                        await bookCollectionSubPage.CommonView.RefreshItemsGrouping();
                     }
                 }
             }
@@ -4064,6 +4064,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        #region Teaching Tips
         private void FlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -4076,7 +4077,7 @@ namespace LibraryProjectUWP.Views.Book
                         {
                             TeachTipNewHelp.Title = "Nouvelle bibliothèque";
                             TeachTipNewHelp.Subtitle = "Suivez cette courte vidéo pour apprendre comment créer une nouvelle bibliothèque.";
-                            
+
                             if (flipViewItem.Content is MediaPlayerElement playerElement)
                             {
                                 playerElement.MediaPlayer.Play();
@@ -4100,7 +4101,7 @@ namespace LibraryProjectUWP.Views.Book
                 if (FlipViewTeachAddNew.Items.Count == 0)
                 {
                     FlipViewItem flipViewItem = new FlipViewItem();
-                    
+
                     if (!flipViewItem.IsSelected)
                         flipViewItem.IsSelected = true;
 
@@ -4182,5 +4183,7 @@ namespace LibraryProjectUWP.Views.Book
             FlipViewTeachAddNew.Items.Clear();
             //FlipViewPipsPager.NumberOfPages = FlipViewTeachAddNew.Items.Count;
         }
+
+        #endregion    
     }
 }

@@ -214,7 +214,7 @@
                             </Grid>
                             <Rectangle Height="1" Grid.Row="1" Fill="{ThemeResource SystemColorControlAccentBrush}"/>
                             <ListView x:Name="Lv_SelectedItems" Margin="0,5,0,0" HorizontalAlignment="Stretch" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.SelectedItems, Mode=OneWay}" MaxHeight="500" MaxWidth="350"
-                                       IsItemClickEnabled="False" SelectionMode="Single" SelectionChanged="Lv_SelectedItems_SelectionChanged" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToEnablingConverter}, Mode=OneWay}">
+                                       IsItemClickEnabled="True" ItemClick="Lv_SelectedItems_ItemClick" SelectionMode="Single" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToEnablingConverter}, Mode=OneWay}">
 
                             </ListView>
                         </Grid>
@@ -263,7 +263,7 @@
                                             VerticalAlignment="Center"/>
                                     <TextBlock Text="{x:Bind ViewModelPage.MaxItemsPerPage, Mode=OneWay}" VerticalAlignment="Top" FontSize="16" FontWeight="SemiBold"/>
                                 </StackPanel>
-                                <TextBlock MaxWidth="250" Text="Attention : un nombre important d'élément affichés par page peut avoir un impact considérable sur les performances" TextWrapping="Wrap"/>
+                                <TextBlock MaxWidth="250" Text="Attention : un nombre important d'élément affichés par page peut avoir un impact considérablement négatif sur les performances." TextWrapping="Wrap"/>
                             </StackPanel>
                         </Grid>
                     </Flyout>
