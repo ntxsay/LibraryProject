@@ -110,6 +110,95 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
+        public async Task<string> GetLibraryCollectionBackgroundImagePathAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var libraryFolder = await this.GetLibrariesFolderAsync();
+                if (libraryFolder == null)
+                {
+                    return EsGeneral.LibraryCollectionDefaultBackgroundImage;
+                }
+
+                foreach (var ext in Files.ImageExtensions)
+                {
+                    string fileName = $"{baseBackgroundFile}{ext}";
+                    var storageItem = await libraryFolder.TryGetItemAsync(fileName);
+                    if (storageItem == null || !storageItem.IsOfType(StorageItemTypes.File))
+                    {
+                        continue;
+                    }
+
+                    return storageItem.Path;
+                }
+
+                return EsGeneral.LibraryCollectionDefaultBackgroundImage;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return EsGeneral.LibraryCollectionDefaultBackgroundImage;
+            }
+        }
+
+        public async Task<OperationStateVM> ChangeLibraryCollectionBackgroundImageAsync()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                var storageFile = await Files.OpenStorageFileAsync(Files.ImageExtensions);
+                if (storageFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le fichier n'a pas pas pû être récupéré par le sélecteur de fichier.",
+                    };
+                }
+
+                var libraryFolder = await this.GetLibrariesFolderAsync();
+                if (libraryFolder == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le répertoire des bibliothèques n'a pas pû être trouvé.",
+                    };
+                }
+
+                var deleteResult = await _EsGeneral.RemoveFileAsync(baseBackgroundFile, libraryFolder, EsGeneral.SearchOptions.StartWith);
+                if (!deleteResult.IsSuccess)
+                {
+                    return deleteResult;
+                }
+
+                var newCopyFile = await storageFile.CopyAsync(libraryFolder, baseBackgroundFile + System.IO.Path.GetExtension(storageFile.Path), NameCollisionOption.ReplaceExisting);
+                if (newCopyFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = "Le fichier n'a pû être copié dans le répertoire de l'application.",
+                    };
+                }
+
+                return new OperationStateVM()
+                {
+                    IsSuccess = true,
+                    Result = newCopyFile.Path,
+                };
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return new OperationStateVM()
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
 
         public async Task<OperationStateVM> ChangeLibraryItemJaquetteAsync(BibliothequeVM viewModel)
         {

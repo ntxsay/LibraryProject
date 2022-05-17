@@ -37,7 +37,7 @@ namespace LibraryProjectUWP.Views.Library
     /// </summary>
     public sealed partial class LibraryCollectionSubPage : Page
     {
-        public LibraryCollectionPageVM ViewModelPage { get; set; } = new LibraryCollectionPageVM();
+        public LibraryCollectionPageVM ViewModelPage { get; set; }
         public CommonView CommonView { get; private set; }
         public BookCollectionPage ParentPage { get; private set; }
         EsLibrary esLibrary = new EsLibrary();
@@ -55,17 +55,25 @@ namespace LibraryProjectUWP.Views.Library
             base.OnNavigatedTo(e);
             if (e.Parameter is BookCollectionPage parameters)
             {
+                ViewModelPage = new LibraryCollectionPageVM(parameters);
                 ParentPage = parameters;
                 CommonView = new CommonView(ParentPage, this);
             }
         }
 
         #region Loading
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            ParentPage.ViewModelPage.BackgroundImagePath = await esLibrary.GetLibraryCollectionBackgroundImagePathAsync();
+            await ParentPage.InitializeBackgroundImagesync();
             if (ViewModelPage.GroupedRelatedViewModel == null || ViewModelPage.GroupedRelatedViewModel.Collection == null || !ViewModelPage.GroupedRelatedViewModel.Collection.Any())
             {
                 InitializeData(true);
+            }
+            else
+            {
+                ParentPage.ViewModelPage.NbItems = ViewModelPage.NbItems;
+                ParentPage.ViewModelPage.NbElementDisplayed = ViewModelPage.NbElementDisplayed;
             }
         }
 

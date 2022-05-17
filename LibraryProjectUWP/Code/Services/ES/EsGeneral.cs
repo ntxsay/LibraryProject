@@ -19,6 +19,7 @@ namespace LibraryProjectUWP.Code.Services.ES
         internal const string BookDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
         internal const string BookDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
         internal const string BookCollectionDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+        internal const string LibraryCollectionDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
         public enum SearchOptions
         {
             StartWith,

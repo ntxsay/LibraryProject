@@ -65,6 +65,46 @@ namespace LibraryProjectUWP.Views.Book
         public ImportBookExcelSubPage ImportBookExcelSubPage => FrameContainer.Content as ImportBookExcelSubPage;
         public ImportBookFileSubPage ImportBookFileSubPage => FrameContainer.Content as ImportBookFileSubPage;
 
+        public bool IsContainsLibraryCollection(out LibraryCollectionSubPage subPage)
+        {
+            try
+            {
+                if (FrameContainer.Content is LibraryCollectionSubPage item)
+                {
+                    subPage = item;
+                    return true;
+                }
+
+                subPage = null;
+                return false;
+            }
+            catch (Exception)
+            {
+                subPage = null;
+                return false;
+            }
+        }
+
+        public bool IsContainsBookCollection(out BookCollectionSubPage subPage)
+        {
+            try
+            {
+                if (FrameContainer.Content is BookCollectionSubPage item)
+                {
+                    subPage = item;
+                    return true;
+                }
+
+                subPage = null;
+                return false;
+            }
+            catch (Exception)
+            {
+                subPage = null;
+                return false;
+            }
+        }
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -145,6 +185,8 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.SelectedItems = new List<object>();
                     this.Lv_SelectedItems.ItemTemplate = (DataTemplate)this.Resources["BookSuggestDataTemplate"];
                     this.ViewModelPage.SelectedItemsMessage = "0 livre(s) sélectionné(s)";
+                    this.ViewModelPage.NbItemsTitle = "Nombre total de livre";
+                    this.ViewModelPage.NbElementDisplayedTitle = "Nombre de livres affichés";
 
                     Parameters.MainPage.ChangeAppTitle(new TitleBarLibraryName(viewModel)
                     {
@@ -178,6 +220,8 @@ namespace LibraryProjectUWP.Views.Book
                 ViewModelPage.SelectedItems = new List<object>();
                 this.Lv_SelectedItems.ItemTemplate = (DataTemplate)this.Resources["LibrarySuggestDataTemplate"];
                 this.ViewModelPage.SelectedItemsMessage = "0 bibliothèque(s) sélectionnée(s)";
+                this.ViewModelPage.NbItemsTitle = "Nombre total de bibliothèque";
+                this.ViewModelPage.NbElementDisplayedTitle = "Nombre de bibliothèques affichés";
 
                 Parameters.MainPage.ChangeAppTitle(Parameters.MainPage.ViewModelPage.MainTitleBar);
                 this.NavigateToView(typeof(LibraryCollectionSubPage), this);
@@ -1377,20 +1421,27 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (this.TeachTipNewHelp.IsOpen == false && (dispatcherTimerAddNewItem == null || (dispatcherTimerAddNewItem != null && !dispatcherTimerAddNewItem.IsEnabled)))
+                if (FrameContainer.Content is LibraryCollectionSubPage)
                 {
-                    dispatcherTimerAddNewItem = new DispatcherTimer()
+                    if (this.TeachTipNewHelp.IsOpen == false && (dispatcherTimerAddNewItem == null || (dispatcherTimerAddNewItem != null && !dispatcherTimerAddNewItem.IsEnabled)))
                     {
-                        Interval = new TimeSpan(0, 0, 0, 3),
-                    };
+                        dispatcherTimerAddNewItem = new DispatcherTimer()
+                        {
+                            Interval = new TimeSpan(0, 0, 0, 3),
+                        };
 
-                    dispatcherTimerAddNewItem.Tick += (f, i) =>
-                    {
-                        this.TeachTipNewHelp.IsOpen = true;
-                        InitializeAddNewTeachingTip();
-                        dispatcherTimerAddNewItem?.Stop();
-                    };
-                    dispatcherTimerAddNewItem.Start();
+                        dispatcherTimerAddNewItem.Tick += (f, i) =>
+                        {
+                            this.TeachTipNewHelp.IsOpen = true;
+                            InitializeAddNewTeachingTip();
+                            dispatcherTimerAddNewItem?.Stop();
+                        };
+                        dispatcherTimerAddNewItem.Start();
+                    }
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
+                {
+#warning Implémenter le teachingTip pour les livres
                 }
             }
             catch (Exception)
@@ -1673,7 +1724,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 AppBarButton AppBarBtnExportAllItems = new AppBarButton()
                 {
-                    Label = "Exporter toutes les bibliothèques",
+                    Label = "Exporter tous les livres",
                     Icon = new FontIcon
                     {
                         FontFamily = new FontFamily("Segoe MDL2 Assets"),
@@ -1769,13 +1820,20 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                EsLibrary esLibrary = new EsLibrary();
                 if (FrameContainer.Content is LibraryCollectionSubPage)
                 {
-#warning Implémenter le background pour les bibliothèques
+                    var result = await esLibrary.ChangeLibraryCollectionBackgroundImageAsync();
+                    if (!result.IsSuccess)
+                    {
+                        return;
+                    }
+
+                    ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.LibraryCollectionDefaultBackgroundImage;
+                    await InitializeBackgroundImagesync();
                 }
                 else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
                 {
-                    EsLibrary esLibrary = new EsLibrary();
                     var result = await esLibrary.ChangeBookCollectionBackgroundImageAsync(Parameters.ParentLibrary.Guid);
                     if (!result.IsSuccess)
                     {
@@ -1825,28 +1883,6 @@ namespace LibraryProjectUWP.Views.Book
         #endregion
         
         #region Médias
-        private async void ChangeBackgroundImageXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                EsLibrary esLibrary = new EsLibrary();
-                var result = await esLibrary.ChangeBookCollectionBackgroundImageAsync(Parameters.ParentLibrary.Guid);
-                if (!result.IsSuccess)
-                {
-                    return;
-                }
-
-                ViewModelPage.BackgroundImagePath = result.Result?.ToString() ?? EsGeneral.BookCollectionDefaultBackgroundImage;
-                await InitializeBackgroundImagesync();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         public async Task InitializeBackgroundImagesync()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -3375,8 +3411,16 @@ namespace LibraryProjectUWP.Views.Book
                 MethodBase m = MethodBase.GetCurrentMethod();
                 try
                 {
-                    var selectedPage = ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
-                    return selectedPage;
+                    if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
+                    {
+                        return libraryCollectionSubPage.ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
+                    }
+                    else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
+                    {
+                        return bookCollectionSubPage.ViewModelPage.PagesList.FirstOrDefault(f => f.IsPageSelected == true)?.CurrentPage ?? 1;
+                    }
+
+                    return 1;
                 }
                 catch (Exception ex)
                 {
@@ -3869,14 +3913,11 @@ namespace LibraryProjectUWP.Views.Book
                 var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
                 if (grid != null)
                 {
-                    Viewbox viewboxThumbnailContainer = grid.Children.FirstOrDefault(f => f is Viewbox _viewboxThumbnailContainer && _viewboxThumbnailContainer.Name == "ViewboxSimpleThumnailDatatemplate") as Viewbox;
-                    if (viewboxThumbnailContainer != null)
+                    if (grid.Children.FirstOrDefault(f => f is Viewbox _viewboxThumbnailContainer && _viewboxThumbnailContainer.Name == "ViewboxSimpleThumnailDatatemplate") is Viewbox viewboxThumbnailContainer)
                     {
-                        Border border = viewboxThumbnailContainer.Child as Border;
-                        if (border != null)
+                        if (viewboxThumbnailContainer.Child is Border border)
                         {
-                            Grid gridImageContainer = border.Child as Grid;
-                            if (gridImageContainer != null)
+                            if (border.Child is Grid gridImageContainer)
                             {
                                 Image image = gridImageContainer.Children.FirstOrDefault(f => f is Image _image) as Image;
                                 return image;
@@ -4034,34 +4075,21 @@ namespace LibraryProjectUWP.Views.Book
                         if (flipView.SelectedIndex == 0)
                         {
                             TeachTipNewHelp.Title = "Nouvelle bibliothèque";
-                            TeachTipNewHelp.Subtitle = "Suivez cette courte vidéo pour apprendre à créer une nouvelle bibliothèque.";
+                            TeachTipNewHelp.Subtitle = "Suivez cette courte vidéo pour apprendre comment créer une nouvelle bibliothèque.";
                             
-                            if (flipViewItem.Content == null)
-                            {
-                                var mediaPlayer = new MediaPlayerElement()
-                                {
-                                    Source = MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/VTutos/AddNewLibrary.mp4")),
-                                    AutoPlay = true,
-                                    AreTransportControlsEnabled = false,
-                                    Stretch = Stretch.UniformToFill,                                    
-                                };
-                                flipViewItem.Content = mediaPlayer;
-                                mediaPlayer.MediaPlayer.IsLoopingEnabled = true;
-                                mediaPlayer.MediaPlayer.Play();
-                            }
-                            else if (flipViewItem.Content is MediaPlayerElement playerElement)
+                            if (flipViewItem.Content is MediaPlayerElement playerElement)
                             {
                                 playerElement.MediaPlayer.Play();
                             }
                         }
                     }
-                    
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
 
@@ -4069,75 +4097,90 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (FlipViewTeachAddNew.Items.Count > 0 && FlipViewTeachAddNew.Items[0] is FlipViewItem flipViewItem)
+                if (FlipViewTeachAddNew.Items.Count == 0)
                 {
-                    TeachTipNewHelp.Title = "Nouvelle bibliothèque";
-                    TeachTipNewHelp.Subtitle = "Suivez cette courte vidéo pour apprendre à créer une nouvelle bibliothèque.";
-                    if (flipViewItem.Content == null)
-                    {
-                        var mediaPlayer = new MediaPlayerElement()
-                        {
-                            Source = MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/VTutos/AddNewLibrary.mp4")),
-                            AutoPlay = true,
-                            AreTransportControlsEnabled = false,
-                            Stretch = Stretch.UniformToFill,
-                        };
-                        flipViewItem.Content = mediaPlayer;
-                        mediaPlayer.MediaPlayer.IsLoopingEnabled = true;
-                        mediaPlayer.MediaPlayer.Play();
-                    }
-                    else if (flipViewItem.Content is MediaPlayerElement playerElement)
-                    {
-                        playerElement.MediaPlayer.Play();
-                    }
-                }
-            }
-            catch (Exception)
-            {
+                    FlipViewItem flipViewItem = new FlipViewItem();
+                    
+                    if (!flipViewItem.IsSelected)
+                        flipViewItem.IsSelected = true;
 
-                throw;
+                    TeachTipNewHelp.Title = "Nouvelle bibliothèque";
+                    TeachTipNewHelp.Subtitle = "Suivez cette courte vidéo pour apprendre comment créer une nouvelle bibliothèque.";
+
+                    MediaPlayerElement mediaPlayer = new MediaPlayerElement()
+                    {
+                        Source = MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/VTutos/AddNewLibrary.mp4")),
+                        AutoPlay = true,
+                        AreTransportControlsEnabled = false,
+                        Stretch = Stretch.UniformToFill,
+                    };
+                    flipViewItem.Content = mediaPlayer;
+                    FlipViewTeachAddNew.Items.Add(flipViewItem);
+
+                    mediaPlayer.MediaPlayer.IsLoopingEnabled = true;
+                    mediaPlayer.MediaPlayer.Play();
+                }
+
+                //FlipViewPipsPager.NumberOfPages = FlipViewTeachAddNew.Items.Count;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
             }
         }
 
         private void TeachTipNewHelp_CloseButtonClick(Microsoft.UI.Xaml.Controls.TeachingTip sender, object args)
         {
-            try
+            if (dispatcherTimerAddNewItem != null)
             {
-                if (dispatcherTimerAddNewItem != null)
+                if (dispatcherTimerAddNewItem?.IsEnabled == true)
                 {
-                    if (dispatcherTimerAddNewItem?.IsEnabled == true)
-                    {
-                        dispatcherTimerAddNewItem?.Stop();
-                    }
-
-                    dispatcherTimerAddNewItem = null;
+                    dispatcherTimerAddNewItem?.Stop();
                 }
-                foreach (var item in FlipViewTeachAddNew.Items)
+
+                dispatcherTimerAddNewItem = null;
+            }
+
+            foreach (var item in FlipViewTeachAddNew.Items)
+            {
+                if (item is FlipViewItem flipViewItem)
                 {
-                    if (item is FlipViewItem flipViewItem)
+                    if (flipViewItem.Content is MediaPlayerElement mediaPlayerElement)
                     {
-                        if (flipViewItem.Content is MediaPlayerElement mediaPlayerElement)
+                        if (mediaPlayerElement.MediaPlayer != null)
                         {
-                            if (mediaPlayerElement.MediaPlayer != null)
+                            try
                             {
-                                //if (mediaPlayerElement.MediaPlayer.PlaybackSession.CanPause)
-                                //{
-                                //    mediaPlayerElement.MediaPlayer.Pause();
-                                //}
+                                if (mediaPlayerElement.MediaPlayer.PlaybackSession.CanPause)
+                                {
+                                    mediaPlayerElement.MediaPlayer.Pause();
+                                }
                                 //mediaPlayerElement.MediaPlayer.Dispose();
+                                if (mediaPlayerElement.Source is MediaSource ms)
+                                {
+                                    ms.Dispose();
+                                    ms = null;
+                                }
                                 mediaPlayerElement.Source = null;
                                 //mediaPlayerElement = null;
                             }
-                            flipViewItem.Content = null;
+                            catch (Exception ex)
+                            {
+                                MethodBase m = MethodBase.GetCurrentMethod();
+                                Logs.Log(ex, m);
+                                continue;
+                            }
+
                         }
+                        flipViewItem.Content = null;
                     }
                 }
             }
-            catch (Exception)
-            {
 
-                throw;
-            }
+            FlipViewTeachAddNew.Items.Clear();
+            //FlipViewPipsPager.NumberOfPages = FlipViewTeachAddNew.Items.Count;
         }
     }
 }

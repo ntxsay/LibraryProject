@@ -40,7 +40,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
     {
         public IEnumerable<LivreVM> GetItems => ViewModelPage.GroupedRelatedViewModel.Collection.SelectMany(s => s.ToList()).Select(q => q).ToList();
         public int CountItems => GetItems?.Count() ?? 0;
-        public BookCollectionSubPageVM ViewModelPage { get; set; } = new BookCollectionSubPageVM();
+        public BookCollectionSubPageVM ViewModelPage { get; set; }
         readonly EsBook esBook = new EsBook();
         readonly UiServices uiServices = new UiServices();
         public CommonView CommonView { get; private set; }
@@ -56,6 +56,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             base.OnNavigatedTo(e);
             if (e.Parameter is BookCollectionPage parameters)
             {
+                ViewModelPage = new BookCollectionSubPageVM(parameters);
                 ParentPage = parameters;
                 CommonView = new CommonView(ParentPage, this);
             }
@@ -74,6 +75,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             else if (ViewModelPage.GroupedRelatedViewModel == null || ViewModelPage.GroupedRelatedViewModel.Collection == null || !ViewModelPage.GroupedRelatedViewModel.Collection.Any())
             {
                 InitializeData(true);
+            }
+            else
+            {
+                ParentPage.ViewModelPage.NbItems = ViewModelPage.NbItems;
+                ParentPage.ViewModelPage.NbElementDisplayed = ViewModelPage.NbElementDisplayed;
             }
         }
 

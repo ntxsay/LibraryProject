@@ -39,11 +39,6 @@
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:StringFormatConverter x:Key="StringFormatConverter"/>
-        <!--Item Flyout-->
-        <XamlUICommand x:Name="ChangeBackgroundImageXUiCmd" 
-                       ExecuteRequested="ChangeBackgroundImageXUiCmd_ExecuteRequested"
-                       Description="Modifie l'image qui sert à présenter le livre">
-        </XamlUICommand>
         <!--CommandBar-->
         <XamlUICommand x:Name="ReloadDataXamlUICommand" 
                        ExecuteRequested="ReloadDataXamlUICommand_ExecuteRequested"
@@ -169,13 +164,15 @@
             <StackPanel Orientation="Horizontal" Spacing="18" Padding="5, 0" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
-                    <Run Text="Nombre total de livre :" />
-                    <Run Text="{x:Bind ViewModelPage.NbBooks, Mode=OneWay}" />
+                    <Run Text="{x:Bind ViewModelPage.NbItemsTitle, Mode=OneWay}" />
+                    <Run Text=":" />
+                    <Run Text="{x:Bind ViewModelPage.NbItems, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Foreground="{ThemeResource AppBarItemForegroundThemeBrush}" FontWeight="Medium">
-                    <Run Text="Nombre de livre affiché :" />
+                    <Run Text="{x:Bind ViewModelPage.NbElementDisplayedTitle, Mode=OneWay}" />
+                    <Run Text=":" />
                     <Run Text="{x:Bind ViewModelPage.NbElementDisplayed, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
@@ -183,8 +180,7 @@
         </Grid>
         <!--CommandBar-->
         <CommandBar x:Name="MyCommand" x:FieldModifier="public" VerticalAlignment="Top" IsSticky="True" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" DefaultLabelPosition="Right">
-            <AppBarButton x:Name="ABBtn_SelectedItems" ToolTipService.ToolTip="Livre(s) sélectionné(s)" Label="{x:Bind ViewModelPage.SelectedItemsMessage, Mode=OneWay}"
-                          IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToEnablingConverter}, Mode=OneWay}">
+            <AppBarButton x:Name="ABBtn_SelectedItems" ToolTipService.ToolTip="Livre(s) sélectionné(s)" Label="{x:Bind ViewModelPage.SelectedItemsMessage, Mode=OneWay}">
                 <AppBarButton.Icon>
                     <FontIcon Glyph="&#xe762;"/>
                 </AppBarButton.Icon>
@@ -203,10 +199,10 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Button x:Name="Btn_SelectAll" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_SelectAll_Click">
+                                <Button x:Name="Btn_SelectAll" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" Margin="0,4" Click="Btn_SelectAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8b3;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Sélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
                                 </Button>
-                                <Button x:Name="Btn_UnSelectAll" Grid.Column="1" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_UnSelectAll_Click">
+                                <Button x:Name="Btn_UnSelectAll" Grid.Column="1" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" Margin="0,4" Click="Btn_UnSelectAll_Click">
                                     <FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe8e6;" Foreground="{ThemeResource SystemAccentColor}" ToolTipService.ToolTip="Désélectionner toutes les fiches" MTUUi:FrameworkElementExtensions.Cursor="Hand"/>
                                 </Button>
                                 <Button x:Name="Btn_Edit_Books" Grid.Column="2" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Mode=OneWay, Converter={StaticResource CountToEnablingConverter}}" HorizontalAlignment="Center" Margin="0,4" Click="Btn_UnSelectAll_Click">
@@ -218,7 +214,7 @@
                             </Grid>
                             <Rectangle Height="1" Grid.Row="1" Fill="{ThemeResource SystemColorControlAccentBrush}"/>
                             <ListView x:Name="Lv_SelectedItems" Margin="0,5,0,0" HorizontalAlignment="Stretch" Grid.Row="2" ItemsSource="{x:Bind ViewModelPage.SelectedItems, Mode=OneWay}" MaxHeight="500" MaxWidth="350"
-                                       IsItemClickEnabled="False" SelectionMode="Single" SelectionChanged="Lv_SelectedItems_SelectionChanged">
+                                       IsItemClickEnabled="False" SelectionMode="Single" SelectionChanged="Lv_SelectedItems_SelectionChanged" IsEnabled="{x:Bind ViewModelPage.SelectedItems.Count, Converter={StaticResource CountToEnablingConverter}, Mode=OneWay}">
 
                             </ListView>
                         </Grid>
@@ -373,22 +369,10 @@
             <MUIXC:TeachingTip.HeroContent>
                 <StackPanel Orientation="Vertical">
                     <FlipView x:Name="FlipViewTeachAddNew" SelectionChanged="FlipView_SelectionChanged" Width="320" Height="200" Margin="0 0 0 0">
-                        <FlipViewItem>
-                        </FlipViewItem>
-                        <FlipViewItem>
-                        </FlipViewItem>
                     </FlipView>
-                    <MUIXC:PipsPager x:Name="FlipViewPipsPager"
-        HorizontalAlignment="Center"
-        Margin="0, 12, 0, 0"
-        NumberOfPages="2"
-        SelectedPageIndex="{x:Bind Path=FlipViewTeachAddNew.SelectedIndex, Mode=TwoWay}" />
-
+                    <MUIXC:PipsPager x:Name="FlipViewPipsPager" HorizontalAlignment="Center" Margin="0, 12, 0, 0" NumberOfPages="1" SelectedPageIndex="{x:Bind Path=FlipViewTeachAddNew.SelectedIndex, Mode=TwoWay}" />
                 </StackPanel>
             </MUIXC:TeachingTip.HeroContent>
-            <!--<MUIXC:TeachingTip.Content>
-                <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">To change your desktop theme visit the <Hyperlink NavigateUri="ms-settings:colors">Settings app</Hyperlink>.</TextBlock>
-            </MUIXC:TeachingTip.Content>-->
         </MUIXC:TeachingTip>
         <MUIXC:TeachingTip x:Name="MyTeachingTip" PreferredPlacement="Bottom">
         </MUIXC:TeachingTip>

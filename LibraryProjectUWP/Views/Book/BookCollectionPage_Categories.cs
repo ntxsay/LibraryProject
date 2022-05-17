@@ -35,7 +35,7 @@ namespace LibraryProjectUWP.Views.Book
                     CategoriesListUC userControl = new CategoriesListUC(new CategorieParameterDriverVM()
                     {
                         BookPage = this,
-                        ParentLibrary = ViewModelPage.ParentLibrary,
+                        ParentLibrary = Parameters.ParentLibrary,
                     });
 
                     userControl.CancelModificationRequested += CategoriesListUC_CancelModificationRequested;

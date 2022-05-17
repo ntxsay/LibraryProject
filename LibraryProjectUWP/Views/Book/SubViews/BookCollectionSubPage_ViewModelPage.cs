@@ -18,6 +18,17 @@ namespace LibraryProjectUWP.Views.Book.SubViews
     {
         public class BookCollectionSubPageVM : INotifyPropertyChanged
         {
+            readonly BookCollectionPage parentPage;
+            public BookCollectionSubPageVM()
+            {
+
+            }
+
+            public BookCollectionSubPageVM(BookCollectionPage _parentPage)
+            {
+                parentPage = _parentPage;
+            }
+
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
             private IEnumerable<CollectionVM> _SelectedCollections = null;
@@ -187,6 +198,30 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     {
                         this._NbItems = value;
                         this.OnPropertyChanged();
+                    }
+
+                    if (parentPage != null && parentPage.ViewModelPage.NbItems != value)
+                    {
+                        parentPage.ViewModelPage.NbItems = value;
+                    }
+                }
+            }
+
+            private int _NbElementDisplayed;
+            public int NbElementDisplayed
+            {
+                get => this._NbElementDisplayed;
+                set
+                {
+                    if (_NbElementDisplayed != value)
+                    {
+                        this._NbElementDisplayed = value;
+                        this.OnPropertyChanged();
+                    }
+
+                    if (parentPage != null && parentPage.ViewModelPage.NbElementDisplayed != value)
+                    {
+                        parentPage.ViewModelPage.NbElementDisplayed = value;
                     }
                 }
             }

@@ -144,67 +144,6 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
-            private BookGroupVM _GroupedRelatedViewModel = new BookGroupVM();
-            [Obsolete("Implémenté dans la sous vue")]
-            public BookGroupVM GroupedRelatedViewModel
-            {
-                get => this._GroupedRelatedViewModel;
-                set
-                {
-                    if (this._GroupedRelatedViewModel != value)
-                    {
-                        this._GroupedRelatedViewModel = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private BookGroupVM.GroupBy _GroupedBy = BookGroupVM.GroupBy.None;
-            [Obsolete("Implémenté dans la sous vue")]
-            public BookGroupVM.GroupBy GroupedBy
-            {
-                get => this._GroupedBy;
-                set
-                {
-                    if (this._GroupedBy != value)
-                    {
-                        this._GroupedBy = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private BookGroupVM.SortBy _SortedBy = BookGroupVM.SortBy.Name;
-            [Obsolete("Implémenté dans la sous vue")]
-            public BookGroupVM.SortBy SortedBy
-            {
-                get => this._SortedBy;
-                set
-                {
-                    if (this._SortedBy != value)
-                    {
-                        this._SortedBy = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private BookGroupVM.OrderBy _OrderedBy = BookGroupVM.OrderBy.Croissant;
-            [Obsolete("Implémenté dans la sous vue")]
-            public BookGroupVM.OrderBy OrderedBy
-            {
-                get => this._OrderedBy;
-                set
-                {
-                    if (this._OrderedBy != value)
-                    {
-                        this._OrderedBy = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-
             private bool _IsSplitViewOpen;
             public bool IsSplitViewOpen
             {
@@ -263,15 +202,29 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
-            private int _NbBooks;
-            public int NbBooks
+            private int _NbItems;
+            public int NbItems
             {
-                get => this._NbBooks;
+                get => this._NbItems;
                 set
                 {
-                    if (_NbBooks != value)
+                    if (_NbItems != value)
                     {
-                        this._NbBooks = value;
+                        this._NbItems = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
+            private string _NbItemsTitle;
+            public string NbItemsTitle
+            {
+                get => this._NbItemsTitle;
+                set
+                {
+                    if (_NbItemsTitle != value)
+                    {
+                        this._NbItemsTitle = value;
                         this.OnPropertyChanged();
                     }
                 }
@@ -291,7 +244,22 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
+            private string _NbElementDisplayedTitle;
+            public string NbElementDisplayedTitle
+            {
+                get => this._NbElementDisplayedTitle;
+                set
+                {
+                    if (_NbElementDisplayedTitle != value)
+                    {
+                        this._NbElementDisplayedTitle = value;
+                        this.OnPropertyChanged();
+                    }
+                }
+            }
+
             private LivreVM _SearchedViewModel = null;
+            [Obsolete]
             public LivreVM SearchedViewModel
             {
                 get => this._SearchedViewModel;
@@ -305,21 +273,8 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
-            private ObservableCollection<PageSystemVM> _PagesList = new ObservableCollection<PageSystemVM>();
-            public ObservableCollection<PageSystemVM> PagesList
-            {
-                get => this._PagesList;
-                set
-                {
-                    if (_PagesList != value)
-                    {
-                        this._PagesList = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
             private int _SelectedPivotIndex;
+            [Obsolete]
             public int SelectedPivotIndex
             {
                 get => this._SelectedPivotIndex;
@@ -398,21 +353,6 @@ namespace LibraryProjectUWP.Views.Book
                     if (_SelectedItemsMessage != value)
                     {
                         this._SelectedItemsMessage = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
-            private BibliothequeVM _ParentLibrary;
-            [Obsolete]
-            public BibliothequeVM ParentLibrary
-            {
-                get => this._ParentLibrary;
-                set
-                {
-                    if (_ParentLibrary != value)
-                    {
-                        this._ParentLibrary = value;
                         this.OnPropertyChanged();
                     }
                 }

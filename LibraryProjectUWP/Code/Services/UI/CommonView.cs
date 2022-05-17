@@ -289,7 +289,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     var searchedItems = await DbServices.Library.SearchAsync<Tlibrary>(searchParams);
                     if (searchedItems == null || !searchedItems.Any())
                     {
-                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        LibraryCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
@@ -299,7 +299,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<Tlibrary> orderModelList = DbServices.Library.OrderLibraries(searchedItems, orderedBy, sortedBy);
                     if (orderModelList == null || !orderModelList.Any())
                     {
-                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        LibraryCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
@@ -312,7 +312,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     var searchedItems = await DbServices.Library.SearchAsync<Tbook>(searchParams);
                     if (searchedItems == null || !searchedItems.Any())
                     {
-                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        BookCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
@@ -322,7 +322,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<Tbook> orderModelList = DbServices.Library.OrderLibraries(searchedItems, orderedBy, sortedBy);
                     if (orderModelList == null || !orderModelList.Any())
                     {
-                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        BookCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
@@ -330,7 +330,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                                                 ParentPage.ViewModelPage.DisplayUnCategorizedBooks, ParentPage.ViewModelPage.SelectedSCategories);
                     if (filterViewModelList == null || !filterViewModelList.Any())
                     {
-                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        BookCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
@@ -342,7 +342,14 @@ namespace LibraryProjectUWP.Code.Services.UI
                     orderModelList = Enumerable.Empty<Tbook>();
                 }
 
-                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage?.Count() ?? 0;
+                if (ParentPage.IsContainsLibraryCollection(out var libraryCollectionSubPage))
+                {
+                    libraryCollectionSubPage.ViewModelPage.NbElementDisplayed = itemsPage?.Count() ?? 0;
+                }
+                else if (ParentPage.IsContainsBookCollection(out var bookCollectionSubPage))
+                {
+                    bookCollectionSubPage.ViewModelPage.NbElementDisplayed = itemsPage?.Count() ?? 0;
+                }
 
                 return new CommonGroupItemVM<T>()
                 {
@@ -376,7 +383,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<Tbook> orderModelList = await DbServices.Library.OrderLibrariesAsync<Tbook>(orderedBy, sortedBy, ParentPage.Parameters.ParentLibrary?.Id);
                     if (orderModelList == null || !orderModelList.Any())
                     {
-                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        BookCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
@@ -384,7 +391,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                                                 ParentPage.ViewModelPage.DisplayUnCategorizedBooks, ParentPage.ViewModelPage.SelectedSCategories);
                     if (filterViewModelList == null || !filterViewModelList.Any())
                     {
-                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        BookCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
@@ -402,7 +409,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<Tlibrary> orderModelList = await DbServices.Library.OrderLibrariesAsync<Tlibrary>(orderedBy, sortedBy);
                     if (orderModelList == null || !orderModelList.Any())
                     {
-                        ParentPage.ViewModelPage.NbElementDisplayed = 0;
+                        LibraryCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
                         return null;
                     }
 
@@ -411,7 +418,14 @@ namespace LibraryProjectUWP.Code.Services.UI
                     orderModelList = Enumerable.Empty<Tlibrary>();
                 }
 
-                ParentPage.ViewModelPage.NbElementDisplayed = itemsPage?.Count() ?? 0;
+                if (ParentPage.IsContainsLibraryCollection(out var libraryCollectionSubPage))
+                {
+                    libraryCollectionSubPage.ViewModelPage.NbElementDisplayed = itemsPage?.Count() ?? 0;
+                }
+                else if (ParentPage.IsContainsBookCollection(out var bookCollectionSubPage))
+                {
+                    bookCollectionSubPage.ViewModelPage.NbElementDisplayed = itemsPage?.Count() ?? 0;
+                }
 
                 return new CommonGroupItemVM<T>()
                 {

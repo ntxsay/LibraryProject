@@ -1,6 +1,7 @@
 ﻿using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Library;
+using LibraryProjectUWP.Views.Book;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,17 @@ namespace LibraryProjectUWP.Views.Library
     {
         public class LibraryCollectionPageVM : INotifyPropertyChanged
         {
+            readonly BookCollectionPage parentPage;
+            public LibraryCollectionPageVM()
+            {
+
+            }
+
+            public LibraryCollectionPageVM(BookCollectionPage _parentPage)
+            {
+                parentPage = _parentPage;
+            }
+
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
             public ToastContentBuilder OperationRunning
@@ -148,6 +160,30 @@ namespace LibraryProjectUWP.Views.Library
                     {
                         this._NbItems = value;
                         this.OnPropertyChanged();
+                    }
+
+                    if (parentPage != null && parentPage.ViewModelPage.NbItems != value)
+                    {
+                        parentPage.ViewModelPage.NbItems = value;
+                    }
+                }
+            }
+
+            private int _NbElementDisplayed;
+            public int NbElementDisplayed
+            {
+                get => this._NbElementDisplayed;
+                set
+                {
+                    if (_NbElementDisplayed != value)
+                    {
+                        this._NbElementDisplayed = value;
+                        this.OnPropertyChanged();
+                    }
+
+                    if (parentPage != null && parentPage.ViewModelPage.NbElementDisplayed != value)
+                    {
+                        parentPage.ViewModelPage.NbElementDisplayed = value;
                     }
                 }
             }
