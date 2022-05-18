@@ -431,33 +431,14 @@ namespace LibraryProjectUWP.Views.Library
             }
         }
 
-        private async void ExportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ExportLibraryXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (args.Parameter is BibliothequeVM viewModel)
                 {
-                    var suggestedFileName = $"Rostalotheque_Bibliotheque_{viewModel.Name}_{DateTime.Now:yyyyMMddHHmmss}";
-
-                    var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
-                    {
-                        {"JavaScript Object Notation", new List<string>() { ".json" } }
-                    }, suggestedFileName);
-
-                    if (savedFile == null)
-                    {
-                        Logs.Log(m, "Le fichier n'a pas pû être créé.");
-                        return;
-                    }
-
-                    //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
-                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModel, savedFile);// savedFile.Path
-                    if (isFileSaved == false)
-                    {
-                        Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
-                        return;
-                    }
+                    ParentPage.ExportThisLibrary(viewModel);
                 }
             }
             catch (Exception ex)

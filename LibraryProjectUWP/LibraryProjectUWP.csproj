@@ -199,7 +199,7 @@
     <Compile Include="Code\Services\Tasks\GetBookPretsTask.cs" />
     <Compile Include="Code\Services\Tasks\GetBookExemplariesTask.cs" />
     <Compile Include="Code\Services\Tasks\ImportBooksTask.cs" />
-    <Compile Include="Code\Services\Tasks\ExportAllBooksTask.cs" />
+    <Compile Include="Code\Services\Tasks\ExportAllBooksOrLibrariesTask.cs" />
     <Compile Include="Code\Services\Tasks\DeleteAllBooksTask.cs" />
     <Compile Include="Code\Services\Tasks\DeleteManyBooksTask.cs" />
     <Compile Include="Code\Services\UI\CommonView.cs" />
@@ -254,6 +254,7 @@
     <Compile Include="ViewModels\Contact\ManageContactParametersDriverVM.cs" />
     <Compile Include="ViewModels\General\BusyLoaderParametersVM.cs" />
     <Compile Include="ViewModels\General\CommonGroupItemVM.cs" />
+    <Compile Include="ViewModels\General\ImportItemsFromTablePageDriverVM.cs" />
     <Compile Include="ViewModels\General\ItemTagContentVM.cs" />
     <Compile Include="ViewModels\General\LibraryBookNavigationDriverVM.cs" />
     <Compile Include="ViewModels\General\ManageBookParametersVM.cs" />
@@ -354,6 +355,12 @@
     </Compile>
     <Compile Include="Views\Collection\NewEditCollectionUC.xaml.cs">
       <DependentUpon>NewEditCollectionUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Common\ImportItemsFromFileSideBar.xaml.cs">
+      <DependentUpon>ImportItemsFromFileSideBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Common\ImportItemsFromTablePage.xaml.cs">
+      <DependentUpon>ImportItemsFromTablePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Contact\ContactListUC.xaml.cs">
       <DependentUpon>ContactListUC.xaml</DependentUpon>
@@ -587,6 +594,14 @@
     <Page Include="Views\Collection\NewEditCollectionUC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Common\ImportItemsFromFileSideBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Common\ImportItemsFromTablePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Contact\ContactListUC.xaml">
       <SubType>Designer</SubType>

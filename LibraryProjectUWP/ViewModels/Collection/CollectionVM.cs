@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -12,7 +13,11 @@ namespace LibraryProjectUWP.ViewModels.Collection
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public long Id { get; set; } = -1;
+        
+        [JsonIgnore]
         public long IdBook { get; set; } = -1;
+        
+        [JsonIgnore]
         public long IdLibrary { get; set; } = -1;
 
         private string _Name;

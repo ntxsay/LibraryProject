@@ -15,13 +15,13 @@ using System.Threading.Tasks;
 
 namespace LibraryProjectUWP.ViewModels.Book
 {
-    public  class LivreVM : INotifyPropertyChanged
+    public class LivreVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         public long Id { get; set; }
+        [JsonIgnore]
         public long? IdLibrary { get; set; }
-        public Guid RefGuid { get; private set; } = Guid.NewGuid();
         public Guid Guid { get; set; } = Guid.NewGuid();
         public long CountOpening { get; set; }
 
@@ -159,7 +159,6 @@ namespace LibraryProjectUWP.ViewModels.Book
             }
         }
 
-        public List<BibliothequeVM> Bibliotheques { get; set; }
         private ObservableCollection<CategorieLivreVM> _Categories = new ObservableCollection<CategorieLivreVM>();
         public ObservableCollection<CategorieLivreVM> Categories
         {
@@ -208,12 +207,6 @@ namespace LibraryProjectUWP.ViewModels.Book
         public LivreIdentificationVM Identification { get; set; } = new LivreIdentificationVM();
         public LivreFormatVM Format { get; set; } = new LivreFormatVM();
         public LivrePublicationVM Publication { get; set; } = new LivrePublicationVM();
-
-        public LivreVM ChangeRefGuid()
-        {
-            RefGuid = Guid.NewGuid();
-            return this;
-        }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

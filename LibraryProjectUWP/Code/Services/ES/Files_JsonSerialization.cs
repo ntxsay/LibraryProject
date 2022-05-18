@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using System.Reflection;
 using LibraryProjectUWP.Code.Services.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace LibraryProjectUWP.Code.Services.ES
 {
     public partial class Files
     {
-        public struct Serialization
+        public partial class Serialization
         {
             public class Json
             {
@@ -72,6 +73,52 @@ namespace LibraryProjectUWP.Code.Services.ES
                     }
                 }
 
+                public static async Task<JToken> GetJsonType(StorageFile configFileName)
+                {
+                    try
+                    {
+                        if (configFileName == null)
+                        {
+                            return null;
+                        }
+
+                        string dataString = await GetDataStringAsync(configFileName);
+                        if (dataString.IsStringNullOrEmptyOrWhiteSpace())
+                        {
+                            return null;
+                        }
+
+                        return GetJsonType(dataString);
+                    }
+                    catch (Exception ex)
+                    {
+                        MethodBase m = MethodBase.GetCurrentMethod();
+                        Logs.Log(ex, m);
+                        return null;
+                    }
+                }
+
+                public static JToken GetJsonType(string jsonStringData)
+                {
+                    try
+                    {
+                        if (jsonStringData.IsStringNullOrEmptyOrWhiteSpace())
+                        {
+                            return null;
+                        }
+                        var token = JToken.Parse(jsonStringData);
+
+                        return token;
+                    }
+                    catch (Exception ex)
+                    {
+                        MethodBase m = MethodBase.GetCurrentMethod();
+                        Logs.Log(ex, m);
+                        return null;
+                    }
+                }
+
+                [Obsolete]
                 public static async Task<DeserializeMode> GetDeSerializationModeAsync(StorageFile configFileName)
                 {
                     try

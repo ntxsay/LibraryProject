@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Input;
 
 namespace LibraryProjectUWP.Code.Services.Tasks
 {
+    [Obsolete("Utilisez ExportAllBooksOrLibrariesTask")]
     public class ExportAllLibrariesTask
     {
         public MainPage MainPage { get; private set; }

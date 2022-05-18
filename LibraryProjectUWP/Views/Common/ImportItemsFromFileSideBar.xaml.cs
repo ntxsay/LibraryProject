@@ -3,9 +3,12 @@ using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Excel;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.Book;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -20,6 +23,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -33,45 +37,105 @@ using Windows.UI.Xaml.Navigation;
 
 // Pour en savoir plus sur le modèle d'élément Contrôle utilisateur, consultez la page https://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace LibraryProjectUWP.Views.Book
+namespace LibraryProjectUWP.Views.Common
 {
-    public sealed partial class ImportBookFromFileUC : PivotItem
+    public sealed partial class ImportItemsFromFileSideBar : PivotItem
     {
-        public readonly ImportBookParametersDriverVM _parameters;
+        public BookCollectionPage BookCollectionPage { get; private set; }
+        public Type Type { get; private set; }
+        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
 
-        public ImportBookFromFileUCVM ViewModelPage { get; set; } = new ImportBookFromFileUCVM();
+        public ImportItemsFromFileSideBarVM ViewModelPage { get; set; }
 
-        public delegate void CancelModificationEventHandler(ImportBookFromFileUC sender, ExecuteRequestedEventArgs e);
+        public delegate void CancelModificationEventHandler(ImportItemsFromFileSideBar sender, ExecuteRequestedEventArgs e);
         public event CancelModificationEventHandler CancelModificationRequested;
 
 
-        public delegate void ImportDataEventHandler(ImportBookFromFileUC sender, ExecuteRequestedEventArgs e);
+        public delegate void ImportDataEventHandler(ImportItemsFromFileSideBar sender, object originalViewModel, OperationStateVM e);
         public event ImportDataEventHandler ImportDataRequested;
-        public ImportBookFromFileUC()
+        public ImportItemsFromFileSideBar()
         {
             this.InitializeComponent();
-        }
-
-        public ImportBookFromFileUC(ImportBookParametersDriverVM parameters)
-        {
-            this.InitializeComponent();
-            _parameters = parameters;
         }
 
         private void PivotItem_Loaded(object sender, RoutedEventArgs e)
         {
-            InitializeText();
         }
+
+        public void InitializeSideBar<T, U>(U page, IEnumerable<T> objectList, StorageFile file) where T : class where U : Page
+        {
+            try
+            {
+                if (objectList == null && !objectList.Any())
+                {
+                    return;
+                }
+
+                Type = typeof(T);
+
+                if (page is BookCollectionPage bookCollectionPage)
+                {
+                    BookCollectionPage = bookCollectionPage;
+                }
+
+
+                ViewModelPage = new ImportItemsFromFileSideBarVM()
+                {
+                    File = file,
+                };
+
+                //ViewModelPage.Header = $"{(ViewModelPage.EditMode == EditMode.Create ? "Ajouter" : "Editer")} un livre";
+
+                InitializeText();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         public void InitializeText()
         {
             try
             {
+                TbcInfos.Inlines.Clear();
+                Run lineT1 = new Run();
+
+                if (Type == typeof(BibliothequeVM))
+                {
+                    lineT1.Text = "Vous êtes en train d'importer des bibliothèques à partir du fichier «";
+                }
+                else if (Type == typeof(LivreVM))
+                {
+                    lineT1.Text = "Vous êtes en train d'importer des livres à partir du fichier «";
+                }
+                TbcInfos.Inlines.Add(lineT1);
+
+                TbcInfos.Inlines.Add(new Run()
+                {
+                    Text = ViewModelPage.File?.Name,
+                    FontWeight = FontWeights.SemiBold,
+                });
+                TbcInfos.Inlines.Add(new Run()
+                {
+                    Text = "»."
+                });
+
                 TbcAfterSearching.Inlines.Clear();
+
+                string countSelectedLines = string.Empty;
+
+                if (BookCollectionPage != null)
+                {
+                    countSelectedLines = $"{BookCollectionPage.ImportItemsFromTablePage.SelectedItems.Count} {(BookCollectionPage.ImportItemsFromTablePage.SelectedItems.Count > 1 ? "lignes ont été sélectionnées" : "ligne a été sélectionnée")}. ";
+                }
 
                 Run lineCount = new Run()
                 {
-                    Text = $"{_parameters.ParentPage.ImportBookFileSubPage.SelectedItems.Count} {(_parameters.ParentPage.ImportBookFileSubPage.SelectedItems.Count > 1 ? "lignes ont été sélectionnées" : "ligne a été sélectionnée")}. ",
+                    Text = countSelectedLines,
                     FontWeight = FontWeights.Medium,
                 };
                 TbcAfterSearching.Inlines.Add(lineCount);
@@ -124,8 +188,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-
-                if (_parameters.ParentPage.ImportBookFileSubPage.SelectedItems.Count == 0)
+                if (BookCollectionPage != null && BookCollectionPage.ImportItemsFromTablePage.SelectedItems.Count == 0)
                 {
                     ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
                     ViewModelPage.ResultMessage = $"Vous devez sélectionner au moins une ligne.";
@@ -134,7 +197,7 @@ namespace LibraryProjectUWP.Views.Book
                     return false;
                 }
 
-                ViewModelPage.NewViewModel = new List<LivreVM>(_parameters.ParentPage.ImportBookFileSubPage.SelectedItems);
+                ViewModelPage.NewViewModel = new List<object>(BookCollectionPage.ImportItemsFromTablePage.SelectedItems);
                 ViewModelPage.IsResultMessageOpen = false;
                 return true;
             }
@@ -174,15 +237,13 @@ namespace LibraryProjectUWP.Views.Book
         }
     }
 
-    public class ImportBookFromFileUCVM : INotifyPropertyChanged
+    public class ImportItemsFromFileSideBarVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public readonly IEnumerable<string> SourceList = LibraryHelpers.Book.Entry.EntrySourceList;
         public readonly IEnumerable<string> EtatList = LibraryHelpers.Book.EtatModelList;
 
-        public Guid ItemGuid { get; private set; } = Guid.NewGuid();
-        //public Guid? ParentGuid { get; set; }
-
+        public StorageFile File { get; set; }
         private string _Header = "Importer un fichier";
         public string Header
         {
@@ -211,6 +272,8 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        
+
         private Visibility _ItemstVisibility = Visibility.Collapsed;
         public Visibility ItemstVisibility
         {
@@ -225,8 +288,8 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private List<LivreVM> _NewViewModel = new List<LivreVM>();
-        public List<LivreVM> NewViewModel
+        private List<object> _NewViewModel = new List<object>();
+        public List<object> NewViewModel
         {
             get => this._NewViewModel;
             set

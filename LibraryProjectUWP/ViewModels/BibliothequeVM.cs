@@ -1,6 +1,7 @@
 ﻿using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +20,8 @@ namespace LibraryProjectUWP.ViewModels
         public Guid Guid { get; set; } = Guid.NewGuid();
 
         private DateTime _DateAjout = DateTime.UtcNow;
+
+        [DisplayName("Date d'ajout")]
         public DateTime DateAjout
         {
             get => _DateAjout;
@@ -33,6 +36,8 @@ namespace LibraryProjectUWP.ViewModels
         }
 
         private DateTime? _DateEdition;
+
+        [DisplayName("Date de la dernière édition")]
         public DateTime? DateEdition
         {
             get => _DateEdition;
@@ -47,6 +52,8 @@ namespace LibraryProjectUWP.ViewModels
         }
 
         private string _Name;
+        
+        [DisplayName("Nom de la bibliothèque")]
         public string Name
         {
             get => _Name;
@@ -61,6 +68,8 @@ namespace LibraryProjectUWP.ViewModels
         }
 
         private string _Description;
+        
+        [DisplayName("Description")]
         public string Description
         {
             get => _Description;
@@ -73,22 +82,13 @@ namespace LibraryProjectUWP.ViewModels
                 }
             }
         }
-        private List<LivreVM> _Books = new List<LivreVM>();
-        [Obsolete]
-        public List<LivreVM> Books
-        {
-            get => _Books;
-            set
-            {
-                if (_Books != value)
-                {
-                    _Books = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+
+        [JsonProperty]
+        public IEnumerable<LivreVM> Books { get; set; } = Enumerable.Empty<LivreVM>();
+
 
         private long _CountBooks;
+        [DisplayName("Nombre de livres")]
         public long CountBooks
         {
             get => _CountBooks;
@@ -158,21 +158,9 @@ namespace LibraryProjectUWP.ViewModels
             }
         }
 
-        private bool _IsSelected;
-        public bool IsSelected
-        {
-            get => _IsSelected;
-            set
-            {
-                if (_IsSelected != value)
-                {
-                    _IsSelected = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         private string _JaquettePath = EsLibrary.LibraryDefaultJaquette;
+        
+        [JsonIgnore]
         public string JaquettePath
         {
             get => this._JaquettePath;

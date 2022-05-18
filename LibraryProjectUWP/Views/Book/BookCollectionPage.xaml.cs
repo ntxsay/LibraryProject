@@ -39,6 +39,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI;
 using LibraryProjectUWP.Views.Library.Manage;
 using Windows.Media.Core;
+using System.Data;
+using LibraryProjectUWP.Views.Common;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -51,6 +53,7 @@ namespace LibraryProjectUWP.Views.Book
     {
         public BookCollectionPageVM ViewModelPage { get; set; } = new BookCollectionPageVM();
         public LibraryBookNavigationDriverVM Parameters { get; private set; }
+        readonly EsGeneral esGeneral = new EsGeneral();
         readonly EsBook esBook = new EsBook();
         readonly UiServices uiServices = new UiServices();
         DispatcherTimer dispatcherTimerAddNewItem;
@@ -63,6 +66,7 @@ namespace LibraryProjectUWP.Views.Book
         public BookCollectionSubPage BookCollectionSubPage => FrameContainer.Content as BookCollectionSubPage;
         public ImportBookExcelSubPage ImportBookExcelSubPage => FrameContainer.Content as ImportBookExcelSubPage;
         public ImportBookFileSubPage ImportBookFileSubPage => FrameContainer.Content as ImportBookFileSubPage;
+        public ImportItemsFromTablePage ImportItemsFromTablePage => FrameContainer.Content as ImportItemsFromTablePage;
 
         public bool IsContainsLibraryCollection(out LibraryCollectionSubPage subPage)
         {
@@ -264,6 +268,22 @@ namespace LibraryProjectUWP.Views.Book
                     ParentPage = this,
                     ViewModelList = new ObservableCollection<LivreVM>(viewModelList),
                 });
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void OpenImportItemsFromTablePage<T, U>(U parentPage, IEnumerable<T> objectList, DataTable dataTable) 
+            where T : class 
+            where U : Page
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                this.NavigateToView(typeof(ImportItemsFromTablePage), new Tuple<U, DataTable, IEnumerable<T>>(parentPage, dataTable, objectList));
             }
             catch (Exception ex)
             {
@@ -1263,6 +1283,7 @@ namespace LibraryProjectUWP.Views.Book
                 MenuFlyoutItem TMFIAddFromFile = new MenuFlyoutItem()
                 {
                     Text = "Ouvrir un fichier",
+                    IsEnabled = true,
                     Icon = new FontIcon
                     {
                         FontFamily = new FontFamily("Segoe MDL2 Assets"),
@@ -1563,14 +1584,38 @@ namespace LibraryProjectUWP.Views.Book
 
         private async void TMFIAddFromFile_Click(object sender, RoutedEventArgs e)
         {
-            if (FrameContainer.Content is LibraryCollectionSubPage)
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
             {
+                if (FrameContainer.Content is LibraryCollectionSubPage)
+                {
+                    var storageFile = await Files.OpenStorageFileAsync(Files.LibraryExtensions);
+                    if (storageFile == null)
+                    {
+                        Logs.Log(m, $"Vous devez sélectionner un type de fichier valide.");
+                        return;
+                    }
+
+                    var viewModels = (await esGeneral.OpenItemFromFileAsync<BibliothequeVM>(storageFile))?.ToList();
+                    if (viewModels != null && viewModels.Any())
+                    {
+                        ImportLibraryFromFile(viewModels, storageFile);
+                        //viewModels.ForEach((book) => this.CompleteBookInfos(book));
+
+                        //if (viewModels.Count() == 1)
+                        //{
+                        //    await NewEditBookAsync(viewModels.First(), EditMode.Create);
+                        //}
+                        //else
+                        //{
+                        //    ImportBookFromFile(viewModels, storageFile);
+                        //    OpenImportBookFromFile(viewModels);
+                        //}
+                    }
+
 #warning Importer une bibliothèque via un fichier (json);
-            }
-            else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                try
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
                 {
                     var storageFile = await Files.OpenStorageFileAsync(Files.BookExtensions);
                     if (storageFile == null)
@@ -1579,7 +1624,7 @@ namespace LibraryProjectUWP.Views.Book
                         return;
                     }
 
-                    var viewModels = (await esBook.OpenBooksFromFileAsync(storageFile))?.ToList();
+                    var viewModels = (await esGeneral.OpenItemFromFileAsync<LivreVM>(storageFile))?.ToList();
                     if (viewModels != null && viewModels.Any())
                     {
                         viewModels.ForEach((book) => this.CompleteBookInfos(book));
@@ -1595,11 +1640,11 @@ namespace LibraryProjectUWP.Views.Book
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    Logs.Log(ex, m);
-                    return;
-                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
             }
         }
 
@@ -2241,6 +2286,88 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        public void ImportLibraryFromFile(IEnumerable<BibliothequeVM> viewModelList, StorageFile file)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModelList == null || !viewModelList.Any())
+                {
+                    return;
+                }
+
+                DataTable dataTable = PropertyHelpers.CreateDataTableOfObject(viewModelList, new string[]
+                {
+                    nameof(BibliothequeVM.Id),
+                    nameof(BibliothequeVM.Guid),
+                    nameof(BibliothequeVM.DateEdition),
+                    nameof(BibliothequeVM.DateAjout),
+                    nameof(BibliothequeVM.Collections),
+                    nameof(BibliothequeVM.Books),
+                    nameof(BibliothequeVM.CountNotInCollectionBooks),
+                    nameof(BibliothequeVM.JaquettePath),
+                    nameof(BibliothequeVM.Categories),
+                    nameof(BibliothequeVM.CountUnCategorizedBooks),
+                });
+
+                OpenImportItemsFromTablePage(this, viewModelList, dataTable);
+                ImportItemsFromFile(viewModelList, file);
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void ImportItemsFromFile<T>(IEnumerable<T> objectList, StorageFile file = null) where T : class
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (this.PivotRightSideBar.Items.FirstOrDefault(f => f is ImportItemsFromFileSideBar item) is ImportItemsFromFileSideBar checkedItem)
+                {
+                    checkedItem.InitializeSideBar(this, objectList, file);
+                    this.SelectItemSideBar(checkedItem);
+                }
+                else
+                {
+                    ImportItemsFromFileSideBar userControl = new ImportItemsFromFileSideBar();
+                    userControl.InitializeSideBar(this, objectList, file);
+
+                    userControl.CancelModificationRequested += ImportItemsFromFileSideBar_CancelModificationRequested;
+                    //userControl.ExecuteTaskRequested += NewEditBookUC_ExecuteTaskRequested;
+
+                    this.AddItemToSideBar(userControl, new SideBarItemHeaderVM()
+                    {
+                        Glyph = userControl.ViewModelPage.Glyph,
+                        Title = userControl.ViewModelPage.Header,
+                        IdItem = userControl.ItemGuid,
+                    });
+                }
+
+                this.ViewModelPage.IsSplitViewOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void ImportItemsFromFileSideBar_CancelModificationRequested(ImportItemsFromFileSideBar sender, ExecuteRequestedEventArgs e)
+        {
+            this.RemoveItemToSideBar(sender);
+            if (this.Parameters.ParentLibrary == null)
+            {
+                this.OpenLibraryCollection();
+            }
+            else
+            {
+                this.OpenBookCollection(this.Parameters.ParentLibrary);
+            }
+        }
+
         #endregion
 
         #region Book Exemplary
@@ -2646,16 +2773,21 @@ namespace LibraryProjectUWP.Views.Book
         }
         #endregion
 
-        private void ExportAllBookXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+
+        #region Export items
+        public void ExportThisLibrary(BibliothequeVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ExportAllBooksTask exportAllBooksTask = new ExportAllBooksTask(Parameters.MainPage) 
-                { 
-                    UseIntervalAfterFinish = false
-                };
-                exportAllBooksTask.InitializeWorker(Parameters.ParentLibrary);
+                if (viewModel != null)
+                {
+                    ExportAllBooksOrLibrariesTask exportAllBooksOrLibrariesTask = new ExportAllBooksOrLibrariesTask(Parameters.MainPage)
+                    {
+                        UseIntervalAfterFinish = false
+                    };
+                    exportAllBooksOrLibrariesTask.InitializeWorker(viewModel);
+                }
             }
             catch (Exception ex)
             {
@@ -2663,8 +2795,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-        #region Export items
         public async Task ExportThisBookAsync(LivreVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -2701,62 +2831,23 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task ExportThisBookAsync(LivreVM viewModel, string suggestName = "model")
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (viewModel != null)
-                {
-                    var suggestedFileName = "model";
-
-                    var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
-                    {
-                        {"JavaScript Object Notation", new List<string>() { ".json" } }
-                    }, suggestedFileName);
-
-                    if (savedFile == null)
-                    {
-                        Logs.Log(m, "Le fichier n'a pas pû être créé.");
-                        return;
-                    }
-
-                    //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
-                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModel, savedFile);// savedFile.Path
-                    if (isFileSaved == false)
-                    {
-                        Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
-                        return;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         public void ExportAllItems()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                ExportAllBooksOrLibrariesTask exportAllBooksOrLibrariesTask = new ExportAllBooksOrLibrariesTask(Parameters.MainPage)
+                {
+                    UseIntervalAfterFinish = false
+                };
+
                 if (FrameContainer.Content is LibraryCollectionSubPage)
                 {
-                    ExportAllLibrariesTask exportAllLibrariesTask = new ExportAllLibrariesTask(Parameters.MainPage)
-                    {
-                        UseIntervalAfterFinish = false
-                    };
-                    exportAllLibrariesTask.InitializeWorker();
+                    exportAllBooksOrLibrariesTask.InitializeWorker();
                 }
                 else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
                 {
-                    ExportAllBooksTask exportAllBooksTask = new ExportAllBooksTask(Parameters.MainPage)
-                    {
-                        UseIntervalAfterFinish = false
-                    };
-                    exportAllBooksTask.InitializeWorker(Parameters.ParentLibrary);
+                    exportAllBooksOrLibrariesTask.InitializeWorker(Parameters.ParentLibrary);
                 }
             }
             catch (Exception ex)
@@ -3677,6 +3768,30 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        public ImportItemsFromFileSideBar GetImportItemsFromFileSideBar()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+
+                if (this.PivotRightSideBar.Items.Count > 0)
+                {
+                    object itemPivot = this.PivotRightSideBar.Items.FirstOrDefault(f => f is ImportItemsFromFileSideBar);
+                    if (itemPivot != null)
+                    {
+                        return itemPivot as ImportItemsFromFileSideBar;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
         private NewEditBookExemplaryUC GetBookExemplarySideBarByGuid(Guid guid)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -3844,176 +3959,6 @@ namespace LibraryProjectUWP.Views.Book
                 return null;
             }
         }
-
-        private Image GetSelectedThumbnailImage(LivreVM viewModel)
-        {
-            try
-            {
-                //if (viewModel == null)
-                //{
-                //    return null;
-                //}
-
-                //if (this.PivotItems.SelectedItem != null)
-                //{
-                //    if (this.PivotItems.SelectedItem is IGrouping<string, LivreVM> group && group.Any(f => f == viewModel))
-                //    {
-
-                //        var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
-                //        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
-                //        while (gridView != null && gridView.Name != "GridViewItems")
-                //        {
-                //            gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
-                //            if (gridView == null)
-                //            {
-                //                return null;
-                //            }
-                //            else
-                //            {
-                //                if (gridView.Name == "GridViewItems")
-                //                {
-                //                    break;
-                //                }
-                //            }
-                //        }
-
-                //        if (gridView != null)
-                //        {
-                //            foreach (var gridViewItem in gridView.Items)
-                //            {
-                //                if (gridViewItem is LivreVM _viewModel && _viewModel == viewModel)
-                //                {
-                //                    if (gridView.SelectedItem != gridViewItem)
-                //                    {
-                //                        gridView.SelectedItem = gridViewItem;
-                //                    }
-
-                //                    var _gridViewItemContainer = gridView.ContainerFromItem(gridViewItem);
-                //                    return SelectImageFromContainer(_gridViewItemContainer);
-                //                }
-                //            }
-                //        }
-                //    }
-                //}
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return null;
-            }
-        }
-
-        private Image SelectImageFromContainer(DependencyObject _gridViewItemContainer)
-        {
-            try
-            {
-                if (_gridViewItemContainer == null)
-                {
-                    return null;
-                }
-
-                var grid = VisualViewHelpers.FindVisualChild<Grid>(_gridViewItemContainer);
-                if (grid != null)
-                {
-                    if (grid.Children.FirstOrDefault(f => f is Viewbox _viewboxThumbnailContainer && _viewboxThumbnailContainer.Name == "ViewboxSimpleThumnailDatatemplate") is Viewbox viewboxThumbnailContainer)
-                    {
-                        if (viewboxThumbnailContainer.Child is Border border)
-                        {
-                            if (border.Child is Grid gridImageContainer)
-                            {
-                                Image image = gridImageContainer.Children.FirstOrDefault(f => f is Image _image) as Image;
-                                return image;
-                            }
-                        }
-                    }
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return null;
-            }
-        }
-
-        //public GridView GetSelectedGridView(string gridViewName = "GridViewItems")
-        //{
-        //    try
-        //    {
-        //        if (this.PivotItems.SelectedItem == null)
-        //        {
-        //            return null;
-        //        }
-
-        //        var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
-        //        var gridView = VisualViewHelpers.FindVisualChild<GridView>(_container);
-        //        while (gridView != null && gridView.Name != gridViewName)
-        //        {
-        //            gridView = VisualViewHelpers.FindVisualChild<GridView>(gridView);
-        //            if (gridView == null)
-        //            {
-        //                return null;
-        //            }
-        //            else
-        //            {
-        //                if (gridView.Name == gridViewName)
-        //                {
-        //                    break;
-        //                }
-        //            }
-        //        }
-
-        //        return gridView;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MethodBase m = MethodBase.GetCurrentMethod();
-        //        Logs.Log(ex, m);
-        //        return null;
-        //    }
-        //}
-
-        //private DataGrid GetSelectedDataGridItems(string dataGridName = "DataGridItems")
-        //{
-        //    try
-        //    {
-        //        if (this.PivotItems.SelectedItem == null)
-        //        {
-        //            return null;
-        //        }
-
-        //        var _container = this.PivotItems.ContainerFromItem(this.PivotItems.SelectedItem);
-        //        DataGrid dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(_container);
-        //        while (dataGrid != null && dataGrid.Name != dataGridName)
-        //        {
-        //            dataGrid = VisualViewHelpers.FindVisualChild<DataGrid>(dataGrid);
-        //            if (dataGrid == null)
-        //            {
-        //                return null;
-        //            }
-        //            else
-        //            {
-        //                if (dataGrid.Name == dataGridName)
-        //                {
-        //                    break;
-        //                }
-        //            }
-        //        }
-
-        //        return dataGrid;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MethodBase m = MethodBase.GetCurrentMethod();
-        //        Logs.Log(ex, m);
-        //        return null;
-        //    }
-        //}
         #endregion
         
         private async void Slider_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)

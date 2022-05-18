@@ -596,84 +596,12 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    await this.ExportThisBookAsync(viewModel);
+                    await ParentPage.ExportThisBookAsync(viewModel);
                 }
             }
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public async Task ExportThisBookAsync(LivreVM viewModel)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (viewModel != null)
-                {
-                    var suggestedFileName = $"Rostalotheque_Livre_{viewModel.MainTitle}_{DateTime.Now:yyyyMMddHHmmss}";
-
-                    var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
-                    {
-                        {"JavaScript Object Notation", new List<string>() { ".json" } }
-                    }, suggestedFileName);
-
-                    if (savedFile == null)
-                    {
-                        Logs.Log(m, "Le fichier n'a pas pû être créé.");
-                        return;
-                    }
-
-                    //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
-                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModel, savedFile);// savedFile.Path
-                    if (isFileSaved == false)
-                    {
-                        Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
-                        return;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public async Task ExportThisBookAsync(LivreVM viewModel, string suggestName = "model")
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (viewModel != null)
-                {
-                    var suggestedFileName = "model";
-
-                    var savedFile = await Files.SaveStorageFileAsync(new Dictionary<string, IList<string>>()
-                    {
-                        {"JavaScript Object Notation", new List<string>() { ".json" } }
-                    }, suggestedFileName);
-
-                    if (savedFile == null)
-                    {
-                        Logs.Log(m, "Le fichier n'a pas pû être créé.");
-                        return;
-                    }
-
-                    //Voir : https://docs.microsoft.com/fr-fr/windows/uwp/files/quickstart-reading-and-writing-files
-                    bool isFileSaved = await Files.Serialization.Json.SerializeAsync(viewModel, savedFile);// savedFile.Path
-                    if (isFileSaved == false)
-                    {
-                        Logs.Log(m, "Le flux n'a pas été enregistré dans le fichier.");
-                        return;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
                 Logs.Log(ex, m);
                 return;
             }

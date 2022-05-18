@@ -43,11 +43,20 @@ namespace LibraryProjectUWP.Code.Services.ES
                 };
         }
 
+        public static IEnumerable<string> LibraryExtensions
+        {
+            get => new List<string>()
+                {
+                    ".rtl",
+                    ".json",
+                };
+        }
+
         public static IEnumerable<string> BookExtensions
         {
             get => new List<string>()
                 {
-                    ".rob",
+                    ".rtb",
                     ".json",
                 };
         }

@@ -1,6 +1,7 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.ES;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -271,6 +272,7 @@ namespace LibraryProjectUWP.ViewModels.Contact
         }
 
         private string _JaquettePath = EsLibrary.LibraryDefaultJaquette;
+        [JsonIgnore]
         public string JaquettePath
         {
             get => this._JaquettePath;

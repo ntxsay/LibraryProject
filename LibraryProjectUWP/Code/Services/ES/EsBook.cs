@@ -2,6 +2,7 @@
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -294,6 +295,7 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
+        [Obsolete]
         public async Task<IEnumerable<LivreVM>> OpenBooksFromFileAsync(StorageFile storageFile)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -305,31 +307,59 @@ namespace LibraryProjectUWP.Code.Services.ES
                     return Enumerable.Empty<LivreVM>();
                 }
 
-                var deserializeMode = await Files.Serialization.Json.GetDeSerializationModeAsync(storageFile);
 
-                switch (deserializeMode)
+                var jsonType = await Files.Serialization.Json.GetJsonType(storageFile);
+                if (jsonType == null)
                 {
-                    case Files.Serialization.Json.DeserializeMode.Single:
-                        var result = await Files.Serialization.Json.DeSerializeSingleAsync<LivreVM>(storageFile);
-                        if (result == null)
-                        {
-                            Logs.Log(m, "Le flux n'a pas été ouvert correctement.");
-                            return Enumerable.Empty<LivreVM>();
-                        }
-                        return new LivreVM[] { result };
-                    case Files.Serialization.Json.DeserializeMode.Multiple:
-                        var resultMultiple = await Files.Serialization.Json.DeSerializeMultipleAsync<LivreVM>(storageFile);
-                        if (resultMultiple == null)
-                        {
-                            Logs.Log(m, "Le flux n'a pas été ouvert correctement.");
-                            return Enumerable.Empty<LivreVM>();
-                        }
-                        return resultMultiple;
-                    case Files.Serialization.Json.DeserializeMode.UnKnow:
-                        return Enumerable.Empty<LivreVM>();
-                    default:
-                        return Enumerable.Empty<LivreVM>();
+                    return Enumerable.Empty<LivreVM>();
                 }
+                else if (jsonType is JObject)
+                {
+                    var result = await Files.Serialization.Json.DeSerializeSingleAsync<LivreVM>(storageFile);
+                    if (result == null)
+                    {
+                        Logs.Log(m, "Le flux n'a pas été ouvert correctement.");
+                        return Enumerable.Empty<LivreVM>();
+                    }
+                    return new LivreVM[] { result };
+                }
+                else if (jsonType is JArray)
+                {
+                    var resultMultiple = await Files.Serialization.Json.DeSerializeMultipleAsync<LivreVM>(storageFile);
+                    if (resultMultiple == null)
+                    {
+                        Logs.Log(m, "Le flux n'a pas été ouvert correctement.");
+                        return Enumerable.Empty<LivreVM>();
+                    }
+                    return resultMultiple;
+                }
+
+                return Enumerable.Empty<LivreVM>();
+
+                //var deserializeMode = await Files.Serialization.Json.GetDeSerializationModeAsync(storageFile);
+                //switch (deserializeMode)
+                //{
+                //    case Files.Serialization.Json.DeserializeMode.Single:
+                //        var result = await Files.Serialization.Json.DeSerializeSingleAsync<LivreVM>(storageFile);
+                //        if (result == null)
+                //        {
+                //            Logs.Log(m, "Le flux n'a pas été ouvert correctement.");
+                //            return Enumerable.Empty<LivreVM>();
+                //        }
+                //        return new LivreVM[] { result };
+                //    case Files.Serialization.Json.DeserializeMode.Multiple:
+                //        var resultMultiple = await Files.Serialization.Json.DeSerializeMultipleAsync<LivreVM>(storageFile);
+                //        if (resultMultiple == null)
+                //        {
+                //            Logs.Log(m, "Le flux n'a pas été ouvert correctement.");
+                //            return Enumerable.Empty<LivreVM>();
+                //        }
+                //        return resultMultiple;
+                //    case Files.Serialization.Json.DeserializeMode.UnKnow:
+                //        return Enumerable.Empty<LivreVM>();
+                //    default:
+                //        return Enumerable.Empty<LivreVM>();
+                //}
             }
             catch (Exception ex)
             {

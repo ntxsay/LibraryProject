@@ -1,6 +1,7 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.General;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -51,6 +52,53 @@ namespace LibraryProjectUWP.Code.Services.ES
             Authors,
             Editors
         }
+
+        public async Task<IEnumerable<T>> OpenItemFromFileAsync<T>(StorageFile storageFile) where T : class
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (storageFile == null)
+                {
+                    Logs.Log(m, "Le fichier n'a pas pû être ouvert.");
+                    return Enumerable.Empty<T>();
+                }
+
+                var jsonType = await Files.Serialization.Json.GetJsonType(storageFile);
+                if (jsonType == null)
+                {
+                    return Enumerable.Empty<T>();
+                }
+                else if (jsonType is JObject)
+                {
+                    var result = await Files.Serialization.Json.DeSerializeSingleAsync<T>(storageFile);
+                    if (result == null)
+                    {
+                        Logs.Log(m, "Le flux n'a pas été ouvert correctement.");
+                        return Enumerable.Empty<T>();
+                    }
+                    return new T[] { result };
+                }
+                else if (jsonType is JArray)
+                {
+                    var result = await Files.Serialization.Json.DeSerializeMultipleAsync<T>(storageFile);
+                    if (result == null)
+                    {
+                        Logs.Log(m, "Le flux n'a pas été ouvert correctement.");
+                        return Enumerable.Empty<T>();
+                    }
+                    return result;
+                }
+
+                return Enumerable.Empty<T>();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
 
         public async Task<OperationStateVM> RemoveFileAsync(string baseName, StorageFolder Folder, SearchOptions options = SearchOptions.StartWith)
         {

@@ -493,7 +493,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                     if (viewModelToCopy == null) return null;
 
                     viewModel.Id = viewModelToCopy.Id;
-                    viewModel.IsSelected = viewModelToCopy.IsSelected;
                     viewModel.CountNotInCollectionBooks = viewModelToCopy.CountNotInCollectionBooks;
                     viewModel.CountBooks = viewModelToCopy.CountBooks;
                     viewModel.CountUnCategorizedBooks = viewModelToCopy.CountUnCategorizedBooks;

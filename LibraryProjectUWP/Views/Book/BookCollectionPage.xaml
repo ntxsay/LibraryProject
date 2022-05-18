@@ -45,10 +45,6 @@
                        Description="Actualise les données depuis la base de données" 
                        Label="Actualiser les données">
         </XamlUICommand>
-        <XamlUICommand x:Name="ExportAllBookXamlUICommand" 
-                       ExecuteRequested="ExportAllBookXamlUICommand_ExecuteRequested"
-                       Description="Exporte tous les livres existants">
-        </XamlUICommand>
         <XamlUICommand x:Name="DisplayEditorListXUiCmd" 
                        ExecuteRequested="DisplayEditorListXUiCmd_ExecuteRequested"
                        Description="Afficher la liste des éditeurs" 
