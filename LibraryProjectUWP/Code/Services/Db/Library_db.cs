@@ -103,6 +103,31 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
+            public static async Task<Tlibrary> SingleAsync(string name)
+            {
+                try
+                {
+                    if (name.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        return null;
+                    }
+
+                    using (LibraryDbContext context = new LibraryDbContext())
+                    {
+                        var s = await context.Tlibrary.SingleOrDefaultAsync(d => d.Name.ToLower() == name.ToLower());
+                        if (s == null) return null;
+
+                        return s;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Debug.WriteLine(Logs.GetLog(ex, m));
+                    return null;
+                }
+            }
+
             /// <summary>
             /// Retourne un modèle de vue avec un identifiant unique
             /// </summary>
@@ -197,7 +222,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                         return new OperationStateVM()
                         {
                             IsSuccess = true,
-                            Message = DbServices.RecordAlreadyExistMessage
+                            Message = DbServices.RecordAlreadyExistMessage,
+                            Id = (await SingleAsync(viewModel.Name))?.Id ?? 0,
                         };
                     }
 
