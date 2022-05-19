@@ -45,6 +45,7 @@ namespace LibraryProjectUWP.Views.Common
             {
                 BookCollectionPage = parameters.Item1;
                 DataTable = parameters.Item2;
+                Title = "Importer des bibliothèques depuis un fichier";
             }
         }
 

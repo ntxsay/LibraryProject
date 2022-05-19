@@ -76,7 +76,7 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         }
 
         #region
-        public void InitializeWorker(IEnumerable<LivreVM> viewModelList)
+        public void InitializeWorker<T>(IEnumerable<T> viewModelList) where T : class
         {
             try
             {
@@ -104,9 +104,8 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                     {
                         if (UseBusyLoader)
                         {
-                            MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                            var parameters = new BusyLoaderParametersVM()
                             {
-                                ProgessText = $"Importation de {viewModelList.Count()} livre(s) en cours",
                                 CancelButtonText = "Annuler l'importation",
                                 CancelButtonVisibility = Visibility.Visible,
                                 CancelButtonCallback = () =>
@@ -117,7 +116,17 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                                     }
                                 },
                                 OpenedLoaderCallback = () => WorkerBackground.RunWorkerAsync(viewModelList),
-                            });
+                            };
+
+                            if (typeof(T).IsAssignableFrom(typeof(BibliothequeVM)))
+                            {
+                                parameters.ProgessText = $"Importation de {viewModelList.Count()} bibliothèque(s) en cours";
+                            }
+                            else if (typeof(T).IsAssignableFrom(typeof(LivreVM)))
+                            {
+                                parameters.ProgessText = $"Importation de {viewModelList.Count()} livre(s) en cours";
+                            }
+                            MainPage.OpenBusyLoader(parameters);
                         }
                         else
                         {
@@ -138,130 +147,137 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         {
             try
             {
-                if (sender is BackgroundWorker worker && e.Argument is IEnumerable<LivreVM> viewModelList)
+                if (sender is BackgroundWorker worker)
                 {
-                    int ModelCount = viewModelList.Count();
-                    double progressPercentage;
-                    int count = 0;
-
-                    List<WorkerState<OperationStateVM, OperationStateVM>> workerStates = new List<WorkerState<OperationStateVM, OperationStateVM>>();
-                    foreach (var newViewModel in viewModelList)
+                    if (e.Argument is IEnumerable<BibliothequeVM> bibliothequeVMs)
                     {
-                        List<WorkerState<OperationStateVM, OperationStateVM>> _subWorkerStates = new List<WorkerState<OperationStateVM, OperationStateVM>>();
-                        if (newViewModel.Auteurs != null && newViewModel.Auteurs.Any())
-                        {
-                            for (int i = 0; i < newViewModel.Auteurs.Count; i++)
-                            {
-                                using (Task<OperationStateVM> task = DbServices.Contact.CreateAsync(newViewModel.Auteurs[i]))
-                                {
-                                    task.Wait();
-                                    _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
-                                    {
-                                        Result = task.Result,
-                                    });
-
-                                    if (!task.Result.IsSuccess)
-                                    {
-                                        newViewModel.Auteurs.RemoveAt(i);
-                                        i = 0;
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        newViewModel.Auteurs[i].Id = task.Result.Id;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (newViewModel.Publication != null)
-                        {
-                            if (newViewModel.Publication.Collections != null && newViewModel.Publication.Collections.Any())
-                            {
-                                for (int i = 0; i < newViewModel.Publication.Collections.Count; i++)
-                                {
-                                    using (Task<OperationStateVM> task = DbServices.Collection.CreateAsync(newViewModel.Publication.Collections[i], IdLibrary))
-                                    {
-                                        task.Wait();
-                                        _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
-                                        {
-                                            Result = task.Result,
-                                        });
-
-                                        if (!task.Result.IsSuccess)
-                                        {
-                                            newViewModel.Publication.Collections.RemoveAt(i);
-                                            i = 0;
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            newViewModel.Publication.Collections[i].Id = task.Result.Id;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (newViewModel.Publication.Editeurs != null && newViewModel.Publication.Editeurs.Any())
-                            {
-                                for (int i = 0; i < newViewModel.Publication.Editeurs.Count; i++)
-                                {
-                                    using (Task<OperationStateVM> task = DbServices.Contact.CreateAsync(newViewModel.Publication.Editeurs[i]))
-                                    {
-                                        task.Wait();
-                                        _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
-                                        {
-                                            Result = task.Result,
-                                        });
-
-                                        if (!task.Result.IsSuccess)
-                                        {
-                                            newViewModel.Publication.Editeurs.RemoveAt(i);
-                                            i = 0;
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            newViewModel.Publication.Editeurs[i].Id = task.Result.Id;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        var bookResult = new WorkerState<OperationStateVM, OperationStateVM>()
-                        {
-                            ResultList = _subWorkerStates.Select(s => s.Result).ToList(),
-                        };
-
-                        using (Task<OperationStateVM> task = DbServices.Book.CreateAsync(newViewModel, IdLibrary))
-                        {
-                            task.Wait();
-                            bookResult.Result = task.Result;
-                            workerStates.Add(bookResult);
-                        }
-
-                        if (worker.CancellationPending)
-                        {
-                            e.Cancel = true;
-                            break;
-                        }
-                        else
-                        {
-                            if (WorkerReportsProgress)
-                            {
-                                var NumberModel = count + 1;
-                                double Operation = (double)NumberModel / (double)ModelCount;
-                                progressPercentage = Operation * 100;
-                                int ProgressValue = Convert.ToInt32(progressPercentage);
-
-                                Thread.Sleep(100);
-                                worker.ReportProgress(ProgressValue, null);
-                                count++;
-                            }
-                        }
+#warning Implémenter pour la bibliothèque
                     }
-                    e.Result = workerStates?.ToArray();
+                    else if (e.Argument is IEnumerable<LivreVM> viewModelList)
+                    {
+                        int ModelCount = viewModelList.Count();
+                        double progressPercentage;
+                        int count = 0;
+
+                        List<WorkerState<OperationStateVM, OperationStateVM>> workerStates = new List<WorkerState<OperationStateVM, OperationStateVM>>();
+                        foreach (var newViewModel in viewModelList)
+                        {
+                            List<WorkerState<OperationStateVM, OperationStateVM>> _subWorkerStates = new List<WorkerState<OperationStateVM, OperationStateVM>>();
+                            if (newViewModel.Auteurs != null && newViewModel.Auteurs.Any())
+                            {
+                                for (int i = 0; i < newViewModel.Auteurs.Count; i++)
+                                {
+                                    using (Task<OperationStateVM> task = DbServices.Contact.CreateAsync(newViewModel.Auteurs[i]))
+                                    {
+                                        task.Wait();
+                                        _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
+                                        {
+                                            Result = task.Result,
+                                        });
+
+                                        if (!task.Result.IsSuccess)
+                                        {
+                                            newViewModel.Auteurs.RemoveAt(i);
+                                            i = 0;
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            newViewModel.Auteurs[i].Id = task.Result.Id;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (newViewModel.Publication != null)
+                            {
+                                if (newViewModel.Publication.Collections != null && newViewModel.Publication.Collections.Any())
+                                {
+                                    for (int i = 0; i < newViewModel.Publication.Collections.Count; i++)
+                                    {
+                                        using (Task<OperationStateVM> task = DbServices.Collection.CreateAsync(newViewModel.Publication.Collections[i], IdLibrary))
+                                        {
+                                            task.Wait();
+                                            _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
+                                            {
+                                                Result = task.Result,
+                                            });
+
+                                            if (!task.Result.IsSuccess)
+                                            {
+                                                newViewModel.Publication.Collections.RemoveAt(i);
+                                                i = 0;
+                                                continue;
+                                            }
+                                            else
+                                            {
+                                                newViewModel.Publication.Collections[i].Id = task.Result.Id;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (newViewModel.Publication.Editeurs != null && newViewModel.Publication.Editeurs.Any())
+                                {
+                                    for (int i = 0; i < newViewModel.Publication.Editeurs.Count; i++)
+                                    {
+                                        using (Task<OperationStateVM> task = DbServices.Contact.CreateAsync(newViewModel.Publication.Editeurs[i]))
+                                        {
+                                            task.Wait();
+                                            _subWorkerStates.Add(new WorkerState<OperationStateVM, OperationStateVM>()
+                                            {
+                                                Result = task.Result,
+                                            });
+
+                                            if (!task.Result.IsSuccess)
+                                            {
+                                                newViewModel.Publication.Editeurs.RemoveAt(i);
+                                                i = 0;
+                                                continue;
+                                            }
+                                            else
+                                            {
+                                                newViewModel.Publication.Editeurs[i].Id = task.Result.Id;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            var bookResult = new WorkerState<OperationStateVM, OperationStateVM>()
+                            {
+                                ResultList = _subWorkerStates.Select(s => s.Result).ToList(),
+                            };
+
+                            using (Task<OperationStateVM> task = DbServices.Book.CreateAsync(newViewModel, IdLibrary))
+                            {
+                                task.Wait();
+                                bookResult.Result = task.Result;
+                                workerStates.Add(bookResult);
+                            }
+
+                            if (worker.CancellationPending)
+                            {
+                                e.Cancel = true;
+                                break;
+                            }
+                            else
+                            {
+                                if (WorkerReportsProgress)
+                                {
+                                    var NumberModel = count + 1;
+                                    double Operation = (double)NumberModel / (double)ModelCount;
+                                    progressPercentage = Operation * 100;
+                                    int ProgressValue = Convert.ToInt32(progressPercentage);
+
+                                    Thread.Sleep(100);
+                                    worker.ReportProgress(ProgressValue, null);
+                                    count++;
+                                }
+                            }
+                        }
+                        e.Result = workerStates?.ToArray();
+                    }
                 }
             }
             catch (Exception ex)

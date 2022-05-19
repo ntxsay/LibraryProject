@@ -3,6 +3,7 @@ using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Excel;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Code.Services.Tasks;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
@@ -43,6 +44,8 @@ namespace LibraryProjectUWP.Views.Common
     {
         public BookCollectionPage BookCollectionPage { get; private set; }
         public Type Type { get; private set; }
+        IEnumerable<BibliothequeVM> bibliothequeVMs;
+        IEnumerable<LivreVM> livreVMs;
         public Guid ItemGuid { get; private set; } = Guid.NewGuid();
 
         public ImportItemsFromFileSideBarVM ViewModelPage { get; set; }
@@ -72,12 +75,19 @@ namespace LibraryProjectUWP.Views.Common
                 }
 
                 Type = typeof(T);
+                if (Type == typeof(BibliothequeVM))
+                {
+                    bibliothequeVMs = objectList.Select(s => (BibliothequeVM)(object)s);
+                }
+                else if (Type == typeof(LivreVM))
+                {
+                    livreVMs = objectList.Select(s => (LivreVM)(object)s);
+                }
 
                 if (page is BookCollectionPage bookCollectionPage)
                 {
                     BookCollectionPage = bookCollectionPage;
                 }
-
 
                 ViewModelPage = new ImportItemsFromFileSideBarVM()
                 {
@@ -172,7 +182,37 @@ namespace LibraryProjectUWP.Views.Common
                     return;
                 }
 
-                ImportDataRequested?.Invoke(this, args);
+                if (Type == typeof(BibliothequeVM))
+                {
+                    List<BibliothequeVM> list = new List<BibliothequeVM>();
+                    foreach (object[] item in ViewModelPage.NewViewModel)
+                    {
+                        var range = bibliothequeVMs.Where(w => w.Name == item[1].ToString());
+                        if (range != null && range.Any())
+                        {
+                            list.AddRange(range);
+                        }
+                    }
+
+                    if (list != null && list.Any())
+                    {
+                        if (BookCollectionPage != null)
+                        {
+                            ImportBooksTask importBooksTask = new ImportBooksTask(BookCollectionPage.Parameters.MainPage, BookCollectionPage.Parameters.ParentLibrary.Id);
+                            importBooksTask.AfterTaskCompletedRequested += ImportBooksTask_AfterTaskCompletedRequested; ;
+                            importBooksTask.InitializeWorker(list);
+                        }
+                    }
+                }
+                else if (Type == typeof(LivreVM))
+                {
+
+                }
+
+                
+
+
+                //ImportDataRequested?.Invoke(this, args);
             }
             catch (Exception ex)
             {
@@ -182,7 +222,10 @@ namespace LibraryProjectUWP.Views.Common
             }
         }
 
-
+        private void ImportBooksTask_AfterTaskCompletedRequested(ImportBooksTask sender, object e)
+        {
+            throw new NotImplementedException();
+        }
 
         private bool IsModelValided()
         {
