@@ -198,7 +198,7 @@ namespace LibraryProjectUWP.Views.Common
                     {
                         if (BookCollectionPage != null)
                         {
-                            ImportBooksTask importBooksTask = new ImportBooksTask(BookCollectionPage.Parameters.MainPage, BookCollectionPage.Parameters.ParentLibrary.Id);
+                            ImportBooksTask importBooksTask = new ImportBooksTask(BookCollectionPage.Parameters.MainPage);
                             importBooksTask.AfterTaskCompletedRequested += ImportBooksTask_AfterTaskCompletedRequested; ;
                             importBooksTask.InitializeWorker(list);
                         }
@@ -224,7 +224,7 @@ namespace LibraryProjectUWP.Views.Common
 
         private void ImportBooksTask_AfterTaskCompletedRequested(ImportBooksTask sender, object e)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private bool IsModelValided()
