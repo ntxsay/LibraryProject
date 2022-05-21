@@ -19,7 +19,7 @@
     </Page.Resources>
     <Grid x:Name="gridMainContainer">
         <MUIXC:NavigationView x:Name="PrincipalNaviguation" PaneDisplayMode="LeftMinimal" IsTitleBarAutoPaddingEnabled="False" IsSettingsVisible="False" IsBackEnabled="True" IsBackButtonVisible="{x:Bind ViewModelPage.IsBackArrowVisible, Mode=OneWay}"
-                              ItemInvoked="PrincipalNaviguation_ItemInvoked" BackRequested="PrincipalNaviguation_BackRequested">
+                              ItemInvoked="PrincipalNaviguation_ItemInvoked" BackRequested="PrincipalNaviguation_BackRequested" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
             <MUIXC:NavigationView.PaneHeader>
                 <Viewbox Height="16" Margin="0 0 0 0" HorizontalAlignment="Left">
                     <icons:LibraryLongLogo />

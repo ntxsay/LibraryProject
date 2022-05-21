@@ -30,6 +30,7 @@ namespace LibraryProjectUWP.Views.Book
     {
         public class BookCollectionPageVM : INotifyPropertyChanged
         {
+            public bool IsUpdateSubView { get; set; }
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
             private ResearchItemVM _ResearchItem = null;

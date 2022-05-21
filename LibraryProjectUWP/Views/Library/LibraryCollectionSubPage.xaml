@@ -30,12 +30,6 @@
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisRtf" TrueValue="Visible" FalseValue="Collapsed"/>
         <MTUUConverters:BoolToObjectConverter x:Key="BoolToVisibilityConverterSynopsisHtml" TrueValue="Visible" FalseValue="Collapsed"/>
         <ThemeShadow x:Name="BackgroundGridShadow"/>
-        <XamlUICommand x:Name="ReloadDataXamlUICommand" 
-                       ExecuteRequested="ReloadDataXamlUICommand_ExecuteRequested"
-                       Description="Actualise les données depuis la base de données" 
-                       Label="Actualiser les données">
-        </XamlUICommand>
-        
         <XamlUICommand x:Name="ChangeJaquetteXamlUICommand" 
                        ExecuteRequested="ChangeJaquetteXamlUICommand_ExecuteRequested"
                        Description="Modifie l'image qui sert à présenter la bibliothèque" 

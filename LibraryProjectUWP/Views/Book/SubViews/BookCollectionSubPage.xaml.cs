@@ -62,6 +62,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
+        public void UpdateBinding()
+        {
+            this.Bindings.Update();
+        }
+
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             EsLibrary esLibrary = new EsLibrary();
@@ -70,11 +75,11 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             if (ParentPage.Parameters.ParentLibrary.Id != IdLibrary)
             {
                 IdLibrary = ParentPage.Parameters.ParentLibrary.Id;
-                InitializeData(true);
+                InitializeData();
             }
             else if (ViewModelPage.GroupedRelatedViewModel == null || ViewModelPage.GroupedRelatedViewModel.Collection == null || !ViewModelPage.GroupedRelatedViewModel.Collection.Any())
             {
-                InitializeData(true);
+                InitializeData();
             }
             else
             {
@@ -116,7 +121,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public void InitializeData(bool firstLoad)
+        public void InitializeData(bool resetPage = true)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -134,26 +139,9 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 {
                     worker.DoWork += (s, e) =>
                     {
-                        switch (ParentPage.ViewModelPage.DataViewMode)
+                        using (Task task = Task.Run(() => this.ViewMode(ParentPage.ViewModelPage.DataViewMode, resetPage)))
                         {
-                            case Code.DataViewModeEnum.DataGridView:
-                                using (Task task = Task.Run(() => this.DataGridViewMode(firstLoad)))
-                                {
-                                    task.Wait();
-                                }
-                                break;
-                            case Code.DataViewModeEnum.GridView:
-                                using (Task task = Task.Run(() => this.GridViewMode(firstLoad)))
-                                {
-                                    task.Wait();
-                                }
-                                break;
-                            default:
-                                using (Task task = Task.Run(() => this.GridViewMode(firstLoad)))
-                                {
-                                    task.Wait();
-                                }
-                                break;
+                            task.Wait();
                         }
                     };
 
@@ -184,39 +172,35 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public async Task GridViewMode(bool firstLoad)
+        /// <summary>
+        /// Change la disposition des éléments
+        /// </summary>
+        /// <param name="viewMode">Mode d'affichage</param>
+        /// <param name="firstLoad"></param>
+        /// <returns></returns>
+        public async Task ViewMode(DataViewModeEnum viewMode, bool resetPage)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                if (viewMode == DataViewModeEnum.GridView)
+                {
+                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                     async () =>
                     {
                         this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
 
-                        if (ParentPage.ViewModelPage.DataViewMode != Code.DataViewModeEnum.GridView)
+                        if (ParentPage.ViewModelPage.DataViewMode != DataViewModeEnum.GridView)
                         {
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
                         }
 
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchItem);
-                        this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
-                        this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage, ParentPage.ViewModelPage.ResearchItem);
                     });
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        public async Task DataGridViewMode(bool firstLoad)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                }
+                else if (viewMode == DataViewModeEnum.DataGridView)
+                {
+                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                     async () =>
                     {
                         this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
@@ -226,10 +210,12 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
                         }
 
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, firstLoad, ParentPage.ViewModelPage.ResearchItem);
-                        this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
-                        this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage, ParentPage.ViewModelPage.ResearchItem);
                     });
+                }
+
+                this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
             catch (Exception ex)
             {
@@ -237,6 +223,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 return;
             }
         }
+
 
         private void GridViewItems_Loaded(object sender, RoutedEventArgs e)
         {

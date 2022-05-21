@@ -270,12 +270,28 @@ namespace LibraryProjectUWP.Code.Services.Tasks
                 }
                 else if (e.Cancelled)
                 {
-                    message = $"L'import de livres a été annulé par l'utilisateur.";
+                    if (Type == typeof(BibliothequeVM))
+                    {
+                        message = $"L'import des bibliothèques a été annulé par l'utilisateur.";
+                    }
+                    else if (Type == typeof(LivreVM))
+                    {
+                        message = $"L'import de livres a été annulé par l'utilisateur.";
+                    }
                 }
                 else
                 {
-                    var viewModelList = e.Result as WorkerState<OperationStateVM, OperationStateVM>[];
-                    message = $"L'import des livres s'est terminé avec {viewModelList?.Count(w => w.Result.IsSuccess == false) ?? 0} erreur(s) et {viewModelList?.Select(s => s.ResultList)?.SelectMany(w => w.ToList())?.Select(q => q)?.Count(c => c.IsSuccess == false) ?? 0} avertissement(s)";
+                    if (e.Result is WorkerState<OperationStateVM, OperationStateVM>[] viewModelList)
+                    {
+                        if (Type == typeof(BibliothequeVM))
+                        {
+                            message = $"L'import des bibliothèques s'est terminé avec {viewModelList?.Count(w => w.Result.IsSuccess == false) ?? 0} erreur(s) et {viewModelList?.Select(s => s.ResultList)?.SelectMany(w => w.ToList())?.Select(q => q)?.Count(c => c.IsSuccess == false) ?? 0} avertissement(s)";
+                        }
+                        else if (Type == typeof(LivreVM))
+                        {
+                            message = $"L'import des livres s'est terminé avec {viewModelList?.Count(w => w.Result.IsSuccess == false) ?? 0} erreur(s) et {viewModelList?.Select(s => s.ResultList)?.SelectMany(w => w.ToList())?.Select(q => q)?.Count(c => c.IsSuccess == false) ?? 0} avertissement(s)";
+                        }
+                    }
                 }
 
                 if (UseBusyLoader)

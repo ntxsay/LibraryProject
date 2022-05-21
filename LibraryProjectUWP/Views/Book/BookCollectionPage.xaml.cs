@@ -219,6 +219,7 @@ namespace LibraryProjectUWP.Views.Book
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                this.Parameters.ParentLibrary = null;
                 ViewModelPage.SelectedItems.Clear();
                 ViewModelPage.SelectedItems = new List<object>();
                 this.Lv_SelectedItems.ItemTemplate = (DataTemplate)this.Resources["LibrarySuggestDataTemplate"];
@@ -312,11 +313,11 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    libraryCollectionSubPage.InitializeData(true);
+                    libraryCollectionSubPage.InitializeData();
                 }
                 else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
                 {
-                    bookCollectionSubPage.InitializeData(true);
+                    bookCollectionSubPage.InitializeData();
                 }
             }
             catch (Exception ex)
@@ -502,7 +503,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is AppBarToggleButton toggleButton)
                 {
-                    if (ViewModelPage.DataViewMode == Code.DataViewModeEnum.GridView)
+                    if (ViewModelPage.DataViewMode == DataViewModeEnum.GridView)
                     {
                         if (toggleButton.IsChecked != true)
                         {
@@ -510,7 +511,8 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         return;
                     }
-                    await this.GridViewMode(false);
+
+                    await this.ViewMode(DataViewModeEnum.GridView, false);
                 }
             }
             catch (Exception ex)
@@ -535,7 +537,7 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         return;
                     }
-                    await this.DataGridViewMode(false);
+                    await this.ViewMode(DataViewModeEnum.DataGridView, false);
                 }
             }
             catch (Exception ex)
@@ -546,39 +548,26 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private async Task GridViewMode(bool firstLoad)
+        /// <summary>
+        /// Change la disposition des éléments
+        /// </summary>
+        /// <param name="viewMode">Mode d'affichage</param>
+        /// <param name="resetPage"></param>
+        /// <returns></returns>
+        private async Task ViewMode(DataViewModeEnum viewMode, bool resetPage)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
-                {
-                    await libraryCollectionSubPage.GridViewMode(firstLoad);
-                }
-                else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
-                {
-                    await bookCollectionSubPage.GridViewMode(firstLoad);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
+                ViewModelPage.DataViewMode = viewMode;
 
-        private async Task DataGridViewMode(bool firstLoad)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
                 if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    await libraryCollectionSubPage.DataGridViewMode(firstLoad);
+                    await libraryCollectionSubPage.ViewMode(viewMode, resetPage);
                 }
                 else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
                 {
-                    await bookCollectionSubPage.DataGridViewMode(firstLoad);
+                    await bookCollectionSubPage.ViewMode(viewMode, resetPage);
                 }
             }
             catch (Exception ex)

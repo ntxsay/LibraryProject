@@ -224,7 +224,24 @@ namespace LibraryProjectUWP.Views.Common
 
         private void ImportBooksTask_AfterTaskCompletedRequested(ImportBooksTask sender, object e)
         {
-            //throw new NotImplementedException();
+            if (BookCollectionPage != null)
+            {
+                BookCollectionPage.ViewModelPage.IsUpdateSubView = true;
+                if (BookCollectionPage.Parameters.ParentLibrary == null)
+                {
+                    BookCollectionPage.OpenLibraryCollection();
+                    //BookCollectionPage.UpdateLayout();
+                }
+                else
+                {
+                    BookCollectionPage.OpenBookCollection(BookCollectionPage.Parameters.ParentLibrary);
+                    if (BookCollectionPage.IsContainsBookCollection(out var bookCollectionSubPage))
+                    {
+                        bookCollectionSubPage.UpdateBinding();
+                    }
+                }
+
+            }
         }
 
         private bool IsModelValided()

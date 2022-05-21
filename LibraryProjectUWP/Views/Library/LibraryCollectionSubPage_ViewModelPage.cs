@@ -18,7 +18,7 @@ namespace LibraryProjectUWP.Views.Library
     {
         public class LibraryCollectionPageVM : INotifyPropertyChanged
         {
-            readonly BookCollectionPage parentPage;
+            public BookCollectionPage ParentPage { private get; set; }
             public LibraryCollectionPageVM()
             {
 
@@ -26,7 +26,7 @@ namespace LibraryProjectUWP.Views.Library
 
             public LibraryCollectionPageVM(BookCollectionPage _parentPage)
             {
-                parentPage = _parentPage;
+                ParentPage = _parentPage;
             }
 
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
@@ -162,9 +162,9 @@ namespace LibraryProjectUWP.Views.Library
                         this.OnPropertyChanged();
                     }
 
-                    if (parentPage != null && parentPage.ViewModelPage.NbItems != value)
+                    if (ParentPage != null && ParentPage.ViewModelPage.NbItems != value)
                     {
-                        parentPage.ViewModelPage.NbItems = value;
+                        ParentPage.ViewModelPage.NbItems = value;
                     }
                 }
             }
@@ -181,9 +181,9 @@ namespace LibraryProjectUWP.Views.Library
                         this.OnPropertyChanged();
                     }
 
-                    if (parentPage != null && parentPage.ViewModelPage.NbElementDisplayed != value)
+                    if (ParentPage != null && ParentPage.ViewModelPage.NbElementDisplayed != value)
                     {
-                        parentPage.ViewModelPage.NbElementDisplayed = value;
+                        ParentPage.ViewModelPage.NbElementDisplayed = value;
                     }
                 }
             }

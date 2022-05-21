@@ -522,6 +522,11 @@ namespace LibraryProjectUWP.Code.Services.UI
 
                     BookCollectionSubView.ViewModelPage.NbItems = (int)await DbServices.Book.CountBooksInLibraryAsync(ParentPage.Parameters.ParentLibrary.Id);
                 }
+
+                if (ParentPage.ViewModelPage.IsUpdateSubView == true)
+                {
+                    ParentPage.ViewModelPage.IsUpdateSubView = false;
+                }
             }
             catch (Exception ex)
             {
