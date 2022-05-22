@@ -12,20 +12,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // Pour en savoir plus sur le modèle d'élément Contrôle utilisateur, consultez la page https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -357,6 +351,7 @@ namespace LibraryProjectUWP.Views.Contact
 
         #endregion
 
+        #region SearchItems
         private void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             try
@@ -444,7 +439,7 @@ namespace LibraryProjectUWP.Views.Contact
                 return;
             }
         }
-
+        #endregion
         private void CancelModificationXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             CancelModificationRequested?.Invoke(this, args);
@@ -473,6 +468,40 @@ namespace LibraryProjectUWP.Views.Contact
         private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
 
+        }
+
+        private void MenuFlyoutDisplayContacts_Opened(object sender, object e)
+        {
+            try
+            {
+                if ()
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void MFI_DisplayAdherant_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeSideBar(ParentPage, null, new ContactRole[] { ContactRole.Adherant });
+        }
+
+        private void MFI_DisplayAuthors_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeSideBar(ParentPage, null, new ContactRole[] { ContactRole.Author });
+
+        }
+
+        private void MFI_DisplayEditors_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeSideBar(ParentPage, null, new ContactRole[] { ContactRole.EditorHouse });
+        }
+
+        private void MFI_DisplayAllContacts_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeSideBar(ParentPage, null, null);
         }
 
         private void ListViewZoomInView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -836,27 +865,6 @@ namespace LibraryProjectUWP.Views.Contact
                 Logs.Log(ex, m);
                 return;
             }
-        }
-
-        private void MFI_DisplayAdherant_Click(object sender, RoutedEventArgs e)
-        {
-            InitializeSideBar(ParentPage, null, new ContactRole[] { ContactRole.Adherant });
-        }
-
-        private void MFI_DisplayAuthors_Click(object sender, RoutedEventArgs e)
-        {
-            InitializeSideBar(ParentPage, null, new ContactRole[] { ContactRole.Author });
-
-        }
-
-        private void MFI_DisplayEditors_Click(object sender, RoutedEventArgs e)
-        {
-            InitializeSideBar(ParentPage, null, new ContactRole[] { ContactRole.EditorHouse });
-        }
-
-        private void MFI_DisplayAllContacts_Click(object sender, RoutedEventArgs e)
-        {
-            InitializeSideBar(ParentPage, null, null);
         }
 
         

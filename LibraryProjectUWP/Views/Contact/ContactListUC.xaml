@@ -128,28 +128,16 @@
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
-                    <MenuFlyout>
-                        <MenuFlyoutItem Text="Afficher les adhérants" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayAdherant_Click">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Afficher les auteurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayAuthors_Click">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Afficher les éditeurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayEditors_Click">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
+                    <MenuFlyout Opened="MenuFlyoutDisplayContacts_Opened">
+                        <ToggleMenuFlyoutItem x:Name="TmfiAdherants" Text="Afficher les adhérants" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayAdherant_Click">
+                        </ToggleMenuFlyoutItem>
+                        <ToggleMenuFlyoutItem x:Name="TmfiAuthors" Text="Afficher les auteurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayAuthors_Click">
+                        </ToggleMenuFlyoutItem>
+                        <ToggleMenuFlyoutItem x:Name="TmfiEditors" Text="Afficher les éditeurs" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayEditors_Click">
+                        </ToggleMenuFlyoutItem>
                         <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Afficher tous les contacts" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayAllContacts_Click">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
+                        <ToggleMenuFlyoutItem x:Name="TmfiAllContacts" Text="Afficher tous les contacts" MTUUi:FrameworkElementExtensions.Cursor="Hand" Click="MFI_DisplayAllContacts_Click">
+                        </ToggleMenuFlyoutItem>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
