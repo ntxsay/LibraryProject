@@ -106,7 +106,6 @@ namespace LibraryProjectUWP.Views.Common
             }
         }
 
-
         public void InitializeText()
         {
             try
@@ -198,8 +197,8 @@ namespace LibraryProjectUWP.Views.Common
                     {
                         if (BookCollectionPage != null)
                         {
-                            ImportBooksTask importBooksTask = new ImportBooksTask(BookCollectionPage.Parameters.MainPage);
-                            importBooksTask.AfterTaskCompletedRequested += ImportBooksTask_AfterTaskCompletedRequested; ;
+                            ImportBooksOrLibrariesTask importBooksTask = new ImportBooksOrLibrariesTask(BookCollectionPage.Parameters.MainPage);
+                            importBooksTask.AfterTaskCompletedRequested += ImportBooksTask_AfterTaskCompletedRequested;
                             importBooksTask.InitializeWorker(list);
                         }
                     }
@@ -222,7 +221,7 @@ namespace LibraryProjectUWP.Views.Common
             }
         }
 
-        private void ImportBooksTask_AfterTaskCompletedRequested(ImportBooksTask sender, object e)
+        private void ImportBooksTask_AfterTaskCompletedRequested(ImportBooksOrLibrariesTask sender, object e)
         {
             if (BookCollectionPage != null)
             {
@@ -230,7 +229,6 @@ namespace LibraryProjectUWP.Views.Common
                 if (BookCollectionPage.Parameters.ParentLibrary == null)
                 {
                     BookCollectionPage.OpenLibraryCollection();
-                    //BookCollectionPage.UpdateLayout();
                 }
                 else
                 {

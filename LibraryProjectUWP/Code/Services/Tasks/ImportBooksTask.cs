@@ -17,7 +17,7 @@ using Windows.UI.Xaml.Input;
 
 namespace LibraryProjectUWP.Code.Services.Tasks
 {
-    public class ImportBooksTask
+    public class ImportBooksOrLibrariesTask
     {
         public MainPage MainPage { get; private set; }
         private BackgroundWorker WorkerBackground;
@@ -32,16 +32,16 @@ namespace LibraryProjectUWP.Code.Services.Tasks
         public bool IsWorkerCancelResquested => WorkerBackground != null && WorkerBackground.CancellationPending;
         CancellationTokenSource CancellationTokenSource { get; set; }
 
-        public delegate void AfterTaskCompletedEventHandler(ImportBooksTask sender, object e);
+        public delegate void AfterTaskCompletedEventHandler(ImportBooksOrLibrariesTask sender, object e);
         public event AfterTaskCompletedEventHandler AfterTaskCompletedRequested;
 
-        public ImportBooksTask(MainPage mainPage, long idLibrary)
+        public ImportBooksOrLibrariesTask(MainPage mainPage, long idLibrary)
         {
             MainPage = mainPage;
             IdLibrary = idLibrary;
         }
 
-        public ImportBooksTask(MainPage mainPage)
+        public ImportBooksOrLibrariesTask(MainPage mainPage)
         {
             MainPage = mainPage;
         }

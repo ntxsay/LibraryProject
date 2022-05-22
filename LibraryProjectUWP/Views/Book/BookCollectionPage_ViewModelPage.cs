@@ -30,7 +30,11 @@ namespace LibraryProjectUWP.Views.Book
     {
         public class BookCollectionPageVM : INotifyPropertyChanged
         {
+            /// <summary>
+            /// Cette propriété renvoie une valeur booléenne indiquant si une sous-vue doit être mise à jour ou non au moment voulu.
+            /// </summary>
             public bool IsUpdateSubView { get; set; }
+
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
             private ResearchItemVM _ResearchItem = null;

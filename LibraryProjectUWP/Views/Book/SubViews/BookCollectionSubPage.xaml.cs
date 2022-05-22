@@ -183,39 +183,31 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (viewMode == DataViewModeEnum.GridView)
-                {
-                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                     async () =>
                     {
                         this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
-
-                        if (ParentPage.ViewModelPage.DataViewMode != DataViewModeEnum.GridView)
+                        if (viewMode == DataViewModeEnum.GridView)
                         {
-                            ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
+                            if (ParentPage.ViewModelPage.DataViewMode != DataViewModeEnum.GridView)
+                            {
+                                ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.GridView;
+                            }
+
+                        }
+                        else if (viewMode == DataViewModeEnum.DataGridView)
+                        {
+                            if (ParentPage.ViewModelPage.DataViewMode != Code.DataViewModeEnum.DataGridView)
+                            {
+                                ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
+                            }
                         }
 
                         await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage, ParentPage.ViewModelPage.ResearchItem);
+                        
+                        this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
+                        this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });
-                }
-                else if (viewMode == DataViewModeEnum.DataGridView)
-                {
-                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                    async () =>
-                    {
-                        this.PivotItems.SelectionChanged -= PivotItems_SelectionChanged;
-
-                        if (ParentPage.ViewModelPage.DataViewMode != Code.DataViewModeEnum.DataGridView)
-                        {
-                            ParentPage.ViewModelPage.DataViewMode = Code.DataViewModeEnum.DataGridView;
-                        }
-
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage, ParentPage.ViewModelPage.ResearchItem);
-                    });
-                }
-
-                this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
-                this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
             }
             catch (Exception ex)
             {

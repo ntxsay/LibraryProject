@@ -116,7 +116,6 @@ namespace LibraryProjectUWP.Views.Book
                 Parameters = parameters;
             }
         }
-        
 
         #region Loading
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -187,6 +186,7 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.SelectedItems.Clear();
                     ViewModelPage.SelectedItems = new List<object>();
                     this.Lv_SelectedItems.ItemTemplate = (DataTemplate)this.Resources["BookSuggestDataTemplate"];
+                    
                     this.ViewModelPage.SelectedItemsMessage = "0 livre(s) sélectionné(s)";
                     this.ViewModelPage.NbItemsTitle = "Nombre total de livre";
                     this.ViewModelPage.NbElementDisplayedTitle = "Nombre de livres affichés";
@@ -223,6 +223,7 @@ namespace LibraryProjectUWP.Views.Book
                 ViewModelPage.SelectedItems.Clear();
                 ViewModelPage.SelectedItems = new List<object>();
                 this.Lv_SelectedItems.ItemTemplate = (DataTemplate)this.Resources["LibrarySuggestDataTemplate"];
+                
                 this.ViewModelPage.SelectedItemsMessage = "0 bibliothèque(s) sélectionnée(s)";
                 this.ViewModelPage.NbItemsTitle = "Nombre total de bibliothèque";
                 this.ViewModelPage.NbElementDisplayedTitle = "Nombre de bibliothèques affichés";
@@ -1525,6 +1526,7 @@ namespace LibraryProjectUWP.Views.Book
         {
             if (FrameContainer.Content is LibraryCollectionSubPage)
             {
+#warning Importer une bibliothèque via un site (peut-être)
             }
             else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
             {
@@ -1589,20 +1591,7 @@ namespace LibraryProjectUWP.Views.Book
                     if (viewModels != null && viewModels.Any())
                     {
                         ImportLibraryFromFile(viewModels, storageFile);
-                        //viewModels.ForEach((book) => this.CompleteBookInfos(book));
-
-                        //if (viewModels.Count() == 1)
-                        //{
-                        //    await NewEditBookAsync(viewModels.First(), EditMode.Create);
-                        //}
-                        //else
-                        //{
-                        //    ImportBookFromFile(viewModels, storageFile);
-                        //    OpenImportBookFromFile(viewModels);
-                        //}
                     }
-
-#warning Importer une bibliothèque via un fichier (json);
                 }
                 else if (FrameContainer.Content is BookCollectionSubPage && Parameters.ParentLibrary != null)
                 {
@@ -2080,7 +2069,7 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                var viewModels = (await esBook.OpenBooksFromFileAsync(storageFile))?.ToList();
+                var viewModels = (await esGeneral.OpenItemFromFileAsync<LivreVM>(storageFile))?.ToList();
                 if (viewModels != null && viewModels.Any())
                 {
                     viewModels.ForEach((book) => this.CompleteBookInfos(book));
@@ -2118,7 +2107,6 @@ namespace LibraryProjectUWP.Views.Book
                     ImportBookFromFileUC userControl = new ImportBookFromFileUC(new ImportBookParametersDriverVM()
                     {
                         ParentPage = this,
-                        //ViewModelList = viewModelList,
                         File = file,
                     });
 
@@ -2147,7 +2135,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 List<LivreVM> newViewModelList = sender.ViewModelPage.NewViewModel;
-                ImportBooksTask importBooksTask = new ImportBooksTask(Parameters.MainPage, Parameters.ParentLibrary.Id);
+                ImportBooksOrLibrariesTask importBooksTask = new ImportBooksOrLibrariesTask(Parameters.MainPage, Parameters.ParentLibrary.Id);
                 importBooksTask.AfterTaskCompletedRequested += ImportBooksTask_AfterTaskCompletedRequested;
                 importBooksTask.InitializeWorker(newViewModelList);
 
@@ -2162,6 +2150,7 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
         private void ImportBookFromFileUC_CancelModificationRequested(ImportBookFromFileUC sender, ExecuteRequestedEventArgs e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -2226,7 +2215,7 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 List<LivreVM> newViewModelList = sender.ViewModelPivotItem.NewViewModel;
-                ImportBooksTask importBooksTask = new ImportBooksTask(Parameters.MainPage, Parameters.ParentLibrary.Id)
+                ImportBooksOrLibrariesTask importBooksTask = new ImportBooksOrLibrariesTask(Parameters.MainPage, Parameters.ParentLibrary.Id)
                 {
                     CloseBusyLoaderAfterFinish = true,
                 };
@@ -2261,7 +2250,7 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-        private void ImportBooksTask_AfterTaskCompletedRequested(ImportBooksTask sender, object e)
+        private void ImportBooksTask_AfterTaskCompletedRequested(ImportBooksOrLibrariesTask sender, object e)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -3165,21 +3154,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void CancelSearch()
-        {
-            try
-            {
-                ViewModelPage.ResearchItem = null;
-                ASB_SearchItem.Text = string.Empty;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
         public void SearchItems(ResearchItemVM ResearchItemVM)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -3303,48 +3277,7 @@ namespace LibraryProjectUWP.Views.Book
                 this.RemoveItemToSideBar(sender);
                 ViewModelPage.ResearchItem = null;
 
-                if (FrameContainer.Content is LibraryCollectionSubPage)
-                {
-                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                    {
-                        ProgessText = $"Reconstruction du catalogue des bibliothèques en cours ...",
-                    });
-                }
-                else if (FrameContainer.Content is BookCollectionSubPage)
-                {
-                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                    {
-                        ProgessText = $"Reconstruction du catalogue des livres en cours ...",
-                    });
-                }                
-
-                DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                {
-                    Interval = new TimeSpan(0, 0, 0, 1),
-                };
-
-                dispatcherTimer.Tick += async (t, f) =>
-                {
-                    await this.RefreshItemsGrouping();
-
-                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 2),
-                    };
-
-                    dispatcherTimer2.Tick += (s, d) =>
-                    {
-                        Parameters.MainPage.CloseBusyLoader();
-                        ASB_SearchItem.Text = String.Empty;
-
-                        dispatcherTimer2.Stop();
-                    };
-                    dispatcherTimer2.Start();
-
-                    dispatcherTimer.Stop();
-                };
-
-                dispatcherTimer.Start();
+                UpdateItemsAfterQuitSearch();
             }
             catch (Exception ex)
             {
@@ -3384,12 +3317,20 @@ namespace LibraryProjectUWP.Views.Book
 
         private void MFIQuitSearch_Click(object sender, RoutedEventArgs e)
         {
+            CancelSearch();
+            UpdateItemsAfterQuitSearch();
+        }
+
+        public void CancelSearch()
+        {
             try
             {
+                ViewModelPage.ResearchItem = null;
+                ASB_SearchItem.Text = string.Empty;
                 SearchBookUC searchBookUC = uiServices.GetSearchBookUCSideBar(this.PivotRightSideBar);
                 if (searchBookUC != null)
                 {
-                    SearchBookUC_CancelModificationRequested(searchBookUC, null);
+                    this.RemoveItemToSideBar(searchBookUC);
                 }
             }
             catch (Exception ex)
@@ -3400,6 +3341,60 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void UpdateItemsAfterQuitSearch()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (FrameContainer.Content is LibraryCollectionSubPage)
+                {
+                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                    {
+                        ProgessText = $"Reconstruction du catalogue des bibliothèques en cours ...",
+                    });
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage)
+                {
+                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                    {
+                        ProgessText = $"Reconstruction du catalogue des livres en cours ...",
+                    });
+                }
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    await this.RefreshItemsGrouping();
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, d) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        ASB_SearchItem.Text = String.Empty;
+
+                        dispatcherTimer2.Stop();
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                };
+
+                dispatcherTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
         #endregion
 
         #region Collections

@@ -257,14 +257,26 @@ namespace LibraryProjectUWP.Code.Services.UI
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                CommonGroupItemVM<T> result = null;
                 if (searchParams != null)
                 {
-                    return await this.GenerateResearchBookGroupItemAsync<T>(searchParams, goToPage);
+                    result = await this.GenerateResearchBookGroupItemAsync<T>(searchParams, goToPage);
                 }
                 else
                 {
-                    return await this.GenerateBookGroupItemAsync<T>(goToPage);
+                    result = await this.GenerateBookGroupItemAsync<T>(goToPage);
                 }
+
+                if (LibraryCollectionSubView != null)
+                {
+                    LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                }
+                else if (BookCollectionSubView != null)
+                {
+                    BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                }
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -286,7 +298,7 @@ namespace LibraryProjectUWP.Code.Services.UI
 
                 if ((typeof(T).IsAssignableFrom(typeof(Tlibrary)) || typeof(T).IsAssignableFrom(typeof(BibliothequeVM))) && LibraryCollectionSubView != null)
                 {
-                    var searchedItems = await DbServices.Library.SearchAsync<Tlibrary>(searchParams);
+                    var searchedItems = await DbServices.Common.SearchAsync<Tlibrary>(searchParams);
                     if (searchedItems == null || !searchedItems.Any())
                     {
                         LibraryCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
@@ -296,7 +308,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     orderedBy = (byte)LibraryCollectionSubView.ViewModelPage.OrderedBy;
                     sortedBy = (byte)LibraryCollectionSubView.ViewModelPage.SortedBy;
 
-                    IEnumerable<Tlibrary> orderModelList = DbServices.Library.OrderLibraries(searchedItems, orderedBy, sortedBy);
+                    IEnumerable<Tlibrary> orderModelList = DbServices.Common.Order(searchedItems, orderedBy, sortedBy);
                     if (orderModelList == null || !orderModelList.Any())
                     {
                         LibraryCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
@@ -309,7 +321,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                 }
                 else if ((typeof(T).IsAssignableFrom(typeof(Tbook)) || typeof(T).IsAssignableFrom(typeof(LivreVM))) && BookCollectionSubView != null)
                 {
-                    var searchedItems = await DbServices.Library.SearchAsync<Tbook>(searchParams);
+                    var searchedItems = await DbServices.Common.SearchAsync<Tbook>(searchParams);
                     if (searchedItems == null || !searchedItems.Any())
                     {
                         BookCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
@@ -319,7 +331,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     orderedBy = (byte)BookCollectionSubView.ViewModelPage.OrderedBy;
                     sortedBy = (byte)BookCollectionSubView.ViewModelPage.SortedBy;
 
-                    IEnumerable<Tbook> orderModelList = DbServices.Library.OrderLibraries(searchedItems, orderedBy, sortedBy);
+                    IEnumerable<Tbook> orderModelList = DbServices.Common.Order(searchedItems, orderedBy, sortedBy);
                     if (orderModelList == null || !orderModelList.Any())
                     {
                         BookCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
@@ -380,7 +392,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     orderedBy = (byte)BookCollectionSubView.ViewModelPage.OrderedBy;
                     sortedBy = (byte)BookCollectionSubView.ViewModelPage.SortedBy;
 
-                    IEnumerable<Tbook> orderModelList = await DbServices.Library.OrderLibrariesAsync<Tbook>(orderedBy, sortedBy, ParentPage.Parameters.ParentLibrary?.Id);
+                    IEnumerable<Tbook> orderModelList = await DbServices.Common.OrderAsync<Tbook>(orderedBy, sortedBy, ParentPage.Parameters.ParentLibrary?.Id);
                     if (orderModelList == null || !orderModelList.Any())
                     {
                         BookCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
@@ -406,7 +418,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                 {
                     orderedBy = (byte)LibraryCollectionSubView.ViewModelPage.OrderedBy;
                     sortedBy = (byte)LibraryCollectionSubView.ViewModelPage.SortedBy;
-                    IEnumerable<Tlibrary> orderModelList = await DbServices.Library.OrderLibrariesAsync<Tlibrary>(orderedBy, sortedBy);
+                    IEnumerable<Tlibrary> orderModelList = await DbServices.Common.OrderAsync<Tlibrary>(orderedBy, sortedBy);
                     if (orderModelList == null || !orderModelList.Any())
                     {
                         LibraryCollectionSubView.ViewModelPage.NbElementDisplayed = 0;

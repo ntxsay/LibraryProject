@@ -53,6 +53,12 @@ namespace LibraryProjectUWP.Code.Services.ES
             Editors
         }
 
+        /// <summary>
+        /// Désérialize un fichier au format json
+        /// </summary>
+        /// <typeparam name="T">Type de l'objet représentant</typeparam>
+        /// <param name="storageFile">Fichier</param>
+        /// <returns></returns>
         public async Task<IEnumerable<T>> OpenItemFromFileAsync<T>(StorageFile storageFile) where T : class
         {
             MethodBase m = MethodBase.GetCurrentMethod();
