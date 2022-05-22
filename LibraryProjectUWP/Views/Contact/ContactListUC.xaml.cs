@@ -135,16 +135,16 @@ namespace LibraryProjectUWP.Views.Contact
                 getContactsListTask.InitializeWorker(contactType, contactRoleList);
                 getContactsListTask.AfterTaskCompletedRequested += (j, e) =>
                 {
+                    if (this.CollectionViewSource.View == null)
+                    {
+                        this.CollectionViewSource.Source = ViewModelListGroup;
+                    }
+
                     if (e.Result is WorkerState<ContactVM, ContactVM> result && result.ResultList != null && result.ResultList.Any())
                     {
                         var GroupingItems = this.OrderItems(result.ResultList)?.Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NomNaissance.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                         if (GroupingItems != null && GroupingItems.Count() > 0)
                         {
-                            if (this.CollectionViewSource.View == null)
-                            {
-                                this.CollectionViewSource.Source = ViewModelListGroup;
-                            }
-
                             List<ContactGroupCastVM> contactGroupCastVMs = GroupingItems.Select(groupingItem => new ContactGroupCastVM()
                             {
                                 GroupName = groupingItem.Key,
@@ -156,10 +156,11 @@ namespace LibraryProjectUWP.Views.Contact
                             {
                                 ViewModelListGroup.Add(item);
                             }
-
-                            
                         }
-
+                    }
+                    else
+                    {
+                        ViewModelListGroup.Clear();
                     }
                     ViewModelPage.WorkerTextVisibility = Visibility.Collapsed;
                     ViewModelPage.DataListVisibility = Visibility.Visible;
@@ -474,7 +475,20 @@ namespace LibraryProjectUWP.Views.Contact
         {
             try
             {
-                if ()
+                if (ViewModelPage.ContactRoles != null && ViewModelPage.ContactRoles.Count > 0)
+                {
+                    TmfiAdherants.IsChecked = ViewModelPage.ContactRoles.Any(a => a == ContactRole.Adherant);
+                    TmfiAuthors.IsChecked = ViewModelPage.ContactRoles.Any(a => a == ContactRole.Author);
+                    TmfiEditors.IsChecked = ViewModelPage.ContactRoles.Any(a => a == ContactRole.EditorHouse);
+                    TmfiAllContacts.IsChecked = false;
+                }
+                else
+                {
+                    TmfiAllContacts.IsChecked = true;
+                    TmfiAdherants.IsChecked = false;
+                    TmfiAuthors.IsChecked = false;
+                    TmfiEditors.IsChecked = false;
+                }
             }
             catch (Exception)
             {

@@ -9,6 +9,7 @@
     xmlns:userControls="using:LibraryProjectUWP.Views.UserControls"
     xmlns:generalVM="using:LibraryProjectUWP.ViewModels.General"
     xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
+    xmlns:categoriesVm="using:LibraryProjectUWP.ViewModels.Categorie"
     xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
@@ -93,7 +94,7 @@
                 <Setter Property="Margin" Value="4 0" />
                 <Setter Property="VerticalAlignment" Value="Top" />
             </Style>
-            <DataTemplate x:Key="CategorieTemplate" x:DataType="viewModels:CategorieLivreVM">
+            <DataTemplate x:Key="CategorieTemplate" x:DataType="categoriesVm:CategorieLivreVM">
                 <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}"
             ItemsSource="{x:Bind SubCategorieLivres, Mode=OneWay}" IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}" IsSelected="{x:Bind IsSelected, Mode=TwoWay}">
                     <Grid RowSpacing="2">
@@ -131,7 +132,7 @@
                     </MUIXC:TreeViewItem.ContextFlyout>
                 </MUIXC:TreeViewItem>
             </DataTemplate>
-            <DataTemplate x:Key="SubCategorieTemplate" x:DataType="viewModels:SubCategorieLivreVM">
+            <DataTemplate x:Key="SubCategorieTemplate" x:DataType="categoriesVm:SubCategorieLivreVM">
                 <MUIXC:TreeViewItem AutomationProperties.Name="{x:Bind Name, Mode=OneWay}" IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}" IsSelected="{x:Bind IsSelected, Mode=TwoWay}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE81E;"/>

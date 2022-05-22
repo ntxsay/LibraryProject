@@ -126,7 +126,9 @@ namespace LibraryProjectUWP.Code.Services.Db
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
                         List<Tcontact> collection = new List<Tcontact>();
-                        if (contactType == null && contactRoleList == null || !contactRoleList.Any())
+                        
+                        //Si aucun type et aucun role alors affiche tous les contacts
+                        if (contactType == null && (contactRoleList == null || contactRoleList != null && !contactRoleList.Any()))
                         {
                             var result = await context.Tcontact.ToListAsync(cancellationToken);
                             if (result != null && result.Any())
@@ -134,7 +136,8 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 collection.AddRange(result);
                             }
                         }
-                        else if (contactType != null && contactRoleList == null || !contactRoleList.Any())
+                        //S'il y a un type mais aucun role alors afficher tous les contacts de ce type
+                        else if (contactType != null && (contactRoleList == null || contactRoleList != null && !contactRoleList.Any()))
                         {
                             var result = await context.Tcontact.Where(w => w.Type == (byte)contactType).ToListAsync(cancellationToken);
                             if (result != null && result.Any())
@@ -142,6 +145,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 collection.AddRange(result);
                             }
                         }
+                        //Si aucun type mais un ou plusieurs roles alors affiche tous les contacts avec ces roles
                         else if (contactType == null && contactRoleList != null && contactRoleList.Any())
                         {
                             List<TcontactRole> tRoleList = new List<TcontactRole>();
@@ -166,6 +170,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 }
                             }
                         }
+                        //S'il y a un type  avec plusieurs roles alors afficher tous les contacts de ce type et avec ces roles
                         else if (contactType != null && contactRoleList != null && contactRoleList.Any())
                         {
                             List<TcontactRole> tRoleList = new List<TcontactRole>();
@@ -193,7 +198,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (collection != null && collection.Any())
                         {
-                            collection.Select(async f => f.TcontactRole = await context.TcontactRole.Where(s => s.IdContact == f.Id).ToListAsync());
+                            collection.ForEach(async ws => await CompleteModelInfos(ws));
                             return collection.Distinct().ToList();
                         }
                         else

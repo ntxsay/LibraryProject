@@ -246,7 +246,7 @@
     <Compile Include="ViewModels\Book\LivreIdentificationVM.cs" />
     <Compile Include="ViewModels\Book\ManageBookParametersDriverVM.cs" />
     <Compile Include="ViewModels\Book\ResearchBookVM.cs" />
-    <Compile Include="ViewModels\CategorieLivreVM.cs" />
+    <Compile Include="ViewModels\Categorie\CategorieLivreVM.cs" />
     <Compile Include="ViewModels\Categorie\CategorieParameterDriverVM.cs" />
     <Compile Include="ViewModels\Collection\CollectionVM.cs" />
     <Compile Include="ViewModels\Collection\ManageCollectionParametersDriverVM.cs" />

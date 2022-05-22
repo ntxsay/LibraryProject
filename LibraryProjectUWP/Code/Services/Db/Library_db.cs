@@ -17,6 +17,7 @@ using Windows.Storage;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Library;
+using LibraryProjectUWP.ViewModels.Categorie;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
@@ -494,67 +495,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static BibliothequeVM DeepCopy(BibliothequeVM viewModelToCopy)
-            {
-                try
-                {
-                    if (viewModelToCopy == null) return null;
-
-                    BibliothequeVM newViewModel = new BibliothequeVM();
-
-                    return DeepCopy(newViewModel, viewModelToCopy);
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Logs.Log(ex, m);
-                    return null;
-                }
-            }
-
-            public static BibliothequeVM DeepCopy(BibliothequeVM viewModel, BibliothequeVM viewModelToCopy)
-            {
-                try
-                {
-                    if (viewModel == null) return null;
-                    if (viewModelToCopy == null) return null;
-
-                    viewModel.Id = viewModelToCopy.Id;
-                    viewModel.CountNotInCollectionBooks = viewModelToCopy.CountNotInCollectionBooks;
-                    viewModel.CountBooks = viewModelToCopy.CountBooks;
-                    viewModel.CountUnCategorizedBooks = viewModelToCopy.CountUnCategorizedBooks;
-                    viewModel.Description = viewModelToCopy.Description;
-                    viewModel.Name = viewModelToCopy.Name;
-                    viewModel.JaquettePath = viewModelToCopy.JaquettePath;
-                    viewModel.DateEdition = viewModelToCopy.DateEdition;
-                    viewModel.DateAjout = viewModelToCopy.DateAjout;
-                    viewModel.Guid = viewModelToCopy.Guid;
-
-                    if (viewModelToCopy.Collections != null && viewModelToCopy.Collections.Any())
-                    {
-                        if (viewModel.Collections == null)
-                        {
-                            viewModel.Collections = new ObservableCollection<CollectionVM>(viewModelToCopy.Collections);
-                        }
-                    }
-
-                    if (viewModelToCopy.Categories != null && viewModelToCopy.Categories.Any())
-                    {
-                        if (viewModel.Categories == null)
-                        {
-                            viewModel.Categories = new ObservableCollection<CategorieLivreVM>(viewModelToCopy.Categories);
-                        }
-                    }
-
-                    return viewModel;
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Logs.Log(ex, m);
-                    return null;
-                }
-            }
             #endregion
         }
     }

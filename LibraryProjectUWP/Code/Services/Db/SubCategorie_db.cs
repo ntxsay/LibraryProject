@@ -12,6 +12,7 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Models.Local;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Categorie;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {

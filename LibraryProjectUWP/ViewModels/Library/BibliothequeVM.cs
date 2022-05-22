@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Categorie;
 using LibraryProjectUWP.ViewModels.Collection;
 using Newtonsoft.Json;
 using System;
