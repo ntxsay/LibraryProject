@@ -7,6 +7,7 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Categorie;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Library;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;

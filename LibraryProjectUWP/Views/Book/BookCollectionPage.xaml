@@ -11,6 +11,7 @@
     xmlns:generalVm="using:LibraryProjectUWP.ViewModels.General"
     xmlns:userControls="using:LibraryProjectUWP.Views.UserControls"
     xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
+    xmlns:libraryVm="using:LibraryProjectUWP.ViewModels.Library"
     xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
@@ -51,7 +52,7 @@
                        Label="Afficher les éditeurs">
         </XamlUICommand>
         <ThemeShadow x:Name="BackgroundGridShadow"/>
-        <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="LibrarySuggestDataTemplate">
+        <DataTemplate x:DataType="libraryVm:BibliothequeVM" x:Key="LibrarySuggestDataTemplate">
             <Grid Margin="0,4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50" />

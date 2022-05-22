@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Library;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

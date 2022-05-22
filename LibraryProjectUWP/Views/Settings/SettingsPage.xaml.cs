@@ -3,6 +3,7 @@ using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.ViewModels.Settings;
 using LibraryProjectUWP.Views.Library;
 using LibraryProjectUWP.Views.Library.Manage;

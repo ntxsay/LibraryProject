@@ -199,7 +199,7 @@
     <Compile Include="Code\Services\Tasks\GetCollectionsTask.cs" />
     <Compile Include="Code\Services\Tasks\GetBookPretsTask.cs" />
     <Compile Include="Code\Services\Tasks\GetBookExemplariesTask.cs" />
-    <Compile Include="Code\Services\Tasks\ImportBooksTask.cs" />
+    <Compile Include="Code\Services\Tasks\ImportBooksOrLibrariesTask.cs" />
     <Compile Include="Code\Services\Tasks\ExportAllBooksOrLibrariesTask.cs" />
     <Compile Include="Code\Services\Tasks\DeleteAllBooksTask.cs" />
     <Compile Include="Code\Services\Tasks\DeleteManyBooksTask.cs" />
@@ -231,7 +231,7 @@
     <Compile Include="Models\Local\TlibraryCategorie.cs" />
     <Compile Include="Models\Local\TlibrarySubCategorie.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\BibliothequeVM.cs" />
+    <Compile Include="ViewModels\Library\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
     <Compile Include="ViewModels\Book\LibraryToBookNavigationDriverVM.cs" />
     <Compile Include="ViewModels\Book\LivreClassificationAgeVM.cs" />

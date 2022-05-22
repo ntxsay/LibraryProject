@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.ViewModels;
+using LibraryProjectUWP.ViewModels.Library;
 using System;
 using System.Collections.Generic;
 using System.IO;

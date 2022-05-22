@@ -6,6 +6,7 @@ using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Book;
 using Microsoft.UI.Xaml.Controls;
 using System;

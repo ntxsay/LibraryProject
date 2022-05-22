@@ -8,6 +8,7 @@
     mc:Ignorable="d" 
     xmlns:generalVm="using:LibraryProjectUWP.ViewModels.General"
     xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
+    xmlns:libraryVm="using:LibraryProjectUWP.ViewModels.Library"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
@@ -52,7 +53,7 @@
         <XamlUICommand x:Name="GotoPageXUiCmd" 
                        ExecuteRequested="GotoPageXUiCmd_ExecuteRequested">
         </XamlUICommand>
-        <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ThumbnailSimpleDataTemplate">
+        <DataTemplate x:DataType="libraryVm:BibliothequeVM" x:Key="ThumbnailSimpleDataTemplate">
             <Grid x:Name="simpleThumnailItemContainer" Height="282" Width="180" Shadow="{StaticResource BackgroundGridShadow}" Translation="0,0,32">
                 <ToolTipService.ToolTip>
                     <ToolTip>
@@ -143,7 +144,7 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="GridViewTemplate" x:DataType="viewModels:BibliothequeVM">
+        <DataTemplate x:Key="GridViewTemplate" x:DataType="libraryVm:BibliothequeVM">
             <ScrollViewer x:Name="scrollItems" HorizontalScrollMode="Disabled" Grid.Row="0">
                 <GridView x:Name="GridViewItems" ItemsSource="{Binding }" SelectionMode="Extended" IsItemClickEnabled="False" Padding="4,14" Loaded="GridViewItems_Loaded" Unloaded="GridViewItems_Unloaded"
                             ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled" IsMultiSelectCheckBoxEnabled="True" SingleSelectionFollowsFocus="True"
@@ -169,7 +170,7 @@
                 </GridView>
             </ScrollViewer>
         </DataTemplate>
-        <DataTemplate x:Key="DataGridViewTemplate" x:DataType="viewModels:BibliothequeVM">
+        <DataTemplate x:Key="DataGridViewTemplate" x:DataType="libraryVm:BibliothequeVM">
             <MTUUControls:DataGrid x:Name="DataGridItems" ItemsSource="{Binding Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 14 0 0"
                                                            HorizontalScrollBarVisibility="Visible" Loaded="DataGridItems_Loaded" Unloaded="DataGridItems_Unloaded"
                                         VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
@@ -232,7 +233,7 @@
         <dTemplateSelectors:DataViewModeTemplateSelector x:Key="dataViewModeTemplateSelector"
         DataGridViewTemplate="{StaticResource DataGridViewTemplate}"
         GridViewTemplate="{StaticResource GridViewTemplate}" />
-        <DataTemplate x:DataType="viewModels:BibliothequeVM" x:Key="ItemAutoSuggestDataTemplate">
+        <DataTemplate x:DataType="libraryVm:BibliothequeVM" x:Key="ItemAutoSuggestDataTemplate">
             <Grid Margin="0,4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50" />

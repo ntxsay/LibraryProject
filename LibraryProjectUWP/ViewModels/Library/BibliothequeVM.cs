@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryProjectUWP.ViewModels
+namespace LibraryProjectUWP.ViewModels.Library
 {
     public class BibliothequeVM : INotifyPropertyChanged
     {

@@ -5,6 +5,7 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Categorie;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Categories;
 using LibraryProjectUWP.Views.Collection;
 using System;

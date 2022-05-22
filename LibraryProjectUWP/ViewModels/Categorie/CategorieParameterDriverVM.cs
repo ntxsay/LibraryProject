@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Library;
 using System;

@@ -1,6 +1,7 @@
 ﻿using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Book;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;

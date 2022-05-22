@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LibraryProjectUWP.Code;
 using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Library;

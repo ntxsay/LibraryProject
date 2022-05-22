@@ -16,6 +16,7 @@ using LibraryProjectUWP.ViewModels.General;
 using Windows.Storage;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Library;
 
 namespace LibraryProjectUWP.Code.Services.Db
 {
