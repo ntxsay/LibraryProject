@@ -26,6 +26,7 @@ namespace LibraryProjectUWP.Code.Services.UI
         readonly BookCollectionSubPage BookCollectionSubView;
         readonly LibraryCollectionSubPage LibraryCollectionSubView;
         readonly EsBook esBook = new EsBook();
+        readonly EsAppBaseApi esAppBaseApi = new EsAppBaseApi();
         public CommonView(BookCollectionPage parentPage, BookCollectionSubPage bookCollectionSubView)
         {
             ParentPage = parentPage;
@@ -464,7 +465,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                     long countPrets = await DbServices.Book.CountPretInBookAsync(book.Id);
                     book.NbPrets = countPrets;
 
-                    var jaquettes = await esBook.GetBookItemJaquettePathAsync(book);
+                    var jaquettes = await esAppBaseApi.GetJaquettePathAsync<LivreVM>(book.Guid);
                     string combinedPath = jaquettes;
                     string jaquetteFile = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : EsGeneral.BookDefaultJaquette;
                     book.JaquettePath = jaquetteFile;

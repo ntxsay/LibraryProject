@@ -19,6 +19,203 @@ namespace LibraryProjectUWP.Code.Services.ES
 {
     internal partial class EsAppBaseApi
     {
+        public async Task<string> GetJaquettePathAsync<T>(Guid guid) where T : class
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (guid == Guid.Empty || guid == default)
+                {
+                    return null;
+                }
+
+                string baseJaquetteFile = null;
+                if (typeof(T) == typeof(BibliothequeVM))
+                {
+                    baseJaquetteFile = EsLibrary.JaquetteBaseFileName;
+                }
+                else if (typeof(T) == typeof(LivreVM))
+                {
+                    baseJaquetteFile = EsBook.baseJaquetteFile;
+                }
+                
+                var folderItem = await this.GetItemFolderAsync<T>(guid);
+                if (folderItem == null)
+                {
+                    return null;
+                }
+
+                foreach (var ext in Files.ImageExtensions)
+                {
+                    string fileName = $"{baseJaquetteFile}{ext}";
+                    var storageItem = await folderItem.TryGetItemAsync(fileName);
+                    if (storageItem == null || !storageItem.IsOfType(StorageItemTypes.File))
+                    {
+                        continue;
+                    }
+
+                    return storageItem.Path;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        public async Task<OperationStateVM> ReplaceJaquetteAsync<T>(Guid guid) where T : class
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (guid == Guid.Empty || guid == default)
+                {
+                    return null;
+                }
+
+                StorageFile storageFile = await Files.OpenStorageFileAsync(Files.ImageExtensions);
+                if (storageFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le fichier n'a pas pas pû être récupéré par le sélecteur de fichier.",
+                    };
+                }
+
+                var folderItem = await this.GetItemFolderAsync<T>(guid);
+                if (folderItem == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le répertoire n'a pas pû être trouvé.",
+                    };
+                }
+
+                OperationStateVM deleteResult = null;
+                string baseJaquetteFile = null;
+                if (typeof(T) == typeof(BibliothequeVM))
+                {
+                    baseJaquetteFile = EsLibrary.JaquetteBaseFileName;
+                    deleteResult = await this.RemoveFileAsync(baseJaquetteFile, folderItem, SearchOptions.StartWith);
+                }
+                else if (typeof(T) == typeof(LivreVM))
+                {
+                    baseJaquetteFile = EsBook.baseJaquetteFile;
+                    deleteResult = await this.RemoveFileAsync(EsBook.baseJaquetteFile, folderItem, SearchOptions.StartWith);
+                }
+
+                if (deleteResult != null && !deleteResult.IsSuccess)
+                {
+                    return deleteResult;
+                }
+
+                StorageFile newCopyFile = await storageFile.CopyAsync(folderItem, baseJaquetteFile + System.IO.Path.GetExtension(storageFile.Path), NameCollisionOption.ReplaceExisting);
+                if (newCopyFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = "Le fichier n'a pû être copié dans le répertoire de l'application.",
+                    };
+                }
+
+                return new OperationStateVM()
+                {
+                    IsSuccess = true,
+                    Result = newCopyFile.Path,
+                };
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return new OperationStateVM()
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        public async Task<OperationStateVM> RemoveJaquetteAsync<T>(T viewModel) where T : class
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModel == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le modèle de vue est null.",
+                    };
+                }
+
+                Guid guid = Guid.Empty;
+                if (viewModel is BibliothequeVM bibliothequeVM)
+                {
+                    guid = bibliothequeVM.Guid;
+                }
+                else if (viewModel is LivreVM livreVM)
+                {
+                    guid = livreVM.Guid;
+                }
+
+                if (guid == Guid.Empty || guid == default)
+                {
+                    return null;
+                }
+
+                var folderItem = await this.GetItemFolderAsync<T>(guid);
+                if (folderItem == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le répertoire n'a pas pû être trouvé.",
+                    };
+                }
+
+                string baseJaquetteFile = null;
+                OperationStateVM deleteResult = null;
+                if (typeof(T) == typeof(BibliothequeVM))
+                {
+                    baseJaquetteFile = EsLibrary.JaquetteBaseFileName;
+                    deleteResult = await this.RemoveFileAsync(baseJaquetteFile, folderItem, SearchOptions.StartWith);
+                }
+                else if (typeof(T) == typeof(LivreVM))
+                {
+                    baseJaquetteFile = EsBook.baseJaquetteFile;
+                    deleteResult = await this.RemoveFileAsync(EsBook.baseJaquetteFile, folderItem, SearchOptions.StartWith);
+                }
+
+                if (deleteResult != null && !deleteResult.IsSuccess)
+                {
+                    return deleteResult;
+                }
+
+                return new OperationStateVM()
+                {
+                    IsSuccess = true,
+                };
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return new OperationStateVM()
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+
+
         /// <summary>
         /// Désérialize un fichier au format json
         /// </summary>
@@ -72,7 +269,6 @@ namespace LibraryProjectUWP.Code.Services.ES
         }
 
 
-        [Obsolete]
         public async Task<OperationStateVM> RemoveFileAsync(string baseName, StorageFolder Folder, SearchOptions options = SearchOptions.StartWith)
         {
             try
@@ -136,64 +332,61 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
-
-
         /// <summary>
-        /// Crée le dossier d'une bibliothèque dans le dossier "Libraries" et/ou renvoie l'objet <see cref="StorageFolder"/> 
+        /// Supprime le dossier d'un livre dans le dossier "Books" et/ou renvoie l'objet <see cref="StorageFolder"/> 
         /// </summary>
         /// <returns></returns>
-        [Obsolete]
-        public async Task<StorageFolder> GetChildItemFolderAsync(Guid guid, MainPathEnum mainPathEnum)
+        public async Task<bool> DeleteItemFolderAsync<T>(Guid guid) where T : class
         {
             try
             {
-                if (guid == Guid.Empty)
+                if (guid == Guid.Empty || guid == default)
                 {
-                    return null;
+                    return false;
                 }
 
-                string folderName = null;
-                switch (mainPathEnum)
+                var bookFolder = await GetItemFolderAsync<T>(guid);
+                if (bookFolder == null)
                 {
-                    case MainPathEnum.Libraries:
-                        folderName = DefaultPathName.Libraries;
-                        break;
-                    case MainPathEnum.Books:
-                        folderName = DefaultPathName.Books;
-                        break;
-                    case MainPathEnum.Contacts:
-                        folderName = DefaultPathName.Contacts;
-                        break;
-                    case MainPathEnum.Authors:
-                        folderName = DefaultPathName.Authors;
-                        break;
-                    case MainPathEnum.Editors:
-                        break;
-                    default:
-                        break;
+                    return true;
                 }
 
-                if (folderName == null)
-                {
-                    return null;
-                }
-
-                var mainFolder = await GetFolderInLocalAppDirAsync(folderName);
-                if (mainFolder == null)
-                {
-                    return null;
-                }
-
-                var libraryFolder = await mainFolder.CreateFolderAsync(guid.ToString(), CreationCollisionOption.OpenIfExists);
-                if (libraryFolder == null)
-                {
-                    return null;
-                }
-
-                return libraryFolder;
+                await bookFolder.DeleteAsync(StorageDeleteOption.Default);
+                return true;
             }
             catch (Exception)
             {
+                return false;
+            }
+        }
+
+        public async Task<StorageFolder> GetItemFolderAsync<T>(Guid itemFolderGuid) where T : class
+        {
+            try
+            {
+                if (itemFolderGuid == Guid.Empty || itemFolderGuid == default)
+                {
+                    return null;
+                }
+
+                StorageFolder defaultFolder = await this.GetFolderInLocalAppDirAsync<T>();
+                if (defaultFolder == null)
+                {
+                    return null;
+                }
+
+                IStorageItem item = await defaultFolder.TryGetItemAsync(itemFolderGuid.ToString());
+                if (item == null || !item.IsOfType(StorageItemTypes.Folder))
+                {
+                    return null;
+                }
+
+                return await defaultFolder.GetFolderAsync(itemFolderGuid.ToString());
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
                 return null;
             }
         }
@@ -227,8 +420,10 @@ namespace LibraryProjectUWP.Code.Services.ES
 
                 return bookFolder;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
                 return null;
             }
         }
@@ -249,15 +444,15 @@ namespace LibraryProjectUWP.Code.Services.ES
 
                 if (typeof(T) == typeof(BibliothequeVM))
                 {
-                    folder = await this.CreateFolderInLocalAppDirAsync(DefaultPathName.Libraries, CreationCollisionOption.OpenIfExists);
+                    folder = await this.GetFolderInLocalAppDirAsync(DefaultPathName.Libraries);
                 }
                 else if (typeof(T) == typeof(LivreVM))
                 {
-                    folder = await this.CreateFolderInLocalAppDirAsync(DefaultPathName.Books, CreationCollisionOption.OpenIfExists);
+                    folder = await this.GetFolderInLocalAppDirAsync(DefaultPathName.Books);
                 }
                 else if (typeof(T) == typeof(ContactVM))
                 {
-                    folder = await this.CreateFolderInLocalAppDirAsync(DefaultPathName.Contacts, CreationCollisionOption.OpenIfExists);
+                    folder = await this.GetFolderInLocalAppDirAsync(DefaultPathName.Contacts);
                 }
 
                 return folder;

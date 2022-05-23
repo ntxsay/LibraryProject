@@ -44,6 +44,7 @@ namespace LibraryProjectUWP.Views.Library
         public BookCollectionPage ParentPage { get; private set; }
 
         readonly EsLibrary esLibrary = new EsLibrary();
+        readonly EsAppBaseApi esAppBaseApi = new EsAppBaseApi();
         readonly UiServices uiServices = new UiServices();
         public MainPage MainPage { get; private set; }
 
@@ -92,31 +93,6 @@ namespace LibraryProjectUWP.Views.Library
             catch (Exception ex)
             {
                 MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-        [Obsolete]
-        private async Task InitializeDataAsync(bool firstLoad)
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (ViewModelPage.ViewModelList != null && ViewModelPage.ViewModelList.Any())
-                {
-                    foreach (var item in ViewModelPage.ViewModelList)
-                    {
-                        string combinedPath = await esLibrary.GetLibraryItemJaquettePathAsync(item);
-                        item.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : EsGeneral.LibraryDefaultJaquette;
-                    }
-                }
-
-                //this.GridViewMode(firstLoad);
-                //this.InitializeCountBookWorker();
-            }
-            catch (Exception ex)
-            {
                 Logs.Log(ex, m);
                 return;
             }
@@ -390,7 +366,7 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (args.Parameter is BibliothequeVM viewModel)
                 {
-                    var result = await esLibrary.ChangeLibraryItemJaquetteAsync(viewModel);
+                    var result = await esAppBaseApi.ReplaceJaquetteAsync<BibliothequeVM>(viewModel.Guid);
                     if (!result.IsSuccess)
                     {
                         return;
@@ -703,7 +679,7 @@ namespace LibraryProjectUWP.Views.Library
                                 var viewModel = getLibraryTask.Result;
                                 if (viewModel != null)
                                 {
-                                    using (Task<string> jaquetteTask = esLibrary.GetLibraryItemJaquettePathAsync(viewModel))
+                                    using (Task<string> jaquetteTask = esAppBaseApi.GetJaquettePathAsync<BibliothequeVM>(viewModel.Guid))
                                     {
                                         jaquetteTask.Wait();
                                         viewModel.JaquettePath = !jaquetteTask.Result.IsStringNullOrEmptyOrWhiteSpace() ? jaquetteTask.Result : EsGeneral.LibraryDefaultJaquette;

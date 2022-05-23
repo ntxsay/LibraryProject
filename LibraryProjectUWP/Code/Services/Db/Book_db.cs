@@ -1005,8 +1005,8 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                         if (Guid.TryParse(record.Guid, out Guid guid))
                         {
-                            EsBook esBook = new EsBook();
-                            await esBook.DeleteBookItemFolderAsync(guid);
+                            EsAppBaseApi esAppBaseApi = new EsAppBaseApi();
+                            await esAppBaseApi.DeleteItemFolderAsync<LivreVM>(guid);
                         }
 
                         return new OperationStateVM()

@@ -202,6 +202,7 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
+        [Obsolete]
         public async Task<OperationStateVM> ChangeLibraryItemJaquetteAsync(BibliothequeVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -270,6 +271,7 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
+        [Obsolete]
         public async Task<string> GetLibraryItemJaquettePathAsync(BibliothequeVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();

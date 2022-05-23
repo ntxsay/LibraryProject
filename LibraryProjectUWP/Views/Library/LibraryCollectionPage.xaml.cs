@@ -48,6 +48,7 @@ namespace LibraryProjectUWP.Views.Library
     {
         public LibraryCollectionPageVM ViewModelPage { get; set; } = new LibraryCollectionPageVM();
         EsLibrary esLibrary = new EsLibrary();
+        readonly EsAppBaseApi esAppBaseApi = new EsAppBaseApi();
         public MainPage MainPage { get; private set; }
 
         public LibraryCollectionPage()
@@ -116,7 +117,7 @@ namespace LibraryProjectUWP.Views.Library
                 {
                     foreach (var item in ViewModelPage.ViewModelList)
                     {
-                        string combinedPath = await esLibrary.GetLibraryItemJaquettePathAsync(item);
+                        string combinedPath = await esAppBaseApi.GetJaquettePathAsync<BibliothequeVM>(item.Guid);
                         item.JaquettePath = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : EsGeneral.LibraryDefaultJaquette;
                     }
                 }
@@ -822,7 +823,7 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (args.Parameter is BibliothequeVM viewModel)
                 {
-                    var result = await esLibrary.ChangeLibraryItemJaquetteAsync(viewModel);
+                    var result = await esAppBaseApi.ReplaceJaquetteAsync<BibliothequeVM>(viewModel.Guid);
                     if (!result.IsSuccess)
                     {
                         return;
@@ -2381,7 +2382,7 @@ namespace LibraryProjectUWP.Views.Library
                                 var viewModel = getLibraryTask.Result;
                                 if (viewModel != null)
                                 {
-                                    using (Task<string> jaquetteTask = esLibrary.GetLibraryItemJaquettePathAsync(viewModel))
+                                    using (Task<string> jaquetteTask = esAppBaseApi.GetJaquettePathAsync<BibliothequeVM>(viewModel.Guid))
                                     {
                                         jaquetteTask.Wait();
                                         viewModel.JaquettePath = !jaquetteTask.Result.IsStringNullOrEmptyOrWhiteSpace() ? jaquetteTask.Result : EsGeneral.LibraryDefaultJaquette;

@@ -42,6 +42,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         public int CountItems => GetItems?.Count() ?? 0;
         public BookCollectionSubPageVM ViewModelPage { get; set; }
         readonly EsBook esBook = new EsBook();
+        readonly EsAppBaseApi esAppBaseApi = new EsAppBaseApi();
         readonly UiServices uiServices = new UiServices();
         public CommonView CommonView { get; private set; }
         public BookCollectionPage ParentPage { get; private set; }
@@ -559,7 +560,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-                    var result = await esBook.ChangeBookItemJaquetteAsync(viewModel);
+                    var result = await esAppBaseApi.ReplaceJaquetteAsync<LivreVM>(viewModel.Guid);
                     if (!result.IsSuccess)
                     {
                         return;
