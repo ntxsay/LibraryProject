@@ -461,7 +461,6 @@ namespace LibraryProjectUWP.Views.Library
                 if (sender is Viewbox viewbox && viewbox.Tag is BibliothequeVM viewModel)
                 {
                     ParentPage.OpenBookCollection(viewModel);
-                    //MainPage.BookCollectionNavigationAsync(viewModel, null);
                 }
             }
             catch (Exception ex)
@@ -478,7 +477,7 @@ namespace LibraryProjectUWP.Views.Library
             {
                 if (sender is DataGrid dataGrid && dataGrid.SelectedItem is BibliothequeVM viewModel)
                 {
-                    MainPage.BookCollectionNavigationAsync(viewModel, null);
+                    ParentPage.OpenBookCollection(viewModel);
                 }
             }
             catch (Exception ex)
@@ -867,6 +866,27 @@ namespace LibraryProjectUWP.Views.Library
                     };
 
                     worker.RunWorkerAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void SetViewModeDataTemplate(DataViewModeEnum viewMode)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewMode == DataViewModeEnum.GridView)
+                {
+                    this.PivotItems.ItemTemplate = (DataTemplate)this.Resources["GridViewTemplate"];
+                }
+                else if (viewMode == DataViewModeEnum.DataGridView)
+                {
+                    this.PivotItems.ItemTemplate = (DataTemplate)this.Resources["DataGridViewTemplate"];
                 }
             }
             catch (Exception ex)

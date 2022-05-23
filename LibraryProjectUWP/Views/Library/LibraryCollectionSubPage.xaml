@@ -7,7 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" 
     xmlns:generalVm="using:LibraryProjectUWP.ViewModels.General"
-    xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:libraryVm="using:LibraryProjectUWP.ViewModels.Library"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
@@ -230,9 +229,9 @@
                 </MTUUControls:DataGrid.RowStyle>
             </MTUUControls:DataGrid>
         </DataTemplate>
-        <dTemplateSelectors:DataViewModeTemplateSelector x:Key="dataViewModeTemplateSelector"
+        <!--<dTemplateSelectors:DataViewModeTemplateSelector x:Key="dataViewModeTemplateSelector"
         DataGridViewTemplate="{StaticResource DataGridViewTemplate}"
-        GridViewTemplate="{StaticResource GridViewTemplate}" />
+        GridViewTemplate="{StaticResource GridViewTemplate}" />-->
         <DataTemplate x:DataType="libraryVm:BibliothequeVM" x:Key="ItemAutoSuggestDataTemplate">
             <Grid Margin="0,4">
                 <Grid.ColumnDefinitions>
@@ -264,8 +263,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Pivot x:Name="PivotItems" x:FieldModifier="Public" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ParentPage.ViewModelPage.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                               ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}" SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}">
+        <Pivot x:Name="PivotItems" x:FieldModifier="Public" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                               SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}">
             <Pivot.OpacityTransition>
                 <ScalarTransition />
             </Pivot.OpacityTransition>

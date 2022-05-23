@@ -538,6 +538,7 @@ namespace LibraryProjectUWP.Views.Book
                         }
                         return;
                     }
+                    
                     await this.ViewMode(DataViewModeEnum.DataGridView, false);
                 }
             }

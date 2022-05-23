@@ -41,9 +41,13 @@
         <!--Item Flyout-->
         <XamlUICommand x:Name="ChangeJaquetteXamlUICommand" 
                        ExecuteRequested="ChangeJaquetteXamlUICommand_ExecuteRequested"
-                       Description="Modifie l'image qui sert à présenter le livre" 
-                       Label="Modifier la jaquette">
+                       Description="Modifie l'image de couverture livre">
         </XamlUICommand>
+        <XamlUICommand x:Name="DeleteJaquetteXamlUICommand" 
+                       ExecuteRequested="DeleteJaquetteXamlUICommand_ExecuteRequested"
+                       Description="Efface l'image de converture du livre">
+        </XamlUICommand>
+
         <XamlUICommand x:Name="EditBookInfosXamlUICommand" 
                        ExecuteRequested="EditBookInfosXamlUICommand_ExecuteRequested"
                        Description="Edite les informations de base du livre" 
@@ -122,11 +126,22 @@
                         </Border>
                         <Button.Flyout>
                             <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                <MenuFlyoutItem Text="Première de couverture" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
-                                    <MenuFlyoutItem.Icon>
+                                <MenuFlyoutSubItem Text="Première de couverture">
+                                    <MenuFlyoutSubItem.Icon>
                                         <FontIcon Glyph="&#xEB9F;"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
+                                    </MenuFlyoutSubItem.Icon>
+                                    <MenuFlyoutItem Text="Changer l'image" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE8E5;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutItem Text="Supprimer l'image" Foreground="OrangeRed" Command="{StaticResource DeleteJaquetteXamlUICommand}" CommandParameter="{x:Bind }">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74D;" Foreground="OrangeRed"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyoutSubItem>
                                 <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{x:Bind }">
                                     <MenuFlyoutItem.Icon>
@@ -172,11 +187,6 @@
                 <GridView x:Name="GridViewItems" ItemsSource="{Binding }" SelectionMode="Extended" IsItemClickEnabled="False" Padding="4,14" Loaded="GridViewItems_Loaded" Unloaded="GridViewItems_Unloaded"
                             ItemTemplate="{StaticResource ThumbnailSimpleDataTemplate}" ScrollViewer.VerticalScrollMode="Disabled" IsMultiSelectCheckBoxEnabled="True" SingleSelectionFollowsFocus="True"
                           KeyDown="GridViewItems_KeyDown">
-                    <!--<GridView.ContextFlyout>
-                        <MenuFlyout>
-                            <MenuFlyoutItem Text="Test" />
-                        </MenuFlyout>
-                    </GridView.ContextFlyout>-->
                     <GridView.ItemContainerStyle>
                         <Style TargetType="GridViewItem" >
                             <Setter Property="Margin" Value="7" />
@@ -185,11 +195,6 @@
                     <GridView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <ItemsWrapGrid  Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                <!--<ItemsWrapGrid.ContextFlyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem Text="Test" />
-                                    </MenuFlyout>
-                                </ItemsWrapGrid.ContextFlyout>-->
                             </ItemsWrapGrid>
                         </ItemsPanelTemplate>
                     </GridView.ItemsPanel>
@@ -253,11 +258,16 @@
                         <Setter Property="MTUUControls:DataGridRow.ContextFlyout">
                             <Setter.Value>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem Text="Première de couverture" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{Binding }">
-                                        <MenuFlyoutItem.Icon>
+                                    <MenuFlyoutSubItem Text="Première de couverture">
+                                        <MenuFlyoutSubItem.Icon>
                                             <FontIcon Glyph="&#xEB9F;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
+                                        </MenuFlyoutSubItem.Icon>
+                                        <MenuFlyoutItem Text="Première de couverture" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{Binding }">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xEB9F;"/>
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyoutSubItem>
                                     <MenuFlyoutSeparator />
                                     <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{Binding }">
                                         <MenuFlyoutItem.Icon>
@@ -323,9 +333,9 @@
                 </StackPanel>
             </Grid>
         </DataTemplate>
-        <dTemplateSelectors:DataViewModeTemplateSelector x:Key="dataViewModeTemplateSelector"
+        <!--<dTemplateSelectors:DataViewModeTemplateSelector x:Key="dataViewModeTemplateSelector"
         DataGridViewTemplate="{StaticResource DataGridViewTemplate}"
-        GridViewTemplate="{StaticResource GridViewTemplate}" />
+        GridViewTemplate="{StaticResource GridViewTemplate}" />-->
     </Page.Resources>
 
     <Grid>
@@ -333,8 +343,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Pivot x:Name="PivotItems" x:FieldModifier="public" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" Tag="{x:Bind ParentPage.ViewModelPage.DataViewMode, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                               ItemTemplateSelector="{StaticResource dataViewModeTemplateSelector}" SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}" PivotItemLoaded="PivotItems_PivotItemLoaded">
+        <Pivot x:Name="PivotItems" x:FieldModifier="public" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                               SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}" PivotItemLoaded="PivotItems_PivotItemLoaded">
             <Pivot.OpacityTransition>
                 <ScalarTransition />
             </Pivot.OpacityTransition>

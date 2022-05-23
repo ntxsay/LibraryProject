@@ -65,7 +65,7 @@ namespace LibraryProjectUWP
                     PrincipalNaviguation.SelectedItem = first;
                 }
 
-                LibrariesBooksCollectionNavigationAsync();
+                LibrariesOrBooksCollectionNavigation();
             }
             catch (Exception ex)
             {
@@ -185,7 +185,7 @@ namespace LibraryProjectUWP
                 }
                 else if (itemTag == ViewModelPage.LibraryCollectionMenuItem.Tag)
                 {
-                    LibraryCollectionNavigationAsync();
+                    LibrariesOrBooksCollectionNavigation();
                 }
                 else if (itemTag == ViewModelPage.ContactCollectionMenuItem.Tag)
                 {
@@ -293,23 +293,6 @@ namespace LibraryProjectUWP
         }
         #endregion
         #region Navigation-Method
-        private async Task AboutDialogNavigationAsync()
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                var dialog = new AboutCd();
-
-                var result = await dialog.ShowAsync();
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-
         private async Task AddElementNavigationAsync()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -356,7 +339,7 @@ namespace LibraryProjectUWP
             }
         }
 
-        internal bool LibrariesBooksCollectionNavigationAsync(BibliothequeVM library = null)
+        internal bool LibrariesOrBooksCollectionNavigation(BibliothequeVM library = null)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -367,21 +350,6 @@ namespace LibraryProjectUWP
                     ParentLibrary = library,
                     MainPage = this
                 });
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return false;
-            }
-        }
-
-        private bool LibraryCollectionNavigationAsync()
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                this.ChangeAppTitle(ViewModelPage.MainTitleBar);
-                return NavigateToView("Library.LibraryCollectionPage", this);
             }
             catch (Exception ex)
             {
@@ -404,6 +372,7 @@ namespace LibraryProjectUWP
             }
         }
 
+        [Obsolete("Est remplacé par LibrariesOrBooksCollectionNavigation")]
         internal bool BookCollectionNavigationAsync(BibliothequeVM parentLibrary, LibraryCollectionPage parentPage)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
@@ -530,35 +499,6 @@ namespace LibraryProjectUWP
                         CancelButtonTitle = parametersVM.CancelButtonText,
                         CancelButtonVisibility = parametersVM.CancelButtonVisibility,
                     });
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        public void UpdateBusyLoader(BusyLoaderParametersVM parametersVM)
-        {
-            try
-            {
-                if (gridMainContainer.Children.FirstOrDefault(a => a is BusyLoader) is BusyLoader busyLoader)
-                {
-                    if (busyLoader.TbcTitle.Text != parametersVM.ProgessText)
-                        busyLoader.TbcTitle.Text = parametersVM.ProgessText;
-                    if (busyLoader.TbcPrimary.Text != parametersVM.PrimaryButtonText)
-                        busyLoader.TbcPrimary.Text = parametersVM.PrimaryButtonText;
-                    if (busyLoader.BtnPrimary.Visibility != parametersVM.PrimaryButtonVisibility)
-                        busyLoader.BtnPrimary.Visibility = parametersVM.PrimaryButtonVisibility;
-                    if (busyLoader.TbcSecondary.Text != parametersVM.SecondaryButtonText)
-                        busyLoader.TbcSecondary.Text = parametersVM.SecondaryButtonText;
-                    if (busyLoader.BtnSecondary.Visibility != parametersVM.SecondaryButtonVisibility)
-                        busyLoader.BtnSecondary.Visibility = parametersVM.SecondaryButtonVisibility;
-                    if (busyLoader.TbcCancel.Text != parametersVM.CancelButtonText)
-                        busyLoader.TbcCancel.Text = parametersVM.CancelButtonText;
-                    if (busyLoader.BtnCancel.Visibility != parametersVM.CancelButtonVisibility)
-                        busyLoader.BtnCancel.Visibility = parametersVM.CancelButtonVisibility;
                 }
             }
             catch (Exception)

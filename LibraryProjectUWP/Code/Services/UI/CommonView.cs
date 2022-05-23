@@ -54,7 +54,6 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<IGrouping<string, BibliothequeVM>> GroupingItems = item.ViewModelList.Select(q => (BibliothequeVM)(object)q).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos bibliothèques").OrderBy(o => o.Key).Select(s => s);
                     if (GroupingItems != null && GroupingItems.Any())
                     {
-                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                         LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
                         LibraryCollectionSubView.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.None;
                     }
@@ -72,7 +71,6 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Select(q => (LivreVM)(object)q).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => "Vos livres").OrderBy(o => o.Key).Select(s => s);
                     if (GroupingItems != null && GroupingItems.Any())
                     {
-                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                         BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
                         BookCollectionSubView.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.None;
                     }
@@ -112,7 +110,6 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<IGrouping<string, BibliothequeVM>> GroupingItems = item.ViewModelList.Select(q => (BibliothequeVM)(object)q).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.Name?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                     if (GroupingItems != null && GroupingItems.Any())
                     {
-                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                         LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
                         LibraryCollectionSubView.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.Letter;
                     }
@@ -130,7 +127,6 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Select(q => (LivreVM)(object)q).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.MainTitle?.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                     if (GroupingItems != null && GroupingItems.Any())
                     {
-                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                         BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
                         BookCollectionSubView.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.Letter;
                     }
@@ -170,7 +166,6 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<IGrouping<string, BibliothequeVM>> GroupingItems = item.ViewModelList.Select(q => (BibliothequeVM)(object)q).Where(w => !w.Name.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                     if (GroupingItems != null && GroupingItems.Any())
                     {
-                        LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                         LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, BibliothequeVM>>(GroupingItems);
                         LibraryCollectionSubView.ViewModelPage.GroupedBy = LibraryGroupVM.GroupBy.CreationYear;
                     }
@@ -188,7 +183,6 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Select(q => (LivreVM)(object)q).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
                     if (GroupingItems != null && GroupingItems.Any())
                     {
-                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                         BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
                         BookCollectionSubView.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
                     }
@@ -228,7 +222,6 @@ namespace LibraryProjectUWP.Code.Services.UI
                     IEnumerable<IGrouping<string, LivreVM>> GroupingItems = item.ViewModelList.Select(q => (LivreVM)(object)q).Where(w => !w.MainTitle.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(g => g.Publication.YearParution ?? "Année de parution inconnue").OrderBy(o => o.Key).Select(s => s);
                     if (GroupingItems != null && GroupingItems.Any())
                     {
-                        BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
                         BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, LivreVM>>(GroupingItems);
                         BookCollectionSubView.ViewModelPage.GroupedBy = BookGroupVM.GroupBy.CreationYear;
                     }
@@ -270,10 +263,12 @@ namespace LibraryProjectUWP.Code.Services.UI
                 if (LibraryCollectionSubView != null)
                 {
                     LibraryCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                    LibraryCollectionSubView.SetViewModeDataTemplate(ParentPage.ViewModelPage.DataViewMode);
                 }
                 else if (BookCollectionSubView != null)
                 {
                     BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
+                    BookCollectionSubView.SetViewModeDataTemplate(ParentPage.ViewModelPage.DataViewMode);
                 }
 
                 return result;

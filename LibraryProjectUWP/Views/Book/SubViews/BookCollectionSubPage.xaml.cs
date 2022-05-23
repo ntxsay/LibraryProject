@@ -172,6 +172,27 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
+        public void SetViewModeDataTemplate(DataViewModeEnum viewMode)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewMode == DataViewModeEnum.GridView)
+                {
+                    this.PivotItems.ItemTemplate = (DataTemplate)this.Resources["GridViewTemplate"];
+                }
+                else if (viewMode == DataViewModeEnum.DataGridView)
+                {
+                    this.PivotItems.ItemTemplate = (DataTemplate)this.Resources["DataGridViewTemplate"];
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         /// <summary>
         /// Change la disposition des éléments
         /// </summary>
@@ -561,6 +582,23 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
+        private void DeleteJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is LivreVM viewModel)
+                {
+#warning A implémenter
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private async void EditBookInfosXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             if (args.Parameter is LivreVM viewModel)
@@ -911,5 +949,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 return;
             }
         }
+
+        
     }
 }
