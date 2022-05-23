@@ -1,6 +1,9 @@
 ﻿using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.ViewModels.Library;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -14,106 +17,8 @@ using Windows.Storage.Search;
 
 namespace LibraryProjectUWP.Code.Services.ES
 {
-    internal partial class EsGeneral
+    internal partial class EsAppBaseApi
     {
-        internal const string LibraryDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-        internal const string BookDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-        internal const string BookDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-        internal const string BookCollectionDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-        internal const string LibraryCollectionDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
-        public enum SearchOptions
-        {
-            StartWith,
-            Contains,
-            EndWith,
-            Egal
-        }
-
-        public class DefaultPathName
-        {
-            public const string Libraries = "Libraries";
-            public const string Books = "Books";
-            public const string Contacts = "Contacts";
-            public const string Authors = "Authors";
-        }
-
-        public enum MainPathEnum
-        {
-            Libraries,
-            Books,
-            Contacts,
-            Authors,
-            Editors
-        }
-
-        public async Task<OperationStateVM> ReplaceJaquetteAsync<T>(T viewModel) where T : class
-        {
-            MethodBase m = MethodBase.GetCurrentMethod();
-            try
-            {
-                if (viewModel == null)
-                {
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = false,
-                        Message = $"Le modèle de vue est null.",
-                    };
-                }
-
-                var storageFile = await Files.OpenStorageFileAsync(Files.ImageExtensions);
-                if (storageFile == null)
-                {
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = false,
-                        Message = $"Le fichier n'a pas pas pû être récupéré par le sélecteur de fichier.",
-                    };
-                }
-
-                var folderItem = await this.GetBookItemFolderAsync(viewModel.Guid);
-                if (folderItem == null)
-                {
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = false,
-                        Message = $"Le répertoire du livre \"{viewModel.TitresOeuvre?.FirstOrDefault()}\" n'a pas pû être trouvé.",
-                    };
-                }
-
-                var deleteResult = await _EsGeneral.RemoveFileAsync(baseJaquetteFile, folderItem, EsGeneral.SearchOptions.StartWith);
-                if (!deleteResult.IsSuccess)
-                {
-                    return deleteResult;
-                }
-
-                var newCopyFile = await storageFile.CopyAsync(folderItem, baseJaquetteFile + System.IO.Path.GetExtension(storageFile.Path), NameCollisionOption.ReplaceExisting);
-                if (newCopyFile == null)
-                {
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = false,
-                        Message = "Le fichier n'a pû être copié dans le répertoire de l'application.",
-                    };
-                }
-
-                return new OperationStateVM()
-                {
-                    IsSuccess = true,
-                    Result = newCopyFile.Path,
-                };
-            }
-            catch (Exception ex)
-            {
-                Logs.Log(ex, m);
-                return new OperationStateVM()
-                {
-                    IsSuccess = false,
-                    Message = ex.Message,
-                };
-            }
-        }
-
-
         /// <summary>
         /// Désérialize un fichier au format json
         /// </summary>
@@ -167,6 +72,7 @@ namespace LibraryProjectUWP.Code.Services.ES
         }
 
 
+        [Obsolete]
         public async Task<OperationStateVM> RemoveFileAsync(string baseName, StorageFolder Folder, SearchOptions options = SearchOptions.StartWith)
         {
             try
@@ -230,36 +136,13 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
-        public async Task<StorageFolder> CreateFolderInLocalFolderAppAsync(string NomDuDossierACreer, CreationCollisionOption creationCollisionOption = CreationCollisionOption.OpenIfExists)
-        {
-            try
-            {
-                if (NomDuDossierACreer.IsStringNullOrEmptyOrWhiteSpace())
-                {
-                    return null;
-                }
 
-                StorageFolder mediaStorage = ApplicationData.Current.LocalFolder;
-                if (mediaStorage == null)
-                {
-                    return null;
-                }
-
-                StorageFolder folder = await mediaStorage.CreateFolderAsync(NomDuDossierACreer, creationCollisionOption);
-                return folder ?? null;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return null;
-            }
-        }
 
         /// <summary>
         /// Crée le dossier d'une bibliothèque dans le dossier "Libraries" et/ou renvoie l'objet <see cref="StorageFolder"/> 
         /// </summary>
         /// <returns></returns>
+        [Obsolete]
         public async Task<StorageFolder> GetChildItemFolderAsync(Guid guid, MainPathEnum mainPathEnum)
         {
             try
@@ -295,7 +178,7 @@ namespace LibraryProjectUWP.Code.Services.ES
                     return null;
                 }
 
-                var mainFolder = await GetParentItemFolderAsync(folderName);
+                var mainFolder = await GetFolderInLocalAppDirAsync(folderName);
                 if (mainFolder == null)
                 {
                     return null;
@@ -316,18 +199,143 @@ namespace LibraryProjectUWP.Code.Services.ES
         }
 
         /// <summary>
-        /// Crée le dossier en question et/ou renvoie l'objet <see cref="StorageFolder"/> 
+        /// Crée ou (obtient si existe déjà) le dossier d'un item particulier tel une bibliothèque, un livre, un contact, etc... via un objet <see cref="StorageFolder"/>
         /// </summary>
+        /// <typeparam name="T">Représente un modèle de vue. Exemple : <see cref="BibliothequeVM"/> ou <see cref="LivreVM" /> ou <see cref="ContactVM" /></typeparam>
+        /// <param name="newDefaultFolderGuid">Représente le nom du dossier</param>
         /// <returns></returns>
-        public async Task<StorageFolder> GetParentItemFolderAsync(string pathName)
+        public async Task<StorageFolder> CreateItemFolderAsync<T>(Guid newItemFolderGuid) where T : class
         {
             try
             {
-                var folder = await CreateFolderInLocalFolderAppAsync(pathName, CreationCollisionOption.OpenIfExists);
-                return folder;
+                if (newItemFolderGuid == Guid.Empty || newItemFolderGuid == default)
+                {
+                    return null;
+                }
+
+                var defaultFolder = await this.GetFolderInLocalAppDirAsync<T>();
+                if (defaultFolder == null)
+                {
+                    return null;
+                }
+
+                var bookFolder = await defaultFolder.CreateFolderAsync(newItemFolderGuid.ToString(), CreationCollisionOption.OpenIfExists);
+                if (bookFolder == null)
+                {
+                    return null;
+                }
+
+                return bookFolder;
             }
             catch (Exception)
             {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Obtient un dossier dans le dossier local de l'application via un objet <see cref="StorageFolder"/>
+        /// </summary>
+        /// <typeparam name="T">
+        /// Représente un modèle de vue. Exemple : <see cref="BibliothequeVM"/> ou <see cref="LivreVM" /> ou <see cref="ContactVM" />
+        /// </typeparam>
+        /// <remarks>Remarques : Ces dossiers retournés font intrèsinquement partie de la structure de l'application.</remarks>
+        /// <returns></returns>
+        public async Task<StorageFolder> GetFolderInLocalAppDirAsync<T>() where T : class
+        {
+            try
+            {
+                StorageFolder folder = null;
+
+                if (typeof(T) == typeof(BibliothequeVM))
+                {
+                    folder = await this.CreateFolderInLocalAppDirAsync(DefaultPathName.Libraries, CreationCollisionOption.OpenIfExists);
+                }
+                else if (typeof(T) == typeof(LivreVM))
+                {
+                    folder = await this.CreateFolderInLocalAppDirAsync(DefaultPathName.Books, CreationCollisionOption.OpenIfExists);
+                }
+                else if (typeof(T) == typeof(ContactVM))
+                {
+                    folder = await this.CreateFolderInLocalAppDirAsync(DefaultPathName.Contacts, CreationCollisionOption.OpenIfExists);
+                }
+
+                return folder;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+        /// <summary>
+        /// Obtient un dossier dans le dossier local de l'application via un objet <see cref="StorageFolder"/>
+        /// </summary>
+        /// <param name="folderName">Nom du dossier</param>
+        /// <remarks>Remarques : Ces dossiers retournés font intrèsinquement partie de la structure de l'application.</remarks>
+        /// <returns></returns>
+        public async Task<StorageFolder> GetFolderInLocalAppDirAsync(string folderName)
+        {
+            try
+            {
+                if (folderName.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    return null;
+                }
+
+                StorageFolder mediaStorage = ApplicationData.Current.LocalFolder;
+                if (mediaStorage == null)
+                {
+                    return null;
+                }
+
+                IStorageItem item = await mediaStorage.TryGetItemAsync(folderName);
+                if (item == null || !item.IsOfType(StorageItemTypes.Folder))
+                {
+                    return null;
+                }
+
+                StorageFolder folder = await mediaStorage.GetFolderAsync(item.Name);
+                return folder ?? null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Crée un dossier dans le dossier local de l'application puis retourne un objet <see cref="StorageFolder"/>
+        /// </summary>
+        /// <param name="folderName">Nom du dossier à créer</param>
+        /// <param name="creationCollisionOption">Action si le dossier existe déjà</param>
+        /// <remarks>Remarques : Ces dossiers retournés font intrèsinquement partie de la structure de l'application.</remarks>
+        /// <returns></returns>
+        public async Task<StorageFolder> CreateFolderInLocalAppDirAsync(string folderName, CreationCollisionOption creationCollisionOption = CreationCollisionOption.OpenIfExists)
+        {
+            try
+            {
+                if (folderName.IsStringNullOrEmptyOrWhiteSpace())
+                {
+                    return null;
+                }
+
+                StorageFolder mediaStorage = ApplicationData.Current.LocalFolder;
+                if (mediaStorage == null)
+                {
+                    return null;
+                }
+
+                StorageFolder folder = await mediaStorage.CreateFolderAsync(folderName, creationCollisionOption);
+                return folder ?? null;
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
                 return null;
             }
         }

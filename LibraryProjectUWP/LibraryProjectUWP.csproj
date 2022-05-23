@@ -181,9 +181,11 @@
     <Compile Include="Code\Services\Db\General_db..cs" />
     <Compile Include="Code\Services\Db\Categorie_db.cs" />
     <Compile Include="Code\Services\Db\Library_db.cs" />
+    <Compile Include="Code\Services\ES\EsAppBaseApiEnum.cs" />
     <Compile Include="Code\Services\ES\EsBook.cs" />
     <Compile Include="Code\Services\ES\EsAuthor.cs" />
     <Compile Include="Code\Services\ES\EsContact.cs" />
+    <Compile Include="Code\Services\ES\EsAppBaseApi.cs" />
     <Compile Include="Code\Services\ES\EsGeneral.cs" />
     <Compile Include="Code\Services\ES\EsLibrary.cs" />
     <Compile Include="Code\Services\ES\EsViewModel.cs" />

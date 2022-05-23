@@ -20,6 +20,74 @@ namespace LibraryProjectUWP.Code.Services.ES
         internal const string baseJaquetteFile = "Book_Jaquette";
         readonly EsGeneral _EsGeneral = new EsGeneral();
 
+        public async Task<OperationStateVM> RemoveItemJaquetteAsync(LivreVM viewModel)
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (viewModel == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le modèle de vue est null.",
+                    };
+                }
+
+                var storageFile = await Files.OpenStorageFileAsync(Files.ImageExtensions);
+                if (storageFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le fichier n'a pas pas pû être récupéré par le sélecteur de fichier.",
+                    };
+                }
+
+                var folderItem = await this.GetBookItemFolderAsync(viewModel.Guid);
+                if (folderItem == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = $"Le répertoire du livre \"{viewModel.TitresOeuvre?.FirstOrDefault()}\" n'a pas pû être trouvé.",
+                    };
+                }
+
+                var deleteResult = await _EsGeneral.RemoveFileAsync(baseJaquetteFile, folderItem, EsGeneral.SearchOptions.StartWith);
+                if (!deleteResult.IsSuccess)
+                {
+                    return deleteResult;
+                }
+
+                var newCopyFile = await storageFile.CopyAsync(folderItem, baseJaquetteFile + System.IO.Path.GetExtension(storageFile.Path), NameCollisionOption.ReplaceExisting);
+                if (newCopyFile == null)
+                {
+                    return new OperationStateVM()
+                    {
+                        IsSuccess = false,
+                        Message = "Le fichier n'a pû être copié dans le répertoire de l'application.",
+                    };
+                }
+
+                return new OperationStateVM()
+                {
+                    IsSuccess = true,
+                    Result = newCopyFile.Path,
+                };
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return new OperationStateVM()
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+
         public async Task<OperationStateVM> ChangeBookItemJaquetteAsync(LivreVM viewModel)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
