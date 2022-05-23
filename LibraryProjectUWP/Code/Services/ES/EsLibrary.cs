@@ -17,6 +17,7 @@ namespace LibraryProjectUWP.Code.Services.ES
 {
     internal class EsLibrary
     {
+        [Obsolete]
         internal const string LibraryDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
         internal const string JaquetteBaseFileName = "Library_Jaquette";
         internal const string baseBackgroundFile = "Book_Collection_Bacground_Image";

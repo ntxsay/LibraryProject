@@ -75,7 +75,6 @@
                 </StackPanel>
             </Grid>
         </DataTemplate>
-
         <DataTemplate x:DataType="booktVm:LivreVM" x:Key="BookSuggestDataTemplate">
             <Grid Margin="0,4">
                 <Grid.ColumnDefinitions>

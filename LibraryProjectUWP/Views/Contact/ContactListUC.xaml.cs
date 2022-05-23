@@ -450,13 +450,14 @@ namespace LibraryProjectUWP.Views.Contact
         {
             try
             {
-                //bool isValided = IsModelValided();
-                //if (!isValided)
-                //{
-                //    return;
-                //}
-
-                UpdateItemRequested?.Invoke(this, args);
+                if (args.Parameter is ContactVM contactVM)
+                {
+                    ParentPage.NewEditContact(EditMode.Edit, null, null, new SideBarInterLinkVM()
+                    {
+                        ParentGuid = this.ItemGuid,
+                        ParentType = typeof(ContactListUC)
+                    }, contactVM);
+                }
             }
             catch (Exception ex)
             {
@@ -465,6 +466,28 @@ namespace LibraryProjectUWP.Views.Contact
                 return;
             }
         }
+
+        private void ABBtnEdit_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (ViewModelPage.SelectedViewModel != null && ViewModelPage.SelectedViewModel is ContactVM viewModel)
+                {
+                    ParentPage.NewEditContact(EditMode.Edit, null, null, new SideBarInterLinkVM()
+                    {
+                        ParentGuid = this.ItemGuid,
+                        ParentType = typeof(ContactListUC)
+                    }, viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
 
         private void DeleteItemXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -558,7 +581,7 @@ namespace LibraryProjectUWP.Views.Contact
             {
                 if (sender is MenuFlyout menuFlyout)
                 {
-                    if (menuFlyout.Items[0] is MenuFlyoutItem flyoutItemOpenSelectedBooks)
+                    if (menuFlyout.Items[0] is MenuFlyoutSubItem flyoutItemOpenSelectedBooks)
                     {
                         if (ViewModelPage.SelectedViewModels != null && ViewModelPage.SelectedViewModels.Count > 0)
                         {
@@ -567,7 +590,7 @@ namespace LibraryProjectUWP.Views.Contact
                         }
                         else if (flyoutItemOpenSelectedBooks.Tag is string value)
                         {
-                            ViewModelPage.SelectedViewModelMessage = $"Afficher « {value} »";
+                            ViewModelPage.SelectedViewModelMessage = $"Afficher les livres de « {value} » en tant que";
                             flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
                             flyoutItemOpenSelectedBooks.IsEnabled = true;
                         }
@@ -825,25 +848,6 @@ namespace LibraryProjectUWP.Views.Contact
 
         }
 
-        private void ABBtnEdit_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (ViewModelPage.SelectedViewModel != null && ViewModelPage.SelectedViewModel is ContactVM viewModel)
-                {
-                    ParentPage.NewEditContact(EditMode.Edit, null, null, new SideBarInterLinkVM()
-                    {
-                        ParentGuid = this.ItemGuid,
-                        ParentType = typeof(ContactListUC)
-                    }, viewModel);
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
 
         private void MFI_CreatePerson_Click(object sender, RoutedEventArgs e)
         {

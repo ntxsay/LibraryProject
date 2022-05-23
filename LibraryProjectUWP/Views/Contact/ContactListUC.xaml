@@ -59,7 +59,15 @@
                 </StackPanel>
                 <ListViewItem.ContextFlyout>
                     <MenuFlyout Opened="MenuFlyout_ListViewItemContext_Opened">
-                        <MenuFlyoutItem Tag="{x:Bind DisplayName3, Mode=OneWay}" Icon="View" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
+                        <MenuFlyoutSubItem Tag="{x:Bind DisplayName3, Mode=OneWay}">
+                            <MenuFlyoutSubItem.Icon>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8F1;"/>
+                            </MenuFlyoutSubItem.Icon>
+                            <MenuFlyoutItem Text="Auteur" Icon="View" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Editeurs" Icon="View" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
+                            <MenuFlyoutSeparator />
+                        </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Tag="{x:Bind DisplayName3, Mode=OneWay}" Icon="Add" Command="{StaticResource AddBooksToCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
                         <MenuFlyoutItem Tag="{x:Bind Mode=OneWay}" Icon="Remove" Command="{StaticResource DecategorizeBooksFromCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
@@ -109,9 +117,6 @@
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 10" TextWrapping="Wrap"/>
         <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Collapsed" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" HorizontalContentAlignment="Left">
             <AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="View">
-                <!--<AppBarButton.Icon>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe736;"/>
-                </AppBarButton.Icon>-->
                 <AppBarButton.Flyout>
                     <MenuFlyout>
                         <MenuFlyoutItem Icon="View" Text="Afficher tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInAllItemXUiCmd}">

@@ -32,13 +32,13 @@ namespace LibraryProjectUWP.Code.Services.ES
                 string baseJaquetteFile = null;
                 if (typeof(T) == typeof(BibliothequeVM))
                 {
-                    baseJaquetteFile = EsLibrary.JaquetteBaseFileName;
+                    baseJaquetteFile = LibraryDefaultJaquette;
                 }
                 else if (typeof(T) == typeof(LivreVM))
                 {
-                    baseJaquetteFile = EsBook.baseJaquetteFile;
+                    baseJaquetteFile = BookDefaultJaquette;
                 }
-                
+
                 var folderItem = await this.GetItemFolderAsync<T>(guid);
                 if (folderItem == null)
                 {
@@ -100,12 +100,12 @@ namespace LibraryProjectUWP.Code.Services.ES
                 string baseJaquetteFile = null;
                 if (typeof(T) == typeof(BibliothequeVM))
                 {
-                    baseJaquetteFile = EsLibrary.JaquetteBaseFileName;
+                    baseJaquetteFile = LibraryDefaultJaquette;
                     deleteResult = await this.RemoveFileAsync(baseJaquetteFile, folderItem, SearchOptions.StartWith);
                 }
                 else if (typeof(T) == typeof(LivreVM))
                 {
-                    baseJaquetteFile = EsBook.baseJaquetteFile;
+                    baseJaquetteFile = BookDefaultJaquette;
                     deleteResult = await this.RemoveFileAsync(EsBook.baseJaquetteFile, folderItem, SearchOptions.StartWith);
                 }
 
@@ -141,30 +141,11 @@ namespace LibraryProjectUWP.Code.Services.ES
             }
         }
 
-        public async Task<OperationStateVM> RemoveJaquetteAsync<T>(T viewModel) where T : class
+        public async Task<OperationStateVM> RemoveJaquetteAsync<T>(Guid guid) where T : class
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (viewModel == null)
-                {
-                    return new OperationStateVM()
-                    {
-                        IsSuccess = false,
-                        Message = $"Le modèle de vue est null.",
-                    };
-                }
-
-                Guid guid = Guid.Empty;
-                if (viewModel is BibliothequeVM bibliothequeVM)
-                {
-                    guid = bibliothequeVM.Guid;
-                }
-                else if (viewModel is LivreVM livreVM)
-                {
-                    guid = livreVM.Guid;
-                }
-
                 if (guid == Guid.Empty || guid == default)
                 {
                     return null;
@@ -184,12 +165,12 @@ namespace LibraryProjectUWP.Code.Services.ES
                 OperationStateVM deleteResult = null;
                 if (typeof(T) == typeof(BibliothequeVM))
                 {
-                    baseJaquetteFile = EsLibrary.JaquetteBaseFileName;
+                    baseJaquetteFile = LibraryDefaultJaquette;
                     deleteResult = await this.RemoveFileAsync(baseJaquetteFile, folderItem, SearchOptions.StartWith);
                 }
                 else if (typeof(T) == typeof(LivreVM))
                 {
-                    baseJaquetteFile = EsBook.baseJaquetteFile;
+                    baseJaquetteFile = BookDefaultJaquette;
                     deleteResult = await this.RemoveFileAsync(EsBook.baseJaquetteFile, folderItem, SearchOptions.StartWith);
                 }
 
@@ -213,8 +194,6 @@ namespace LibraryProjectUWP.Code.Services.ES
                 };
             }
         }
-
-
 
         /// <summary>
         /// Désérialize un fichier au format json

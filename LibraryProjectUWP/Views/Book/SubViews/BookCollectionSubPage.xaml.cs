@@ -583,13 +583,20 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        private void DeleteJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private async void DeleteJaquetteXamlUICommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
             {
                 if (args.Parameter is LivreVM viewModel)
                 {
-#warning A implémenter
+                    _ = await esAppBaseApi.RemoveJaquetteAsync<LivreVM>(viewModel.Guid);
+                    viewModel.JaquettePath = EsGeneral.BookDefaultJaquette;
+                    var image = uiServices.GetSelectedThumbnailImage<LivreVM>(viewModel.Id, PivotItems, "GridViewItems");
+                    if (image != null)
+                    {
+                        var bitmapImage = await Files.BitmapImageFromFileAsync(viewModel.JaquettePath);
+                        image.Source = bitmapImage;
+                    }
                 }
             }
             catch (Exception ex)
