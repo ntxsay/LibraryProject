@@ -32,6 +32,20 @@ namespace LibraryProjectUWP.ViewModels.General
             }
         }
 
+        private string _TermMessage;
+        public string TermMessage
+        {
+            get => _TermMessage;
+            set
+            {
+                if (_TermMessage != value)
+                {
+                    _TermMessage = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private bool? _SearchInMainTitle;
         public bool? SearchInMainTitle
         {
@@ -115,21 +129,6 @@ namespace LibraryProjectUWP.ViewModels.General
                 }
             }
         }
-
-        private ObservableCollection<ResearchItemVM> _SearchTask = new ObservableCollection<ResearchItemVM>();
-        public ObservableCollection<ResearchItemVM> SearchTask
-        {
-            get => _SearchTask;
-            set
-            {
-                if (_SearchTask != value)
-                {
-                    _SearchTask = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

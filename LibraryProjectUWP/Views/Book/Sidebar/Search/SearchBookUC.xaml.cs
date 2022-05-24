@@ -164,6 +164,100 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void BtnAddToSearch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                bool isValided = IsModelValided();
+                if (!isValided)
+                {
+                    return;
+                }
+
+                ResearchItemVM value = new ResearchItemVM()
+                {
+                    Term = ViewModelPage.ViewModel.Term,
+                    TermParameter = ViewModelPage.ViewModel.TermParameter,
+                    SearchInAuthors = ViewModelPage.ViewModel.SearchInAuthors,
+                    SearchInCollections = ViewModelPage.ViewModel.SearchInCollections,
+                    SearchInEditors = ViewModelPage.ViewModel.SearchInEditors,
+                    SearchInMainTitle = ViewModelPage.ViewModel.SearchInMainTitle,
+                    SearchInOtherTitles = ViewModelPage.ViewModel.SearchInOtherTitles,
+                };
+
+                string where = null;
+                if (value.SearchInAuthors == true)
+                {
+                    where += "auteurs, ";
+                }
+                if (value.SearchInCollections == true)
+                {
+                    where += "collections, ";
+                }
+                if (value.SearchInEditors == true)
+                {
+                    where += "éditeurs, ";
+                }
+                if (value.SearchInMainTitle == true)
+                {
+                    where += "titre, ";
+                }
+                if (value.SearchInOtherTitles == true)
+                {
+                    where += "autre(s) titres, ";
+                }
+
+                where = where.Trim();
+                if (where.EndsWith(','))
+                {
+                    where = where.Remove(where.Length -1, 1);
+                }
+                
+                var keyPair = Code.Search.SearchOnListDictionary.SingleOrDefault(s => s.Key == (byte)value.TermParameter);
+                if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
+                {
+                    value.TermMessage = $"{keyPair.Value} « {value.Term} » dans « {where} ».";
+                }
+
+                if (ViewModelPage.SearchTask.Any())
+                {
+                    bool IsAlreadyExist = ViewModelPage.SearchTask.Any(c => c.Term.ToLower() == value.Term.ToLower() && c.TermParameter == value.TermParameter);
+                    if (!IsAlreadyExist)
+                    {
+                        ViewModelPage.SearchTask.Add(value);
+                    }
+                }
+                else
+                {
+                    ViewModelPage.SearchTask.Add(value);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void DeleteSearchItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is ResearchItemVM viewModel && ViewModelPage.SearchTask.Contains(viewModel))
+                {
+                    ViewModelPage.SearchTask.Remove(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
         private void SearchBookXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             try
@@ -252,7 +346,7 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is ComboBox comboBox && comboBox.SelectedItem is string value)
                 {
-                    var keyPair = LibraryHelpers.Book.Search.SearchOnListDictionary.SingleOrDefault(s => s.Value == value);
+                    var keyPair = Code.Search.SearchOnListDictionary.SingleOrDefault(s => s.Value == value);
                     if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
                     {
                         ViewModelPage.ViewModel.TermParameter = (Code.Search.Terms)keyPair.Key;
@@ -265,6 +359,8 @@ namespace LibraryProjectUWP.Views.Book
                 throw;
             }
         }
+
+        
     }
 
     public class SearchBookUCVM : INotifyPropertyChanged
@@ -369,6 +465,20 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     this._ViewModel = value;
                     this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<ResearchItemVM> _SearchTask = new ObservableCollection<ResearchItemVM>();
+        public ObservableCollection<ResearchItemVM> SearchTask
+        {
+            get => _SearchTask;
+            set
+            {
+                if (_SearchTask != value)
+                {
+                    _SearchTask = value;
+                    OnPropertyChanged();
                 }
             }
         }
