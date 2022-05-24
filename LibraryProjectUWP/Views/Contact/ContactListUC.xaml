@@ -8,7 +8,6 @@
     mc:Ignorable="d"    
     xmlns:contactVm="using:LibraryProjectUWP.ViewModels.Contact"
     xmlns:userControls="using:LibraryProjectUWP.Views.UserControls"
-    xmlns:viewModels="using:LibraryProjectUWP.ViewModels"
     xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
     xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
@@ -59,15 +58,8 @@
                 </StackPanel>
                 <ListViewItem.ContextFlyout>
                     <MenuFlyout Opened="MenuFlyout_ListViewItemContext_Opened">
-                        <MenuFlyoutSubItem Tag="{x:Bind DisplayName3, Mode=OneWay}">
-                            <MenuFlyoutSubItem.Icon>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8F1;"/>
-                            </MenuFlyoutSubItem.Icon>
-                            <MenuFlyoutItem Text="Auteur" Icon="View" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
-                            <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Editeurs" Icon="View" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
-                            <MenuFlyoutSeparator />
-                        </MenuFlyoutSubItem>
+                        <MenuFlyoutItem Icon="Find" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
+                        <MenuFlyoutItem Icon="Find" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Tag="{x:Bind DisplayName3, Mode=OneWay}" Icon="Add" Command="{StaticResource AddBooksToCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
                         <MenuFlyoutItem Tag="{x:Bind Mode=OneWay}" Icon="Remove" Command="{StaticResource DecategorizeBooksFromCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>

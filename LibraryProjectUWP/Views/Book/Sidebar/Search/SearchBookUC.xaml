@@ -74,7 +74,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="Rechercher dans" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    <StackPanel Grid.Row="1" Spacing="4" Orientation="Vertical" Padding="0 0 0 0">
+                    <MTUUControls:WrapPanel Grid.Row="1" HorizontalSpacing="8" VerticalSpacing="4" Orientation="Horizontal" Padding="0 0 0 0">
                         <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInMainTitle, Mode=TwoWay}" Visibility="{x:Bind ViewModelPage.SearchInMainTitleVisibility, Mode=OneWay}">
                             <TextBlock Text="Titre"/>
                         </CheckBox>
@@ -90,7 +90,22 @@
                         <CheckBox IsThreeState="False" IsChecked="{x:Bind ViewModelPage.ViewModel.SearchInCollections, Mode=TwoWay}" Visibility="{x:Bind ViewModelPage.SearchInCollectionsVisibility, Mode=OneWay}">
                             <TextBlock Text="Collections"/>
                         </CheckBox>
-                    </StackPanel>
+                    </MTUUControls:WrapPanel>
+                </Grid>
+                <Button HorizontalAlignment="Center">
+                    <TextBlock Text="Ajouter à la recherche" />
+                </Button>
+                <Grid RowSpacing="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Rechercher dans" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
+                    <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.ViewModel.SearchTask, Mode=TwoWay}">
+                        <ListViewItem>
+                            <TextBlock Text=" jjj"/>
+                        </ListViewItem>
+                    </ListView>
                 </Grid>
             </StackPanel>
         </ScrollViewer>

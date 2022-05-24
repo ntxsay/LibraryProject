@@ -552,7 +552,8 @@ namespace LibraryProjectUWP.Views.Contact
                     this.ViewModelPage.SelectedViewModels = new ObservableCollection<ContactVM>(cast);
                     if (listView.SelectedItems.Count > 1)
                     {
-                        ViewModelPage.SelectedViewModelMessage = $"Afficher « {listView.SelectedItems.Count} contacts »";
+                        ViewModelPage.SearchAuthorsMessage = $"Rechercher les livres de ces auteurs";
+                        ViewModelPage.SearchEditorsMessage = $"Rechercher les livres de ces éditeurs";
                         //if (TtipDeleteCollection.IsOpen)
                         //{
                         //    TtipDeleteCollection.IsOpen = false;
@@ -560,11 +561,13 @@ namespace LibraryProjectUWP.Views.Contact
                     }
                     else if (listView.SelectedItems.Count == 1)
                     {
-                        ViewModelPage.SelectedViewModelMessage = $"Afficher « {ViewModelPage.SelectedViewModel?.DisplayName3} »";
+                        ViewModelPage.SearchAuthorsMessage = $"Rechercher les livres de cet auteur";
+                        ViewModelPage.SearchEditorsMessage = $"Rechercher les livres de cet éditeur";
                     }
                     else
                     {
-                        ViewModelPage.SelectedViewModelMessage = $"Aucun contact n'est à afficher";
+                        ViewModelPage.SearchAuthorsMessage = $"Aucun livre à rechercher";
+                        ViewModelPage.SearchAuthorsMessage = $"Aucun livre à rechercher";
                     }
                 }
             }
@@ -581,30 +584,38 @@ namespace LibraryProjectUWP.Views.Contact
             {
                 if (sender is MenuFlyout menuFlyout)
                 {
-                    if (menuFlyout.Items[0] is MenuFlyoutSubItem flyoutItemOpenSelectedBooks)
+                    if (ViewModelPage.SelectedViewModels != null && ViewModelPage.SelectedViewModels.Count > 0)
                     {
-                        if (ViewModelPage.SelectedViewModels != null && ViewModelPage.SelectedViewModels.Count > 0)
+                        if (menuFlyout.Items[0] is MenuFlyoutItem menuFlyoutItemSearchAuthors)
                         {
-                            flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
-                            flyoutItemOpenSelectedBooks.IsEnabled = true;
+                            menuFlyoutItemSearchAuthors.Text = ViewModelPage.SearchAuthorsMessage;
+                            menuFlyoutItemSearchAuthors.IsEnabled = true;
                         }
-                        else if (flyoutItemOpenSelectedBooks.Tag is string value)
+
+                        if (menuFlyout.Items[1] is MenuFlyoutItem menuFlyoutItemSearchEditors)
                         {
-                            ViewModelPage.SelectedViewModelMessage = $"Afficher les livres de « {value} » en tant que";
-                            flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
-                            flyoutItemOpenSelectedBooks.IsEnabled = true;
+                            menuFlyoutItemSearchEditors.Text = ViewModelPage.SearchEditorsMessage;
+                            menuFlyoutItemSearchEditors.IsEnabled = true;
                         }
-                        else
+                    }
+                    else
+                    {
+                        if (menuFlyout.Items[0] is MenuFlyoutItem menuFlyoutItemSearchAuthors)
                         {
-                            flyoutItemOpenSelectedBooks.Text = ViewModelPage.SelectedViewModelMessage;
-                            flyoutItemOpenSelectedBooks.IsEnabled = false;
+                            menuFlyoutItemSearchAuthors.Text = ViewModelPage.SearchAuthorsMessage;
+                            menuFlyoutItemSearchAuthors.IsEnabled = false;
+                        }
+
+                        if (menuFlyout.Items[1] is MenuFlyoutItem menuFlyoutItemSearchEditors)
+                        {
+                            menuFlyoutItemSearchEditors.Text = ViewModelPage.SearchEditorsMessage;
+                            menuFlyoutItemSearchEditors.IsEnabled = false;
                         }
                     }
 
-
                     if (ParentPage.ViewModelPage.SelectedItems != null && ParentPage.ViewModelPage.SelectedItems.Any())
                     {
-                        if (menuFlyout.Items[2] is MenuFlyoutItem flyoutItem)
+                        if (menuFlyout.Items[3] is MenuFlyoutItem flyoutItem)
                         {
                             flyoutItem.Text = $"Ajouter {ParentPage.ViewModelPage.SelectedItems.Count} livre(s) à « {flyoutItem.Tag} »";
                             flyoutItem.IsEnabled = true;
@@ -612,14 +623,14 @@ namespace LibraryProjectUWP.Views.Contact
                     }
                     else
                     {
-                        if (menuFlyout.Items[2] is MenuFlyoutItem flyoutItem)
+                        if (menuFlyout.Items[3] is MenuFlyoutItem flyoutItem)
                         {
                             flyoutItem.Text = $"Aucun livre à ajouter à « {flyoutItem.Tag} »";
                             flyoutItem.IsEnabled = false;
                         }
                     }
 
-                    if (menuFlyout.Items[3] is MenuFlyoutItem flyoutItemDecategorize)
+                    if (menuFlyout.Items[4] is MenuFlyoutItem flyoutItemDecategorize)
                     {
                         if (flyoutItemDecategorize.Tag is ContactVM collectionVM)
                         {
@@ -1073,6 +1084,34 @@ namespace LibraryProjectUWP.Views.Contact
                 if (this._SelectedViewModelMessage != value)
                 {
                     this._SelectedViewModelMessage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _SearchAuthorsMessage;
+        public string SearchAuthorsMessage
+        {
+            get => this._SearchAuthorsMessage;
+            set
+            {
+                if (this._SearchAuthorsMessage != value)
+                {
+                    this._SearchAuthorsMessage = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _SearchEditorsMessage;
+        public string SearchEditorsMessage
+        {
+            get => this._SearchEditorsMessage;
+            set
+            {
+                if (this._SearchEditorsMessage != value)
+                {
+                    this._SearchEditorsMessage = value;
                     this.OnPropertyChanged();
                 }
             }

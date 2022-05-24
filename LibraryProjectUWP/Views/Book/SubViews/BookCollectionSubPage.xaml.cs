@@ -41,7 +41,6 @@ namespace LibraryProjectUWP.Views.Book.SubViews
         public IEnumerable<LivreVM> GetItems => ViewModelPage.GroupedRelatedViewModel.Collection.SelectMany(s => s.ToList()).Select(q => q).ToList();
         public int CountItems => GetItems?.Count() ?? 0;
         public BookCollectionSubPageVM ViewModelPage { get; set; }
-        readonly EsBook esBook = new EsBook();
         readonly EsAppBaseApi esAppBaseApi = new EsAppBaseApi();
         readonly UiServices uiServices = new UiServices();
         public CommonView CommonView { get; private set; }

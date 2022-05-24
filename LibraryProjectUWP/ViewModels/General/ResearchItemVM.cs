@@ -2,6 +2,7 @@
 using LibraryProjectUWP.ViewModels.Book;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -110,6 +111,20 @@ namespace LibraryProjectUWP.ViewModels.General
                 if (_TermParameter != value)
                 {
                     _TermParameter = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<ResearchItemVM> _SearchTask = new ObservableCollection<ResearchItemVM>();
+        public ObservableCollection<ResearchItemVM> SearchTask
+        {
+            get => _SearchTask;
+            set
+            {
+                if (_SearchTask != value)
+                {
+                    _SearchTask = value;
                     OnPropertyChanged();
                 }
             }
