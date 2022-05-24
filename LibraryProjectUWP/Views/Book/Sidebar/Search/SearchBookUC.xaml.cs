@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code;
+using LibraryProjectUWP.Code.Extensions;
 using LibraryProjectUWP.Code.Helpers;
 using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.Logging;
@@ -65,7 +66,7 @@ namespace LibraryProjectUWP.Views.Book
         }
 
 
-        public void InitializeSideBar(BookCollectionPage parentPage, ResearchItemVM viewModel, long? idLibrary = null)
+        public void InitializeSideBar(BookCollectionPage parentPage, long? idLibrary = null)
         {
             try
             {
@@ -73,10 +74,10 @@ namespace LibraryProjectUWP.Views.Book
                 ViewModelPage = new SearchBookUCVM()
                 {
                     IdLibrary = idLibrary,
-                    ViewModel = viewModel,
+                    SearchTask = parentPage.ViewModelPage.ResearchItems.DeepCopy()
                 };
 
-                if (ViewModelPage.ViewModel.TypeObject == typeof(BibliothequeVM))
+                if (parentPage.IsContainsLibraryCollection(out _))
                 {
                     ViewModelPage.SearchInMainTitleVisibility = Visibility.Visible;
                     ViewModelPage.SearchInOtherTitlesVisibility = Visibility.Collapsed;
@@ -84,7 +85,7 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.SearchInEditorsVisibility = Visibility.Collapsed;
                     ViewModelPage.SearchInCollectionsVisibility = Visibility.Collapsed;
                 }
-                else if (ViewModelPage.ViewModel.TypeObject == typeof(LivreVM))
+                else if (parentPage.IsContainsBookCollection(out _))
                 {
                     ViewModelPage.SearchInMainTitleVisibility = Visibility.Visible;
                     ViewModelPage.SearchInOtherTitlesVisibility = Visibility.Visible;
@@ -166,6 +167,52 @@ namespace LibraryProjectUWP.Views.Book
 
         private void BtnAddToSearch_Click(object sender, RoutedEventArgs e)
         {
+            AddItemToSearch();
+        }
+
+        private void DeleteSearchItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (args.Parameter is ResearchItemVM viewModel && ViewModelPage.SearchTask.Contains(viewModel))
+                {
+                    ViewModelPage.SearchTask.Remove(viewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
+        private void SearchBookXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        {
+            try
+            {
+                if (!ViewModelPage.SearchTask.Any())
+                {
+                    AddItemToSearch();
+                    if (!ViewModelPage.SearchTask.Any())
+                    {
+                        return;
+                    }
+                }                
+
+                SearchBookRequested?.Invoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void AddItemToSearch()
+        {
             try
             {
                 bool isValided = IsModelValided();
@@ -210,9 +257,9 @@ namespace LibraryProjectUWP.Views.Book
                 where = where.Trim();
                 if (where.EndsWith(','))
                 {
-                    where = where.Remove(where.Length -1, 1);
+                    where = where.Remove(where.Length - 1, 1);
                 }
-                
+
                 var keyPair = Code.Search.SearchOnListDictionary.SingleOrDefault(s => s.Key == (byte)value.TermParameter);
                 if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
                 {
@@ -240,43 +287,6 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        private void DeleteSearchItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                if (args.Parameter is ResearchItemVM viewModel && ViewModelPage.SearchTask.Contains(viewModel))
-                {
-                    ViewModelPage.SearchTask.Remove(viewModel);
-                }
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
-
-
-        private void SearchBookXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-        {
-            try
-            {
-                bool isValided = IsModelValided();
-                if (!isValided)
-                {
-                    return;
-                }
-
-                SearchBookRequested?.Invoke(this, args);
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return;
-            }
-        }
 
         private bool IsModelValided()
         {
@@ -455,7 +465,7 @@ namespace LibraryProjectUWP.Views.Book
         }
 
 
-        private ResearchItemVM _ViewModel;
+        private ResearchItemVM _ViewModel = new ResearchItemVM();
         public ResearchItemVM ViewModel
         {
             get => this._ViewModel;

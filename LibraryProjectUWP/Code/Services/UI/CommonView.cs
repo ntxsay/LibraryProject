@@ -39,11 +39,11 @@ namespace LibraryProjectUWP.Code.Services.UI
             LibraryCollectionSubView = libraryCollectionSubView;
         }
 
-        public async Task GroupItemsByNone<T>(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null) where T : class
+        public async Task GroupItemsByNone<T>(int goToPage = 1, bool resetPage = true) where T : class
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync<T>(goToPage, searchParams);
+                var item = await this.GenerateGroupItemAsync<T>(goToPage);
                 if (item == null)
                 {
                     ClearPageList();
@@ -95,11 +95,11 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task GroupItemsByAlphabeticAsync<T>(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null) where T : class
+        public async Task GroupItemsByAlphabeticAsync<T>(int goToPage = 1, bool resetPage = true) where T : class
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync<T>(goToPage, searchParams);
+                var item = await this.GenerateGroupItemAsync<T>(goToPage);
                 if (item == null)
                 {
                     ClearPageList();
@@ -151,11 +151,11 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task GroupByCreationYear<T>(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null) where T : class
+        public async Task GroupByCreationYear<T>(int goToPage = 1, bool resetPage = true) where T : class
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync<T>(goToPage, searchParams);
+                var item = await this.GenerateGroupItemAsync<T>(goToPage);
                 if (item == null)
                 {
                     ClearPageList();
@@ -207,11 +207,11 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task GroupByParutionYear<T>(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null) where T : class
+        public async Task GroupByParutionYear<T>(int goToPage = 1, bool resetPage = true) where T : class
         {
             try
             {
-                var item = await this.GenerateBookGroupItemAsync<T>(goToPage, searchParams);
+                var item = await this.GenerateGroupItemAsync<T>(goToPage);
                 if (item == null)
                 {
                     ClearPageList();
@@ -246,19 +246,19 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        public async Task<CommonGroupItemVM<T>> GenerateBookGroupItemAsync<T>(int goToPage = 1, ResearchItemVM searchParams = null) where T : class
+        public async Task<CommonGroupItemVM<T>> GenerateGroupItemAsync<T>(int goToPage = 1) where T : class
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 CommonGroupItemVM<T> result = null;
-                if (searchParams != null)
+                if (ParentPage.ViewModelPage.ResearchItems != null && ParentPage.ViewModelPage.ResearchItems.Any())
                 {
-                    result = await this.GenerateResearchBookGroupItemAsync<T>(searchParams, goToPage);
+                    result = await this.GenerateResearchGroupItemAsync<T>(ParentPage.ViewModelPage.ResearchItems, goToPage);
                 }
                 else
                 {
-                    result = await this.GenerateBookGroupItemAsync<T>(goToPage);
+                    result = await this.GenerateGroupItemAsync_<T>(goToPage);
                 }
 
                 if (LibraryCollectionSubView != null)
@@ -281,7 +281,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        private async Task<CommonGroupItemVM<T>> GenerateResearchBookGroupItemAsync<T>(ResearchItemVM searchParams, int goToPage = 1) where T : class
+        private async Task<CommonGroupItemVM<T>> GenerateResearchGroupItemAsync<T>(IEnumerable<ResearchItemVM> searchParams, int goToPage = 1) where T : class
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -372,7 +372,7 @@ namespace LibraryProjectUWP.Code.Services.UI
             }
         }
 
-        private async Task<CommonGroupItemVM<T>> GenerateBookGroupItemAsync<T>(int goToPage = 1) where T : class
+        private async Task<CommonGroupItemVM<T>> GenerateGroupItemAsync_<T>(int goToPage = 1) where T : class
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -482,7 +482,7 @@ namespace LibraryProjectUWP.Code.Services.UI
         }
 
 
-        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
+        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -492,16 +492,16 @@ namespace LibraryProjectUWP.Code.Services.UI
                     switch (LibraryCollectionSubView.ViewModelPage.GroupedBy)
                     {
                         case LibraryGroupVM.GroupBy.None:
-                            await this.GroupItemsByNone<BibliothequeVM>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByNone<BibliothequeVM>(goToPage, resetPage);
                             break;
                         case LibraryGroupVM.GroupBy.Letter:
-                            await this.GroupItemsByAlphabeticAsync<BibliothequeVM>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByAlphabeticAsync<BibliothequeVM>(goToPage, resetPage);
                             break;
                         case LibraryGroupVM.GroupBy.CreationYear:
-                            await this.GroupByCreationYear<BibliothequeVM>(goToPage, resetPage, searchParams);
+                            await this.GroupByCreationYear<BibliothequeVM>(goToPage, resetPage);
                             break;
                         default:
-                            await this.GroupItemsByNone<BibliothequeVM>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByNone<BibliothequeVM>(goToPage, resetPage);
                             break;
                     }
 
@@ -512,19 +512,19 @@ namespace LibraryProjectUWP.Code.Services.UI
                     switch (BookCollectionSubView.ViewModelPage.GroupedBy)
                     {
                         case BookGroupVM.GroupBy.None:
-                            await this.GroupItemsByNone<LivreVM>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByNone<LivreVM>(goToPage, resetPage);
                             break;
                         case BookGroupVM.GroupBy.Letter:
-                            await this.GroupItemsByAlphabeticAsync<LivreVM>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByAlphabeticAsync<LivreVM>(goToPage, resetPage);
                             break;
                         case BookGroupVM.GroupBy.CreationYear:
-                            await this.GroupByCreationYear<LivreVM>(goToPage, resetPage, searchParams);
+                            await this.GroupByCreationYear<LivreVM>(goToPage, resetPage);
                             break;
                         case BookGroupVM.GroupBy.ParutionYear:
-                            await this.GroupByParutionYear<LivreVM>(goToPage, resetPage, searchParams);
+                            await this.GroupByParutionYear<LivreVM>(goToPage, resetPage);
                             break;
                         default:
-                            await this.GroupItemsByNone<LivreVM>(goToPage, resetPage, searchParams);
+                            await this.GroupItemsByNone<LivreVM>(goToPage, resetPage);
                             break;
                     }
 

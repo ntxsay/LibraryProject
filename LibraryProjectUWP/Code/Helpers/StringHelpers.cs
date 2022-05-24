@@ -123,9 +123,7 @@ namespace LibraryProjectUWP.Code.Helpers
             }
         }
 
-
-
-        public static string JoinStringArray(string[] values, string separator, out string MessageState)
+        public static string JoinStringArray(IEnumerable<string> values, string separator, out string MessageState)
         {
             try
             {

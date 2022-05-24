@@ -30,11 +30,11 @@ namespace LibraryProjectUWP.Views.Book
     public sealed partial class BookCollectionPage : Page
     {
 
-        public void GroupItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
+        public void GroupItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true)
         {
             try
             {
-                this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage, searchParams);
+                this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage);
             }
             catch (Exception ex)
             {
@@ -44,11 +44,11 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void OrderItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
+        public void OrderItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true)
         {
             try
             {
-                this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage, searchParams);
+                this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage);
             }
             catch (Exception ex)
             {
@@ -58,11 +58,11 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void SortItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
+        public void SortItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true)
         {
             try
             {
-                this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage, searchParams);
+                this.GenerateItemsWithBusyLoader(busyLoaderMessage, goToPage, resetPage);
             }
             catch (Exception ex)
             {
@@ -72,7 +72,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void GenerateItemsWithBusyLoader(string busyLoaderMessage, int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
+        public void GenerateItemsWithBusyLoader(string busyLoaderMessage, int goToPage = 1, bool resetPage = true)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 dispatcherTimer.Tick += async (t, f) =>
                 {
-                    await this.RefreshItemsGrouping(goToPage, resetPage, searchParams);
+                    await this.RefreshItemsGrouping(goToPage, resetPage);
 
                     DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
                     {
@@ -115,18 +115,18 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true, ResearchItemVM searchParams = null)
+        public async Task RefreshItemsGrouping(int goToPage = 1, bool resetPage = true)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
                 if (FrameContainer.Content is LibraryCollectionSubPage libraryCollectionSubPage)
                 {
-                    await libraryCollectionSubPage.CommonView.RefreshItemsGrouping(goToPage, resetPage, searchParams);
+                    await libraryCollectionSubPage.CommonView.RefreshItemsGrouping(goToPage, resetPage);
                 }
                 else if (FrameContainer.Content is BookCollectionSubPage bookCollectionSubPage)
                 {
-                    await bookCollectionSubPage.CommonView.RefreshItemsGrouping(goToPage, resetPage, searchParams);
+                    await bookCollectionSubPage.CommonView.RefreshItemsGrouping(goToPage, resetPage);
                 }
             }
             catch (Exception ex)

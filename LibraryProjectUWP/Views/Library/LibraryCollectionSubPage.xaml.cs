@@ -903,7 +903,7 @@ namespace LibraryProjectUWP.Views.Library
                             }
                         }
 
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage, ParentPage.ViewModelPage.ResearchItem);
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage);
 
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;

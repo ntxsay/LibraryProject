@@ -224,7 +224,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             }
                         }
 
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage, ParentPage.ViewModelPage.ResearchItem);
+                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage);
                         
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
@@ -767,7 +767,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 await this.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal,
                    async () =>
                     {
-                        await CommonView.RefreshItemsGrouping(page, true, ParentPage.ViewModelPage.ResearchItem);
+                        await CommonView.RefreshItemsGrouping(page, true);
                         var buttonsPage = VisualViewHelpers.FindVisualChilds<Button>(this.itemControlPageList);
                         if (buttonsPage != null && buttonsPage.Any())
                         {

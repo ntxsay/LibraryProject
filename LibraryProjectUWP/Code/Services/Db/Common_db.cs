@@ -20,6 +20,41 @@ namespace LibraryProjectUWP.Code.Services.Db
     {
         public partial struct Common
         {
+            public static async Task<IList<T>> SearchAsync<T>(IEnumerable<ResearchItemVM> parameters, CancellationToken cancellationToken = default) where T : class, new ()
+            {
+                try
+                {
+                    if (parameters == null || !parameters.Any())
+                    {
+                        return Enumerable.Empty<T>().ToList();
+                    }
+
+                    List<T> values = new List<T>();
+                    foreach (var item in parameters)
+                    {
+                        var value = await SearchAsync<T>(item, cancellationToken);
+                        if (value != null)
+                        {
+                            values.AddRange(value);
+                        }
+
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return values;
+                        }
+                    }
+
+                    return values;
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return Enumerable.Empty<T>().ToList();
+                }
+            }
+
+
             public static async Task<IList<T>> SearchAsync<T>(ResearchItemVM parameters, CancellationToken cancellationToken = default) where T : class
             {
                 try
