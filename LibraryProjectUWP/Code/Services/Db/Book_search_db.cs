@@ -176,7 +176,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         return Enumerable.Empty<Tbook>().ToList();
                     }
-                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+                    if (parameters.IdLibrary == null || parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
                     {
                         return Enumerable.Empty<Tbook>().ToList();
                     }

@@ -3101,6 +3101,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else if (FrameContainer.Content is BookCollectionSubPage)
                 {
+                    researchItemVM.IdLibrary = Parameters.ParentLibrary.Id;
                     Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
                     {
                         ProgessText = $"Recherche en cours de livres avec le terme « {researchItemVM.Term} » ...",

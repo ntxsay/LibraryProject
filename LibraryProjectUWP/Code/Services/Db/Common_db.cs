@@ -33,7 +33,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                     foreach (var item in parameters)
                     {
                         var value = await SearchAsync<T>(item, cancellationToken);
-                        if (value != null)
+                        if (value != null && value.Any())
                         {
                             values.AddRange(value);
                         }
@@ -63,7 +63,13 @@ namespace LibraryProjectUWP.Code.Services.Db
                     {
                         return Enumerable.Empty<T>().ToList();
                     }
-                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+
+                    if (parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+                    {
+                        return Enumerable.Empty<T>().ToList();
+                    }
+
+                    if (typeof(T) == typeof(Tbook) && (parameters.IdLibrary == null || parameters.IdLibrary < 1))
                     {
                         return Enumerable.Empty<T>().ToList();
                     }

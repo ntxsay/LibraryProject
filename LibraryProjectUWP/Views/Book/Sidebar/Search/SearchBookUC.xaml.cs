@@ -71,10 +71,16 @@ namespace LibraryProjectUWP.Views.Book
             try
             {
                 ParentPage = parentPage;
+                var items = parentPage.ViewModelPage.ResearchItems.DeepCopy()?.ToList();
+                if (items != null && items.Any())
+                {
+                    items.ForEach(w => RefreshSearchItems(w));
+                }
+
                 ViewModelPage = new SearchBookUCVM()
                 {
                     IdLibrary = idLibrary,
-                    SearchTask = parentPage.ViewModelPage.ResearchItems.DeepCopy()
+                    SearchTask = new ObservableCollection<ResearchItemVM>(items),
                 };
 
                 if (parentPage.IsContainsLibraryCollection(out _))
@@ -102,7 +108,7 @@ namespace LibraryProjectUWP.Views.Book
 
 
                 InitializeActionInfos();
-                this.Bindings.Update();
+                //this.Bindings.Update();
             }
             catch (Exception ex)
             {
@@ -165,9 +171,52 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void CmbxTermsParams_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is ComboBox comboBox && comboBox.SelectedItem is string value)
+                {
+                    var keyPair = Code.Search.SearchOnListDictionary.SingleOrDefault(s => s.Value == value);
+                    if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
+                    {
+                        ViewModelPage.ViewModel.TermParameter = (Code.Search.Terms)keyPair.Key;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void BtnAddToSearch_Click(object sender, RoutedEventArgs e)
         {
             AddItemToSearch();
+        }
+
+        private void ListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            try
+            {
+                if (e.ClickedItem is ResearchItemVM itemVM)
+                {
+                    ViewModelPage.ViewModel = itemVM.DeepCopy();
+                    var keyPair = Code.Search.SearchOnListDictionary.SingleOrDefault(s => s.Key == (byte)ViewModelPage.ViewModel.TermParameter);
+                    if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
+                    {
+                        CmbxTermsParams.SelectedItem = keyPair.Value;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
         }
 
         private void DeleteSearchItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
@@ -186,7 +235,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
 
         private void SearchBookXUiCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
@@ -211,6 +259,52 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
+        private void RefreshSearchItems(ResearchItemVM value)
+        {
+            try
+            {
+                string where = null;
+                if (value.SearchInAuthors == true)
+                {
+                    where += "auteurs, ";
+                }
+                if (value.SearchInCollections == true)
+                {
+                    where += "collections, ";
+                }
+                if (value.SearchInEditors == true)
+                {
+                    where += "éditeurs, ";
+                }
+                if (value.SearchInMainTitle == true)
+                {
+                    where += "titre, ";
+                }
+                if (value.SearchInOtherTitles == true)
+                {
+                    where += "autre(s) titres, ";
+                }
+
+                where = where.Trim();
+                if (where.EndsWith(','))
+                {
+                    where = where.Remove(where.Length - 1, 1);
+                }
+
+                var keyPair = Code.Search.SearchOnListDictionary.SingleOrDefault(s => s.Key == (byte)value.TermParameter);
+                if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
+                {
+                    value.TermMessage = $"{keyPair.Value} « {value.Term} » dans « {where} ».";
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
         private void AddItemToSearch()
         {
             try
@@ -221,16 +315,12 @@ namespace LibraryProjectUWP.Views.Book
                     return;
                 }
 
-                ResearchItemVM value = new ResearchItemVM()
+                ResearchItemVM value = ViewModelPage.ViewModel.DeepCopy();
+
+                if (ParentPage.IsContainsBookCollection(out _))
                 {
-                    Term = ViewModelPage.ViewModel.Term,
-                    TermParameter = ViewModelPage.ViewModel.TermParameter,
-                    SearchInAuthors = ViewModelPage.ViewModel.SearchInAuthors,
-                    SearchInCollections = ViewModelPage.ViewModel.SearchInCollections,
-                    SearchInEditors = ViewModelPage.ViewModel.SearchInEditors,
-                    SearchInMainTitle = ViewModelPage.ViewModel.SearchInMainTitle,
-                    SearchInOtherTitles = ViewModelPage.ViewModel.SearchInOtherTitles,
-                };
+                    value.IdLibrary = ParentPage.Parameters?.ParentLibrary?.Id;
+                }
 
                 string where = null;
                 if (value.SearchInAuthors == true)
@@ -268,10 +358,16 @@ namespace LibraryProjectUWP.Views.Book
 
                 if (ViewModelPage.SearchTask.Any())
                 {
-                    bool IsAlreadyExist = ViewModelPage.SearchTask.Any(c => c.Term.ToLower() == value.Term.ToLower() && c.TermParameter == value.TermParameter);
-                    if (!IsAlreadyExist)
+                    var item = ViewModelPage.SearchTask.SingleOrDefault(c => c.Term.ToLower() == value.Term.ToLower() && c.TermParameter == value.TermParameter);
+                    if (item == null)
                     {
                         ViewModelPage.SearchTask.Add(value);
+                    }
+                    else
+                    {
+                        int index = ViewModelPage.SearchTask.IndexOf(item);
+                        ViewModelPage.SearchTask.Remove(item);
+                        ViewModelPage.SearchTask.Insert(index, value);
                     }
                 }
                 else
@@ -349,28 +445,6 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
-
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                if (sender is ComboBox comboBox && comboBox.SelectedItem is string value)
-                {
-                    var keyPair = Code.Search.SearchOnListDictionary.SingleOrDefault(s => s.Value == value);
-                    if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
-                    {
-                        ViewModelPage.ViewModel.TermParameter = (Code.Search.Terms)keyPair.Key;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        
     }
 
     public class SearchBookUCVM : INotifyPropertyChanged
