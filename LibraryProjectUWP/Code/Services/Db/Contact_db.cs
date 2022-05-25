@@ -815,6 +815,104 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Helpers
+
+            public static string DisplayName(Tcontact model, bool startWithFirstName = true, bool useTitreCivility = false)
+            {
+                try
+                {
+                    if (model == null)
+                    {
+                        return null;
+                    }
+
+                    string value = null;
+                    string titrecivility = !model.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ? model.TitreCivilite + " " : "";
+                    string prenom = !model.Prenom.IsStringNullOrEmptyOrWhiteSpace() ? model.Prenom + " " : "";
+                    string autresPrenoms = !model.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() ? model.AutresPrenoms + " " : "";
+                    string nomNaissance = !model.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ? model.NomNaissance + " " : "";
+                    string nomUsage = !model.NomUsage.IsStringNullOrEmptyOrWhiteSpace() ? model.NomUsage + " " : "";
+
+                    var contactType = (ContactType)model.Type;
+                    if (contactType == ContactType.Human)
+                    {
+                        if (startWithFirstName)
+                        {
+                            value = $"{prenom}{autresPrenoms}{nomNaissance}{nomUsage?.Trim()}";
+                        }
+                        else
+                        {
+                            value = $"{nomNaissance}{nomUsage}{prenom}{autresPrenoms?.Trim()}";
+                        }
+
+                        if (useTitreCivility)
+                        {
+                            value = titrecivility + value;
+                        }
+                    }
+                    else if (contactType == ContactType.Society)
+                    {
+                        value = model.SocietyName;
+
+                    }
+
+                    return value?.Trim();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
+            public static string DisplayName(ContactVM model, bool startWithFirstName = true, bool useTitreCivility = false)
+            {
+                try
+                {
+                    if (model == null)
+                    {
+                        return null;
+                    }
+
+                    string value = null;
+                    string titrecivility = !model.TitreCivilite.IsStringNullOrEmptyOrWhiteSpace() ? model.TitreCivilite + " " : "";
+                    string prenom = !model.Prenom.IsStringNullOrEmptyOrWhiteSpace() ? model.Prenom + " " : "";
+                    string autresPrenoms = !model.AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() ? model.AutresPrenoms + " " : "";
+                    string nomNaissance = !model.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ? model.NomNaissance + " " : "";
+                    string nomUsage = !model.NomUsage.IsStringNullOrEmptyOrWhiteSpace() ? model.NomUsage + " " : "";
+
+                    if (model.ContactType == ContactType.Human)
+                    {
+                        if (startWithFirstName)
+                        {
+                            value = $"{prenom}{autresPrenoms}{nomNaissance}{nomUsage?.Trim()}";
+                        }
+                        else
+                        {
+                            value = $"{nomNaissance}{nomUsage}{prenom}{autresPrenoms?.Trim()}";
+                        }
+
+                        if (useTitreCivility)
+                        {
+                            value = titrecivility + value;
+                        }
+                    }
+                    else if (model.ContactType == ContactType.Society)
+                    {
+                        value = model.SocietyName;
+
+                    }
+
+                    return value?.Trim();
+                }
+                catch (Exception ex)
+                {
+                    MethodBase m = MethodBase.GetCurrentMethod();
+                    Logs.Log(ex, m);
+                    return null;
+                }
+            }
+
             public static async Task CompleteModelInfos(Tcontact model)
             {
                 try

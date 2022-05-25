@@ -23,6 +23,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 
 // Pour en savoir plus sur le modèle d'élément Contrôle utilisateur, consultez la page https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -208,6 +209,30 @@ namespace LibraryProjectUWP.Views.Book
                     if (!keyPair.Equals(default(KeyValuePair<byte, string>)))
                     {
                         CmbxTermsParams.SelectedItem = keyPair.Value;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void BtnExcludeIncludeItemSearch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Button button && button.Tag is ResearchItemVM itemVM)
+                {
+                    if (itemVM.IsExcluded)
+                    {
+                        itemVM.IsExcluded = false;
+                    }
+                    else if (!itemVM.IsExcluded)
+                    {
+                        itemVM.IsExcluded = true;
                     }
                 }
             }
@@ -445,6 +470,7 @@ namespace LibraryProjectUWP.Views.Book
                 return;
             }
         }
+
     }
 
     public class SearchBookUCVM : INotifyPropertyChanged

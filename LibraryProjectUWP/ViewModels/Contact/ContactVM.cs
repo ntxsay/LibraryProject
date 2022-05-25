@@ -1,5 +1,6 @@
 ﻿using LibraryProjectUWP.Code;
 using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.Code.Services.Db;
 using LibraryProjectUWP.Code.Services.ES;
 using Newtonsoft.Json;
 using System;
@@ -403,28 +404,8 @@ namespace LibraryProjectUWP.ViewModels.Contact
             }
         }
 
-        public string DisplayName3
-        {
-            get
-            {
-                try
-                {
-                    switch (ContactType)
-                    {
-                        case ContactType.Human:
-                            return $"{(!Prenom.IsStringNullOrEmptyOrWhiteSpace() ? Prenom + " " : "")}{(!AutresPrenoms.IsStringNullOrEmptyOrWhiteSpace() ? AutresPrenoms + " " : "")}{(!NomNaissance.IsStringNullOrEmptyOrWhiteSpace() ? NomNaissance + " " : "")}{(!NomUsage.IsStringNullOrEmptyOrWhiteSpace() ? NomUsage : "")}";
-                        case ContactType.Society:
-                            return SocietyName;
-                        default:
-                            return NomNaissance;
-                    }
-                }
-                catch (Exception)
-                {
-                    return NomNaissance;
-                }
-            }
-        }
+        public string DisplayName3 => DbServices.Contact.DisplayName(this, true, false);
+        
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

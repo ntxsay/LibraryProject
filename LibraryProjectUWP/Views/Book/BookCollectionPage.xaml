@@ -343,7 +343,7 @@
                             <SymbolIcon Symbol="Find" ToolTipService.ToolTip="Afficher tous les résultats"/>
                         </AutoSuggestBox.QueryIcon>
                     </AutoSuggestBox>
-                    <MUIXC:SplitButton x:Name="splitBtnSearch" Visibility="{x:Bind ViewModelPage.ResearchItem, Converter={StaticResource nullToVisibilityConverter}, Mode=OneWay}" Click="SplitBtnSearch_Click"
+                    <MUIXC:SplitButton x:Name="splitBtnSearch" Visibility="{x:Bind ViewModelPage.ResearchItems, Converter={StaticResource nullToVisibilityConverter}, Mode=OneWay}" Click="SplitBtnSearch_Click"
                                        BorderThickness="0" Background="Transparent" ToolTipService.ToolTip="Afficher ou masquer la recherche avancée" VerticalAlignment="Center" Margin="0 6 0 0">
                         <FontIcon Glyph="&#xE713;" FontSize="16" VerticalAlignment="Center"/>
                         <MUIXC:SplitButton.Flyout>

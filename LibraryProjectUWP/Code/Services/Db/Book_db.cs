@@ -151,20 +151,20 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     case ContactRole.Author:
                                         foreach (var idContact in idContactList)
                                         {
-                                            long? idBook = (await context.TbookAuthorConnector.SingleOrDefaultAsync(w => w.Id == idContact))?.IdBook;
-                                            if (idBook != null)
+                                            IEnumerable<long> idBooks = await context.TbookAuthorConnector.Where(w => w.IdContact == idContact).Select(s => s.IdBook).ToListAsync();
+                                            if (idBooks != null && idBooks.Any())
                                             {
-                                                Ncollection.Add((long)idBook);
+                                                Ncollection.AddRange(idBooks);
                                             }
                                         }
                                         break;
                                     case ContactRole.EditorHouse:
                                         foreach (var idContact in idContactList)
                                         {
-                                            long? idBook = (await context.TbookEditeurConnector.SingleOrDefaultAsync(w => w.Id == idContact))?.IdBook;
-                                            if (idBook != null)
+                                            IEnumerable<long> idBooks = await context.TbookEditeurConnector.Where(w => w.IdContact == idContact).Select(s => s.IdBook).ToListAsync();
+                                            if (idBooks != null && idBooks.Any())
                                             {
-                                                Ncollection.Add((long)idBook);
+                                                Ncollection.AddRange(idBooks);
                                             }
                                         }
                                         break;

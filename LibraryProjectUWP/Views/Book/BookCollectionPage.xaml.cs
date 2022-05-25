@@ -3085,61 +3085,18 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     Term = sender.Text?.Trim(),
                     TermParameter = Code.Search.Terms.Contains,
-                    SearchInAuthors = true,
                     SearchInMainTitle = true,
-                    SearchInEditors = true,
-                    SearchInOtherTitles = true,
-                    SearchInCollections = false,
                 };
 
-                if (FrameContainer.Content is LibraryCollectionSubPage)
+                if (IsContainsBookCollection(out _))
                 {
-                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                    {
-                        ProgessText = $"Recherche en cours de bibliothèques avec le terme « {researchItemVM.Term} » ...",
-                    });
-                }
-                else if (FrameContainer.Content is BookCollectionSubPage)
-                {
-                    researchItemVM.IdLibrary = Parameters.ParentLibrary.Id;
-                    Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                    {
-                        ProgessText = $"Recherche en cours de livres avec le terme « {researchItemVM.Term} » ...",
-                    });
+                    researchItemVM.SearchInAuthors = true;
+                    researchItemVM.SearchInEditors = true;
+                    researchItemVM.SearchInOtherTitles = true;
+                    researchItemVM.SearchInCollections = true;
                 }
 
-                DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                {
-                    Interval = new TimeSpan(0, 0, 0, 1),
-                };
-
-                dispatcherTimer.Tick += async (t, f) =>
-                {
-                    ViewModelPage.ResearchItems = new ObservableCollection<ResearchItemVM>()
-                    {
-                        researchItemVM,
-                    };
-
-                    await this.RefreshItemsGrouping(1, true);
-
-                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 2),
-                    };
-
-                    dispatcherTimer2.Tick += (s, d) =>
-                    {
-                        Parameters.MainPage.CloseBusyLoader();
-                        SearchItems();
-
-                        dispatcherTimer2.Stop();
-                    };
-                    dispatcherTimer2.Start();
-
-                    dispatcherTimer.Stop();
-                };
-
-                dispatcherTimer.Start();
+                LaunchSearch(new List<ResearchItemVM>() { researchItemVM});
             }
             catch (Exception ex)
             {
@@ -3149,7 +3106,7 @@ namespace LibraryProjectUWP.Views.Book
             }
         }
 
-        public void SearchItems()
+        public void SearchItemsSideBar()
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -3222,68 +3179,8 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     ASB_SearchItem.Text = "";
                 }
-               
-                if (FrameContainer.Content is LibraryCollectionSubPage)
-                {
-                    if (sender.ViewModelPage.SearchTask.Count == 1)
-                    {
-                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                        {
-                            ProgessText = $"Recherche en cours de bibliothèques avec le terme « {sender.ViewModelPage.SearchTask.FirstOrDefault()?.Term} » ...",
-                        });
-                    }
-                    else
-                    {
-                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                        {
-                            ProgessText = $"Recherche en cours de bibliothèques avec les termes « {StringHelpers.JoinStringArray(sender.ViewModelPage.SearchTask.Select(s => s.Term), ",", out _)} » ...",
-                        });
-                    }
-                }
-                else if (FrameContainer.Content is BookCollectionSubPage)
-                {
-                    if (sender.ViewModelPage.SearchTask.Count == 1)
-                    {
-                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                        {
-                            ProgessText = $"Recherche en cours de livres avec le terme « {sender.ViewModelPage.SearchTask.FirstOrDefault()?.Term} » ...",
-                        });
-                    }
-                    else
-                    {
-                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
-                        {
-                            ProgessText = $"Recherche en cours de livres avec les termes « {StringHelpers.JoinStringArray(sender.ViewModelPage.SearchTask.Select(s => s.Term), ",", out _)} » ...",
-                        });
-                    }
-                }
 
-                DispatcherTimer dispatcherTimer = new DispatcherTimer()
-                {
-                    Interval = new TimeSpan(0, 0, 0, 1),
-                };
-
-                dispatcherTimer.Tick += async (t, f) =>
-                {
-                    this.ViewModelPage.ResearchItems = sender.ViewModelPage.SearchTask.DeepCopy();
-                    await this.RefreshItemsGrouping(1, true);
-
-                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
-                    {
-                        Interval = new TimeSpan(0, 0, 0, 2),
-                    };
-
-                    dispatcherTimer2.Tick += (s, d) =>
-                    {
-                        Parameters.MainPage.CloseBusyLoader();
-                        dispatcherTimer2.Stop();
-                    };
-                    dispatcherTimer2.Start();
-
-                    dispatcherTimer.Stop();
-                };
-
-                dispatcherTimer.Start();
+                LaunchSearch(sender.ViewModelPage.SearchTask.DeepCopy());
                 
                 this.ViewModelPage.IsGroupBookAppBarBtnEnabled = false;
                 this.ViewModelPage.IsSortBookAppBarBtnEnabled = false;
@@ -3330,7 +3227,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
                 else
                 {
-                    SearchItems();
+                    SearchItemsSideBar();
                 }
             }
             catch (Exception ex)
@@ -3347,11 +3244,98 @@ namespace LibraryProjectUWP.Views.Book
             UpdateItemsAfterQuitSearch();
         }
 
+        public void LaunchSearch(IEnumerable<ResearchItemVM> researchItemVMs, bool displaySideBar = true)
+        {
+            try
+            {
+                if (researchItemVMs == null || !researchItemVMs.Any())
+                {
+                    return;
+                }
+
+                if (FrameContainer.Content is LibraryCollectionSubPage)
+                {
+                    if (researchItemVMs.Count() == 1)
+                    {
+                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                        {
+                            ProgessText = $"Recherche en cours de bibliothèques avec le terme « {researchItemVMs.FirstOrDefault()?.Term} » ...",
+                        });
+                    }
+                    else
+                    {
+                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                        {
+                            ProgessText = $"Recherche en cours de bibliothèques avec les termes « {StringHelpers.JoinStringArray(researchItemVMs.Select(s => s.Term), ", ", out _)} » ...",
+                        });
+                    }
+                }
+                else if (FrameContainer.Content is BookCollectionSubPage)
+                {
+                    researchItemVMs.Select(s => s.IdLibrary = Parameters.ParentLibrary.Id);
+                    if (researchItemVMs.Count() == 1)
+                    {
+                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                        {
+                            ProgessText = $"Recherche en cours de livres avec le terme « {researchItemVMs.FirstOrDefault()?.Term} » ...",
+                        });
+                    }
+                    else
+                    {
+                        Parameters.MainPage.OpenBusyLoader(new BusyLoaderParametersVM()
+                        {
+                            ProgessText = $"Recherche en cours de livres avec les termes « {StringHelpers.JoinStringArray(researchItemVMs.Select(s => s.Term), ", ", out _)} » ...",
+                        });
+                    }
+                }
+
+                DispatcherTimer dispatcherTimer = new DispatcherTimer()
+                {
+                    Interval = new TimeSpan(0, 0, 0, 1),
+                };
+
+                dispatcherTimer.Tick += async (t, f) =>
+                {
+                    ViewModelPage.ResearchItems = new ObservableCollection<ResearchItemVM>(researchItemVMs);
+
+                    await this.RefreshItemsGrouping(1, true);
+
+                    DispatcherTimer dispatcherTimer2 = new DispatcherTimer()
+                    {
+                        Interval = new TimeSpan(0, 0, 0, 2),
+                    };
+
+                    dispatcherTimer2.Tick += (s, d) =>
+                    {
+                        Parameters.MainPage.CloseBusyLoader();
+                        if (displaySideBar)
+                        {
+                            SearchItemsSideBar();
+                        }
+
+                        dispatcherTimer2.Stop();
+                    };
+                    dispatcherTimer2.Start();
+
+                    dispatcherTimer.Stop();
+                };
+
+                dispatcherTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+
         public void CancelSearch()
         {
             try
             {
-                ViewModelPage.ResearchItems = new ObservableCollection<ResearchItemVM>();
+                ViewModelPage.ResearchItems = null;
                 ASB_SearchItem.Text = string.Empty;
                 SearchBookUC searchBookUC = uiServices.GetSearchBookUCSideBar(this.PivotRightSideBar);
                 if (searchBookUC != null)

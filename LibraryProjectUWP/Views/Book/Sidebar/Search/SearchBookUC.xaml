@@ -17,27 +17,30 @@
     d:DesignHeight="800"
     d:DesignWidth="510" Loaded="PivotItem_Loaded" Unloaded="UserControl_Unloaded">
     <PivotItem.Resources>
-        <customConverters:DateTimeToStringDisplay x:Key="dateTimeToStringDisplay"/>
-        <customConverters:NameToColorConverter x:Key="NameToColorConverter"/>
-        <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
-        <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
-        <MTUUConverters:BoolToObjectConverter x:Key="boolToInvertVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
-        <XamlUICommand x:Name="CancelModificationXUiCommand" 
+        <ResourceDictionary>
+            <customConverters:MinusPlusGlyphToggleConverter x:Key="minusPlusGlyphToggleConverter"/>
+            <customConverters:DateTimeToStringDisplay x:Key="dateTimeToStringDisplay"/>
+            <customConverters:NameToColorConverter x:Key="NameToColorConverter"/>
+            <customConverters:EditModeToVisibilityConverter x:Key="editModeToVisibilityConverter" />
+            <MTUUConverters:BoolToObjectConverter x:Key="boolToVisibilityConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+            <MTUUConverters:BoolToObjectConverter x:Key="boolToInvertVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+            <XamlUICommand x:Name="CancelModificationXUiCommand" 
                        ExecuteRequested="CancelModificationXUiCommand_ExecuteRequested"
                        Description="Annule toutes les modifications apportées à l'item">
-        </XamlUICommand>
-        <XamlUICommand x:Name="SearchBookXUiCommand" 
+            </XamlUICommand>
+            <XamlUICommand x:Name="SearchBookXUiCommand" 
                        ExecuteRequested="SearchBookXUiCommand_ExecuteRequested"
                        Description="Crée un nouvel item">
-        </XamlUICommand>
-        <XamlUICommand x:Name="DeleteSearchItemXUiCmd" 
+            </XamlUICommand>
+            <XamlUICommand x:Name="DeleteSearchItemXUiCmd" 
                        ExecuteRequested="DeleteSearchItemXUiCmd_ExecuteRequested"
-                       Description="Crée un nouvel item">
-        </XamlUICommand>
-        <Style TargetType="Grid" x:Key="WrapGridChildStyle">
-            <Setter Property="Margin" Value="4 0" />
-            <Setter Property="VerticalAlignment" Value="Top" />
-        </Style>
+                       Description="Efface cette recherche de la liste">
+            </XamlUICommand>
+            <Style TargetType="Grid" x:Key="WrapGridChildStyle">
+                <Setter Property="Margin" Value="4 0" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+            </Style>
+        </ResourceDictionary>
     </PivotItem.Resources>
     <PivotItem.Header>
         <Grid ColumnSpacing="8">
@@ -111,16 +114,15 @@
                             <DataTemplate x:DataType="generalVm:ResearchItemVM">
                                 <Grid Margin="0 5" Padding="2 5" ColumnSpacing="4">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{x:Bind TermMessage}" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                                    <Button Grid.Column="1" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" CornerRadius="22" MTUUi:FrameworkElementExtensions.Cursor="Hand" Height="28" Width="28" Padding="0" 
-                                        Command="{StaticResource DeleteSearchItemXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}">
-                                        <!--ECC9-->
-                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC8;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>
+                                    <Button x:Name="BtnExcludeIncludeItemSearch" Grid.Column="0" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" CornerRadius="22" MTUUi:FrameworkElementExtensions.Cursor="Hand" Height="28" Width="28" Padding="0" 
+                                       Tag="{x:Bind Mode=OneWay}" Click="BtnExcludeIncludeItemSearch_Click">
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind IsExcluded, Converter={StaticResource minusPlusGlyphToggleConverter}, ConverterParameter='invert', Mode=OneWay}" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>
                                     </Button>
+                                    <TextBlock Grid.Column="1" Text="{x:Bind TermMessage}" TextWrapping="Wrap" VerticalAlignment="Center"/>
                                     <Button Grid.Column="2" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" CornerRadius="22" MTUUi:FrameworkElementExtensions.Cursor="Hand" Height="28" Width="28" Padding="0" 
                                         Command="{StaticResource DeleteSearchItemXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}">
                                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" FontSize="16"/>

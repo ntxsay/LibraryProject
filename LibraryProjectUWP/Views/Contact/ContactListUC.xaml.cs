@@ -357,11 +357,6 @@ namespace LibraryProjectUWP.Views.Contact
         {
             try
             {
-                //if (ViewModelPage.SearchedViewModel != null)
-                //{
-                //    ViewModelPage.SearchedViewModel = null;
-                //}
-
                 if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || !ViewModelListGroup.Any())
                 {
                     return;
@@ -602,14 +597,30 @@ namespace LibraryProjectUWP.Views.Contact
                     {
                         if (menuFlyout.Items[0] is MenuFlyoutItem menuFlyoutItemSearchAuthors)
                         {
+                            if (menuFlyoutItemSearchAuthors.CommandParameter is ContactVM contactVM)
+                            {
+                                menuFlyoutItemSearchAuthors.IsEnabled = true;
+                                ViewModelPage.SearchAuthorsMessage = $"Rechercher les livres de cet auteur";
+                            }
+                            else
+                            {
+                                menuFlyoutItemSearchAuthors.IsEnabled = false;
+                            }
                             menuFlyoutItemSearchAuthors.Text = ViewModelPage.SearchAuthorsMessage;
-                            menuFlyoutItemSearchAuthors.IsEnabled = false;
                         }
 
                         if (menuFlyout.Items[1] is MenuFlyoutItem menuFlyoutItemSearchEditors)
                         {
+                            if (menuFlyoutItemSearchEditors.CommandParameter is ContactVM contactVM)
+                            {
+                                menuFlyoutItemSearchEditors.IsEnabled = true;
+                                ViewModelPage.SearchEditorsMessage = $"Rechercher les livres de cet éditeur";
+                            }
+                            else
+                            {
+                                menuFlyoutItemSearchEditors.IsEnabled = false;
+                            }
                             menuFlyoutItemSearchEditors.Text = ViewModelPage.SearchEditorsMessage;
-                            menuFlyoutItemSearchEditors.IsEnabled = false;
                         }
                     }
 
@@ -820,16 +831,35 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private async void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                if (ViewModelPage.SelectedViewModels != null)
+                if (ParentPage.IsContainsBookCollection(out _))
                 {
-                    ParentPage.ViewModelPage.SelectedContacts = ViewModelPage.SelectedViewModels;
-                    await ParentPage.RefreshItemsGrouping();
+                    List<ContactVM> list = new List<ContactVM>();
+                    if (ViewModelPage.SelectedViewModels != null && ViewModelPage.SelectedViewModels.Any())
+                    {
+                        list.AddRange(ViewModelPage.SelectedViewModels);
+                    }
+                    else if (args.Parameter is ContactVM contactVM)
+                    {
+                        list.Add(contactVM);
+                    }
+
+                    if (list != null && list.Any())
+                    {
+                        ParentPage.LaunchSearch(list.Select(s => new ResearchItemVM()
+                        {
+                            IdLibrary = ParentPage.Parameters.ParentLibrary.Id,
+                            SearchInAuthors = true,
+                            Term = s.DisplayName3,
+                            TermParameter = Search.Terms.Equals,
+                        }), false);
+                    }
                 }
+                
             }
             catch (Exception ex)
             {

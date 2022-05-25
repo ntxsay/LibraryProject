@@ -44,6 +44,15 @@ namespace LibraryProjectUWP.Code.Services.Db
                         }
                     }
 
+                    if (values != null && values.Any())
+                    {
+                        if (typeof(T).IsAssignableFrom(typeof(Tbook)))
+                        {
+                            TbookIdEqualityComparer idEqualityComparer = new TbookIdEqualityComparer();
+                            values = values.Select(s => (Tbook)(object)s).Distinct(idEqualityComparer).Select(s => (T)(object)s).ToList();
+                        }
+                    }
+
                     return values;
                 }
                 catch (Exception ex)

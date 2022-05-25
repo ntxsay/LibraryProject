@@ -46,7 +46,7 @@ namespace LibraryProjectUWP.ViewModels.General
             }
         }
 
-        private bool? _SearchInMainTitle;
+        private bool? _SearchInMainTitle = false;
         public bool? SearchInMainTitle
         {
             get => _SearchInMainTitle;
@@ -60,7 +60,7 @@ namespace LibraryProjectUWP.ViewModels.General
             }
         }
 
-        private bool? _SearchInOtherTitles;
+        private bool? _SearchInOtherTitles = false;
         public bool? SearchInOtherTitles
         {
             get => _SearchInOtherTitles;
@@ -74,7 +74,7 @@ namespace LibraryProjectUWP.ViewModels.General
             }
         }
 
-        private bool? _SearchInAuthors;
+        private bool? _SearchInAuthors = false;
         public bool? SearchInAuthors
         {
             get => _SearchInAuthors;
@@ -88,7 +88,7 @@ namespace LibraryProjectUWP.ViewModels.General
             }
         }
 
-        private bool? _SearchInCollections;
+        private bool? _SearchInCollections = false;
         public bool? SearchInCollections
         {
             get => _SearchInCollections;
@@ -102,7 +102,7 @@ namespace LibraryProjectUWP.ViewModels.General
             }
         }
 
-        private bool? _SearchInEditors;
+        private bool? _SearchInEditors = false;
         public bool? SearchInEditors
         {
             get => _SearchInEditors;
@@ -125,6 +125,20 @@ namespace LibraryProjectUWP.ViewModels.General
                 if (_TermParameter != value)
                 {
                     _TermParameter = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _IsExcluded;
+        public bool IsExcluded
+        {
+            get => _IsExcluded;
+            set
+            {
+                if (_IsExcluded != value)
+                {
+                    _IsExcluded = value;
                     OnPropertyChanged();
                 }
             }

@@ -37,22 +37,6 @@ namespace LibraryProjectUWP.Views.Book
 
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-            private ResearchItemVM _ResearchItem = null;
-
-            [Obsolete]
-            public ResearchItemVM ResearchItem
-            {
-                get => this._ResearchItem;
-                set
-                {
-                    if (this._ResearchItem != value)
-                    {
-                        this._ResearchItem = value;
-                        this.OnPropertyChanged();
-                    }
-                }
-            }
-
             private ObservableCollection<ResearchItemVM> _ResearchItems = new ObservableCollection<ResearchItemVM>();
             public ObservableCollection<ResearchItemVM> ResearchItems
             {

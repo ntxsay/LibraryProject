@@ -299,37 +299,38 @@ namespace LibraryProjectUWP.Code.Services.Db
                         {
                             foreach (var item in existingItemList)
                             {
+                                string contactDisplayStyle1 = Contact.DisplayName(item, true, true);
+                                string contactDisplayStyle2 = Contact.DisplayName(item, false, true);
+                                string contactDisplayStyle3 = Contact.DisplayName(item, true, false);
+                                string contactDisplayStyle4 = Contact.DisplayName(item, false, false);
+                                
                                 switch (parameters.TermParameter)
                                 {
                                     case Code.Search.Terms.Equals:
-                                        if (item.TitreCivilite?.ToLower() == termToLower || item.NomNaissance?.ToLower() == termToLower ||
-                                            item.Prenom?.ToLower() == termToLower || item.AutresPrenoms?.ToLower() == termToLower ||
-                                            item.NomUsage?.ToLower() == termToLower || item.SocietyName?.ToLower() == termToLower)
+                                        if (contactDisplayStyle1?.ToLower() == termToLower || contactDisplayStyle2?.ToLower() == termToLower ||
+                                            contactDisplayStyle3?.ToLower() == termToLower || contactDisplayStyle4?.ToLower() == termToLower)
                                         {
                                             tcontacts.Add(item);
                                         }
                                         break;
                                     case Code.Search.Terms.Contains:
-                                        if (item.TitreCivilite?.ToLower().Contains(termToLower) == true || item.NomNaissance?.ToLower().Contains(termToLower) == true ||
-                                            item.Prenom?.ToLower().Contains(termToLower) == true || item.AutresPrenoms?.ToLower().Contains(termToLower) == true ||
-                                            item.NomUsage?.ToLower().Contains(termToLower) == true || item.SocietyName?.ToLower().Contains(termToLower) == true)
+                                        if (contactDisplayStyle1?.ToLower().Contains(termToLower) == true || contactDisplayStyle2?.ToLower().Contains(termToLower) == true ||
+                                            contactDisplayStyle3?.ToLower().Contains(termToLower) == true || contactDisplayStyle4?.ToLower().Contains(termToLower) == true)
                                         {
                                             tcontacts.Add(item);
                                         }
 
                                         break;
                                     case Code.Search.Terms.StartWith:
-                                        if (item.TitreCivilite?.ToLower().StartsWith(termToLower) == true || item.NomNaissance?.ToLower().StartsWith(termToLower) == true ||
-                                            item.Prenom?.ToLower().StartsWith(termToLower) == true || item.AutresPrenoms?.ToLower().StartsWith(termToLower) == true ||
-                                            item.NomUsage?.ToLower().StartsWith(termToLower) == true || item.SocietyName?.ToLower().StartsWith(termToLower) == true)
+                                        if (contactDisplayStyle1?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle2?.ToLower().StartsWith(termToLower) == true ||
+                                            contactDisplayStyle3?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle4?.ToLower().StartsWith(termToLower) == true)
                                         {
                                             tcontacts.Add(item);
                                         }
                                         break;
                                     case Code.Search.Terms.EndWith:
-                                        if (item.TitreCivilite?.ToLower().EndsWith(termToLower) == true || item.NomNaissance?.ToLower().EndsWith(termToLower) == true ||
-                                            item.Prenom?.ToLower().EndsWith(termToLower) == true || item.AutresPrenoms?.ToLower().EndsWith(termToLower) == true ||
-                                            item.NomUsage?.ToLower().EndsWith(termToLower) == true || item.SocietyName?.ToLower().EndsWith(termToLower) == true)
+                                        if (contactDisplayStyle1?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle2?.ToLower().EndsWith(termToLower) == true ||
+                                            contactDisplayStyle3?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle4?.ToLower().EndsWith(termToLower) == true)
                                         {
                                             tcontacts.Add(item);
                                         }

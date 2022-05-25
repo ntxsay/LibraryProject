@@ -19,9 +19,6 @@
                     <SolidColorBrush x:Key="PageNotSelectedBackground" Color="{ThemeResource ButtonBackgroundPressed}"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
-            <!--<ResourceDictionary.ThemeDictionaries>
-                <SolidColorBrush x:Key="ItemInfoContainerThemeColor" Color="{ThemeResource SystemControlChromeHighAcrylicElementMediumBrush}"/>
-            </ResourceDictionary.ThemeDictionaries>-->
             <!-- Other app resources here -->
         </ResourceDictionary>
     </Application.Resources>
