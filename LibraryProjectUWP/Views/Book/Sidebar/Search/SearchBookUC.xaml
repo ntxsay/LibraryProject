@@ -109,7 +109,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="Liste des recherches" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                    <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.SearchTask, Mode=TwoWay}" IsItemClickEnabled="True" ItemClick="ListView_ItemClick">
+                    <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModelPage.SearchTask, Mode=TwoWay}" IsItemClickEnabled="True" ItemClick="ListView_ItemClick" CanReorderItems="True" CanDragItems="True" AllowDrop="True">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="generalVm:ResearchItemVM">
                                 <Grid Margin="0 5" Padding="2 5" ColumnSpacing="4">
