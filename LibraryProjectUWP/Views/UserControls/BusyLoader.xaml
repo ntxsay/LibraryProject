@@ -16,9 +16,9 @@
     </Grid.Background>
     <StackPanel Orientation="Vertical" Spacing="8" Padding="12" VerticalAlignment="Center" HorizontalAlignment="Center">
         <ProgressRing IsActive="True" Margin="0,0,12,0" Foreground="White" Height="42" Width="42"/>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Margin="20 0">
             <TextBlock x:Name="TbcTitle" x:FieldModifier="public" Text="Loading control with wait ring" VerticalAlignment="Center" Foreground="White" FontSize="18" FontWeight="Bold"
-                       TextWrapping="Wrap" TextAlignment="Center"/>
+                       TextWrapping="WrapWholeWords" TextAlignment="Center"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
             <Button x:Name="BtnPrimary" x:FieldModifier="public" Click="BtnPrimary_Click" Visibility="Collapsed" MTUUi:FrameworkElementExtensions.Cursor="Hand">

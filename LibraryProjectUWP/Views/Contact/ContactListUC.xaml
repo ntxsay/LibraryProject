@@ -34,13 +34,13 @@
                        ExecuteRequested="DeleteItemXUiCommand_ExecuteRequested"
                        Description="Supprime l'item">
         </XamlUICommand>
-        <XamlUICommand x:Name="NavigateInThisItemXUiCmd" 
-                       ExecuteRequested="NavigateInThisItemXUiCmd_ExecuteRequested"
-                       Description="Supprime l'item">
+        <XamlUICommand x:Name="ResearchBooksFromAuthorsXUiCmd" 
+                       ExecuteRequested="ResearchBooksFromAuthorsXUiCmd_ExecuteRequested"
+                       Description="Recherche les livres associés à ce ou ces auteurs">
         </XamlUICommand>
-        <XamlUICommand x:Name="NavigateInAllItemXUiCmd" 
-                       ExecuteRequested="NavigateInAllItemXUiCmd_ExecuteRequested"
-                       Description="Supprime l'item">
+        <XamlUICommand x:Name="ResearchBooksFromEditorsXUiCmd" 
+                       ExecuteRequested="ResearchBooksFromEditorsXUiCmd_ExecuteRequested"
+                       Description="Recherche les livres associés à ce ou ces éditeurs">
         </XamlUICommand>
         <XamlUICommand x:Name="AddBooksToCollectionXUiCmd" 
                        ExecuteRequested="AddBooksToCollectionXUiCmd_ExecuteRequested"
@@ -53,13 +53,13 @@
         <DataTemplate x:Key="ZoomedInTemplate" x:DataType="contactVm:ContactVM">
             <ListViewItem>
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <PersonPicture DisplayName="{x:Bind DisplayName3}" Width="32" Height="32" BorderBrush="Transparent" BorderThickness="0" Background="{x:Bind DisplayName, Converter={StaticResource NameToColorConverter}}"/>
+                    <PersonPicture DisplayName="{x:Bind DisplayName3}" Width="32" Height="32" BorderBrush="Transparent" BorderThickness="0" Background="{x:Bind DisplayName3, Converter={StaticResource NameToColorConverter}}"/>
                     <TextBlock TextWrapping="NoWrap" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Text="{x:Bind DisplayName3, Mode=OneWay}"/>
                 </StackPanel>
                 <ListViewItem.ContextFlyout>
                     <MenuFlyout Opened="MenuFlyout_ListViewItemContext_Opened">
-                        <MenuFlyoutItem Icon="Find" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
-                        <MenuFlyoutItem Icon="Find" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource NavigateInThisItemXUiCmd}"/>
+                        <MenuFlyoutItem Icon="Find" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource ResearchBooksFromAuthorsXUiCmd}"/>
+                        <MenuFlyoutItem Icon="Find" CommandParameter="{x:Bind Mode=OneWay}" Command="{StaticResource ResearchBooksFromEditorsXUiCmd}"/>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Tag="{x:Bind DisplayName3, Mode=OneWay}" Icon="Add" Command="{StaticResource AddBooksToCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
                         <MenuFlyoutItem Tag="{x:Bind Mode=OneWay}" Icon="Remove" Command="{StaticResource DecategorizeBooksFromCollectionXUiCmd}" CommandParameter="{x:Bind Mode=OneWay}"/>
@@ -108,7 +108,7 @@
         </Grid.RowDefinitions>
         <TextBlock x:Name="TbcInfos" Grid.Row="0" Margin="0 10" TextWrapping="Wrap"/>
         <CommandBar Grid.Row="1" VerticalAlignment="Top" IsSticky="False"  DefaultLabelPosition="Collapsed" Background="{ThemeResource SystemControlChromeLowAcrylicElementBrush}" HorizontalContentAlignment="Left">
-            <AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="View">
+            <!--<AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand" Icon="View">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
                         <MenuFlyoutItem Icon="View" Text="Afficher tous les livres" MTUUi:FrameworkElementExtensions.Cursor="Hand" Command="{StaticResource NavigateInAllItemXUiCmd}">
@@ -119,7 +119,7 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
-            <AppBarSeparator/>
+            <AppBarSeparator/>-->
             <AppBarButton Label="Ajouter" MTUUi:FrameworkElementExtensions.Cursor="Hand">
                 <AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xe779;"/>

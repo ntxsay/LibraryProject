@@ -31,7 +31,6 @@ namespace LibraryProjectUWP.Views.Book
 {
     public sealed partial class SearchBookUC : PivotItem
     {
-
         public SearchBookUCVM ViewModelPage { get; set; } = new SearchBookUCVM();
         public BookCollectionPage ParentPage { get; private set; }
 

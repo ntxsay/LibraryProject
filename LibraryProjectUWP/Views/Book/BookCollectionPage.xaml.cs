@@ -3096,7 +3096,7 @@ namespace LibraryProjectUWP.Views.Book
                     researchItemVM.SearchInCollections = true;
                 }
 
-                LaunchSearch(new List<ResearchItemVM>() { researchItemVM});
+                LaunchSearch(new List<ResearchItemVM>() { researchItemVM}, true);
             }
             catch (Exception ex)
             {
@@ -3180,7 +3180,7 @@ namespace LibraryProjectUWP.Views.Book
                     ASB_SearchItem.Text = "";
                 }
 
-                LaunchSearch(sender.ViewModelPage.SearchTask.DeepCopy());
+                LaunchSearch(sender.ViewModelPage.SearchTask.DeepCopy(), true);
                 
                 this.ViewModelPage.IsGroupBookAppBarBtnEnabled = false;
                 this.ViewModelPage.IsSortBookAppBarBtnEnabled = false;
@@ -3244,7 +3244,7 @@ namespace LibraryProjectUWP.Views.Book
             UpdateItemsAfterQuitSearch();
         }
 
-        public void LaunchSearch(IEnumerable<ResearchItemVM> researchItemVMs, bool displaySideBar = true)
+        public void LaunchSearch(IEnumerable<ResearchItemVM> researchItemVMs, bool resetSearch = false, bool displaySideBar = true)
         {
             try
             {
@@ -3296,7 +3296,27 @@ namespace LibraryProjectUWP.Views.Book
 
                 dispatcherTimer.Tick += async (t, f) =>
                 {
-                    ViewModelPage.ResearchItems = new ObservableCollection<ResearchItemVM>(researchItemVMs);
+                    if (resetSearch || ViewModelPage.ResearchItems == null || !ViewModelPage.ResearchItems.Any())
+                    {
+                        ViewModelPage.ResearchItems = new ObservableCollection<ResearchItemVM>(researchItemVMs);
+                    }
+                    else
+                    {
+                        foreach (var value in researchItemVMs)
+                        {
+                            var item = ViewModelPage.ResearchItems.SingleOrDefault(c => c.Term.ToLower() == value.Term.ToLower() && c.TermParameter == value.TermParameter);
+                            if (item == null)
+                            {
+                                ViewModelPage.ResearchItems.Add(value);
+                            }
+                            else
+                            {
+                                int index = ViewModelPage.ResearchItems.IndexOf(item);
+                                ViewModelPage.ResearchItems.Remove(item);
+                                ViewModelPage.ResearchItems.Insert(index, value);
+                            }
+                        }
+                    }
 
                     await this.RefreshItemsGrouping(1, true);
 

@@ -142,7 +142,8 @@ namespace LibraryProjectUWP.Views.Contact
 
                     if (e.Result is WorkerState<ContactVM, ContactVM> result && result.ResultList != null && result.ResultList.Any())
                     {
-                        var GroupingItems = this.OrderItems(result.ResultList)?.Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NomNaissance.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
+                        ViewModelPage.contactList = result.ResultList;
+                        var GroupingItems = result.ResultList.OrderBy(o => o.DisplayName3)?.Where(w => !w.DisplayName3.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DisplayName3.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
                         if (GroupingItems != null && GroupingItems.Count() > 0)
                         {
                             List<ContactGroupCastVM> contactGroupCastVMs = GroupingItems.Select(groupingItem => new ContactGroupCastVM()
@@ -213,151 +214,12 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        #region Groups
-       
-        //public void GroupItemsByLetterNomNaissance()
-        //{
-        //    try
-        //    {
-        //        if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-        //        {
-        //            return;
-        //        }
-
-        //        var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.NomNaissance.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
-        //        if (GroupingItems != null && GroupingItems.Count() > 0)
-        //        {
-        //            List<ContactGroupCastVM> contactGroupCastVMs = (GroupingItems.Select(groupingItem => new ContactGroupCastVM()
-        //            {
-        //                GroupName = groupingItem.Key,
-        //                Items = new ObservableCollection<ContactVM>(groupingItem),
-        //            })).ToList();
-
-        //            ViewModelPage.ViewModelListGroup = contactGroupCastVMs;
-                    
-        //            //_contactParameters.ParentPage.ViewModelPage.GroupedBy = ContactGroupVM.GroupBy.LetterNomNaissance;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MethodBase m = MethodBase.GetCurrentMethod();
-        //        Logs.Log(ex, m);
-        //        return;
-        //    }
-        //}
-
-        //public void GroupItemsByLetterPrenom()
-        //{
-        //    try
-        //    {
-        //        if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-        //        {
-        //            return;
-        //        }
-
-        //        var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList, _contactParameters.ParentPage.ViewModelPage.OrderedBy, _contactParameters.ParentPage.ViewModelPage.SortedBy).Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.Prenom.FirstOrDefault().ToString().ToUpper()).OrderBy(o => o.Key).Select(s => s);
-        //        if (GroupingItems != null && GroupingItems.Count() > 0)
-        //        {
-        //            ViewModelPage.GroupedRelatedViewModel.Collection = new ObservableCollection<IGrouping<string, ContactVM>>(GroupingItems);
-        //            _contactParameters.ParentPage.ViewModelPage.GroupedBy = ContactGroupVM.GroupBy.LetterPrenom;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MethodBase m = MethodBase.GetCurrentMethod();
-        //        Logs.Log(ex, m);
-        //        return;
-        //    }
-        //}
-
-        //public void GroupByCreationYear()
-        //{
-        //    try
-        //    {
-        //        if (ViewModelPage.ViewModelList == null || !ViewModelPage.ViewModelList.Any())
-        //        {
-        //            return;
-        //        }
-
-        //        var GroupingItems = this.OrderItems(ViewModelPage.ViewModelList).Where(w => !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace())?.GroupBy(s => s.DateAjout.Year.ToString() ?? "Année de création inconnue").OrderBy(o => o.Key).Select(s => s);
-        //        if (GroupingItems != null && GroupingItems.Count() > 0)
-        //        {
-        //            ViewModelPage.Collection = new ObservableCollection<IGrouping<string, ContactVM>>(GroupingItems);
-        //            //_contactParameters.ParentPage.ViewModelPage.GroupedBy = ContactGroupVM.GroupBy.CreationYear;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MethodBase m = MethodBase.GetCurrentMethod();
-        //        Logs.Log(ex, m);
-        //        return;
-        //    }
-        //}
-        #endregion
-
-        #region Group-Orders
-        private IEnumerable<ContactVM> OrderItems(IEnumerable<ContactVM> Collection, ContactGroupVM.OrderBy OrderBy = ContactGroupVM.OrderBy.Croissant, ContactGroupVM.SortBy SortBy = ContactGroupVM.SortBy.Prenom)
-        {
-            try
-            {
-                if (Collection == null || Collection.Count() == 0)
-                {
-                    return null;
-                }
-
-                if (SortBy == ContactGroupVM.SortBy.Prenom)
-                {
-                    if (OrderBy == ContactGroupVM.OrderBy.Croissant)
-                    {
-                        return Collection.Where(w => w != null && !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.Prenom);
-                    }
-                    else if (OrderBy == ContactGroupVM.OrderBy.DCroissant)
-                    {
-                        return Collection.Where(w => w != null && !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.Prenom);
-                    }
-                }
-                else if (SortBy == ContactGroupVM.SortBy.NomNaissance)
-                {
-                    if (OrderBy == ContactGroupVM.OrderBy.Croissant)
-                    {
-                        return Collection.Where(w => w != null && !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace()).OrderBy(o => o.NomNaissance);
-                    }
-                    else if (OrderBy == ContactGroupVM.OrderBy.DCroissant)
-                    {
-                        return Collection.Where(w => w != null && !w.NomNaissance.IsStringNullOrEmptyOrWhiteSpace() && !w.Prenom.IsStringNullOrEmptyOrWhiteSpace()).OrderByDescending(o => o.NomNaissance);
-                    }
-                }
-                else if (SortBy == ContactGroupVM.SortBy.DateCreation)
-                {
-                    if (OrderBy == ContactGroupVM.OrderBy.Croissant)
-                    {
-                        return Collection.OrderBy(o => o.DateAjout);
-                    }
-                    else if (OrderBy == ContactGroupVM.OrderBy.DCroissant)
-                    {
-                        return Collection.OrderByDescending(o => o.DateAjout);
-                    }
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MethodBase m = MethodBase.GetCurrentMethod();
-                Logs.Log(ex, m);
-                return Enumerable.Empty<ContactVM>();
-            }
-        }
-
-
-        #endregion
-
         #region SearchItems
         private void ASB_SearchItem_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             try
             {
-                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || !ViewModelListGroup.Any())
+                if (sender.Text.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.contactList == null || !ViewModelPage.contactList.Any())
                 {
                     return;
                 }
@@ -365,7 +227,7 @@ namespace LibraryProjectUWP.Views.Contact
                 var FilteredItems = new List<ContactVM>();
                 var splitSearchTerm = sender.Text.ToLower().Split(" ");
 
-                foreach (var value in ViewModelListGroup.Select(s => s.Items).SelectMany(a => a.ToList()).Select(q => q).ToList())
+                foreach (var value in ViewModelPage.contactList)
                 {
                     if (value.DisplayName3.IsStringNullOrEmptyOrWhiteSpace()) continue;
 
@@ -831,7 +693,7 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private void NavigateInThisItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ResearchBooksFromAuthorsXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -856,10 +718,10 @@ namespace LibraryProjectUWP.Views.Contact
                             SearchInAuthors = true,
                             Term = s.DisplayName3,
                             TermParameter = Search.Terms.Equals,
-                        }), false);
+                        }), false, false);
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -868,13 +730,35 @@ namespace LibraryProjectUWP.Views.Contact
             }
         }
 
-        private async void NavigateInAllItemXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+        private void ResearchBooksFromEditorsXUiCmd_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
-                ParentPage.ViewModelPage.SelectedContacts = null;
-                await ParentPage.RefreshItemsGrouping();
+                if (ParentPage.IsContainsBookCollection(out _))
+                {
+                    List<ContactVM> list = new List<ContactVM>();
+                    if (ViewModelPage.SelectedViewModels != null && ViewModelPage.SelectedViewModels.Any())
+                    {
+                        list.AddRange(ViewModelPage.SelectedViewModels);
+                    }
+                    else if (args.Parameter is ContactVM contactVM)
+                    {
+                        list.Add(contactVM);
+                    }
+
+                    if (list != null && list.Any())
+                    {
+                        ParentPage.LaunchSearch(list.Select(s => new ResearchItemVM()
+                        {
+                            IdLibrary = ParentPage.Parameters.ParentLibrary.Id,
+                            SearchInEditors = true,
+                            Term = s.DisplayName3,
+                            TermParameter = Search.Terms.Equals,
+                        }), false, false);
+                    }
+                }
+
             }
             catch (Exception ex)
             {
@@ -882,7 +766,7 @@ namespace LibraryProjectUWP.Views.Contact
                 return;
             }
         }
-
+        
 
         private void ABBtnExport_Click(object sender, RoutedEventArgs e)
         {
@@ -925,8 +809,6 @@ namespace LibraryProjectUWP.Views.Contact
                 return;
             }
         }
-
-        
     }
 
     public class ContactListUCVM : INotifyPropertyChanged
@@ -934,7 +816,7 @@ namespace LibraryProjectUWP.Views.Contact
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         //public SideBarInterLinkVM ParentReferences { get; set; }
-
+        public IEnumerable<ContactVM> contactList;
         private string _Header;
         public string Header
         {

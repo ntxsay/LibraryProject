@@ -844,7 +844,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             value = $"{nomNaissance}{nomUsage}{prenom}{autresPrenoms?.Trim()}";
                         }
 
-                        if (useTitreCivility)
+                        if (useTitreCivility && !titrecivility.IsStringNullOrEmptyOrWhiteSpace())
                         {
                             value = titrecivility + value;
                         }
@@ -892,7 +892,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             value = $"{nomNaissance}{nomUsage}{prenom}{autresPrenoms?.Trim()}";
                         }
 
-                        if (useTitreCivility)
+                        if (useTitreCivility && !titrecivility.IsStringNullOrEmptyOrWhiteSpace())
                         {
                             value = titrecivility + value;
                         }
@@ -900,7 +900,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                     else if (model.ContactType == ContactType.Society)
                     {
                         value = model.SocietyName;
-
                     }
 
                     return value?.Trim();
