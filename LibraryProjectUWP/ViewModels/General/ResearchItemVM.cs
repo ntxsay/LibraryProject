@@ -14,6 +14,7 @@ namespace LibraryProjectUWP.ViewModels.General
     public class ResearchItemVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public Guid Guid { get; private set; } = Guid.NewGuid();
 
         public Type TypeObject { get; set; } = typeof(LivreVM);
         public long? IdLibrary { get; set; }
@@ -144,10 +145,64 @@ namespace LibraryProjectUWP.ViewModels.General
             }
         }
 
+        private bool _IsSearchFromParentResult = false;
+        public bool IsSearchFromParentResult
+        {
+            get => _IsSearchFromParentResult;
+            set
+            {
+                if (_IsSearchFromParentResult != value)
+                {
+                    _IsSearchFromParentResult = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             // Raise the PropertyChanged event, passing the name of the property whose value has changed.
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
+    public class ResearchContainerVM<T> : INotifyPropertyChanged where T : class
+    {
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        private ResearchItemVM _CurrentSearchParameter;
+        public ResearchItemVM CurrentSearchParameter
+        {
+            get => _CurrentSearchParameter;
+            set
+            {
+                if (_CurrentSearchParameter != value)
+                {
+                    _CurrentSearchParameter = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private IEnumerable<T> _ParentSearchedResult;
+        public IEnumerable<T> ParentSearchedResult
+        {
+            get => _ParentSearchedResult;
+            set
+            {
+                if (_ParentSearchedResult != value)
+                {
+                    _ParentSearchedResult = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
 }

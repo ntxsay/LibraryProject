@@ -168,44 +168,76 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
             #region Search
-            public static async Task<IList<Tbook>> SearchBooksInMainTitle(ResearchItemVM parameters, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInMainTitle(ResearchContainerVM<Tbook> parameter, long idLibrary, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    if (parameters == null)
-                    {
-                        return Enumerable.Empty<Tbook>().ToList();
-                    }
-                    if (parameters.IdLibrary == null || parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+                    if (parameter == null || parameter.CurrentSearchParameter == null)
                     {
                         return Enumerable.Empty<Tbook>().ToList();
                     }
 
-                    using (LibraryDbContext context = new LibraryDbContext())
+                    if (parameter.CurrentSearchParameter.Term.IsStringNullOrEmptyOrWhiteSpace())
                     {
-                        List<Tbook> tbooks = new List<Tbook>();
-                        var termToLower = parameters.Term.ToLower();
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
 
-                        switch (parameters.TermParameter)
+                    if (parameter.CurrentSearchParameter.IdLibrary == null || parameter.CurrentSearchParameter.IdLibrary < 1)
+                    {
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
+
+                    var term = parameter.CurrentSearchParameter.Term;//.ToLower();
+                    List<Tbook> tbooks = new List<Tbook>();
+
+                    if (parameter.CurrentSearchParameter.IsSearchFromParentResult == false)
+                    {
+                        using (LibraryDbContext context = new LibraryDbContext())
                         {
-                            case Code.Search.Terms.Equals:
-                                tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle == parameters.Term).ToListAsync(cancellationToken);
-                                break;
-                            case Code.Search.Terms.Contains:
-                                tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.Contains(parameters.Term)).ToListAsync(cancellationToken);
-                                break;
-                            case Code.Search.Terms.StartWith:
-                                tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
-                                break;
-                            case Code.Search.Terms.EndWith:
-                                tbooks = await context.Tbook.Where(w => w.IdLibrary == parameters.IdLibrary && w.MainTitle.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
-                                break;
-                            default:
-                                break;
+                            switch (parameter.CurrentSearchParameter.TermParameter)
+                            {
+                                case Code.Search.Terms.Equals:
+                                    tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle == term).ToListAsync(cancellationToken);
+                                    break;
+                                case Code.Search.Terms.Contains:
+                                    tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle.Contains(term)).ToListAsync(cancellationToken);
+                                    break;
+                                case Code.Search.Terms.StartWith:
+                                    tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle.StartsWith(term)).ToListAsync(cancellationToken);
+                                    break;
+                                case Code.Search.Terms.EndWith:
+                                    tbooks = await context.Tbook.Where(w => w.IdLibrary == idLibrary && w.MainTitle.EndsWith(term)).ToListAsync(cancellationToken);
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-
-                        return tbooks;
                     }
+                    else
+                    {
+                        if (parameter.ParentSearchedResult != null && parameter.ParentSearchedResult.Any())
+                        {
+                            switch (parameter.CurrentSearchParameter.TermParameter)
+                            {
+                                case Code.Search.Terms.Equals:
+                                    tbooks = parameter.ParentSearchedResult.Where(w => w.IdLibrary == idLibrary && w.MainTitle == term).ToList();
+                                    break;
+                                case Code.Search.Terms.Contains:
+                                    tbooks = parameter.ParentSearchedResult.Where(w => w.IdLibrary == idLibrary && w.MainTitle.Contains(term)).ToList();
+                                    break;
+                                case Code.Search.Terms.StartWith:
+                                    tbooks = parameter.ParentSearchedResult.Where(w => w.IdLibrary == idLibrary && w.MainTitle.StartsWith(term)).ToList();
+                                    break;
+                                case Code.Search.Terms.EndWith:
+                                    tbooks = parameter.ParentSearchedResult.Where(w => w.IdLibrary == idLibrary && w.MainTitle.EndsWith(term)).ToList();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+
+                    return tbooks;
                 }
                 catch (Exception ex)
                 {
@@ -362,115 +394,115 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tbook>> SearchBooksAsync(ResearchItemVM parameters, CancellationToken cancellationToken = default)
-            {
-                try
-                {
-                    if (parameters == null)
-                    {
-                        return Enumerable.Empty<Tbook>().ToList();
-                    }
-                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        return Enumerable.Empty<Tbook>().ToList();
-                    }
+            //public static async Task<IList<Tbook>> SearchBooksAsync(ResearchItemVM parameters, CancellationToken cancellationToken = default)
+            //{
+            //    try
+            //    {
+            //        if (parameters == null)
+            //        {
+            //            return Enumerable.Empty<Tbook>().ToList();
+            //        }
+            //        if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+            //        {
+            //            return Enumerable.Empty<Tbook>().ToList();
+            //        }
 
-                    using (LibraryDbContext context = new LibraryDbContext())
-                    {
-                        List<Tbook> tbooks = new List<Tbook>();
-                        TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
-                        var termToLower = parameters.Term.ToLower();
+            //        using (LibraryDbContext context = new LibraryDbContext())
+            //        {
+            //            List<Tbook> tbooks = new List<Tbook>();
+            //            TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
+            //            var termToLower = parameters.Term.ToLower();
 
-                        if (parameters.SearchInMainTitle == true)
-                        {
-                            IList<Tbook> _tbooks = await SearchBooksInMainTitle(parameters, cancellationToken);
-                            if (_tbooks != null && _tbooks.Any())
-                            {
-                                tbooks.AddRange(_tbooks);
-                            }
-                        }
+            //            if (parameters.SearchInMainTitle == true)
+            //            {
+            //                IList<Tbook> _tbooks = await SearchBooksInMainTitle(parameters, cancellationToken);
+            //                if (_tbooks != null && _tbooks.Any())
+            //                {
+            //                    tbooks.AddRange(_tbooks);
+            //                }
+            //            }
 
-                        if (parameters.SearchInOtherTitles == true)
-                        {
-                            IList<Tbook> _tbooks = await SearchBooksInOtherTitles(parameters, cancellationToken);
-                            if (_tbooks != null && _tbooks.Any())
-                            {
-                                tbooks.AddRange(_tbooks);
-                            }
-                        }
+            //            if (parameters.SearchInOtherTitles == true)
+            //            {
+            //                IList<Tbook> _tbooks = await SearchBooksInOtherTitles(parameters, cancellationToken);
+            //                if (_tbooks != null && _tbooks.Any())
+            //                {
+            //                    tbooks.AddRange(_tbooks);
+            //                }
+            //            }
 
-                        if (parameters.SearchInAuthors == true)
-                        {
-                            IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.Author }, cancellationToken);
-                            if (_tbooks != null && _tbooks.Any())
-                            {
-                                tbooks.AddRange(_tbooks);
-                            }
-                        }
+            //            if (parameters.SearchInAuthors == true)
+            //            {
+            //                IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.Author }, cancellationToken);
+            //                if (_tbooks != null && _tbooks.Any())
+            //                {
+            //                    tbooks.AddRange(_tbooks);
+            //                }
+            //            }
 
-                        if (parameters.SearchInEditors == true)
-                        {
-                            IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.EditorHouse }, cancellationToken);
-                            if (_tbooks != null && _tbooks.Any())
-                            {
-                                tbooks.AddRange(_tbooks);
-                            }
-                        }
+            //            if (parameters.SearchInEditors == true)
+            //            {
+            //                IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.EditorHouse }, cancellationToken);
+            //                if (_tbooks != null && _tbooks.Any())
+            //                {
+            //                    tbooks.AddRange(_tbooks);
+            //                }
+            //            }
 
-                        if (parameters.SearchInCollections == true)
-                        {
+            //            if (parameters.SearchInCollections == true)
+            //            {
 
-                        }
+            //            }
 
-                        //if (cancellationToken.IsCancellationRequested)
-                        //{
+            //            //if (cancellationToken.IsCancellationRequested)
+            //            //{
 
-                        //}
+            //            //}
 
-                        if (tbooks != null && tbooks.Any())
-                        {
-                            tbooks = tbooks.Distinct(tbookIdEqualityComparer).ToList();
-                            tbooks.ForEach(async (book) => await CompleteModelInfos(context, book));
-                            return tbooks;
-                        }
-                    }
+            //            if (tbooks != null && tbooks.Any())
+            //            {
+            //                tbooks = tbooks.Distinct(tbookIdEqualityComparer).ToList();
+            //                tbooks.ForEach(async (book) => await CompleteModelInfos(context, book));
+            //                return tbooks;
+            //            }
+            //        }
 
-                    return Enumerable.Empty<Tbook>().ToList();
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Logs.Log(ex, m);
-                    return Enumerable.Empty<Tbook>().ToList();
-                }
-            }
+            //        return Enumerable.Empty<Tbook>().ToList();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        MethodBase m = MethodBase.GetCurrentMethod();
+            //        Logs.Log(ex, m);
+            //        return Enumerable.Empty<Tbook>().ToList();
+            //    }
+            //}
 
-            public static async Task<IList<LivreVM>> SearchBooksVMAsync(ResearchItemVM parameters, CancellationToken cancellationToken = default)
-            {
-                try
-                {
-                    if (parameters == null)
-                    {
-                        return Enumerable.Empty<LivreVM>().ToList();
-                    }
-                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
-                    {
-                        return Enumerable.Empty<LivreVM>().ToList();
-                    }
+            //public static async Task<IList<LivreVM>> SearchBooksVMAsync(ResearchItemVM parameters, CancellationToken cancellationToken = default)
+            //{
+            //    try
+            //    {
+            //        if (parameters == null)
+            //        {
+            //            return Enumerable.Empty<LivreVM>().ToList();
+            //        }
+            //        if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+            //        {
+            //            return Enumerable.Empty<LivreVM>().ToList();
+            //        }
 
-                    var collection = await SearchBooksAsync(parameters, cancellationToken);
-                    if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
+            //        var collection = await SearchBooksAsync(parameters, cancellationToken);
+            //        if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
 
-                    var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
-                    return values;
-                }
-                catch (Exception ex)
-                {
-                    MethodBase m = MethodBase.GetCurrentMethod();
-                    Logs.Log(ex, m);
-                    return Enumerable.Empty<LivreVM>().ToList();
-                }
-            }
+            //        var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
+            //        return values;
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        MethodBase m = MethodBase.GetCurrentMethod();
+            //        Logs.Log(ex, m);
+            //        return Enumerable.Empty<LivreVM>().ToList();
+            //    }
+            //}
 
             #endregion
         }

@@ -82,6 +82,7 @@ namespace LibraryProjectUWP.Views.Book
                     IdLibrary = idLibrary,
                     SearchTask = new ObservableCollection<ResearchItemVM>(items),
                 };
+                ViewModelPage.SearchTask.CollectionChanged += SearchTask_CollectionChanged;
 
                 if (parentPage.IsContainsLibraryCollection(out _))
                 {
@@ -209,6 +210,7 @@ namespace LibraryProjectUWP.Views.Book
                     {
                         CmbxTermsParams.SelectedItem = keyPair.Value;
                     }
+                    this.Bindings.Update();
                 }
             }
             catch (Exception ex)
@@ -225,13 +227,28 @@ namespace LibraryProjectUWP.Views.Book
             {
                 if (sender is Button button && button.Tag is ResearchItemVM itemVM)
                 {
-                    if (itemVM.IsExcluded)
+                    ResearchItemVM item = ViewModelPage.SearchTask.SingleOrDefault(s => s.Guid == itemVM.Guid);
+                    if (item != null)
                     {
-                        itemVM.IsExcluded = false;
-                    }
-                    else if (!itemVM.IsExcluded)
-                    {
-                        itemVM.IsExcluded = true;
+                        if (ViewModelPage.SearchTask.IndexOf(item) == 0)
+                        {
+                            if (item.IsSearchFromParentResult)
+                            {
+                                item.IsSearchFromParentResult = false;
+                                this.Bindings.Update();
+                            }
+                            return;
+                        }
+
+                        if (item.IsSearchFromParentResult)
+                        {
+                            item.IsSearchFromParentResult = false;
+                        }
+                        else if (!item.IsSearchFromParentResult)
+                        {
+                            item.IsSearchFromParentResult = true;
+                        }
+                        this.Bindings.Update();
                     }
                 }
             }
@@ -247,9 +264,32 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                if (args.Parameter is ResearchItemVM viewModel && ViewModelPage.SearchTask.Contains(viewModel))
+                if (args.Parameter is ResearchItemVM viewModel)
                 {
-                    ViewModelPage.SearchTask.Remove(viewModel);
+                    var item = ViewModelPage.SearchTask.SingleOrDefault(a => a.Guid == viewModel.Guid);
+                    if (item != null)
+                    {
+                        ViewModelPage.SearchTask.Remove(item);
+                        this.Bindings.Update();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MethodBase m = MethodBase.GetCurrentMethod();
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        private void SearchTask_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            try
+            {
+                if (ViewModelPage.SearchTask.Any() && ViewModelPage.SearchTask[0].IsSearchFromParentResult)
+                {
+                    ViewModelPage.SearchTask[0].IsSearchFromParentResult = false;
+                    //this.Bindings.Update();
                 }
             }
             catch (Exception ex)
@@ -390,8 +430,8 @@ namespace LibraryProjectUWP.Views.Book
                     else
                     {
                         int index = ViewModelPage.SearchTask.IndexOf(item);
-                        ViewModelPage.SearchTask.Remove(item);
                         ViewModelPage.SearchTask.Insert(index, value);
+                        ViewModelPage.SearchTask.Remove(item);
                     }
                 }
                 else

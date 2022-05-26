@@ -3296,7 +3296,7 @@ namespace LibraryProjectUWP.Views.Book
 
                 dispatcherTimer.Tick += async (t, f) =>
                 {
-                    if (resetSearch || ViewModelPage.ResearchItems == null || !ViewModelPage.ResearchItems.Any())
+                    if (resetSearch || ViewModelPage.ResearchItems == null)// || !ViewModelPage.ResearchItems.Any()
                     {
                         ViewModelPage.ResearchItems = new ObservableCollection<ResearchItemVM>(researchItemVMs);
                     }
@@ -3312,8 +3312,8 @@ namespace LibraryProjectUWP.Views.Book
                             else
                             {
                                 int index = ViewModelPage.ResearchItems.IndexOf(item);
-                                ViewModelPage.ResearchItems.Remove(item);
                                 ViewModelPage.ResearchItems.Insert(index, value);
+                                ViewModelPage.ResearchItems.Remove(item);
                             }
                         }
                     }

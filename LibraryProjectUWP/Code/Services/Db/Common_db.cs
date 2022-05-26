@@ -20,7 +20,7 @@ namespace LibraryProjectUWP.Code.Services.Db
     {
         public partial struct Common
         {
-            public static async Task<IList<T>> SearchAsync<T>(IEnumerable<ResearchItemVM> parameters, CancellationToken cancellationToken = default) where T : class, new ()
+            public static async Task<IList<T>> SearchAsync<T>(ResearchItemVM[] parameters, long? idLibrary = null, CancellationToken cancellationToken = default) where T : class, new ()
             {
                 try
                 {
@@ -29,19 +29,61 @@ namespace LibraryProjectUWP.Code.Services.Db
                         return Enumerable.Empty<T>().ToList();
                     }
 
-                    List<T> values = new List<T>();
-                    foreach (var item in parameters)
+                    if (typeof(T) == typeof(Tbook) && (idLibrary == null || idLibrary < 1))
                     {
-                        var value = await SearchAsync<T>(item, cancellationToken);
-                        if (value != null && value.Any())
+                        return Enumerable.Empty<T>().ToList();
+                    }
+
+                    List<IEnumerable<T>> searchArrayList = new List<IEnumerable<T>>();
+                    for (int i = 0; i < parameters.Count(); i++)
+                    {
+                        var item  = parameters[i];  
+                        if (i == 0)
                         {
-                            values.AddRange(value);
+                            if (item.IsSearchFromParentResult)
+                            {
+                                item.IsSearchFromParentResult = false;
+                            }
+                        }
+
+                        IEnumerable<T> valueList = await SearchAsync(new ResearchContainerVM<T>()
+                        {
+                            CurrentSearchParameter = item,
+                            ParentSearchedResult = item.IsSearchFromParentResult ? searchArrayList.LastOrDefault() : null,
+                        }, idLibrary, cancellationToken);
+                        
+                        if (valueList != null && valueList.Any())
+                        {
+                            if (item.IsSearchFromParentResult)
+                            {
+                                var lastItem = searchArrayList.LastOrDefault();
+                                if (lastItem != null)
+                                {
+                                    int index = searchArrayList.IndexOf(lastItem);
+                                    searchArrayList.Insert(index, valueList);
+                                    searchArrayList.Remove(lastItem);
+                                }
+                                else
+                                {
+                                    searchArrayList.Add(valueList);
+                                }
+                            }
+                            else
+                            {
+                                searchArrayList.Add(valueList);
+                            }
                         }
 
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            return values;
+                            break;
                         }
+                    }
+
+                    List<T> values = new List<T>();
+                    if (searchArrayList != null && searchArrayList.Any())
+                    {
+                        values = searchArrayList.SelectMany(s => s.ToList()).Select(s => s).ToList();
                     }
 
                     if (values != null && values.Any())
@@ -64,35 +106,35 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
 
-            public static async Task<IList<T>> SearchAsync<T>(ResearchItemVM parameters, CancellationToken cancellationToken = default) where T : class
+            public static async Task<IList<T>> SearchAsync<T>(ResearchContainerVM<T> parameter, long? idLibrary = null, CancellationToken cancellationToken = default) where T : class
             {
                 try
                 {
-                    if (parameters == null)
+                    if (parameter == null || parameter.CurrentSearchParameter == null)
                     {
                         return Enumerable.Empty<T>().ToList();
                     }
 
-                    if (parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+                    if (parameter.CurrentSearchParameter.Term.IsStringNullOrEmptyOrWhiteSpace())
                     {
                         return Enumerable.Empty<T>().ToList();
                     }
 
-                    if (typeof(T) == typeof(Tbook) && (parameters.IdLibrary == null || parameters.IdLibrary < 1))
+                    if (typeof(T) == typeof(Tbook) && (idLibrary == null || idLibrary < 1))
                     {
                         return Enumerable.Empty<T>().ToList();
                     }
 
                     using (LibraryDbContext context = new LibraryDbContext())
                     {
-                        var termToLower = parameters.Term.ToLower();
+                        var termToLower = parameter.CurrentSearchParameter.Term.ToLower();
 
                         if (typeof(T).IsAssignableFrom(typeof(Tlibrary)))
                         {
                             List<Tlibrary> tlibraries = new List<Tlibrary>();
-                            if (parameters.SearchInMainTitle == true)
+                            if (parameter.CurrentSearchParameter.SearchInMainTitle == true)
                             {
-                                var _tlibraries = await Library.SearchLibrariesInName(parameters, cancellationToken);
+                                var _tlibraries = await Library.SearchLibrariesInName(parameter.CurrentSearchParameter, cancellationToken);
                                 if (_tlibraries != null && _tlibraries.Any())
                                 {
                                     tlibraries.AddRange(_tlibraries);
@@ -107,47 +149,47 @@ namespace LibraryProjectUWP.Code.Services.Db
                                 return tlibraries.Select(s => (T)(object)s).ToList();
                             }
                         }
-                        else if (typeof(T).IsAssignableFrom(typeof(Tbook)))
+                        else if (parameter is ResearchContainerVM<Tbook> bookParameter)
                         {
                             List<Tbook> tbooks = new List<Tbook>();
 
-                            if (parameters.SearchInMainTitle == true)
+                            if (parameter.CurrentSearchParameter.SearchInMainTitle == true)
                             {
-                                IList<Tbook> _tbooks = await Book.SearchBooksInMainTitle(parameters, cancellationToken);
+                                IList<Tbook> _tbooks = await Book.SearchBooksInMainTitle(bookParameter, (long)idLibrary, cancellationToken);
                                 if (_tbooks != null && _tbooks.Any())
                                 {
                                     tbooks.AddRange(_tbooks);
                                 }
                             }
 
-                            if (parameters.SearchInOtherTitles == true)
+                            if (parameter.CurrentSearchParameter.SearchInOtherTitles == true)
                             {
-                                IList<Tbook> _tbooks = await Book.SearchBooksInOtherTitles(parameters, cancellationToken);
+                                IList<Tbook> _tbooks = await Book.SearchBooksInOtherTitles(parameter.CurrentSearchParameter, cancellationToken);
                                 if (_tbooks != null && _tbooks.Any())
                                 {
                                     tbooks.AddRange(_tbooks);
                                 }
                             }
 
-                            if (parameters.SearchInAuthors == true)
+                            if (parameter.CurrentSearchParameter.SearchInAuthors == true)
                             {
-                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.Author }, cancellationToken);
+                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameter.CurrentSearchParameter, new ContactRole[] { ContactRole.Author }, cancellationToken);
                                 if (_tbooks != null && _tbooks.Any())
                                 {
                                     tbooks.AddRange(_tbooks);
                                 }
                             }
 
-                            if (parameters.SearchInEditors == true)
+                            if (parameter.CurrentSearchParameter.SearchInEditors == true)
                             {
-                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.EditorHouse }, cancellationToken);
+                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameter.CurrentSearchParameter, new ContactRole[] { ContactRole.EditorHouse }, cancellationToken);
                                 if (_tbooks != null && _tbooks.Any())
                                 {
                                     tbooks.AddRange(_tbooks);
                                 }
                             }
 
-                            if (parameters.SearchInCollections == true)
+                            if (parameter.CurrentSearchParameter.SearchInCollections == true)
                             {
 
                             }

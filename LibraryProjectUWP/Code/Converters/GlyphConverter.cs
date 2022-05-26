@@ -1,6 +1,8 @@
-﻿using LibraryProjectUWP.ViewModels.General;
+﻿using LibraryProjectUWP.Code.Helpers;
+using LibraryProjectUWP.ViewModels.General;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,29 +12,30 @@ using Windows.UI.Xaml.Media;
 
 namespace LibraryProjectUWP.Code.Converters
 {
-    public class MinusPlusGlyphToggleConverter : IValueConverter
+    public class FalseTrueGlyphToggleConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             try
             {
-                if (value is bool boolean)
+                if (value is bool boolean && parameter is string para)
                 {
-                    if (parameter == null || parameter is string invert && invert != "invert")
+                    var split = StringHelpers.SplitWord(para, new char[] { '|' }, true);
+                    if (split != null && split.Length == 2)
                     {
-                        return boolean ? "\uECC8" : "\uECC9";
-                    }
-                    else
-                    {
-                        return boolean ? "\uECC9" : "\uECC8";
+                        /* 0 => false
+                           1 => true */
+
+                        char trueVal = (char)(System.Convert.ToInt32(split[1], 16));
+                        char falseVal = (char)(System.Convert.ToInt32(split[0], 16));
+                        return boolean ? trueVal.ToString() : falseVal.ToString();
                     }
                 }
-
-                throw new NotImplementedException();
+                return "";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new NotImplementedException();
+                return "";
             }
         }
 

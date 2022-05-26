@@ -294,7 +294,7 @@ namespace LibraryProjectUWP.Code.Services.UI
 
                 if ((typeof(T).IsAssignableFrom(typeof(Tlibrary)) || typeof(T).IsAssignableFrom(typeof(BibliothequeVM))) && LibraryCollectionSubView != null)
                 {
-                    var searchedItems = await DbServices.Common.SearchAsync<Tlibrary>(searchParams);
+                    var searchedItems = await DbServices.Common.SearchAsync<Tlibrary>(searchParams?.ToArray()) ;
                     if (searchedItems == null || !searchedItems.Any())
                     {
                         LibraryCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
@@ -317,7 +317,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                 }
                 else if ((typeof(T).IsAssignableFrom(typeof(Tbook)) || typeof(T).IsAssignableFrom(typeof(LivreVM))) && BookCollectionSubView != null)
                 {
-                    var searchedItems = await DbServices.Common.SearchAsync<Tbook>(searchParams);
+                    var searchedItems = await DbServices.Common.SearchAsync<Tbook>(searchParams?.ToArray(), ParentPage.Parameters?.ParentLibrary?.Id);
                     if (searchedItems == null || !searchedItems.Any())
                     {
                         BookCollectionSubView.ViewModelPage.NbElementDisplayed = 0;
