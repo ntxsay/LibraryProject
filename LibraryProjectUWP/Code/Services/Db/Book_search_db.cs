@@ -369,124 +369,111 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                     var termToLower = parameter.CurrentSearchParameter.Term.ToLower();
                     List<Tbook> tbooks = new List<Tbook>();
+                    List<Tcontact> tcontacts = new List<Tcontact>();
+                    List<Tcontact> existingItemList = new List<Tcontact>();
                     TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
+                    
                     if (parameter.CurrentSearchParameter.IsSearchFromParentResult == false)
                     {
                         using (LibraryDbContext context = new LibraryDbContext())
                         {
-                            List<Tcontact> existingItemList = (await Contact.MultipleAsync(null, contactRoleList))?.ToList();
-                            List<Tcontact> tcontacts = new List<Tcontact>();
-
-                            if (existingItemList != null && existingItemList.Any())
-                            {
-                                foreach (var item in existingItemList)
-                                {
-                                    string contactDisplayStyle1 = Contact.DisplayName(item, true, true);
-                                    string contactDisplayStyle2 = Contact.DisplayName(item, false, true);
-                                    string contactDisplayStyle3 = Contact.DisplayName(item, true, false);
-                                    string contactDisplayStyle4 = Contact.DisplayName(item, false, false);
-
-                                    switch (parameter.CurrentSearchParameter.TermParameter)
-                                    {
-                                        case Code.Search.Terms.Equals:
-                                            if (contactDisplayStyle1?.ToLower() == termToLower || contactDisplayStyle2?.ToLower() == termToLower ||
-                                                contactDisplayStyle3?.ToLower() == termToLower || contactDisplayStyle4?.ToLower() == termToLower)
-                                            {
-                                                tcontacts.Add(item);
-                                            }
-                                            break;
-                                        case Code.Search.Terms.Contains:
-                                            if (contactDisplayStyle1?.ToLower().Contains(termToLower) == true || contactDisplayStyle2?.ToLower().Contains(termToLower) == true ||
-                                                contactDisplayStyle3?.ToLower().Contains(termToLower) == true || contactDisplayStyle4?.ToLower().Contains(termToLower) == true)
-                                            {
-                                                tcontacts.Add(item);
-                                            }
-
-                                            break;
-                                        case Code.Search.Terms.StartWith:
-                                            if (contactDisplayStyle1?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle2?.ToLower().StartsWith(termToLower) == true ||
-                                                contactDisplayStyle3?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle4?.ToLower().StartsWith(termToLower) == true)
-                                            {
-                                                tcontacts.Add(item);
-                                            }
-                                            break;
-                                        case Code.Search.Terms.EndWith:
-                                            if (contactDisplayStyle1?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle2?.ToLower().EndsWith(termToLower) == true ||
-                                                contactDisplayStyle3?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle4?.ToLower().EndsWith(termToLower) == true)
-                                            {
-                                                tcontacts.Add(item);
-                                            }
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-
-                            if (tcontacts != null && tcontacts.Any())
-                            {
-                                var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontacts.Select(s => s.Id), contactRoleList);
-                                List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, idLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
-                                if (_tbooks != null && _tbooks.Any())
-                                {
-                                    tbooks.AddRange(_tbooks);
-                                }
-                            }
-
+                            existingItemList = (await Contact.MultipleAsync(null, contactRoleList))?.ToList();
                         }
                     }
                     else
                     {
                         if (parameter.ParentSearchedResult != null && parameter.ParentSearchedResult.Any())
                         {
-                        //    IEnumerable<TbookOtherTitle> existingList = parameter.ParentSearchedResult.Where(w => w.TbookOtherTitle != null).SelectMany(s => s.TbookOtherTitle);
-                        //    if (existingItemList != null && existingItemList.Any())
-                        //    {
-                        //        foreach (var item in existingItemList)
-                        //        {
-                        //            string contactDisplayStyle1 = Contact.DisplayName(item, true, true);
-                        //            string contactDisplayStyle2 = Contact.DisplayName(item, false, true);
-                        //            string contactDisplayStyle3 = Contact.DisplayName(item, true, false);
-                        //            string contactDisplayStyle4 = Contact.DisplayName(item, false, false);
-
-                        //            switch (parameter.CurrentSearchParameter.TermParameter)
-                        //            {
-                        //                case Code.Search.Terms.Equals:
-                        //                    if (contactDisplayStyle1?.ToLower() == termToLower || contactDisplayStyle2?.ToLower() == termToLower ||
-                        //                        contactDisplayStyle3?.ToLower() == termToLower || contactDisplayStyle4?.ToLower() == termToLower)
-                        //                    {
-                        //                        tcontacts.Add(item);
-                        //                    }
-                        //                    break;
-                        //                case Code.Search.Terms.Contains:
-                        //                    if (contactDisplayStyle1?.ToLower().Contains(termToLower) == true || contactDisplayStyle2?.ToLower().Contains(termToLower) == true ||
-                        //                        contactDisplayStyle3?.ToLower().Contains(termToLower) == true || contactDisplayStyle4?.ToLower().Contains(termToLower) == true)
-                        //                    {
-                        //                        tcontacts.Add(item);
-                        //                    }
-
-                        //                    break;
-                        //                case Code.Search.Terms.StartWith:
-                        //                    if (contactDisplayStyle1?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle2?.ToLower().StartsWith(termToLower) == true ||
-                        //                        contactDisplayStyle3?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle4?.ToLower().StartsWith(termToLower) == true)
-                        //                    {
-                        //                        tcontacts.Add(item);
-                        //                    }
-                        //                    break;
-                        //                case Code.Search.Terms.EndWith:
-                        //                    if (contactDisplayStyle1?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle2?.ToLower().EndsWith(termToLower) == true ||
-                        //                        contactDisplayStyle3?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle4?.ToLower().EndsWith(termToLower) == true)
-                        //                    {
-                        //                        tcontacts.Add(item);
-                        //                    }
-                        //                    break;
-                        //                default:
-                        //                    break;
-                        //            }
-                        //        }
-                        //    }
-
+                            foreach (var role in contactRoleList)
+                            {
+                                switch (role)
+                                {
+                                    case ContactRole.Adherant:
+                                        break;
+                                    case ContactRole.Author:
+                                        existingItemList = parameter.ParentSearchedResult.Where(w => w.TbookAuthorConnector != null && w.TbookAuthorConnector.Any()).SelectMany(s => s.TbookAuthorConnector).Where(w => w.IdContactNavigation != null).Select(s => s.IdContactNavigation).ToList();
+                                        break;
+                                    case ContactRole.EditorHouse:
+                                        existingItemList = parameter.ParentSearchedResult.Where(w => w.TbookEditeurConnector != null && w.TbookEditeurConnector.Any()).SelectMany(s => s.TbookEditeurConnector).Where(w => w.IdContactNavigation != null).Select(s => s.IdContactNavigation).ToList();
+                                        break;
+                                    case ContactRole.Translator:
+                                        break;
+                                    case ContactRole.Illustrator:
+                                        break;
+                                }
+                            }
                         }
+                    }
+
+                    if (existingItemList != null && existingItemList.Any())
+                    {
+                        foreach (var item in existingItemList)
+                        {
+                            string contactDisplayStyle1 = Contact.DisplayName(item, true, true);
+                            string contactDisplayStyle2 = Contact.DisplayName(item, false, true);
+                            string contactDisplayStyle3 = Contact.DisplayName(item, true, false);
+                            string contactDisplayStyle4 = Contact.DisplayName(item, false, false);
+
+                            switch (parameter.CurrentSearchParameter.TermParameter)
+                            {
+                                case Code.Search.Terms.Equals:
+                                    if (contactDisplayStyle1?.ToLower() == termToLower || contactDisplayStyle2?.ToLower() == termToLower ||
+                                        contactDisplayStyle3?.ToLower() == termToLower || contactDisplayStyle4?.ToLower() == termToLower)
+                                    {
+                                        tcontacts.Add(item);
+                                    }
+                                    break;
+                                case Code.Search.Terms.Contains:
+                                    if (contactDisplayStyle1?.ToLower().Contains(termToLower) == true || contactDisplayStyle2?.ToLower().Contains(termToLower) == true ||
+                                        contactDisplayStyle3?.ToLower().Contains(termToLower) == true || contactDisplayStyle4?.ToLower().Contains(termToLower) == true)
+                                    {
+                                        tcontacts.Add(item);
+                                    }
+
+                                    break;
+                                case Code.Search.Terms.StartWith:
+                                    if (contactDisplayStyle1?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle2?.ToLower().StartsWith(termToLower) == true ||
+                                        contactDisplayStyle3?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle4?.ToLower().StartsWith(termToLower) == true)
+                                    {
+                                        tcontacts.Add(item);
+                                    }
+                                    break;
+                                case Code.Search.Terms.EndWith:
+                                    if (contactDisplayStyle1?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle2?.ToLower().EndsWith(termToLower) == true ||
+                                        contactDisplayStyle3?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle4?.ToLower().EndsWith(termToLower) == true)
+                                    {
+                                        tcontacts.Add(item);
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+
+                    if (tcontacts != null && tcontacts.Any())
+                    {
+                        if (parameter.CurrentSearchParameter.IsSearchFromParentResult == false)
+                        {
+                            var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontacts.Select(s => s.Id), contactRoleList);
+                            List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, idLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
+                            if (_tbooks != null && _tbooks.Any())
+                            {
+                                tbooks.AddRange(_tbooks);
+                            }
+                        }
+                        else
+                        {
+                            if (parameter.ParentSearchedResult != null && parameter.ParentSearchedResult.Any())
+                            {
+                                var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontacts.Select(s => s.Id), contactRoleList, parameter.ParentSearchedResult);
+                                List<Tbook> _tbooks = selectedBooks.Select(s => parameter.ParentSearchedResult.SingleOrDefault(a => a.Id == s)).Distinct(tbookIdEqualityComparer).ToList();
+                                if (_tbooks != null && _tbooks.Any())
+                                {
+                                    tbooks.AddRange(_tbooks);
+                                }
+                            }
+                        }   
                     }
 
                     return tbooks;
@@ -498,117 +485,6 @@ namespace LibraryProjectUWP.Code.Services.Db
                     return Enumerable.Empty<Tbook>().ToList();
                 }
             }
-
-            //public static async Task<IList<Tbook>> SearchBooksAsync(ResearchItemVM parameters, CancellationToken cancellationToken = default)
-            //{
-            //    try
-            //    {
-            //        if (parameters == null)
-            //        {
-            //            return Enumerable.Empty<Tbook>().ToList();
-            //        }
-            //        if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
-            //        {
-            //            return Enumerable.Empty<Tbook>().ToList();
-            //        }
-
-            //        using (LibraryDbContext context = new LibraryDbContext())
-            //        {
-            //            List<Tbook> tbooks = new List<Tbook>();
-            //            TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
-            //            var termToLower = parameters.Term.ToLower();
-
-            //            if (parameters.SearchInMainTitle == true)
-            //            {
-            //                IList<Tbook> _tbooks = await SearchBooksInMainTitle(parameters, cancellationToken);
-            //                if (_tbooks != null && _tbooks.Any())
-            //                {
-            //                    tbooks.AddRange(_tbooks);
-            //                }
-            //            }
-
-            //            if (parameters.SearchInOtherTitles == true)
-            //            {
-            //                IList<Tbook> _tbooks = await SearchBooksInOtherTitles(parameters, cancellationToken);
-            //                if (_tbooks != null && _tbooks.Any())
-            //                {
-            //                    tbooks.AddRange(_tbooks);
-            //                }
-            //            }
-
-            //            if (parameters.SearchInAuthors == true)
-            //            {
-            //                IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.Author }, cancellationToken);
-            //                if (_tbooks != null && _tbooks.Any())
-            //                {
-            //                    tbooks.AddRange(_tbooks);
-            //                }
-            //            }
-
-            //            if (parameters.SearchInEditors == true)
-            //            {
-            //                IList<Tbook> _tbooks = await SearchBooksInContacts(parameters, new ContactRole[] { ContactRole.EditorHouse }, cancellationToken);
-            //                if (_tbooks != null && _tbooks.Any())
-            //                {
-            //                    tbooks.AddRange(_tbooks);
-            //                }
-            //            }
-
-            //            if (parameters.SearchInCollections == true)
-            //            {
-
-            //            }
-
-            //            //if (cancellationToken.IsCancellationRequested)
-            //            //{
-
-            //            //}
-
-            //            if (tbooks != null && tbooks.Any())
-            //            {
-            //                tbooks = tbooks.Distinct(tbookIdEqualityComparer).ToList();
-            //                tbooks.ForEach(async (book) => await CompleteModelInfos(context, book));
-            //                return tbooks;
-            //            }
-            //        }
-
-            //        return Enumerable.Empty<Tbook>().ToList();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        MethodBase m = MethodBase.GetCurrentMethod();
-            //        Logs.Log(ex, m);
-            //        return Enumerable.Empty<Tbook>().ToList();
-            //    }
-            //}
-
-            //public static async Task<IList<LivreVM>> SearchBooksVMAsync(ResearchItemVM parameters, CancellationToken cancellationToken = default)
-            //{
-            //    try
-            //    {
-            //        if (parameters == null)
-            //        {
-            //            return Enumerable.Empty<LivreVM>().ToList();
-            //        }
-            //        if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
-            //        {
-            //            return Enumerable.Empty<LivreVM>().ToList();
-            //        }
-
-            //        var collection = await SearchBooksAsync(parameters, cancellationToken);
-            //        if (!collection.Any()) return Enumerable.Empty<LivreVM>().ToList();
-
-            //        var values = collection.Select(async s => await ViewModelConverterAsync(s)).Select(s => s.Result).ToList();
-            //        return values;
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        MethodBase m = MethodBase.GetCurrentMethod();
-            //        Logs.Log(ex, m);
-            //        return Enumerable.Empty<LivreVM>().ToList();
-            //    }
-            //}
-
             #endregion
         }
     }

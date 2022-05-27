@@ -180,29 +180,46 @@ namespace LibraryProjectUWP.Code.Helpers
                         {
                             day = null;
                             month = null;
-                            year = splitString[0];
-                            return splitString[0];
+                            year = splitString[0] != "--" ? splitString[0] : null;
+                            return $"--/--/{year}";
                         }
                         else if (splitString.Length == 2)
                         {
                             day = null;
-                            month = !isMonthString ? splitString[0] : ChooseMonth().ToList()[Convert.ToInt32(splitString[0])];
+                            if (isMonthString)
+                            {
+                                month = splitString[0] != "--" ? ChooseMonth().ToList()[Convert.ToInt32(splitString[0])] : null;
+                            }
+                            else
+                            {
+                                month = splitString[0] != "--" ? splitString[0] : null;
+                            }
                             year = splitString[1];
-                            return $"{splitString[0]}/{splitString[1]}";
+                            return $"--/{month}/{year}";
                         }
                         else if (splitString.Length == 3)
                         {
-                            day = splitString[0];
-                            month = !isMonthString ? splitString[1] : ChooseMonth().ToList()[Convert.ToInt32(splitString[1])];
-                            year = splitString[2];
-                            return $"{splitString[0]}/{splitString[1]}/{splitString[2]}";
+                            day = splitString[0] != "--" ? splitString[0] : null;
+                            
+                            if (isMonthString)
+                            {
+                                month = splitString[1] != "--" ? ChooseMonth().ToList()[Convert.ToInt32(splitString[1])] : null;
+                            }
+                            else
+                            {
+                                month = splitString[1] != "--" ? splitString[1] : null;
+                            }
+
+                            year = splitString[2] != "--" ? splitString[2] : null;
+                            
+                            return $"{day}/{month}/{year}";
                         }
                     }
 
                     day = null;
                     month = null;
                     year = null;
-                    return null;
+                    return "--/--/--";
                 }
                 catch (Exception ex)
                 {
@@ -210,7 +227,7 @@ namespace LibraryProjectUWP.Code.Helpers
                     day = null;
                     month = null;
                     year = null;
-                    return null;
+                    return "--/--/--";
                 }
             }
             /// <summary>

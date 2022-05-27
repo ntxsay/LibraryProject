@@ -133,15 +133,15 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<long>> GetListOfIdBooksFromContactListAsync(IEnumerable<long> idContactList, IEnumerable<ContactRole> contactRoleList)
+            public static async Task<IList<long>> GetListOfIdBooksFromContactListAsync(IEnumerable<long> idContactList, IEnumerable<ContactRole> contactRoleList, IEnumerable<Tbook> modelList = null)
             {
                 try
                 {
-                    using (LibraryDbContext context = new LibraryDbContext())
+                    if (contactRoleList != null && contactRoleList.Any())
                     {
-                        if (contactRoleList != null && contactRoleList.Any())
+                        List<long> Ncollection = new List<long>();
+                        if (modelList != null && modelList.Any())
                         {
-                            List<long> Ncollection = new List<long>();
                             foreach (ContactRole contactRole in contactRoleList)
                             {
                                 switch (contactRole)
@@ -151,7 +151,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     case ContactRole.Author:
                                         foreach (var idContact in idContactList)
                                         {
-                                            IEnumerable<long> idBooks = await context.TbookAuthorConnector.Where(w => w.IdContact == idContact).Select(s => s.IdBook).ToListAsync();
+                                            IEnumerable<long> idBooks = modelList.Where(w => w.TbookAuthorConnector != null && w.TbookAuthorConnector.Any()).SelectMany(s => s.TbookAuthorConnector).Where(w => w.IdContact == idContact).Select(s => s.IdBook).ToList();
                                             if (idBooks != null && idBooks.Any())
                                             {
                                                 Ncollection.AddRange(idBooks);
@@ -161,7 +161,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                                     case ContactRole.EditorHouse:
                                         foreach (var idContact in idContactList)
                                         {
-                                            IEnumerable<long> idBooks = await context.TbookEditeurConnector.Where(w => w.IdContact == idContact).Select(s => s.IdBook).ToListAsync();
+                                            IEnumerable<long> idBooks = modelList.Where(w => w.TbookEditeurConnector != null && w.TbookEditeurConnector.Any()).SelectMany(s => s.TbookEditeurConnector).Where(w => w.IdContact == idContact).Select(s => s.IdBook).ToList();
                                             if (idBooks != null && idBooks.Any())
                                             {
                                                 Ncollection.AddRange(idBooks);
@@ -176,11 +176,53 @@ namespace LibraryProjectUWP.Code.Services.Db
                                         break;
                                 }
                             }
-                            return Ncollection.Distinct().ToList();
+
+                        }
+                        else
+                        {
+                            using (LibraryDbContext context = new LibraryDbContext())
+                            {
+                                foreach (ContactRole contactRole in contactRoleList)
+                                {
+                                    switch (contactRole)
+                                    {
+                                        case ContactRole.Adherant:
+                                            break;
+                                        case ContactRole.Author:
+                                            foreach (var idContact in idContactList)
+                                            {
+                                                IEnumerable<long> idBooks = await context.TbookAuthorConnector.Where(w => w.IdContact == idContact).Select(s => s.IdBook).ToListAsync();
+                                                if (idBooks != null && idBooks.Any())
+                                                {
+                                                    Ncollection.AddRange(idBooks);
+                                                }
+                                            }
+                                            break;
+                                        case ContactRole.EditorHouse:
+                                            foreach (var idContact in idContactList)
+                                            {
+                                                IEnumerable<long> idBooks = await context.TbookEditeurConnector.Where(w => w.IdContact == idContact).Select(s => s.IdBook).ToListAsync();
+                                                if (idBooks != null && idBooks.Any())
+                                                {
+                                                    Ncollection.AddRange(idBooks);
+                                                }
+                                            }
+                                            break;
+                                        case ContactRole.Translator:
+                                            break;
+                                        case ContactRole.Illustrator:
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+
+                            }
                         }
 
-                        return Enumerable.Empty<long>().ToList();
+                        return Ncollection.Distinct().ToList();
                     }
+                    return Enumerable.Empty<long>().ToList();
                 }
                 catch (Exception ex)
                 {
@@ -403,7 +445,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             Guid = viewModel.Guid.ToString(),
                             DateAjout = viewModel.DateAjout.ToString(),
                             DateEdition = viewModel.DateEdition?.ToString(),
-                            DateParution = viewModel.Publication.DateParution?.ToString(),
+                            DateParution = viewModel.Publication.DateParution,
                             MainTitle = viewModel.MainTitle.Trim(),
                             CountOpening = viewModel.CountOpening,
                             Resume = viewModel.Description?.Resume,

@@ -332,30 +332,7 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Text="Date de parution" Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
-                            <userControls:CustomDatePickerUC Grid.Row="1" x:Name="CustomDatePickerParution"/>
-                            <!--<Grid Grid.Row="1" ColumnSpacing="8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.Resources>
-                                    <Style TargetType="ComboBox" x:Key="comboxDate">
-                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                        <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                        <Setter Property="BorderThickness" Value="0" />
-                                    </Style>
-                                </Grid.Resources>
-                                <ComboBox Grid.Column="0" ItemsSource="{x:Bind ViewModelPage.chooseDays}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.DayParution, Mode=TwoWay}" PlaceholderText="Jour" Style="{StaticResource comboxDate}">
-
-                                </ComboBox>
-                                <ComboBox Grid.Column="1" ItemsSource="{x:Bind ViewModelPage.chooseMonths}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.MonthParution, Mode=TwoWay}" PlaceholderText="Mois" Style="{StaticResource comboxDate}">
-
-                                </ComboBox>
-                                <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModelPage.chooseYear}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.YearParution, Mode=TwoWay}" PlaceholderText="Année" Style="{StaticResource comboxDate}">
-
-                                </ComboBox>
-                            </Grid>-->
+                            <userControls:CustomDatePickerUC Grid.Row="1" x:Name="CustomDatePickerParution" Jour="{x:Bind ViewModelPage.ViewModel.Publication.DayParution, Mode=TwoWay}" Mois="{x:Bind ViewModelPage.ViewModel.Publication.MonthParution, Mode=TwoWay}" Annee="{x:Bind ViewModelPage.ViewModel.Publication.YearParution, Mode=TwoWay}"/>
                         </Grid>
                         <ComboBox ItemsSource="{x:Bind ViewModelPage.languagesList}" SelectedItem="{x:Bind ViewModelPage.ViewModel.Publication.Langue, Mode=TwoWay}" PlaceholderText="Langue" HorizontalAlignment="Stretch">
                             <ComboBox.Header>

@@ -923,12 +923,6 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
-                bool isValided = IsModelValided();
-                if (!isValided)
-                {
-                    return;
-                }
-
                 OperationStateVM result = null;
                 if (ViewModelPage.EditMode == EditMode.Create)
                 {
@@ -937,6 +931,11 @@ namespace LibraryProjectUWP.Views.Book
                 else if (ViewModelPage.EditMode == EditMode.Edit)
                 {
                     result = await UpdateAsync();
+                }
+
+                if (!result.IsSuccess)
+                {
+                    return;
                 }
 
                 ExecuteTaskRequested?.Invoke(this, OriginalViewModel, result);
@@ -1051,58 +1050,18 @@ namespace LibraryProjectUWP.Views.Book
                     ViewModelPage.ViewModel.ClassificationAge.Jusqua = 0;
                 }
 
-                if (!ViewModelPage.ViewModel.Publication.MonthParution.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.Publication.MonthParution != DatesHelpers.NoAnswer &&
-                    ViewModelPage.ViewModel.Publication.YearParution.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.ViewModel.Publication.YearParution == DatesHelpers.NoAnswer)
+                string stringDate = CustomDatePickerParution.GetDate(out string errorMessage, out _);
+                if (!errorMessage.IsStringNullOrEmptyOrWhiteSpace())
                 {
                     ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Vous devez spécifier l'année d'acquisition pour valider le mois.";
-                    ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                    ViewModelPage.IsResultMessageOpen = true;
-                    return false;
-                }
-                else if (!ViewModelPage.ViewModel.Publication.DayParution.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.Publication.DayParution != DatesHelpers.NoAnswer &&
-                    ViewModelPage.ViewModel.Publication.MonthParution.IsStringNullOrEmptyOrWhiteSpace() || ViewModelPage.ViewModel.Publication.MonthParution == DatesHelpers.NoAnswer)
-                {
-                    ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                    ViewModelPage.ResultMessage = $"Vous devez spécifier le mois d'acquisition pour valider le jour.";
+                    ViewModelPage.ResultMessage = $"Date de parution : {errorMessage}.";
                     ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
                     ViewModelPage.IsResultMessageOpen = true;
                     return false;
                 }
                 else
                 {
-                    if (!ViewModelPage.ViewModel.Publication.DayParution.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.Publication.DayParution != DatesHelpers.NoAnswer &&
-                    !ViewModelPage.ViewModel.Publication.MonthParution.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.Publication.MonthParution != DatesHelpers.NoAnswer &&
-                    !ViewModelPage.ViewModel.Publication.YearParution.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.Publication.YearParution != DatesHelpers.NoAnswer)
-                    {
-                        var day = Convert.ToInt32(ViewModelPage.ViewModel.Publication.DayParution);
-                        var month = DatesHelpers.ChooseMonth().ToList().IndexOf(ViewModelPage.ViewModel.Publication.MonthParution);
-                        var year = Convert.ToInt32(ViewModelPage.ViewModel.Publication.YearParution);
-                        var isDateCorrect = DateTime.TryParseExact($"{day:00}/{month:00}/{year:0000}", "dd/MM/yyyy", new CultureInfo("fr-FR"), DateTimeStyles.AssumeLocal, out DateTime date);
-                        if (!isDateCorrect)
-                        {
-                            ViewModelPage.ResultMessageTitle = "Vérifiez vos informations";
-                            ViewModelPage.ResultMessage = $"La date d'acquisition n'est pas valide.";
-                            ViewModelPage.ResultMessageSeverity = InfoBarSeverity.Warning;
-                            ViewModelPage.IsResultMessageOpen = true;
-                            return false;
-                        }
-                        else
-                        {
-                            ViewModelPage.ViewModel.Publication.DateParution = date.ToString("dd/MM/yyyy");
-                        }
-                    }
-                    else if (!ViewModelPage.ViewModel.Publication.MonthParution.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.Publication.MonthParution != DatesHelpers.NoAnswer &&
-                            !ViewModelPage.ViewModel.Publication.YearParution.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.Publication.YearParution != DatesHelpers.NoAnswer)
-                    {
-                        var month = DatesHelpers.ChooseMonth().ToList().IndexOf(ViewModelPage.ViewModel.Publication.MonthParution);
-                        var year = Convert.ToInt32(ViewModelPage.ViewModel.Publication.YearParution);
-                        ViewModelPage.ViewModel.Publication.DateParution = $"{month:00}/{year:0000}";
-                    }
-                    else if (!ViewModelPage.ViewModel.Publication.YearParution.IsStringNullOrEmptyOrWhiteSpace() && ViewModelPage.ViewModel.Publication.YearParution != DatesHelpers.NoAnswer)
-                    {
-                        ViewModelPage.ViewModel.Publication.DateParution = $"{ViewModelPage.ViewModel.Publication.YearParution}";
-                    }
+                    ViewModelPage.ViewModel.Publication.DateParution = stringDate;
                 }
 
                 ViewModelPage.IsResultMessageOpen = false;
@@ -1120,6 +1079,16 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
+                bool isValided = IsModelValided();
+                if (!isValided)
+                {
+                    return new OperationStateVM()
+                    {
+                        Message = "Le formulaire comporte une ou plusieurs erreurs.",
+                        IsSuccess = false,
+                    };
+                }
+
                 LivreVM viewModel = this.ViewModelPage.ViewModel;
 
                 OperationStateVM result = await DbServices.Book.CreateAsync(viewModel, ViewModelPage.IdLibrary);
@@ -1155,6 +1124,16 @@ namespace LibraryProjectUWP.Views.Book
         {
             try
             {
+                bool isValided = IsModelValided();
+                if (!isValided)
+                {
+                    return new OperationStateVM()
+                    {
+                        Message = "Le formulaire comporte une ou plusieurs erreurs.",
+                        IsSuccess = false,
+                    };
+                }
+
                 LivreVM viewModel = this.ViewModelPage.ViewModel;
 
                 OperationStateVM result = await DbServices.Book.UpdateAsync(viewModel);
