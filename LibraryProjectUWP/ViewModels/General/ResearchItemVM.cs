@@ -17,6 +17,8 @@ namespace LibraryProjectUWP.ViewModels.General
         public Guid Guid { get; private set; } = Guid.NewGuid();
 
         public Type TypeObject { get; set; } = typeof(LivreVM);
+
+        [Obsolete]
         public long? IdLibrary { get; set; }
 
         private string _Term;

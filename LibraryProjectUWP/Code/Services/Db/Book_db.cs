@@ -1056,6 +1056,25 @@ namespace LibraryProjectUWP.Code.Services.Db
                     model.TbookClassification = await context.TbookClassification.SingleOrDefaultAsync(s => s.Id == model.Id);
                     model.TbookFormat = await context.TbookFormat.SingleOrDefaultAsync(s => s.Id == model.Id);
                     model.TbookIdentification = await context.TbookIdentification.SingleOrDefaultAsync(s => s.Id == model.Id);
+                    model.TbookOtherTitle = await context.TbookOtherTitle.Where(w => w.IdBook == model.Id).ToListAsync();
+                    model.TbookReading  = await context.TbookReading.SingleOrDefaultAsync(w => w.Id == model.Id);
+                    model.TbookAuthorConnector = await context.TbookAuthorConnector.Where(w => w.IdBook == model.Id).ToListAsync();
+                    if (model.TbookAuthorConnector != null && model.TbookAuthorConnector.Any())
+                    {
+                        foreach (var item in model.TbookAuthorConnector)
+                        {
+                            item.IdContactNavigation = await context.Tcontact.SingleOrDefaultAsync(s => s.Id == item.IdContact);
+                        }
+                    }
+
+                    model.TbookEditeurConnector = await context.TbookEditeurConnector.Where(w => w.IdBook == model.Id).ToListAsync();
+                    if (model.TbookEditeurConnector != null && model.TbookEditeurConnector.Any())
+                    {
+                        foreach (var item in model.TbookEditeurConnector)
+                        {
+                            item.IdContactNavigation = await context.Tcontact.SingleOrDefaultAsync(s => s.Id == item.IdContact);
+                        }
+                    }
                     //Facultatif
                     //model.TbookCollections = await context.TbookCollections.Where(w => w.IdBook == model.Id).ToListAsync();
                 }
@@ -1292,9 +1311,10 @@ namespace LibraryProjectUWP.Code.Services.Db
                     if (model == null) return null;
                     if (viewModel == null) return null;
 
-                    IList<string> titres = await GetOtherTitlesInBookAsync(model.Id);
-                    IList<ContactVM> authors = await Contact.GetContactsVmInBookAsync<TbookAuthorConnector>(model.Id);
-                    IList<ContactVM> editors = await Contact.GetContactsVmInBookAsync<TbookEditeurConnector>(model.Id);
+#warning Faire de même avec les autres
+                    IList<string> titres = model.TbookOtherTitle != null && model.TbookOtherTitle.Any() ? model.TbookOtherTitle.Select(s => s.Title).ToList() :  await GetOtherTitlesInBookAsync(model.Id);
+                    IList<ContactVM> authors = model.TbookAuthorConnector != null && model.TbookAuthorConnector.Any() ? model.TbookAuthorConnector.Select(async s => await Contact.ViewModelConverterAsync(s.IdContactNavigation)).Select(s => s.Result).ToList() : await Contact.GetContactsVmInBookAsync<TbookAuthorConnector>(model.Id);
+                    IList<ContactVM> editors = model.TbookEditeurConnector != null && model.TbookEditeurConnector.Any() ? model.TbookEditeurConnector.Select(async s => await Contact.ViewModelConverterAsync(s.IdContactNavigation)).Select(s => s.Result).ToList() : await Contact.GetContactsVmInBookAsync<TbookEditeurConnector>(model.Id);
                     IList<CollectionVM> collections = await Collection.GetCollectionsVmInBookAsync(model.Id, CollectionTypeEnum.Collection);
                     
                     viewModel.TitresOeuvre = titres != null && titres.Any() ? new ObservableCollection<string>(titres) : new ObservableCollection<string>();

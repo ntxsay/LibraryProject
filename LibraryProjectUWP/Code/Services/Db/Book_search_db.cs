@@ -182,7 +182,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                         return Enumerable.Empty<Tbook>().ToList();
                     }
 
-                    if (parameter.CurrentSearchParameter.IdLibrary == null || parameter.CurrentSearchParameter.IdLibrary < 1)
+                    if (idLibrary < 1)
                     {
                         return Enumerable.Empty<Tbook>().ToList();
                     }
@@ -247,55 +247,103 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tbook>> SearchBooksInOtherTitles(ResearchItemVM parameters, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInOtherTitles(ResearchContainerVM<Tbook> parameter, long idLibrary, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    if (parameters == null)
-                    {
-                        return Enumerable.Empty<Tbook>().ToList();
-                    }
-                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+                    if (parameter == null || parameter.CurrentSearchParameter == null)
                     {
                         return Enumerable.Empty<Tbook>().ToList();
                     }
 
-                    using (LibraryDbContext context = new LibraryDbContext())
+                    if (parameter.CurrentSearchParameter.Term.IsStringNullOrEmptyOrWhiteSpace())
                     {
-                        List<Tbook> tbooks = new List<Tbook>();
-                        TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
-                        var termToLower = parameters.Term.ToLower();
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
 
-                        List<TbookOtherTitle> booksTitles = null;
-                        switch (parameters.TermParameter)
-                        {
-                            case Code.Search.Terms.Equals:
-                                booksTitles = await context.TbookOtherTitle.Where(w => w.Title == parameters.Term).ToListAsync(cancellationToken);
-                                break;
-                            case Code.Search.Terms.Contains:
-                                booksTitles = await context.TbookOtherTitle.Where(w => w.Title.Contains(parameters.Term)).ToListAsync(cancellationToken);
-                                break;
-                            case Code.Search.Terms.StartWith:
-                                booksTitles = await context.TbookOtherTitle.Where(w => w.Title.StartsWith(parameters.Term)).ToListAsync(cancellationToken);
-                                break;
-                            case Code.Search.Terms.EndWith:
-                                booksTitles = await context.TbookOtherTitle.Where(w => w.Title.EndsWith(parameters.Term)).ToListAsync(cancellationToken);
-                                break;
-                            default:
-                                break;
-                        }
+                    var term = parameter.CurrentSearchParameter.Term.ToLower();
+                    List<Tbook> tbooks = new List<Tbook>();
+                    TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
 
-                        if (booksTitles != null && booksTitles.Any())
+                    if (parameter.CurrentSearchParameter.IsSearchFromParentResult == false)
+                    {
+                        using (LibraryDbContext context = new LibraryDbContext())
                         {
-                            List<Tbook> _tbooks = booksTitles.Select(async s => await SingleAsync(s.Id, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
-                            if (_tbooks != null && _tbooks.Any())
+                            List<TbookOtherTitle> booksTitles = null;
+
+                            switch (parameter.CurrentSearchParameter.TermParameter)
                             {
-                                tbooks.AddRange(_tbooks);
+                                case Code.Search.Terms.Equals:
+                                    booksTitles = await context.TbookOtherTitle.Where(w => w.Title.ToLower() == term).ToListAsync(cancellationToken);
+                                    break;
+                                case Code.Search.Terms.Contains:
+                                    booksTitles = await context.TbookOtherTitle.Where(w => w.Title.ToLower().Contains(term)).ToListAsync(cancellationToken);
+                                    break;
+                                case Code.Search.Terms.StartWith:
+                                    booksTitles = await context.TbookOtherTitle.Where(w => w.Title.ToLower().StartsWith(term)).ToListAsync(cancellationToken);
+                                    break;
+                                case Code.Search.Terms.EndWith:
+                                    booksTitles = await context.TbookOtherTitle.Where(w => w.Title.ToLower().EndsWith(term)).ToListAsync(cancellationToken);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (booksTitles != null && booksTitles.Any())
+                            {
+                                List<Tbook> _tbooks = booksTitles.Select(async s => await SingleAsync(s.IdBook, idLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
+                                if (_tbooks != null && _tbooks.Any())
+                                {
+                                    tbooks.AddRange(_tbooks);
+                                }
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        if (parameter.ParentSearchedResult != null && parameter.ParentSearchedResult.Any())
+                        {
+                            List<long> idBooks = new List<long>();
+                            IEnumerable<TbookOtherTitle> existingList = parameter.ParentSearchedResult.Where(w => w.TbookOtherTitle != null).SelectMany(s => s.TbookOtherTitle);
+                            switch (parameter.CurrentSearchParameter.TermParameter)
+                            {
+                                case Code.Search.Terms.Equals:
+                                    idBooks = existingList.Where(s => s.Title.ToLower() == term).Select(s => s.IdBook).ToList();
+                                    break;
+                                case Code.Search.Terms.Contains:
+                                    idBooks = existingList.Where(s => s.Title.ToLower().Contains(term)).Select(s => s.IdBook).ToList();
+                                    break;
+                                case Code.Search.Terms.StartWith:
+                                    idBooks = existingList.Where(s => s.Title.ToLower().StartsWith(term)).Select(s => s.IdBook).ToList();
+                                    break;
+                                case Code.Search.Terms.EndWith:
+                                    idBooks = existingList.Where(s => s.Title.ToLower().EndsWith(term)).Select(s => s.IdBook).ToList();
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (idBooks != null && idBooks.Any())
+                            {
+                                List<Tbook> _tbooks = new List<Tbook>();
+                                foreach (var id in idBooks)
+                                {
+                                    var items = parameter.ParentSearchedResult.Where(w => w.Id == id);
+                                    if (items != null && items.Any())
+                                    {
+                                        _tbooks.AddRange(items);
+                                    }
+                                }
+                                if (_tbooks != null && _tbooks.Any())
+                                {
+                                    tbooks.AddRange(_tbooks.Distinct(tbookIdEqualityComparer).ToList());
+                                }
                             }
                         }
-
-                        return tbooks;
                     }
+
+                    return tbooks;
                 }
                 catch (Exception ex)
                 {
@@ -305,86 +353,143 @@ namespace LibraryProjectUWP.Code.Services.Db
                 }
             }
 
-            public static async Task<IList<Tbook>> SearchBooksInContacts(ResearchItemVM parameters, IEnumerable<ContactRole> contactRoleList, CancellationToken cancellationToken = default)
+            public static async Task<IList<Tbook>> SearchBooksInContacts(ResearchContainerVM<Tbook> parameter, long idLibrary, IEnumerable<ContactRole> contactRoleList, CancellationToken cancellationToken = default)
             {
                 try
                 {
-                    if (parameters == null)
-                    {
-                        return Enumerable.Empty<Tbook>().ToList();
-                    }
-                    if (parameters.IdLibrary < 1 || parameters.Term.IsStringNullOrEmptyOrWhiteSpace())
+                    if (parameter == null || parameter.CurrentSearchParameter == null)
                     {
                         return Enumerable.Empty<Tbook>().ToList();
                     }
 
-                    using (LibraryDbContext context = new LibraryDbContext())
+                    if (parameter.CurrentSearchParameter.Term.IsStringNullOrEmptyOrWhiteSpace())
                     {
-                        List<Tbook> tbooks = new List<Tbook>();
-                        var termToLower = parameters.Term.ToLower();
-                        TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
+                        return Enumerable.Empty<Tbook>().ToList();
+                    }
 
-                        List<Tcontact> existingItemList = (await Contact.MultipleAsync(null, contactRoleList))?.ToList();
-                        List<Tcontact> tcontacts = new List<Tcontact>();
-
-                        if (existingItemList != null && existingItemList.Any())
+                    var termToLower = parameter.CurrentSearchParameter.Term.ToLower();
+                    List<Tbook> tbooks = new List<Tbook>();
+                    TbookIdEqualityComparer tbookIdEqualityComparer = new TbookIdEqualityComparer();
+                    if (parameter.CurrentSearchParameter.IsSearchFromParentResult == false)
+                    {
+                        using (LibraryDbContext context = new LibraryDbContext())
                         {
-                            foreach (var item in existingItemList)
-                            {
-                                string contactDisplayStyle1 = Contact.DisplayName(item, true, true);
-                                string contactDisplayStyle2 = Contact.DisplayName(item, false, true);
-                                string contactDisplayStyle3 = Contact.DisplayName(item, true, false);
-                                string contactDisplayStyle4 = Contact.DisplayName(item, false, false);
-                                
-                                switch (parameters.TermParameter)
-                                {
-                                    case Code.Search.Terms.Equals:
-                                        if (contactDisplayStyle1?.ToLower() == termToLower || contactDisplayStyle2?.ToLower() == termToLower ||
-                                            contactDisplayStyle3?.ToLower() == termToLower || contactDisplayStyle4?.ToLower() == termToLower)
-                                        {
-                                            tcontacts.Add(item);
-                                        }
-                                        break;
-                                    case Code.Search.Terms.Contains:
-                                        if (contactDisplayStyle1?.ToLower().Contains(termToLower) == true || contactDisplayStyle2?.ToLower().Contains(termToLower) == true ||
-                                            contactDisplayStyle3?.ToLower().Contains(termToLower) == true || contactDisplayStyle4?.ToLower().Contains(termToLower) == true)
-                                        {
-                                            tcontacts.Add(item);
-                                        }
+                            List<Tcontact> existingItemList = (await Contact.MultipleAsync(null, contactRoleList))?.ToList();
+                            List<Tcontact> tcontacts = new List<Tcontact>();
 
-                                        break;
-                                    case Code.Search.Terms.StartWith:
-                                        if (contactDisplayStyle1?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle2?.ToLower().StartsWith(termToLower) == true ||
-                                            contactDisplayStyle3?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle4?.ToLower().StartsWith(termToLower) == true)
-                                        {
-                                            tcontacts.Add(item);
-                                        }
-                                        break;
-                                    case Code.Search.Terms.EndWith:
-                                        if (contactDisplayStyle1?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle2?.ToLower().EndsWith(termToLower) == true ||
-                                            contactDisplayStyle3?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle4?.ToLower().EndsWith(termToLower) == true)
-                                        {
-                                            tcontacts.Add(item);
-                                        }
-                                        break;
-                                    default:
-                                        break;
+                            if (existingItemList != null && existingItemList.Any())
+                            {
+                                foreach (var item in existingItemList)
+                                {
+                                    string contactDisplayStyle1 = Contact.DisplayName(item, true, true);
+                                    string contactDisplayStyle2 = Contact.DisplayName(item, false, true);
+                                    string contactDisplayStyle3 = Contact.DisplayName(item, true, false);
+                                    string contactDisplayStyle4 = Contact.DisplayName(item, false, false);
+
+                                    switch (parameter.CurrentSearchParameter.TermParameter)
+                                    {
+                                        case Code.Search.Terms.Equals:
+                                            if (contactDisplayStyle1?.ToLower() == termToLower || contactDisplayStyle2?.ToLower() == termToLower ||
+                                                contactDisplayStyle3?.ToLower() == termToLower || contactDisplayStyle4?.ToLower() == termToLower)
+                                            {
+                                                tcontacts.Add(item);
+                                            }
+                                            break;
+                                        case Code.Search.Terms.Contains:
+                                            if (contactDisplayStyle1?.ToLower().Contains(termToLower) == true || contactDisplayStyle2?.ToLower().Contains(termToLower) == true ||
+                                                contactDisplayStyle3?.ToLower().Contains(termToLower) == true || contactDisplayStyle4?.ToLower().Contains(termToLower) == true)
+                                            {
+                                                tcontacts.Add(item);
+                                            }
+
+                                            break;
+                                        case Code.Search.Terms.StartWith:
+                                            if (contactDisplayStyle1?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle2?.ToLower().StartsWith(termToLower) == true ||
+                                                contactDisplayStyle3?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle4?.ToLower().StartsWith(termToLower) == true)
+                                            {
+                                                tcontacts.Add(item);
+                                            }
+                                            break;
+                                        case Code.Search.Terms.EndWith:
+                                            if (contactDisplayStyle1?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle2?.ToLower().EndsWith(termToLower) == true ||
+                                                contactDisplayStyle3?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle4?.ToLower().EndsWith(termToLower) == true)
+                                            {
+                                                tcontacts.Add(item);
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
                             }
-                        }
 
-                        if (tcontacts != null && tcontacts.Any())
-                        {
-                            var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontacts.Select(s => s.Id), contactRoleList);
-                            List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, parameters.IdLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
-                            if (_tbooks != null && _tbooks.Any())
+                            if (tcontacts != null && tcontacts.Any())
                             {
-                                tbooks.AddRange(_tbooks);
+                                var selectedBooks = await GetListOfIdBooksFromContactListAsync(tcontacts.Select(s => s.Id), contactRoleList);
+                                List<Tbook> _tbooks = selectedBooks.Select(async s => await SingleAsync(s, idLibrary)).Select(t => t.Result).Distinct(tbookIdEqualityComparer).ToList();
+                                if (_tbooks != null && _tbooks.Any())
+                                {
+                                    tbooks.AddRange(_tbooks);
+                                }
                             }
-                        }
 
-                        return tbooks;
+                        }
                     }
+                    else
+                    {
+                        if (parameter.ParentSearchedResult != null && parameter.ParentSearchedResult.Any())
+                        {
+                        //    IEnumerable<TbookOtherTitle> existingList = parameter.ParentSearchedResult.Where(w => w.TbookOtherTitle != null).SelectMany(s => s.TbookOtherTitle);
+                        //    if (existingItemList != null && existingItemList.Any())
+                        //    {
+                        //        foreach (var item in existingItemList)
+                        //        {
+                        //            string contactDisplayStyle1 = Contact.DisplayName(item, true, true);
+                        //            string contactDisplayStyle2 = Contact.DisplayName(item, false, true);
+                        //            string contactDisplayStyle3 = Contact.DisplayName(item, true, false);
+                        //            string contactDisplayStyle4 = Contact.DisplayName(item, false, false);
+
+                        //            switch (parameter.CurrentSearchParameter.TermParameter)
+                        //            {
+                        //                case Code.Search.Terms.Equals:
+                        //                    if (contactDisplayStyle1?.ToLower() == termToLower || contactDisplayStyle2?.ToLower() == termToLower ||
+                        //                        contactDisplayStyle3?.ToLower() == termToLower || contactDisplayStyle4?.ToLower() == termToLower)
+                        //                    {
+                        //                        tcontacts.Add(item);
+                        //                    }
+                        //                    break;
+                        //                case Code.Search.Terms.Contains:
+                        //                    if (contactDisplayStyle1?.ToLower().Contains(termToLower) == true || contactDisplayStyle2?.ToLower().Contains(termToLower) == true ||
+                        //                        contactDisplayStyle3?.ToLower().Contains(termToLower) == true || contactDisplayStyle4?.ToLower().Contains(termToLower) == true)
+                        //                    {
+                        //                        tcontacts.Add(item);
+                        //                    }
+
+                        //                    break;
+                        //                case Code.Search.Terms.StartWith:
+                        //                    if (contactDisplayStyle1?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle2?.ToLower().StartsWith(termToLower) == true ||
+                        //                        contactDisplayStyle3?.ToLower().StartsWith(termToLower) == true || contactDisplayStyle4?.ToLower().StartsWith(termToLower) == true)
+                        //                    {
+                        //                        tcontacts.Add(item);
+                        //                    }
+                        //                    break;
+                        //                case Code.Search.Terms.EndWith:
+                        //                    if (contactDisplayStyle1?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle2?.ToLower().EndsWith(termToLower) == true ||
+                        //                        contactDisplayStyle3?.ToLower().EndsWith(termToLower) == true || contactDisplayStyle4?.ToLower().EndsWith(termToLower) == true)
+                        //                    {
+                        //                        tcontacts.Add(item);
+                        //                    }
+                        //                    break;
+                        //                default:
+                        //                    break;
+                        //            }
+                        //        }
+                        //    }
+
+                        }
+                    }
+
+                    return tbooks;
                 }
                 catch (Exception ex)
                 {

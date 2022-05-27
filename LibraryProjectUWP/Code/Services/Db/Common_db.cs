@@ -46,7 +46,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             }
                         }
 
-                        IEnumerable<T> valueList = await SearchAsync(new ResearchContainerVM<T>()
+                        List<T> valueList = await SearchAsync(new ResearchContainerVM<T>()
                         {
                             CurrentSearchParameter = item,
                             ParentSearchedResult = item.IsSearchFromParentResult ? searchArrayList.LastOrDefault() : null,
@@ -92,6 +92,10 @@ namespace LibraryProjectUWP.Code.Services.Db
                         {
                             TbookIdEqualityComparer idEqualityComparer = new TbookIdEqualityComparer();
                             values = values.Select(s => (Tbook)(object)s).Distinct(idEqualityComparer).Select(s => (T)(object)s).ToList();
+                            using (LibraryDbContext context = new LibraryDbContext())
+                            {
+                                values.ForEach(async f => await Book.CompleteModelInfos(context, (Tbook)(object)f));
+                            }
                         }
                     }
 
@@ -106,7 +110,7 @@ namespace LibraryProjectUWP.Code.Services.Db
             }
 
 
-            public static async Task<IList<T>> SearchAsync<T>(ResearchContainerVM<T> parameter, long? idLibrary = null, CancellationToken cancellationToken = default) where T : class
+            public static async Task<List<T>> SearchAsync<T>(ResearchContainerVM<T> parameter, long? idLibrary = null, CancellationToken cancellationToken = default) where T : class
             {
                 try
                 {
@@ -164,7 +168,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                             if (parameter.CurrentSearchParameter.SearchInOtherTitles == true)
                             {
-                                IList<Tbook> _tbooks = await Book.SearchBooksInOtherTitles(parameter.CurrentSearchParameter, cancellationToken);
+                                IList<Tbook> _tbooks = await Book.SearchBooksInOtherTitles(bookParameter, (long)idLibrary, cancellationToken);
                                 if (_tbooks != null && _tbooks.Any())
                                 {
                                     tbooks.AddRange(_tbooks);
@@ -173,7 +177,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                             if (parameter.CurrentSearchParameter.SearchInAuthors == true)
                             {
-                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameter.CurrentSearchParameter, new ContactRole[] { ContactRole.Author }, cancellationToken);
+                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(bookParameter, (long)idLibrary, new ContactRole[] { ContactRole.Author }, cancellationToken);
                                 if (_tbooks != null && _tbooks.Any())
                                 {
                                     tbooks.AddRange(_tbooks);
@@ -182,7 +186,7 @@ namespace LibraryProjectUWP.Code.Services.Db
 
                             if (parameter.CurrentSearchParameter.SearchInEditors == true)
                             {
-                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(parameter.CurrentSearchParameter, new ContactRole[] { ContactRole.EditorHouse }, cancellationToken);
+                                IList<Tbook> _tbooks = await Book.SearchBooksInContacts(bookParameter, (long)idLibrary, new ContactRole[] { ContactRole.EditorHouse }, cancellationToken);
                                 if (_tbooks != null && _tbooks.Any())
                                 {
                                     tbooks.AddRange(_tbooks);
