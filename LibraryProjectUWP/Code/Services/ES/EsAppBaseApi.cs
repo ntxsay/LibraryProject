@@ -32,11 +32,11 @@ namespace LibraryProjectUWP.Code.Services.ES
                 string baseJaquetteFile = null;
                 if (typeof(T) == typeof(BibliothequeVM))
                 {
-                    baseJaquetteFile = LibraryDefaultJaquette;
+                    baseJaquetteFile = BaseLibraryJaquetteFile;
                 }
                 else if (typeof(T) == typeof(LivreVM))
                 {
-                    baseJaquetteFile = BookDefaultJaquette;
+                    baseJaquetteFile = BaseBookJaquetteFile;
                 }
 
                 var folderItem = await this.GetItemFolderAsync<T>(guid);
@@ -100,13 +100,13 @@ namespace LibraryProjectUWP.Code.Services.ES
                 string baseJaquetteFile = null;
                 if (typeof(T) == typeof(BibliothequeVM))
                 {
-                    baseJaquetteFile = LibraryDefaultJaquette;
+                    baseJaquetteFile = BaseLibraryJaquetteFile;
                     deleteResult = await this.RemoveFileAsync(baseJaquetteFile, folderItem, SearchOptions.StartWith);
                 }
                 else if (typeof(T) == typeof(LivreVM))
                 {
-                    baseJaquetteFile = BookDefaultJaquette;
-                    deleteResult = await this.RemoveFileAsync(EsBook.baseJaquetteFile, folderItem, SearchOptions.StartWith);
+                    baseJaquetteFile = BaseBookJaquetteFile;
+                    deleteResult = await this.RemoveFileAsync(baseJaquetteFile, folderItem, SearchOptions.StartWith);
                 }
 
                 if (deleteResult != null && !deleteResult.IsSuccess)
@@ -165,13 +165,13 @@ namespace LibraryProjectUWP.Code.Services.ES
                 OperationStateVM deleteResult = null;
                 if (typeof(T) == typeof(BibliothequeVM))
                 {
-                    baseJaquetteFile = LibraryDefaultJaquette;
+                    baseJaquetteFile = BaseLibraryJaquetteFile;
                     deleteResult = await this.RemoveFileAsync(baseJaquetteFile, folderItem, SearchOptions.StartWith);
                 }
                 else if (typeof(T) == typeof(LivreVM))
                 {
-                    baseJaquetteFile = BookDefaultJaquette;
-                    deleteResult = await this.RemoveFileAsync(EsBook.baseJaquetteFile, folderItem, SearchOptions.StartWith);
+                    baseJaquetteFile = BaseBookJaquetteFile;
+                    deleteResult = await this.RemoveFileAsync(baseJaquetteFile, folderItem, SearchOptions.StartWith);
                 }
 
                 if (deleteResult != null && !deleteResult.IsSuccess)

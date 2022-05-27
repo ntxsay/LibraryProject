@@ -1391,7 +1391,7 @@ namespace LibraryProjectUWP.Code.Services.Db
                             viewModel.Publication.EditeursStringList = StringHelpers.JoinStringArray(viewModel.Publication.Editeurs?.Select(s => s.SocietyName)?.ToArray() ?? Array.Empty<string>(), ", ", out _);
                         }
 
-                        var dateParution = DatesHelpers.Converter.StringDateToStringDate(model.DateParution, '/', out string dayParution, out string monthParution, out string yearParution);
+                        var dateParution = DatesHelpers.Converter.StringDateToStringDate(model.DateParution, '/', out string dayParution, out string monthParution, out string yearParution, false);
                         viewModel.Publication.DateParution = dateParution;
                         viewModel.Publication.DayParution = dayParution;
                         viewModel.Publication.MonthParution = monthParution;

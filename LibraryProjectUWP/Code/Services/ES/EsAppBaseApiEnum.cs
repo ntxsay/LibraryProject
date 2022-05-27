@@ -17,7 +17,9 @@ namespace LibraryProjectUWP.Code.Services.ES
     internal partial class EsAppBaseApi
     {
         internal const string LibraryDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+        internal const string BaseLibraryJaquetteFile = "Library_Jaquette";
         internal const string BookDefaultJaquette = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
+        internal const string BaseBookJaquetteFile = "Book_Jaquette";
         internal const string BookDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
         internal const string BookCollectionDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";
         internal const string LibraryCollectionDefaultBackgroundImage = "ms-appx:///Assets/Backgrounds/polynesia-3021072.jpg";

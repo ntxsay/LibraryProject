@@ -212,7 +212,7 @@ namespace LibraryProjectUWP.Code.Helpers
 
                             year = splitString[2] != "--" ? splitString[2] : null;
                             
-                            return $"{day}/{month}/{year}";
+                            return $"{day ?? "--"}/{month ?? "--"}/{year ?? "--"}";
                         }
                     }
 
