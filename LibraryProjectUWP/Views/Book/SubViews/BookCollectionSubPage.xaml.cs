@@ -67,6 +67,26 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             this.Bindings.Update();
         }
 
+        public void ChangeView(BookGroupVM groupedRelatedViewModel)
+        {
+            try
+            {
+                PivotItems.ItemsSource = ViewModelPage.GroupedRelatedViewModel.Collection;
+                //PivotItems.SetBinding(ItemsControl.ItemsSourceProperty, new Binding()
+                //{
+                //    Source = subtitles,
+                //    Path = new PropertyPath("settings.Background"),
+                //    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                //    Mode = BindingMode.TwoWay
+                //}); ;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             EsLibrary esLibrary = new EsLibrary();
@@ -90,7 +110,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            //GC.Collect();
+            GC.Collect();
         }
 
         private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -157,6 +177,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             ParentPage.Parameters.MainPage.CloseBusyLoader();
                             dispatcherTimer.Stop();
                             dispatcherTimer = null;
+                            GC.Collect();
                         };
 
                         dispatcherTimer.Start();
@@ -224,8 +245,23 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             }
                         }
 
-                        await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage);
-                        
+#warning Essai
+#warning Si essai accepté alors ajouter paramètre bool UpdatefromdATAbase
+                        if (ViewModelPage.GroupedRelatedViewModel == null || ViewModelPage.GroupedRelatedViewModel.Collection == null || ViewModelPage.GroupedRelatedViewModel.Collection.Count == 0)
+                        {
+                            await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage);
+                        }
+
+#warning Essai
+                        if (PivotItems.ItemsSource != null)
+                        {
+                            PivotItems.ItemsSource = null;
+                        }
+                        SetViewModeDataTemplate(viewMode);
+                        PivotItems.ItemsSource = ViewModelPage.GroupedRelatedViewModel.Collection;
+
+                        //await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage);
+
                         this.PivotItems.SelectedIndex = this.ViewModelPage.SelectedPivotIndex;
                         this.PivotItems.SelectionChanged += PivotItems_SelectionChanged;
                     });
@@ -957,6 +993,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        
+        private void Page_LayoutUpdated(object sender, object e)
+        {
+        }
     }
 }

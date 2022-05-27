@@ -269,7 +269,7 @@ namespace LibraryProjectUWP.Code.Services.UI
                 else if (BookCollectionSubView != null)
                 {
                     BookCollectionSubView.ViewModelPage.GroupedRelatedViewModel.Collection.Clear();
-                    BookCollectionSubView.SetViewModeDataTemplate(ParentPage.ViewModelPage.DataViewMode);
+                    //BookCollectionSubView.SetViewModeDataTemplate(ParentPage.ViewModelPage.DataViewMode);
                 }
 
                 return result;

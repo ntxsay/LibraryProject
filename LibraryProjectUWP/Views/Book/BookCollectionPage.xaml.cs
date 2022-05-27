@@ -41,6 +41,7 @@ using LibraryProjectUWP.Views.Library.Manage;
 using Windows.Media.Core;
 using System.Data;
 using LibraryProjectUWP.Views.Common;
+using Windows.System;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -571,6 +572,8 @@ namespace LibraryProjectUWP.Views.Book
                 {
                     await bookCollectionSubPage.ViewMode(viewMode, resetPage);
                 }
+
+                GC.Collect();
             }
             catch (Exception ex)
             {

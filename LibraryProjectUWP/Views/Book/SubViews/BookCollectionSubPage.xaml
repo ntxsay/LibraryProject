@@ -16,7 +16,7 @@
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
     xmlns:brushes="using:Microsoft.Toolkit.Uwp.UI.Media"
-    Loaded="Page_Loaded" Unloaded="Page_Unloaded" NavigationCacheMode="Enabled">
+    Loaded="Page_Loaded" Unloaded="Page_Unloaded" NavigationCacheMode="Enabled" LayoutUpdated="Page_LayoutUpdated">
     <Page.Resources>
         <customConverters:ClassificationAgeToStringConverter x:Key="classificationAgeToStringConverter" />
         <customConverters:IntToBooleanConverter x:Key="intToBooleanConverter" />
@@ -343,7 +343,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Pivot x:Name="PivotItems" x:FieldModifier="public" ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        <!--ItemsSource="{x:Bind ViewModelPage.GroupedRelatedViewModel.Collection, Mode=OneWay}"-->
+        <Pivot x:Name="PivotItems" x:FieldModifier="public" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                SelectedIndex="{x:Bind ViewModelPage.SelectedPivotIndex, Mode=OneWay}" PivotItemLoaded="PivotItems_PivotItemLoaded">
             <Pivot.OpacityTransition>
                 <ScalarTransition />
