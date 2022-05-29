@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
-namespace LibraryProjectUWP.Views.Book
+namespace LibraryProjectUWP.Views.PrincipalPages
 {
     public sealed partial class BookCollectionPage : Page
     {

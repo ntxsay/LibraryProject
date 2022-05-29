@@ -6,6 +6,8 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.Code.Services.UI;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.General;
+using LibraryProjectUWP.Views.PrincipalPages;
+using LibraryProjectUWP.Views.UserControls;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
@@ -110,7 +112,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            GC.Collect();
+            MainPage.CallGarbageCollector();
         }
 
         private void ViewboxSimpleThumnailDatatemplate_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -177,7 +179,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             ParentPage.Parameters.MainPage.CloseBusyLoader();
                             dispatcherTimer.Stop();
                             dispatcherTimer = null;
-                            GC.Collect();
+                            //MainPage.CallGarbageCollector();
                         };
 
                         dispatcherTimer.Start();
@@ -205,6 +207,35 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                 else if (viewMode == DataViewModeEnum.DataGridView)
                 {
                     this.PivotItems.ItemTemplate = (DataTemplate)this.Resources["DataGridViewTemplate"];
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Log(ex, m);
+                return;
+            }
+        }
+
+        public void PopulateData()
+        {
+            MethodBase m = MethodBase.GetCurrentMethod();
+            try
+            {
+                if (ViewModelPage.GroupedRelatedViewModel == null || ViewModelPage.GroupedRelatedViewModel.Collection == null || ViewModelPage.GroupedRelatedViewModel.Collection.Count == 0)
+                {
+                    return;
+                }
+
+                PivotItems.Items.Clear();
+                foreach (var item in ViewModelPage.GroupedRelatedViewModel.Collection)
+                {
+                    var pivotItem = new PivotItemLibraryCollection()
+                    {
+                        Header = item.Key,
+                    };
+
+                    PivotItems.Items.Add(pivotItem);
+                    pivotItem.NavigateToView(typeof(CustomGvLibraryCollectionPage), item.Select(q => q).ToList());
                 }
             }
             catch (Exception ex)
@@ -253,12 +284,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         }
 
 #warning Essai
-                        if (PivotItems.ItemsSource != null)
-                        {
-                            PivotItems.ItemsSource = null;
-                        }
                         SetViewModeDataTemplate(viewMode);
-                        PivotItems.ItemsSource = ViewModelPage.GroupedRelatedViewModel.Collection;
+                        PopulateData();
 
                         //await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage);
 
@@ -315,6 +342,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     }
                     gridView.SelectionChanged += GridViewItems_SelectionChanged;
                     gridView.Focus(FocusState.Pointer);
+
+                    MainPage.CallGarbageCollector();
                 }
             }
             catch (Exception ex)

@@ -42,10 +42,11 @@ using Windows.Media.Core;
 using System.Data;
 using LibraryProjectUWP.Views.Common;
 using Windows.System;
+using LibraryProjectUWP.Views.Book;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace LibraryProjectUWP.Views.Book
+namespace LibraryProjectUWP.Views.PrincipalPages
 {
     /// <summary>
     /// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.

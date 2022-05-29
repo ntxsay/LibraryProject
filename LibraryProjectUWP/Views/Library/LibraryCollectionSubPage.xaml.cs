@@ -9,6 +9,7 @@ using LibraryProjectUWP.ViewModels;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Book;
+using LibraryProjectUWP.Views.PrincipalPages;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;

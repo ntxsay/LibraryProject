@@ -12,7 +12,7 @@ namespace LibraryProjectUWP.ViewModels.General
     {
         public MainPage MainPage { get; set; }
         public BibliothequeVM ParentLibrary { get; set; }
-        public BookCollectionPage ParentPage { get; set; }
+        //public BookCollectionPage ParentPage { get; set; }
     }
 
 }

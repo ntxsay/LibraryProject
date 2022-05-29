@@ -25,11 +25,10 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 
-namespace LibraryProjectUWP.Views.Book
+namespace LibraryProjectUWP.Views.PrincipalPages
 {
     public sealed partial class BookCollectionPage : Page
     {
-
         public void GroupItemsBy(string busyLoaderMessage, int goToPage = 1, bool resetPage = true)
         {
             try

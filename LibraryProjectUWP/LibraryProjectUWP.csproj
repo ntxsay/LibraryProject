@@ -148,6 +148,7 @@
     <Compile Include="Code\Converters\BookConverters.cs" />
     <Compile Include="Code\Converters\VisibilityConverter.cs" />
     <Compile Include="Code\DataTemplatesSelector\BookExemplaryDataTemplateSelector.cs" />
+    <Compile Include="Code\DataTemplatesSelector\LibraryThumbnailItemDataTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\ContactTypeDataTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\DataViewModeTemplateSelector.cs" />
     <Compile Include="Code\DataTemplatesSelector\CategoriesDataTemplateSelector.cs" />
@@ -287,11 +288,14 @@
     <Compile Include="Views\Book\Dialog\BookBeforeGoBackCD.xaml.cs">
       <DependentUpon>BookBeforeGoBackCD.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\BookCollectionPage_Categories.cs" />
-    <Compile Include="Views\Book\BookCollectionPage_Collection.cs" />
-    <Compile Include="Views\Book\BookCollectionPage_ItemsGeneration.cs" />
-    <Compile Include="Views\Book\BookCollectionPage_Search.cs" />
-    <Compile Include="Views\Book\BookCollectionPage_ViewModelPage.cs" />
+    <Compile Include="Views\PrincipalPages\BookCollectionPage_Categories.cs" />
+    <Compile Include="Views\PrincipalPages\BookCollectionPage_Collection.cs" />
+    <Compile Include="Views\PrincipalPages\BookCollectionPage_ItemsGeneration.cs" />
+    <Compile Include="Views\PrincipalPages\BookCollectionPage_Search.cs" />
+    <Compile Include="Views\PrincipalPages\BookCollectionPage_ViewModelPage.cs" />
+    <Compile Include="Views\Book\SubViews\BookItemCollectionPage.xaml.cs">
+      <DependentUpon>BookItemCollectionPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Book\SubViews\BookPretScheduleSubPage.xaml.cs">
       <DependentUpon>BookPretScheduleSubPage.xaml</DependentUpon>
     </Compile>
@@ -328,7 +332,7 @@
     <Compile Include="Views\Book\Sidebar\Exemplary\NewEditBookExemplaryUC.xaml.cs">
       <DependentUpon>NewEditBookExemplaryUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\BookCollectionPage.xaml.cs">
+    <Compile Include="Views\PrincipalPages\BookCollectionPage.xaml.cs">
       <DependentUpon>BookCollectionPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Book\ReturnBookExemplaryUC.xaml.cs">
@@ -337,11 +341,11 @@
     <Compile Include="Views\Book\Sidebar\Search\SearchBookUC.xaml.cs">
       <DependentUpon>SearchBookUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\SubViews\BookCollectionSubPage.xaml.cs">
+    <Compile Include="Views\IntermediatePages\BookCollectionSubPage.xaml.cs">
       <DependentUpon>BookCollectionSubPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Book\SubViews\BookCollectionSubPage_Tasks.cs" />
-    <Compile Include="Views\Book\SubViews\BookCollectionSubPage_ViewModelPage.cs" />
+    <Compile Include="Views\IntermediatePages\BookCollectionSubPage_Tasks.cs" />
+    <Compile Include="Views\IntermediatePages\BookCollectionSubPage_ViewModelPage.cs" />
     <Compile Include="Views\Book\SubViews\ImportBookExcelSubPage.xaml.cs">
       <DependentUpon>ImportBookExcelSubPage.xaml</DependentUpon>
     </Compile>
@@ -408,6 +412,12 @@
     </Compile>
     <Compile Include="Views\UserControls\CustomDatePickerUC.xaml.cs">
       <DependentUpon>CustomDatePickerUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserControls\CustomGvLibraryCollectionPage.xaml.cs">
+      <DependentUpon>CustomGvLibraryCollectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserControls\PivotItemLibraryCollection.xaml.cs">
+      <DependentUpon>PivotItemLibraryCollection.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UserControls\SideBarPivotItem.xaml.cs">
       <DependentUpon>SideBarPivotItem.xaml</DependentUpon>
@@ -511,6 +521,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Book\SubViews\BookItemCollectionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Book\SubViews\BookPretScheduleSubPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -559,7 +573,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Book\BookCollectionPage.xaml">
+    <Page Include="Views\PrincipalPages\BookCollectionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -571,7 +585,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Book\SubViews\BookCollectionSubPage.xaml">
+    <Page Include="Views\IntermediatePages\BookCollectionSubPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -663,6 +677,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\UserControls\CustomGvLibraryCollectionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\PivotItemLibraryCollection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\UserControls\SideBarPivotItem.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -722,6 +744,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\UI\" />
+    <Folder Include="Views\TertiaryPages\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

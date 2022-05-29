@@ -7,6 +7,7 @@ using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
 using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
+using LibraryProjectUWP.Views.PrincipalPages;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;

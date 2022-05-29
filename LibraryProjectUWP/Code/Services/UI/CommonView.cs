@@ -10,6 +10,7 @@ using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Book.SubViews;
 using LibraryProjectUWP.Views.Library;
+using LibraryProjectUWP.Views.PrincipalPages;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -459,13 +460,13 @@ namespace LibraryProjectUWP.Code.Services.UI
 
                 foreach (var book in viewModelList)
                 {
-                    long countExemplaries = await DbServices.Book.CountExemplaryInBookAsync(book.Id);
+                    long countExemplaries = 0;// await DbServices.Book.CountExemplaryInBookAsync(book.Id);
                     book.NbExemplaires = countExemplaries;
 
-                    long countPrets = await DbServices.Book.CountPretInBookAsync(book.Id);
+                    long countPrets = 0 ;// await DbServices.Book.CountPretInBookAsync(book.Id);
                     book.NbPrets = countPrets;
 
-                    var jaquettes = await esAppBaseApi.GetJaquettePathAsync<LivreVM>(book.Guid);
+                    string jaquettes = null;//await esAppBaseApi.GetJaquettePathAsync<LivreVM>(book.Guid);
                     string combinedPath = jaquettes;
                     string jaquetteFile = !combinedPath.IsStringNullOrEmptyOrWhiteSpace() ? combinedPath : EsGeneral.BookDefaultJaquette;
                     book.JaquettePath = jaquetteFile;

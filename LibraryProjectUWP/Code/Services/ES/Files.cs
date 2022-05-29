@@ -87,6 +87,7 @@ namespace LibraryProjectUWP.Code.Services.ES
                 }
 
                 BitmapImage image = new BitmapImage();
+                
                 if (imageFileName.StartsWith("ms-appx:///"))
                 {
                     var uri = new System.Uri(imageFileName);
@@ -300,13 +301,43 @@ namespace LibraryProjectUWP.Code.Services.ES
             try
             {
                 string path = System.IO.Path.GetDirectoryName(filePath);
-                var fileName = System.IO.Path.GetFileName(filePath);
+                string fileName = System.IO.Path.GetFileName(filePath);
+
                 StorageFolder accessFolder = await StorageFolder.GetFolderFromPathAsync(path);
-                StorageFile file = await accessFolder.GetFileAsync(fileName);
-                return file != null;
+                if (accessFolder == null)
+                {
+                    return false;
+                }
+                IStorageItem _file = await accessFolder.TryGetItemAsync(fileName);
+                if (_file == null || !_file.IsOfType(StorageItemTypes.File))
+                {
+                    return false;
+                }
+
+                path = null;
+                fileName = null;
+                accessFolder = null;
+                _file = null;
+                return true;
             }
-            catch
+            catch (FileNotFoundException ex1)
             {
+                Debug.WriteLine(ex1.Message);
+                return false;
+            }
+            catch (UnauthorizedAccessException ex2)
+            {
+                Debug.WriteLine(ex2.Message);
+                return false;
+            }
+            catch (ArgumentException ex3)
+            {
+                Debug.WriteLine(ex3.Message);
+                return false;
+            }
+            catch (Exception ex4)
+            {
+                Debug.WriteLine(ex4.Message);
                 return false;
             }
         }

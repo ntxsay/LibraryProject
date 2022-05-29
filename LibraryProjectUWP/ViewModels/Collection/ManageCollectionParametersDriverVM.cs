@@ -17,10 +17,4 @@ namespace LibraryProjectUWP.ViewModels.Collection
         public BibliothequeVM ParentLibrary { get; set; }
         public Type ParentSideBarItemType { get; set; }
     }
-
-    public class CollectionListParametersDriverVM
-    {
-        public BibliothequeVM ParentLibrary { get; set; }
-        public BookCollectionPage ParentPage { get; set; }
-    }
 }

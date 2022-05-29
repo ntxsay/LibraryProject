@@ -1,4 +1,5 @@
 ﻿using LibraryProjectUWP.Code.Services.Logging;
+using LibraryProjectUWP.Views.PrincipalPages;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;

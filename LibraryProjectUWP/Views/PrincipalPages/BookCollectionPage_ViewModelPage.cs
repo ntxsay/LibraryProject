@@ -24,7 +24,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
-namespace LibraryProjectUWP.Views.Book
+namespace LibraryProjectUWP.Views.PrincipalPages
 {
     public sealed partial class BookCollectionPage : Page
     {
@@ -193,7 +193,7 @@ namespace LibraryProjectUWP.Views.Book
                 }
             }
 
-            private int _MaxItemsPerPage = 100;
+            private int _MaxItemsPerPage = 50;//100;//20;
             public int MaxItemsPerPage
             {
                 get => this._MaxItemsPerPage;

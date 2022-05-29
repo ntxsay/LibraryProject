@@ -38,6 +38,7 @@ using LibraryProjectUWP.Views.Icons;
 using Windows.UI.Core;
 using LibraryProjectUWP.Views.UserControls;
 using LibraryProjectUWP.ViewModels.Library;
+using LibraryProjectUWP.Views.PrincipalPages;
 
 // Pour plus d'informations sur le modèle d'élément Page vierge, consultez la page https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -524,6 +525,11 @@ namespace LibraryProjectUWP
 
                 throw;
             }
+        }
+
+        public static void CallGarbageCollector()
+        {
+            GC.Collect();   
         }
     }
 

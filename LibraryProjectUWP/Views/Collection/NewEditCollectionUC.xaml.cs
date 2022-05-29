@@ -8,6 +8,7 @@ using LibraryProjectUWP.ViewModels.Collection;
 using LibraryProjectUWP.ViewModels.Contact;
 using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.Views.Book;
+using LibraryProjectUWP.Views.PrincipalPages;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
