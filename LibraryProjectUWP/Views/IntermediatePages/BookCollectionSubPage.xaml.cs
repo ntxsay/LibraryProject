@@ -216,7 +216,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
             }
         }
 
-        public void PopulateData()
+        public void PopulateData(DataViewModeEnum viewMode = DataViewModeEnum.GridView)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
             try
@@ -235,7 +235,18 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     };
 
                     PivotItems.Items.Add(pivotItem);
-                    pivotItem.NavigateToView(typeof(CustomGvLibraryCollectionPage), item.Select(q => q).ToList());
+                    if (viewMode == DataViewModeEnum.GridView)
+                    {
+                        pivotItem.NavigateToView(typeof(CustomGvLibraryCollectionPage), new IntermediatePageToTertiaryPageDriverVM<LivreVM>()
+                        {
+                            Tables = item.Select(q => q),
+                            IntermediatePage = this,
+                        });
+                    }
+                    else if (viewMode == DataViewModeEnum.DataGridView)
+                    {
+                        pivotItem.NavigateToView(typeof(CustomDTGLibraryCollectionPage), item.Select(q => q).ToList());
+                    }
                 }
             }
             catch (Exception ex)
@@ -285,7 +296,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
 #warning Essai
                         SetViewModeDataTemplate(viewMode);
-                        PopulateData();
+                        PopulateData(viewMode);
 
                         //await CommonView.RefreshItemsGrouping(this.GetSelectedPage, resetPage);
 

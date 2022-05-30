@@ -104,7 +104,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
 
                 dispatcherTimer.Tick += (t, f) =>
                 {
-                    PopulateData();
+                    PopulateData(ParentPage.ViewModelPage.DataViewMode);
                     ParentPage.Parameters.MainPage.CloseBusyLoader();
                     dispatcherTimer.Stop();
                     dispatcherTimer = null;

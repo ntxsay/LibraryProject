@@ -1,0 +1,154 @@
+﻿<Page
+    x:Class="LibraryProjectUWP.Views.UserControls.CustomDTGLibraryCollectionPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LibraryProjectUWP.Views.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:generalVm="using:LibraryProjectUWP.ViewModels.General"
+    xmlns:userControls="using:LibraryProjectUWP.Views.UserControls"
+    xmlns:booktVm="using:LibraryProjectUWP.ViewModels.Book"
+    xmlns:libraryVm="using:LibraryProjectUWP.ViewModels.Library"
+    xmlns:dTemplateSelectors="using:LibraryProjectUWP.Code.DataTemplatesSelector"
+    xmlns:customConverters="using:LibraryProjectUWP.Code.Converters"
+    xmlns:MTUUi="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:MTUUConverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
+    xmlns:brushes="using:Microsoft.Toolkit.Uwp.UI.Media"
+    NavigationCacheMode="Enabled">
+    <Page.Resources>
+        <customConverters:IntToVisibilityConverter x:Key="intToVisibilityConverter" />
+        <!--Item Flyout-->
+        <XamlUICommand x:Name="ChangeJaquetteXamlUICommand" 
+                       ExecuteRequested="ChangeJaquetteXamlUICommand_ExecuteRequested"
+                       Description="Modifie l'image de couverture livre">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DeleteJaquetteXamlUICommand" 
+                       ExecuteRequested="DeleteJaquetteXamlUICommand_ExecuteRequested"
+                       Description="Efface l'image de converture du livre">
+        </XamlUICommand>
+
+        <XamlUICommand x:Name="EditBookInfosXamlUICommand" 
+                       ExecuteRequested="EditBookInfosXamlUICommand_ExecuteRequested"
+                       Description="Edite les informations de base du livre" 
+                       Label="Editer les informations">
+        </XamlUICommand>
+        <XamlUICommand x:Name="DeleteBookXUiCmd" 
+                       ExecuteRequested="DeleteBookXUiCmd_ExecuteRequested"
+                       Description="Supprime définitivement le livre actuel" 
+                       Label="Supprimer le livre">
+        </XamlUICommand>
+        <XamlUICommand x:Name="ExportThisBookXamlUICommand"
+                       ExecuteRequested="ExportThisBookXamlUICommand_ExecuteRequested"
+                       Description="Exporte le livre et son contenu dans un dossier">
+        </XamlUICommand>
+        <XamlUICommand x:Name="BookExemplaryListXUiCmd" 
+                       ExecuteRequested="BookExemplaryListXUiCmd_ExecuteRequested"
+                       Description="Affiche la liste des exemplaires de ce livre" 
+                       Label="Afficher les exemplaires">
+        </XamlUICommand>
+        <XamlUICommand x:Name="NewBookPretXUiCmd" 
+                       ExecuteRequested="NewBookPretXUiCmd_ExecuteRequested"
+                       Description="">
+        </XamlUICommand>
+    </Page.Resources>
+    <MTUUControls:DataGrid x:Name="DataGridItems" ItemsSource="{Binding Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 14 0 0"
+                                                           HorizontalScrollBarVisibility="Visible" Loaded="DataGridItems_Loaded" Unloaded="DataGridItems_Unloaded"
+                                        VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
+                                        AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
+                                        AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
+                                        FrozenColumnCount="2" GridLinesVisibility="None" HeadersVisibility="Column"
+                                        IsReadOnly="True" BorderThickness="0"
+                                        RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
+                                        RowGroupHeaderPropertyNameAlternative="Range" IsDoubleTapEnabled="True" DoubleTapped="DataGridItems_DoubleTapped">
+        <MTUUControls:DataGrid.Columns>
+            <MTUUControls:DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+            <MTUUControls:DataGridTextColumn Header="Titre" Binding="{Binding MainTitle}"/>
+            <MTUUControls:DataGridTextColumn Header="Autre(s) titre(s)" Binding="{Binding TitresOeuvreStringList,  Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Auteur(s)" Binding="{Binding AuteursStringList,  Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Maison(s) d'édition" Binding="{Binding Publication.EditeursStringList,  Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Date de parution" Binding="{Binding Publication.DateParution,  Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Collection(s)" Binding="{Binding Publication.CollectionsStringList,  Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Classification âge" Binding="{Binding ClassificationAge.StringClassification, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Format" Binding="{Binding Format.Format, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Dimensions (L × l × E)" Binding="{Binding Format.Dimensions,  Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Pages" Binding="{Binding Format.NbOfPages,  Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Langue" Binding="{Binding Publication.Langue,  Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Nombre d'exemplaires" Binding="{Binding NbExemplaires, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Nombre de prêts" Binding="{Binding NbPrets, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="Cotation" Binding="{Binding Identification.Cotation, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="ISBN" Binding="{Binding Identification.ISBN, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="ISBN-10" Binding="{Binding Identification.ISBN10, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="ISBN13" Binding="{Binding Identification.ISBN13, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="ISSN" Binding="{Binding Identification.ISSN, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTextColumn Header="ASIN" Binding="{Binding Identification.ASIN, Mode=OneWay}" Width="Auto"/>
+            <MTUUControls:DataGridTemplateColumn Header="Date d'ajout" Tag="First_ascent">
+                <MTUUControls:DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding DateAjout, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:dd/MM/yyy}'}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </DataTemplate>
+                </MTUUControls:DataGridTemplateColumn.CellTemplate>
+                <MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate>
+                        <CalendarDatePicker Margin="3,4,3,3" Date="{Binding DateAjout, Mode=OneWay}"/>
+                    </DataTemplate>
+                </MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
+            </MTUUControls:DataGridTemplateColumn>
+        </MTUUControls:DataGrid.Columns>
+        <MTUUControls:DataGrid.RowStyle>
+            <Style TargetType="MTUUControls:DataGridRow">
+                <Setter Property="MTUUControls:DataGridRow.ContextFlyout">
+                    <Setter.Value>
+                        <MenuFlyout>
+                            <MenuFlyoutSubItem Text="Première de couverture">
+                                <MenuFlyoutSubItem.Icon>
+                                    <FontIcon Glyph="&#xEB9F;"/>
+                                </MenuFlyoutSubItem.Icon>
+                                <MenuFlyoutItem Text="Première de couverture" Command="{StaticResource ChangeJaquetteXamlUICommand}" CommandParameter="{Binding }">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xEB9F;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Exemplaires" Command="{StaticResource BookExemplaryListXUiCmd}" CommandParameter="{Binding }">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xF5ED;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem Text="Emprunts" Command="{StaticResource NewBookPretXUiCmd}" CommandParameter="{Binding }">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE748;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator />
+                            <!--<MenuFlyoutItem Text="Ouvrir ce livre">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE8A7;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>-->
+                            <MenuFlyoutItem Text="Exporter ce livre" Command="{StaticResource ExportThisBookXamlUICommand}" CommandParameter="{Binding }">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xEDE1;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem Text="Editer ce livre" Command="{StaticResource EditBookInfosXamlUICommand}" CommandParameter="{Binding }">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE70F;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Supprimer ce livre" Command="{StaticResource DeleteBookXUiCmd}" CommandParameter="{Binding }" Foreground="OrangeRed">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE74D;" Foreground="OrangeRed"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                        </MenuFlyout>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </MTUUControls:DataGrid.RowStyle>
+    </MTUUControls:DataGrid>
+</Page>

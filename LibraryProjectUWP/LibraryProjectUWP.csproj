@@ -235,6 +235,7 @@
     <Compile Include="Models\Local\TlibraryCategorie.cs" />
     <Compile Include="Models\Local\TlibrarySubCategorie.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\General\IntermediatePageToTertiaryPageDriverVM.cs" />
     <Compile Include="ViewModels\Library\BibliothequeVM.cs" />
     <Compile Include="ViewModels\Book\BookGroupVM.cs" />
     <Compile Include="ViewModels\Book\LibraryToBookNavigationDriverVM.cs" />
@@ -413,7 +414,10 @@
     <Compile Include="Views\UserControls\CustomDatePickerUC.xaml.cs">
       <DependentUpon>CustomDatePickerUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\UserControls\CustomGvLibraryCollectionPage.xaml.cs">
+    <Compile Include="Views\TertiaryPages\CustomDTGLibraryCollectionPage.xaml.cs">
+      <DependentUpon>CustomDTGLibraryCollectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TertiaryPages\CustomGvLibraryCollectionPage.xaml.cs">
       <DependentUpon>CustomGvLibraryCollectionPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UserControls\PivotItemLibraryCollection.xaml.cs">
@@ -677,7 +681,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\UserControls\CustomGvLibraryCollectionPage.xaml">
+    <Page Include="Views\TertiaryPages\CustomDTGLibraryCollectionPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TertiaryPages\CustomGvLibraryCollectionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -744,7 +752,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\UI\" />
-    <Folder Include="Views\TertiaryPages\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -346,7 +346,7 @@ namespace LibraryProjectUWP
             try
             {
                 this.ChangeAppTitle(ViewModelPage.MainTitleBar);
-                return NavigateToView("Book.BookCollectionPage", new LibraryBookNavigationDriverVM()
+                return NavigateToView("PrincipalPages.BookCollectionPage", new LibraryBookNavigationDriverVM()
                 {
                     ParentLibrary = library,
                     MainPage = this
@@ -383,7 +383,7 @@ namespace LibraryProjectUWP
                 { 
                     Margin = new Thickness(0, 14, 0, 0),
                 });
-                return NavigateToView("Book.BookCollectionPage", new LibraryToBookNavigationDriverVM() { ParentLibrary = parentLibrary, ParentPage = parentPage, MainPage = this, });
+                return NavigateToView("PrincipalPages.BookCollectionPage", new LibraryToBookNavigationDriverVM() { ParentLibrary = parentLibrary, ParentPage = parentPage, MainPage = this, });
             }
             catch (Exception ex)
             {

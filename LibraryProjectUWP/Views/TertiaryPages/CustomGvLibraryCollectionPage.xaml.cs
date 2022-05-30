@@ -2,6 +2,7 @@
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Book.SubViews;
@@ -30,6 +31,8 @@ namespace LibraryProjectUWP.Views.UserControls
     /// </summary>
     public sealed partial class CustomGvLibraryCollectionPage : Page
     {
+        public Type Type {get; set;}
+
         public CustomGvLibraryCollectionPage()
         {
             this.InitializeComponent();
@@ -38,19 +41,20 @@ namespace LibraryProjectUWP.Views.UserControls
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is List<LivreVM> parameters)
+            if (e.Parameter is IntermediatePageToTertiaryPageDriverVM<LivreVM> parameters)
             {
+                Type = typeof(LivreVM);
                 if (GridViewItems.ItemsSource != null && GridViewItems.ItemsSource is List<LivreVM> existingList)
                 {
-                    var changed = PropertyHelpers.GetChangedProperties(parameters, existingList);
-                    if (changed != null && changed.Any())
-                    {
-                        GridViewItems.ItemsSource = e.Parameter;
-                    }
+                    //var changed = PropertyHelpers.GetChangedProperties(parameters, existingList);
+                    //if (changed != null && changed.Any())
+                    //{
+                    //    GridViewItems.ItemsSource = e.Parameter;
+                    //}
                 }
                 else
                 {
-                    GridViewItems.ItemsSource = e.Parameter;
+                    GridViewItems.ItemsSource = parameters.Tables.ToList();
                 }
                 //ViewModelPage = new BookCollectionSubPageVM(parameters);
                 //ParentPage = parameters;
