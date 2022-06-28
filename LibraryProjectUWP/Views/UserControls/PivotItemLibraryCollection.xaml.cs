@@ -32,6 +32,7 @@ namespace LibraryProjectUWP.Views.UserControls
             MethodBase m = MethodBase.GetCurrentMethod();
             try
             {
+                ClearAllNavigationStack();
                 _ = FrameContainer.Navigate(page, parameters, new EntranceNavigationTransitionInfo());
             }
             catch (Exception ex)

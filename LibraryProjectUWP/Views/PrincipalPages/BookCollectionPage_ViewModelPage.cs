@@ -65,7 +65,7 @@ namespace LibraryProjectUWP.Views.PrincipalPages
                 }
             }
 
-            private DataViewModeEnum _DataViewMode = DataViewModeEnum.GridView;
+            private DataViewModeEnum _DataViewMode = DataViewModeEnum.DataGridView;
             public DataViewModeEnum DataViewMode
             {
                 get => this._DataViewMode;

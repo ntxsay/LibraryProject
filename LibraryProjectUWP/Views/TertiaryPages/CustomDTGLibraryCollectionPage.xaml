@@ -17,7 +17,7 @@
     xmlns:MTUUControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:MUIXC="using:Microsoft.UI.Xaml.Controls"
     xmlns:brushes="using:Microsoft.Toolkit.Uwp.UI.Media"
-    NavigationCacheMode="Enabled">
+    NavigationCacheMode="Required">
     <Page.Resources>
         <customConverters:IntToVisibilityConverter x:Key="intToVisibilityConverter" />
         <!--Item Flyout-->
@@ -54,49 +54,15 @@
                        Description="">
         </XamlUICommand>
     </Page.Resources>
-    <MTUUControls:DataGrid x:Name="DataGridItems" ItemsSource="{Binding Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 14 0 0"
-                                                           HorizontalScrollBarVisibility="Visible" Loaded="DataGridItems_Loaded" Unloaded="DataGridItems_Unloaded"
+    <MTUUControls:DataGrid x:Name="DataGridItems" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 14 0 0"
+                                                           HorizontalScrollBarVisibility="Visible" 
                                         VerticalScrollBarVisibility="Visible" AlternatingRowBackground="Transparent" AlternatingRowForeground="Gray"
                                         AreRowDetailsFrozen="False" AreRowGroupHeadersFrozen="True"
                                         AutoGenerateColumns="False" CanUserSortColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" ColumnHeaderHeight="32"
                                         FrozenColumnCount="2" GridLinesVisibility="None" HeadersVisibility="Column"
-                                        IsReadOnly="True" BorderThickness="0"
+                                        IsReadOnly="True" BorderThickness="0" 
                                         RowDetailsVisibilityMode="VisibleWhenSelected" SelectionMode="Extended"
                                         RowGroupHeaderPropertyNameAlternative="Range" IsDoubleTapEnabled="True" DoubleTapped="DataGridItems_DoubleTapped">
-        <MTUUControls:DataGrid.Columns>
-            <MTUUControls:DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
-            <MTUUControls:DataGridTextColumn Header="Titre" Binding="{Binding MainTitle}"/>
-            <MTUUControls:DataGridTextColumn Header="Autre(s) titre(s)" Binding="{Binding TitresOeuvreStringList,  Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Auteur(s)" Binding="{Binding AuteursStringList,  Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Maison(s) d'édition" Binding="{Binding Publication.EditeursStringList,  Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Date de parution" Binding="{Binding Publication.DateParution,  Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Collection(s)" Binding="{Binding Publication.CollectionsStringList,  Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Classification âge" Binding="{Binding ClassificationAge.StringClassification, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Format" Binding="{Binding Format.Format, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Dimensions (L × l × E)" Binding="{Binding Format.Dimensions,  Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Pages" Binding="{Binding Format.NbOfPages,  Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Langue" Binding="{Binding Publication.Langue,  Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Nombre d'exemplaires" Binding="{Binding NbExemplaires, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Nombre de prêts" Binding="{Binding NbPrets, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="Cotation" Binding="{Binding Identification.Cotation, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="ISBN" Binding="{Binding Identification.ISBN, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="ISBN-10" Binding="{Binding Identification.ISBN10, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="ISBN13" Binding="{Binding Identification.ISBN13, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="ISSN" Binding="{Binding Identification.ISSN, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTextColumn Header="ASIN" Binding="{Binding Identification.ASIN, Mode=OneWay}" Width="Auto"/>
-            <MTUUControls:DataGridTemplateColumn Header="Date d'ajout" Tag="First_ascent">
-                <MTUUControls:DataGridTemplateColumn.CellTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding DateAjout, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:dd/MM/yyy}'}" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                    </DataTemplate>
-                </MTUUControls:DataGridTemplateColumn.CellTemplate>
-                <MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
-                    <DataTemplate>
-                        <CalendarDatePicker Margin="3,4,3,3" Date="{Binding DateAjout, Mode=OneWay}"/>
-                    </DataTemplate>
-                </MTUUControls:DataGridTemplateColumn.CellEditingTemplate>
-            </MTUUControls:DataGridTemplateColumn>
-        </MTUUControls:DataGrid.Columns>
         <MTUUControls:DataGrid.RowStyle>
             <Style TargetType="MTUUControls:DataGridRow">
                 <Setter Property="MTUUControls:DataGridRow.ContextFlyout">

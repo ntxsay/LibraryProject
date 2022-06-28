@@ -2,9 +2,11 @@
 using LibraryProjectUWP.Code.Services.ES;
 using LibraryProjectUWP.Code.Services.Logging;
 using LibraryProjectUWP.ViewModels.Book;
+using LibraryProjectUWP.ViewModels.General;
 using LibraryProjectUWP.ViewModels.Library;
 using LibraryProjectUWP.Views.Book;
 using LibraryProjectUWP.Views.Book.SubViews;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,6 +32,7 @@ namespace LibraryProjectUWP.Views.UserControls
     /// </summary>
     public sealed partial class CustomDTGLibraryCollectionPage : Page
     {
+        public Type Type { get; set; }
         public CustomDTGLibraryCollectionPage()
         {
             this.InitializeComponent();
@@ -38,44 +41,185 @@ namespace LibraryProjectUWP.Views.UserControls
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is List<LivreVM> parameters)
+            if (e.Parameter is IntermediatePageToTertiaryPageDriverVM<LivreVM> parameters)
             {
-                //if (GridViewItems.ItemsSource != null && GridViewItems.ItemsSource is List<LivreVM> existingList)
-                //{
-                //    var changed = PropertyHelpers.GetChangedProperties(parameters, existingList);
-                //    if (changed != null && changed.Any())
-                //    {
-                //        GridViewItems.ItemsSource = e.Parameter;
-                //    }
-                //}
-                //else
-                //{
-                //    GridViewItems.ItemsSource = e.Parameter;
-                //}
-                //ViewModelPage = new BookCollectionSubPageVM(parameters);
-                //ParentPage = parameters;
-                //CommonView = new CommonView(ParentPage, this);
+                Type = typeof(LivreVM);
+                InitializeData(parameters.Tables);
             }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            //GridViewItems.ItemsSource = null;
             //DeleteBookXUiCmd = null;
             //GC.Collect();
         }
 
-        private void InitializeData()
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+            DataGridItems.ItemsSource = Enumerable.Empty<LivreVM>();
+        }
+
+        private void InitializeData<T>(IEnumerable<T> data) where T : class
         {
             try
             {
-                DataGridItems.Columns.Add(new DataGridTextColumn()
+                if (DataGridItems.ItemsSource != null)
                 {
-                    Header = ParentPage.ViewModelPage.DataTable.Columns[i].ToString(),
-                    Binding = new Binding { Path = new PropertyPath("[" + i.ToString() + "]") },
-                    IsReadOnly = i == 0,
-                });
+                    return;
+                }
+                if (Type == typeof(LivreVM))
+                {
+                    ////Id
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "Id",
+                    //    Binding = new Binding { Path = new PropertyPath("Id"), Mode = BindingMode.OneWay },
+                    //});
+
+                    //Titre
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Titre",
+                        Binding = new Binding { Path = new PropertyPath("MainTitle"), Mode = BindingMode.OneWay },
+                    });
+
+                    //Autre(s) titre(s)
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Autre(s) titre(s)",
+                        Binding = new Binding { Path = new PropertyPath("TitresOeuvreStringList"), Mode = BindingMode.OneWay },
+                    });
+
+                    //Auteur(s)
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Auteur(s)",
+                        Binding = new Binding { Path = new PropertyPath("AuteursStringList"), Mode = BindingMode.OneWay },
+                    });
+
+                    //Maison(s) d'édition
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Maison(s) d'édition",
+                        Binding = new Binding { Path = new PropertyPath("Publication.EditeursStringList"), Mode = BindingMode.OneWay },
+                    });
+
+                    //Date de parution
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Date de parution",
+                        Binding = new Binding { Path = new PropertyPath("Publication.DateParution"), Mode = BindingMode.OneWay },
+                    });
+
+                    //Collection(s)
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Collection(s)",
+                        Binding = new Binding { Path = new PropertyPath("Publication.CollectionsStringList"), Mode = BindingMode.OneWay },
+                    });
+
+                    ////Classification âge
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "Classification âge",
+                    //    Binding = new Binding { Path = new PropertyPath("ClassificationAge.StringClassification"), Mode = BindingMode.OneWay },
+                    //});
+
+                    ////Format
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "Format",
+                    //    Binding = new Binding { Path = new PropertyPath("Format.Format"), Mode = BindingMode.OneWay },
+                    //});
+
+                    ////Dimensions (L × l × E)
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "Dimensions (L × l × E)",
+                    //    Binding = new Binding { Path = new PropertyPath("Format.Dimensions"), Mode = BindingMode.OneWay },
+                    //});
+
+                    ////Pages
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "Pages",
+                    //    Binding = new Binding { Path = new PropertyPath("Format.NbOfPages"), Mode = BindingMode.OneWay },
+                    //});
+
+                    //Langue
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Langue",
+                        Binding = new Binding { Path = new PropertyPath("Publication.Langue"), Mode = BindingMode.OneWay },
+                    });
+
+                    //Nombre d'exemplaires
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Nombre d'exemplaires",
+                        Binding = new Binding { Path = new PropertyPath("NbExemplaires"), Mode = BindingMode.OneWay },
+                    });
+
+                    //Nombre de prêts
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Nombre de prêts",
+                        Binding = new Binding { Path = new PropertyPath("NbPrets"), Mode = BindingMode.OneWay },
+                    });
+
+                    ////Cotation
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "Cotation",
+                    //    Binding = new Binding { Path = new PropertyPath("Identification.Cotation"), Mode = BindingMode.OneWay },
+                    //});
+
+                    ////ISBN
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "ISBN",
+                    //    Binding = new Binding { Path = new PropertyPath("Identification.ISBN"), Mode = BindingMode.OneWay },
+                    //});
+
+                    ////ISBN-10
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "ISBN-10",
+                    //    Binding = new Binding { Path = new PropertyPath("Identification.ISBN10"), Mode = BindingMode.OneWay },
+                    //});
+
+                    ////ISBN13
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "ISBN13",
+                    //    Binding = new Binding { Path = new PropertyPath("Identification.ISBN13"), Mode = BindingMode.OneWay },
+                    //});
+
+                    ////ISSN
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "ISSN",
+                    //    Binding = new Binding { Path = new PropertyPath("Identification.ISSN"), Mode = BindingMode.OneWay },
+                    //});
+
+                    ////ASIN
+                    //DataGridItems.Columns.Add(new DataGridTextColumn()
+                    //{
+                    //    Header = "ASIN",
+                    //    Binding = new Binding { Path = new PropertyPath("Identification.ASIN"), Mode = BindingMode.OneWay },
+                    //});
+
+                    //Date d'ajout
+                    DataGridItems.Columns.Add(new DataGridTextColumn()
+                    {
+                        Header = "Date d'ajout",
+                        Binding = new Binding { Path = new PropertyPath("DateAjout"), Mode = BindingMode.OneWay },
+                    });
+                    DataGridItems.ItemsSource = data;
+                }
+
             }
             catch (Exception)
             {

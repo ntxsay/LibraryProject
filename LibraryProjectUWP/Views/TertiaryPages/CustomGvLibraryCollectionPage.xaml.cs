@@ -65,7 +65,7 @@ namespace LibraryProjectUWP.Views.UserControls
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            //GridViewItems.ItemsSource = null;
+            GridViewItems.ItemsSource = Enumerable.Empty<LivreVM>();
             //DeleteBookXUiCmd = null;
             //GC.Collect();
         }

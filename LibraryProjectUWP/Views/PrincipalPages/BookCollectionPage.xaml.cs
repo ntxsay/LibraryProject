@@ -574,7 +574,7 @@ namespace LibraryProjectUWP.Views.PrincipalPages
                     await bookCollectionSubPage.ViewMode(viewMode, resetPage);
                 }
 
-                GC.Collect();
+                //GC.Collect();
             }
             catch (Exception ex)
             {

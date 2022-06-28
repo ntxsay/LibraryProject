@@ -179,7 +179,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                             ParentPage.Parameters.MainPage.CloseBusyLoader();
                             dispatcherTimer.Stop();
                             dispatcherTimer = null;
-                            //MainPage.CallGarbageCollector();
+                            MainPage.CallGarbageCollector();
                         };
 
                         dispatcherTimer.Start();
@@ -226,7 +226,8 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     return;
                 }
 
-                PivotItems.Items.Clear();
+                //PivotItems.Items.Clear();
+                List<PivotItemLibraryCollection> uiList = new List<PivotItemLibraryCollection>();
                 foreach (var item in ViewModelPage.GroupedRelatedViewModel.Collection)
                 {
                     var pivotItem = new PivotItemLibraryCollection()
@@ -234,7 +235,7 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                         Header = item.Key,
                     };
 
-                    PivotItems.Items.Add(pivotItem);
+                    //PivotItems.Items.Add(pivotItem);
                     if (viewMode == DataViewModeEnum.GridView)
                     {
                         pivotItem.NavigateToView(typeof(CustomGvLibraryCollectionPage), new IntermediatePageToTertiaryPageDriverVM<LivreVM>()
@@ -245,9 +246,17 @@ namespace LibraryProjectUWP.Views.Book.SubViews
                     }
                     else if (viewMode == DataViewModeEnum.DataGridView)
                     {
-                        pivotItem.NavigateToView(typeof(CustomDTGLibraryCollectionPage), item.Select(q => q).ToList());
+                        pivotItem.NavigateToView(typeof(CustomDTGLibraryCollectionPage), new IntermediatePageToTertiaryPageDriverVM<LivreVM>()
+                        {
+                            Tables = item.Select(q => q),
+                            IntermediatePage = this,
+                        });
                     }
+
+                    uiList.Add(pivotItem);
                 }
+
+                PivotItems.ItemsSource = uiList;
             }
             catch (Exception ex)
             {
