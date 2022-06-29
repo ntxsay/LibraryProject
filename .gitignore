@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+LibraryProjectUWP/ViewModels/.DS_Store
+LibraryProjectUWP/Code/Services/.DS_Store
+LibraryProjectUWP/Code/.DS_Store
+LibraryProjectUWP/.DS_Store
